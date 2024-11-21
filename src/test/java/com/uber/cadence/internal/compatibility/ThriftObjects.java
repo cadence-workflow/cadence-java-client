@@ -138,6 +138,8 @@ public final class ThriftObjects {
           .setStartedTimestamp(2)
           .setAttempt(3)
           .setOriginalScheduledTimestamp(4);
+  public static final WorkerVersionInfo WORKER_VERSION_INFO =
+      new WorkerVersionInfo().setFeatureVersion("featureVersion").setImpl("impl");
   public static final SupportedClientVersions SUPPORTED_CLIENT_VERSIONS =
       new SupportedClientVersions().setGoSdk("goSdk").setJavaSdk("javaSdk");
   public static final Map<String, IndexedValueType> INDEXED_VALUES =
@@ -161,23 +163,25 @@ public final class ThriftObjects {
           .setOwnerEmail("email")
           .setData(DATA)
           .setUuid("uuid");
+  public static final BadBinaryInfo BAD_BINARY_INFO =
+      new BadBinaryInfo().setReason("reason").setOperator("operator").setCreatedTimeNano(3);
+  public static final BadBinaries BAD_BINARIES =
+      new BadBinaries().setBinaries(ImmutableMap.of("badBinaryKey", BAD_BINARY_INFO));
   public static final DomainConfiguration DOMAIN_CONFIGURATION =
       new DomainConfiguration()
           .setWorkflowExecutionRetentionPeriodInDays(2)
-          .setBadBinaries(
-              new BadBinaries()
-                  .setBinaries(
-                      ImmutableMap.of(
-                          "badBinaryKey",
-                          new BadBinaryInfo()
-                              .setReason("reason")
-                              .setOperator("operator")
-                              .setCreatedTimeNano(3))))
+          .setBadBinaries(BAD_BINARIES)
           .setHistoryArchivalStatus(ArchivalStatus.ENABLED)
           .setHistoryArchivalURI("historyArchivalUri")
           .setVisibilityArchivalStatus(ArchivalStatus.DISABLED)
           .setVisibilityArchivalURI("visibilityArchivalUri")
           .setEmitMetric(true);
+  public static final StartTimeFilter START_TIME_FILTER =
+      new StartTimeFilter().setEarliestTime(2).setLatestTime(3);
+  public static final WorkflowExecutionFilter WORKFLOW_EXECUTION_FILTER =
+      new WorkflowExecutionFilter().setWorkflowId(WORKFLOW_ID).setRunId(RUN_ID);
+  public static final WorkflowTypeFilter WORKFLOW_TYPE_FILTER =
+      new WorkflowTypeFilter().setName(WORKFLOW_TYPE.getName());
 
   public static final DomainReplicationConfiguration DOMAIN_REPLICATION_CONFIGURATION =
       new DomainReplicationConfiguration()
@@ -814,8 +818,7 @@ public final class ThriftObjects {
           .setCompletedType(QueryTaskCompletedType.COMPLETED)
           .setQueryResult(utf8("queryResult"))
           .setErrorMessage("errorMessage")
-          .setWorkerVersionInfo(
-              new WorkerVersionInfo().setFeatureVersion("featureVersion").setImpl("impl"))
+          .setWorkerVersionInfo(WORKER_VERSION_INFO)
           .setTaskToken(utf8("taskToken"));
 
   public static final ListWorkflowExecutionsRequest LIST_WORKFLOW_EXECUTIONS_REQUEST =
@@ -990,22 +993,20 @@ public final class ThriftObjects {
       new ListClosedWorkflowExecutionsRequest()
           .setDomain("domain")
           .setMaximumPageSize(1)
-          .setExecutionFilter(
-              new WorkflowExecutionFilter().setWorkflowId(WORKFLOW_ID).setRunId(RUN_ID))
-          .setTypeFilter(new WorkflowTypeFilter().setName(WORKFLOW_TYPE.getName()))
+          .setExecutionFilter(WORKFLOW_EXECUTION_FILTER)
+          .setTypeFilter(WORKFLOW_TYPE_FILTER)
           .setStatusFilter(WorkflowExecutionCloseStatus.COMPLETED)
           .setNextPageToken(utf8("nextPageToken"))
-          .setStartTimeFilter(new StartTimeFilter().setEarliestTime(2).setLatestTime(3));
+          .setStartTimeFilter(START_TIME_FILTER);
 
   public static final ListOpenWorkflowExecutionsRequest LIST_OPEN_WORKFLOW_EXECUTIONS_REQUEST =
       new ListOpenWorkflowExecutionsRequest()
           .setDomain("domain")
           .setMaximumPageSize(1)
-          .setExecutionFilter(
-              new WorkflowExecutionFilter().setWorkflowId(WORKFLOW_ID).setRunId(RUN_ID))
-          .setTypeFilter(new WorkflowTypeFilter().setName(WORKFLOW_TYPE.getName()))
+          .setExecutionFilter(WORKFLOW_EXECUTION_FILTER)
+          .setTypeFilter(WORKFLOW_TYPE_FILTER)
           .setNextPageToken(utf8("nextPageToken"))
-          .setStartTimeFilter(new StartTimeFilter().setEarliestTime(2).setLatestTime(3));
+          .setStartTimeFilter(START_TIME_FILTER);
 
   public static final StartWorkflowExecutionResponse START_WORKFLOW_EXECUTION_RESPONSE =
       new StartWorkflowExecutionResponse().setRunId(RUN_ID);

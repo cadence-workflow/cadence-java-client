@@ -201,6 +201,14 @@ public final class ProtoObjects {
           .setScheduledTimeOfThisAttempt(timestampNanos(3))
           .setTaskToken(utf8("taskToken"))
           .build();
+  public static final BadBinaryInfo BAD_BINARY_INFO =
+      BadBinaryInfo.newBuilder()
+          .setReason("reason")
+          .setOperator("operator")
+          .setCreatedTime(timestampNanos(3))
+          .build();
+  public static final BadBinaries BAD_BINARIES =
+      BadBinaries.newBuilder().putBinaries("badBinaryKey", BAD_BINARY_INFO).build();
   public static final Domain DOMAIN =
       Domain.newBuilder()
           .setId("uuid")
@@ -210,15 +218,7 @@ public final class ProtoObjects {
           .setOwnerEmail("email")
           .putAllData(DATA)
           .setWorkflowExecutionRetentionPeriod(days(2))
-          .setBadBinaries(
-              BadBinaries.newBuilder()
-                  .putBinaries(
-                      "badBinaryKey",
-                      BadBinaryInfo.newBuilder()
-                          .setReason("reason")
-                          .setOperator("operator")
-                          .setCreatedTime(timestampNanos(3))
-                          .build()))
+          .setBadBinaries(BAD_BINARIES)
           .setHistoryArchivalStatus(ArchivalStatus.ARCHIVAL_STATUS_ENABLED)
           .setHistoryArchivalUri("historyArchivalUri")
           .setVisibilityArchivalStatus(ArchivalStatus.ARCHIVAL_STATUS_DISABLED)
@@ -227,6 +227,24 @@ public final class ProtoObjects {
           .addClusters(CLUSTER_REPLICATION_CONFIGURATION)
           .setFailoverVersion(1)
           .setIsGlobalDomain(true)
+          .build();
+  public static final WorkerVersionInfo WORKER_VERSION_INFO =
+      WorkerVersionInfo.newBuilder().setFeatureVersion("featureVersion").setImpl("impl").build();
+  public static final StartTimeFilter START_TIME_FILTER =
+      StartTimeFilter.newBuilder()
+          .setEarliestTime(timestampNanos(2))
+          .setLatestTime(timestampNanos(3))
+          .build();
+  public static final WorkflowExecutionFilter WORKFLOW_EXECUTION_FILTER =
+      WorkflowExecutionFilter.newBuilder()
+          .setWorkflowId(WORKFLOW_EXECUTION.getWorkflowId())
+          .setRunId(WORKFLOW_EXECUTION.getRunId())
+          .build();
+  public static final WorkflowTypeFilter WORKFLOW_TYPE_FILTER =
+      WorkflowTypeFilter.newBuilder().setName(WORKFLOW_TYPE.getName()).build();
+  public static final StatusFilter STATUS_FILTER =
+      StatusFilter.newBuilder()
+          .setStatus(WorkflowExecutionCloseStatus.WORKFLOW_EXECUTION_CLOSE_STATUS_COMPLETED)
           .build();
 
   public static Decision DECISION_SCHEDULE_ACTIVITY_TASK =
@@ -930,8 +948,7 @@ public final class ProtoObjects {
                   .setResultType(QueryResultType.QUERY_RESULT_TYPE_ANSWERED)
                   .setAnswer(payload("queryResult"))
                   .setErrorMessage("errorMessage"))
-          .setWorkerVersionInfo(
-              WorkerVersionInfo.newBuilder().setFeatureVersion("featureVersion").setImpl("impl"))
+          .setWorkerVersionInfo(WORKER_VERSION_INFO)
           .setTaskToken(utf8("taskToken"))
           .build();
   public static final ScanWorkflowExecutionsRequest SCAN_WORKFLOW_EXECUTIONS_REQUEST =
@@ -1144,36 +1161,21 @@ public final class ProtoObjects {
       ListClosedWorkflowExecutionsRequest.newBuilder()
           .setDomain("domain")
           .setPageSize(1)
-          .setExecutionFilter(
-              WorkflowExecutionFilter.newBuilder()
-                  .setWorkflowId(WORKFLOW_EXECUTION.getWorkflowId())
-                  .setRunId(WORKFLOW_EXECUTION.getRunId()))
-          .setTypeFilter(WorkflowTypeFilter.newBuilder().setName(WORKFLOW_TYPE.getName()))
-          .setStatusFilter(
-              StatusFilter.newBuilder()
-                  .setStatus(
-                      WorkflowExecutionCloseStatus.WORKFLOW_EXECUTION_CLOSE_STATUS_COMPLETED))
+          .setExecutionFilter(WORKFLOW_EXECUTION_FILTER)
+          .setTypeFilter(WORKFLOW_TYPE_FILTER)
+          .setStatusFilter(STATUS_FILTER)
           .setNextPageToken(utf8("nextPageToken"))
-          .setStartTimeFilter(
-              StartTimeFilter.newBuilder()
-                  .setEarliestTime(timestampNanos(2))
-                  .setLatestTime(timestampNanos(3)))
+          .setStartTimeFilter(START_TIME_FILTER)
           .build();
 
   public static final ListOpenWorkflowExecutionsRequest LIST_OPEN_WORKFLOW_EXECUTIONS_REQUEST =
       ListOpenWorkflowExecutionsRequest.newBuilder()
           .setDomain("domain")
           .setPageSize(1)
-          .setExecutionFilter(
-              WorkflowExecutionFilter.newBuilder()
-                  .setWorkflowId(WORKFLOW_EXECUTION.getWorkflowId())
-                  .setRunId(WORKFLOW_EXECUTION.getRunId()))
-          .setTypeFilter(WorkflowTypeFilter.newBuilder().setName(WORKFLOW_TYPE.getName()))
+          .setExecutionFilter(WORKFLOW_EXECUTION_FILTER)
+          .setTypeFilter(WORKFLOW_TYPE_FILTER)
           .setNextPageToken(utf8("nextPageToken"))
-          .setStartTimeFilter(
-              StartTimeFilter.newBuilder()
-                  .setEarliestTime(timestampNanos(2))
-                  .setLatestTime(timestampNanos(3)))
+          .setStartTimeFilter(START_TIME_FILTER)
           .build();
 
   public static final StartWorkflowExecutionResponse START_WORKFLOW_EXECUTION_RESPONSE =
@@ -1385,7 +1387,7 @@ public final class ProtoObjects {
 
   private ProtoObjects() {}
 
-  private static Payload payload(String value) {
+  public static Payload payload(String value) {
     return Payload.newBuilder().setData(utf8(value)).build();
   }
 
