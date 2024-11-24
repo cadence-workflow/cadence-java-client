@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -361,5 +362,42 @@ public class WorkflowExecutionUtilsTest {
 
     // Verify that hasNext() is false immediately
     assertFalse(iterator.hasNext());
+  }
+
+  // ===========================
+  // Test for null history returned to GetHistoryPage
+  // ===========================
+  @Test
+  public void testGetHistoryPage_HistoryIsNull() throws Exception {
+    when(mockService.GetWorkflowExecutionHistory(any())).thenReturn(null);
+
+    IllegalArgumentException exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+              WorkflowExecutionUtils.getHistoryPage(
+                  "page-token".getBytes(), mockService, "testDomain", workflowExecution);
+            });
+
+    assertTrue(exception.getMessage().contains(workflowExecution.toString()));
+  }
+
+  // ===========================
+  // Test for exception thrown on GetWorkflowExecutionHistory
+  // ===========================
+  @Test
+  public void testGetHistoryPage_ExceptionWhileRetrievingExecutionHistory() throws Exception {
+    final String errMessage = "thrift comm exception";
+    when(mockService.GetWorkflowExecutionHistory(any())).thenThrow(new TException(errMessage));
+
+    Error exception =
+        assertThrows(
+            Error.class,
+            () -> {
+              WorkflowExecutionUtils.getHistoryPage(
+                  "page-token".getBytes(), mockService, "testDomain", workflowExecution);
+            });
+
+    assertTrue(exception.getMessage().contains(errMessage));
   }
 }
