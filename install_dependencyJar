@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=./dependencyJar/cadence-dependencies.jar -DgroupId=com.cadence.dependencies -DartifactId=cadence-dependencies.jar -Dversion=1.0 -Dpackaging=jar
