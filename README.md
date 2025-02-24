@@ -49,3 +49,6 @@ We'd love your help in making the Cadence Java client great. Please review our [
 
 ## License
 Apache License, please see [LICENSE](LICENSE) for details.
+
+## athenahealth fork
+We are forking to see ways of removing the thrift legacy code.
