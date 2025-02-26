@@ -74,7 +74,7 @@ class TypeMapper {
     if (t == null || t == com.uber.cadence.api.v1.Payload.getDefaultInstance()) {
       return null;
     }
-    if (t.getData() == null || t.getData().size() == 0) {
+    if (t.getData().size() == 0) {
       // protoPayload will not generate this case
       // however, Data field will be dropped by the encoding if it's empty
       // and receiver side will see null for the Data field
