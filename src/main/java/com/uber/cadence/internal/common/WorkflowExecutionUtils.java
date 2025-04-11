@@ -274,6 +274,7 @@ public class WorkflowExecutionUtils {
     request.setExecution(workflowExecution);
     request.setHistoryEventFilterType(HistoryEventFilterType.CLOSE_EVENT);
     request.setWaitForNewEvent(true);
+    request.setSkipArchival(true);
     request.setNextPageToken(pageToken);
     CompletableFuture<GetWorkflowExecutionHistoryResponse> response =
         getWorkflowExecutionHistoryAsync(service, request, timeout, unit);
