@@ -21,7 +21,8 @@ package com.uber.cadence.internal.testservice;
 
 import static com.uber.cadence.internal.testservice.TestWorkflowMutableStateAttrUtil.inheritUnsetPropertiesFromParentWorkflow;
 
-import com.uber.cadence.*;
+import com.google.protobuf.Duration;
+import com.uber.cadence.api.v1.*;
 import java.util.Arrays;
 import java.util.Collection;
 import junit.framework.TestCase;
@@ -51,7 +52,7 @@ public class TestWorkflowMutableStateAttrUtil_validateStartChildExecutionAttribu
           {"all set", createAtt(), createAtt()},
           {
             "empty",
-            new StartChildWorkflowExecutionDecisionAttributes(),
+            StartChildWorkflowExecutionDecisionAttributes.getDefaultInstance(),
             createAtt()
                 .setTaskList(new TaskList().setName("testTaskListFromParent"))
                 .setExecutionStartToCloseTimeoutSeconds(21)
@@ -60,7 +61,7 @@ public class TestWorkflowMutableStateAttrUtil_validateStartChildExecutionAttribu
           {
             "taskList null",
             createAtt().setTaskList(null),
-            createAtt().setTaskList(new TaskList().setName("testTaskListFromParent"))
+            createAtt().setTaskList(TaskList.newBuilder().setName("testTaskListFromParent").build())
           },
           {
             "taskList name empty",
@@ -83,19 +84,20 @@ public class TestWorkflowMutableStateAttrUtil_validateStartChildExecutionAttribu
   @Test
   public void testValidateScheduleActivityTask() {
     StartWorkflowExecutionRequest startRequest =
-        new StartWorkflowExecutionRequest()
-            .setTaskList(new TaskList().setName("testTaskListFromParent"))
-            .setExecutionStartToCloseTimeoutSeconds(21)
-            .setTaskStartToCloseTimeoutSeconds(22);
+        StartWorkflowExecutionRequest.newBuilder()
+            .setTaskList(TaskList.newBuilder().setName("testTaskListFromParent"))
+            .setExecutionStartToCloseTimeout(Duration.newBuilder().setSeconds(21))
+            .setTaskStartToCloseTimeout(Duration.newBuilder().setSeconds(22))
+            .build();
 
-    inheritUnsetPropertiesFromParentWorkflow(startRequest, attributes);
+    attributes = inheritUnsetPropertiesFromParentWorkflow(startRequest, attributes);
     assertEquals(expectedAttributes, attributes);
   }
 
-  private static StartChildWorkflowExecutionDecisionAttributes createAtt() {
-    return new StartChildWorkflowExecutionDecisionAttributes()
-        .setTaskList(new TaskList().setName("testTaskList"))
-        .setExecutionStartToCloseTimeoutSeconds(11)
-        .setTaskStartToCloseTimeoutSeconds(12);
+  private static StartChildWorkflowExecutionDecisionAttributes.Builder createAtt() {
+    return StartChildWorkflowExecutionDecisionAttributes.newBuilder()
+        .setTaskList(TaskList.newBuilder().setName("testTaskList"))
+        .setExecutionStartToCloseTimeout(Duration.newBuilder().setSeconds(11))
+        .setTaskStartToCloseTimeout(Duration.newBuilder().setSeconds(12));
   }
 }

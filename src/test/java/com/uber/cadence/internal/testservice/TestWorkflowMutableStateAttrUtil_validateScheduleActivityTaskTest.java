@@ -19,9 +19,10 @@
 
 package com.uber.cadence.internal.testservice;
 
-import com.uber.cadence.ActivityType;
-import com.uber.cadence.ScheduleActivityTaskDecisionAttributes;
-import com.uber.cadence.TaskList;
+import com.google.protobuf.Duration;
+import com.uber.cadence.api.v1.ActivityType;
+import com.uber.cadence.api.v1.ScheduleActivityTaskDecisionAttributes;
+import com.uber.cadence.api.v1.TaskList;
 import java.util.Arrays;
 import java.util.Collection;
 import junit.framework.TestCase;
@@ -47,10 +48,10 @@ public class TestWorkflowMutableStateAttrUtil_validateScheduleActivityTaskTest e
         new Object[][] {
           {"valid", createAtt(), null},
           {"null", null, "ScheduleActivityTaskDecisionAttributes is not set on decision."},
-          {"task list null", createAtt().setTaskList(null), "TaskList is not set on decision."},
+          {"task list null", createAtt().clearTaskList(), "TaskList is not set on decision."},
           {
             "task list no name",
-            createAtt().setTaskList(new TaskList().setName("")),
+            createAtt().setTaskList(TaskList.newBuilder().setName("")),
             "TaskList is not set on decision."
           },
           {
@@ -63,37 +64,37 @@ public class TestWorkflowMutableStateAttrUtil_validateScheduleActivityTaskTest e
           },
           {
             "activity type null",
-            createAtt().setActivityType(null),
+            createAtt().clearActivityType(),
             "ActivityType is not set on decision."
           },
           {
             "activity type name null",
-            createAtt().setActivityType(new ActivityType().setName(null)),
+            createAtt().setActivityType(ActivityType.newBuilder()),
             "ActivityType is not set on decision."
           },
           {
             "activity type name empty",
-            createAtt().setActivityType(new ActivityType().setName("")),
+            createAtt().setActivityType(ActivityType.newBuilder().setName("")),
             "ActivityType is not set on decision."
           },
           {
             "start to close <= 0",
-            createAtt().setStartToCloseTimeoutSeconds(0),
+            createAtt().setStartToCloseTimeout(Duration.newBuilder().setSeconds(0)),
             "A valid StartToCloseTimeoutSeconds is not set on decision."
           },
           {
             "schedule to start <= 0",
-            createAtt().setScheduleToStartTimeoutSeconds(0),
+            createAtt().setScheduleToStartTimeout(Duration.newBuilder().setSeconds(0)),
             "A valid ScheduleToStartTimeoutSeconds is not set on decision."
           },
           {
             "schedule to close <= 0",
-            createAtt().setScheduleToCloseTimeoutSeconds(0),
+            createAtt().setScheduleToCloseTimeout(Duration.newBuilder().setSeconds(0)),
             "A valid ScheduleToCloseTimeoutSeconds is not set on decision."
           },
           {
             "heartbeat < 0",
-            createAtt().setHeartbeatTimeoutSeconds(-1),
+            createAtt().setHeartbeatTimeout(Duration.newBuilder().setSeconds(-1)),
             "Ac valid HeartbeatTimeoutSeconds is not set on decision."
           },
         });
@@ -111,14 +112,14 @@ public class TestWorkflowMutableStateAttrUtil_validateScheduleActivityTaskTest e
     }
   }
 
-  private static ScheduleActivityTaskDecisionAttributes createAtt() {
-    return new ScheduleActivityTaskDecisionAttributes()
-        .setTaskList(new TaskList().setName("testTaskList"))
+  private static ScheduleActivityTaskDecisionAttributes.Builder createAtt() {
+    return ScheduleActivityTaskDecisionAttributes.newBuilder()
+        .setTaskList(TaskList.newBuilder().setName("testTaskList"))
         .setActivityId("testActivityId")
-        .setActivityType(new ActivityType().setName("testActivityType"))
-        .setStartToCloseTimeoutSeconds(12)
-        .setScheduleToStartTimeoutSeconds(34)
-        .setScheduleToCloseTimeoutSeconds(45)
-        .setHeartbeatTimeoutSeconds(78);
+        .setActivityType(ActivityType.newBuilder().setName("testActivityType"))
+        .setStartToCloseTimeout(Duration.newBuilder().setSeconds(12))
+        .setScheduleToStartTimeout(Duration.newBuilder().setSeconds(34))
+        .setScheduleToCloseTimeout(Duration.newBuilder().setSeconds(45))
+        .setHeartbeatTimeout(Duration.newBuilder().setSeconds(78));
   }
 }

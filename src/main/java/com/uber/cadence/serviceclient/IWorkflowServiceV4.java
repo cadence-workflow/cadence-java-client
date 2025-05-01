@@ -23,8 +23,11 @@ import javax.annotation.Nullable;
 
 public interface IWorkflowServiceV4 {
   Blocking blockingStub();
+
   Future futureStub();
+
   ClientOptions getOptions();
+
   CompletableFuture<Boolean> isHealthy();
 
   interface Blocking {
@@ -61,7 +64,7 @@ public interface IWorkflowServiceV4 {
         ListWorkflowExecutionsRequest request, @Nullable CallMetaData meta);
 
     ListArchivedWorkflowExecutionsResponse listArchivedWorkflowExecutions(
-            ListArchivedWorkflowExecutionsRequest listRequest, @Nullable CallMetaData meta);
+        ListArchivedWorkflowExecutionsRequest listRequest, @Nullable CallMetaData meta);
 
     ScanWorkflowExecutionsResponse scanWorkflowExecutions(
         ScanWorkflowExecutionsRequest request, @Nullable CallMetaData meta);
@@ -107,6 +110,12 @@ public interface IWorkflowServiceV4 {
 
     RespondDecisionTaskCompletedResponse respondDecisionTaskCompleted(
         RespondDecisionTaskCompletedRequest request, @Nullable CallMetaData meta);
+
+    RespondQueryTaskCompletedResponse respondQueryTaskCompleted(
+        RespondQueryTaskCompletedRequest request, @Nullable CallMetaData meta);
+
+    ResetStickyTaskListResponse resetStickyTaskList(
+        ResetStickyTaskListRequest resetRequest, @Nullable CallMetaData meta);
 
     RefreshWorkflowTasksResponse refreshWorkflowTasks(
         RefreshWorkflowTasksRequest request, @Nullable CallMetaData meta);
@@ -158,7 +167,7 @@ public interface IWorkflowServiceV4 {
         ListClosedWorkflowExecutionsRequest request, @Nullable CallMetaData meta);
 
     CompletableFuture<ListArchivedWorkflowExecutionsResponse> listArchivedWorkflowExecutions(
-            ListArchivedWorkflowExecutionsRequest listRequest, @Nullable CallMetaData meta);
+        ListArchivedWorkflowExecutionsRequest listRequest, @Nullable CallMetaData meta);
 
     CompletableFuture<CountWorkflowExecutionsResponse> countWorkflowExecutions(
         CountWorkflowExecutionsRequest request, @Nullable CallMetaData meta);
@@ -197,6 +206,6 @@ public interface IWorkflowServiceV4 {
         RespondDecisionTaskCompletedRequest request, @Nullable CallMetaData meta);
 
     CompletableFuture<RefreshWorkflowTasksResponse> refreshWorkflowTasks(
-            RefreshWorkflowTasksRequest request, @Nullable CallMetaData meta);
+        RefreshWorkflowTasksRequest request, @Nullable CallMetaData meta);
   }
 }

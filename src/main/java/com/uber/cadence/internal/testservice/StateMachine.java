@@ -17,10 +17,10 @@
 
 package com.uber.cadence.internal.testservice;
 
-import com.uber.cadence.BadRequestError;
-import com.uber.cadence.InternalServiceError;
 import com.uber.cadence.internal.testservice.StateMachines.Action;
 import com.uber.cadence.internal.testservice.StateMachines.State;
+import com.uber.cadence.serviceclient.exceptions.BadRequestException;
+import com.uber.cadence.serviceclient.exceptions.InternalServiceException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,7 +45,7 @@ final class StateMachine<Data> {
   interface Callback<D, R> {
 
     void apply(RequestContext ctx, D data, R request, long referenceId)
-        throws InternalServiceError, BadRequestError;
+        throws InternalServiceException, BadRequestException;
   }
 
   /**
@@ -57,7 +57,7 @@ final class StateMachine<Data> {
 
     /** @return state after the action */
     State apply(RequestContext ctx, D data, R request, long referenceId)
-        throws InternalServiceError, BadRequestError;
+        throws InternalServiceException, BadRequestException;
   }
 
   private static class Transition {
@@ -110,7 +110,7 @@ final class StateMachine<Data> {
 
   private interface TransitionDestination<Data, R> {
     State apply(RequestContext ctx, Data data, R request, long referenceId)
-        throws InternalServiceError, BadRequestError;
+        throws InternalServiceException, BadRequestException;
   }
 
   private static class FixedTransitionDestination<Data, R>
@@ -132,7 +132,7 @@ final class StateMachine<Data> {
 
     @Override
     public State apply(RequestContext ctx, Data data, R request, long referenceId)
-        throws InternalServiceError, BadRequestError {
+        throws InternalServiceException, BadRequestException {
       callback.apply(ctx, data, request, referenceId);
       return state;
     }
@@ -158,7 +158,7 @@ final class StateMachine<Data> {
 
     @Override
     public State apply(RequestContext ctx, Data data, R request, long referenceId)
-        throws InternalServiceError, BadRequestError {
+        throws InternalServiceException, BadRequestException {
       state = callback.apply(ctx, data, request, referenceId);
       for (State s : expectedStates) {
         if (s == state) {
@@ -221,13 +221,14 @@ final class StateMachine<Data> {
   }
 
   <R> void action(Action action, RequestContext context, R request, long referenceId)
-      throws InternalServiceError, BadRequestError {
+      throws InternalServiceException, BadRequestException {
     Transition transition = new Transition(state, action);
     @SuppressWarnings("unchecked")
     TransitionDestination<Data, R> destination =
         (TransitionDestination<Data, R>) transitions.get(transition);
     if (destination == null) {
-      throw new InternalServiceError("Invalid " + transition + ", history: " + transitionHistory);
+      throw new InternalServiceException(
+          "Invalid " + transition + ", history: " + transitionHistory);
     }
     state = destination.apply(context, data, request, referenceId);
     transitionHistory.add(transition);

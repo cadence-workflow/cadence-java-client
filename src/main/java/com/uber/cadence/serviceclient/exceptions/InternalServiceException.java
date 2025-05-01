@@ -18,6 +18,10 @@
 package com.uber.cadence.serviceclient.exceptions;
 
 public class InternalServiceException extends ServiceClientException {
+  public InternalServiceException(String message) {
+    super(message);
+  }
+
   public InternalServiceException(Throwable cause) {
     super(cause);
   }

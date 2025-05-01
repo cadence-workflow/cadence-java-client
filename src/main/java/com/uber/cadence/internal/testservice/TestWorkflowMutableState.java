@@ -17,40 +17,12 @@
 
 package com.uber.cadence.internal.testservice;
 
-import com.uber.cadence.BadRequestError;
-import com.uber.cadence.ChildWorkflowExecutionCanceledEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionCompletedEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionFailedEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionStartedEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionTimedOutEventAttributes;
-import com.uber.cadence.EntityNotExistsError;
-import com.uber.cadence.InternalServiceError;
-import com.uber.cadence.PollForActivityTaskRequest;
-import com.uber.cadence.PollForActivityTaskResponse;
-import com.uber.cadence.PollForDecisionTaskRequest;
-import com.uber.cadence.PollForDecisionTaskResponse;
-import com.uber.cadence.QueryWorkflowRequest;
-import com.uber.cadence.QueryWorkflowResponse;
-import com.uber.cadence.RecordActivityTaskHeartbeatResponse;
-import com.uber.cadence.RequestCancelWorkflowExecutionRequest;
-import com.uber.cadence.RespondActivityTaskCanceledByIDRequest;
-import com.uber.cadence.RespondActivityTaskCanceledRequest;
-import com.uber.cadence.RespondActivityTaskCompletedByIDRequest;
-import com.uber.cadence.RespondActivityTaskCompletedRequest;
-import com.uber.cadence.RespondActivityTaskFailedByIDRequest;
-import com.uber.cadence.RespondActivityTaskFailedRequest;
-import com.uber.cadence.RespondDecisionTaskCompletedRequest;
-import com.uber.cadence.RespondDecisionTaskFailedRequest;
-import com.uber.cadence.RespondQueryTaskCompletedRequest;
-import com.uber.cadence.SignalExternalWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.SignalExternalWorkflowExecutionFailedCause;
-import com.uber.cadence.SignalWorkflowExecutionRequest;
-import com.uber.cadence.StartChildWorkflowExecutionFailedEventAttributes;
-import com.uber.cadence.StartWorkflowExecutionRequest;
-import com.uber.cadence.StickyExecutionAttributes;
-import com.uber.cadence.WorkflowExecutionAlreadyCompletedError;
-import com.uber.cadence.WorkflowExecutionCloseStatus;
+import com.uber.cadence.api.v1.*;
 import com.uber.cadence.internal.testservice.TestWorkflowMutableStateImpl.QueryId;
+import com.uber.cadence.serviceclient.exceptions.BadRequestException;
+import com.uber.cadence.serviceclient.exceptions.EntityNotExistsException;
+import com.uber.cadence.serviceclient.exceptions.InternalServiceException;
+import com.uber.cadence.serviceclient.exceptions.WorkflowExecutionAlreadyCompletedException;
 import java.util.Optional;
 import org.apache.thrift.TException;
 
@@ -64,102 +36,102 @@ interface TestWorkflowMutableState {
   StartWorkflowExecutionRequest getStartRequest();
 
   void startDecisionTask(PollForDecisionTaskResponse task, PollForDecisionTaskRequest pollRequest)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void completeDecisionTask(int historySize, RespondDecisionTaskCompletedRequest request)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void completeSignalExternalWorkflowExecution(String signalId, String runId)
-      throws EntityNotExistsError, InternalServiceError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws EntityNotExistsException, InternalServiceException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void failSignalExternalWorkflowExecution(
       String signalId, SignalExternalWorkflowExecutionFailedCause cause)
-      throws EntityNotExistsError, InternalServiceError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws EntityNotExistsException, InternalServiceException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void failDecisionTask(RespondDecisionTaskFailedRequest request)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void childWorkflowStarted(ChildWorkflowExecutionStartedEventAttributes a)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void childWorkflowFailed(String workflowId, ChildWorkflowExecutionFailedEventAttributes a)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void childWorkflowTimedOut(String activityId, ChildWorkflowExecutionTimedOutEventAttributes a)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void failStartChildWorkflow(String workflowId, StartChildWorkflowExecutionFailedEventAttributes a)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void childWorkflowCompleted(String workflowId, ChildWorkflowExecutionCompletedEventAttributes a)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void childWorkflowCanceled(String workflowId, ChildWorkflowExecutionCanceledEventAttributes a)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void startWorkflow(
       boolean continuedAsNew, Optional<SignalWorkflowExecutionRequest> signalWithStartSignal)
-      throws InternalServiceError, BadRequestError;
+      throws InternalServiceException, BadRequestException;
 
   void startActivityTask(PollForActivityTaskResponse task, PollForActivityTaskRequest pollRequest)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void completeActivityTask(String activityId, RespondActivityTaskCompletedRequest request)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void completeActivityTaskById(String activityId, RespondActivityTaskCompletedByIDRequest request)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void failActivityTask(String activityId, RespondActivityTaskFailedRequest request)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void failActivityTaskById(String id, RespondActivityTaskFailedByIDRequest failRequest)
-      throws EntityNotExistsError, InternalServiceError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws EntityNotExistsException, InternalServiceException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   RecordActivityTaskHeartbeatResponse heartbeatActivityTask(String activityId, byte[] details)
-      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws InternalServiceException, EntityNotExistsException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void signal(SignalWorkflowExecutionRequest signalRequest)
-      throws EntityNotExistsError, InternalServiceError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws EntityNotExistsException, InternalServiceException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void signalFromWorkflow(SignalExternalWorkflowExecutionDecisionAttributes a)
-      throws EntityNotExistsError, InternalServiceError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws EntityNotExistsException, InternalServiceException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void requestCancelWorkflowExecution(RequestCancelWorkflowExecutionRequest cancelRequest)
-      throws EntityNotExistsError, InternalServiceError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws EntityNotExistsException, InternalServiceException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void cancelActivityTask(String id, RespondActivityTaskCanceledRequest canceledRequest)
-      throws EntityNotExistsError, InternalServiceError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws EntityNotExistsException, InternalServiceException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   void cancelActivityTaskById(String id, RespondActivityTaskCanceledByIDRequest canceledRequest)
-      throws EntityNotExistsError, InternalServiceError, WorkflowExecutionAlreadyCompletedError,
-          BadRequestError;
+      throws EntityNotExistsException, InternalServiceException,
+          WorkflowExecutionAlreadyCompletedException, BadRequestException;
 
   QueryWorkflowResponse query(QueryWorkflowRequest queryRequest) throws TException;
 
   void completeQuery(QueryId queryId, RespondQueryTaskCompletedRequest completeRequest)
-      throws EntityNotExistsError;
+      throws EntityNotExistsException;
 
   StickyExecutionAttributes getStickyExecutionAttributes();
 

@@ -18,8 +18,8 @@
 package com.uber.cadence.internal.testservice;
 
 import com.google.common.base.Throwables;
-import com.uber.cadence.InternalServiceError;
-import com.uber.cadence.WorkflowExecution;
+import com.uber.cadence.api.v1.WorkflowExecution;
+import com.uber.cadence.serviceclient.exceptions.InternalServiceException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -39,7 +39,10 @@ final class ActivityId {
   }
 
   ActivityId(String domain, String workflowId, String runId, String id) {
-    this(domain, new WorkflowExecution().setWorkflowId(workflowId).setRunId(runId), id);
+    this(
+        domain,
+        WorkflowExecution.newBuilder().setWorkflowId(workflowId).setRunId(runId).build(),
+        id);
   }
 
   public ActivityId(ExecutionId executionId, String id) {
@@ -85,7 +88,7 @@ final class ActivityId {
   }
 
   /** Used for task tokens. */
-  public byte[] toBytes() throws InternalServiceError {
+  public byte[] toBytes() throws InternalServiceException {
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
     DataOutputStream out = new DataOutputStream(bout);
     try {
@@ -96,11 +99,11 @@ final class ActivityId {
       out.writeUTF(id);
       return bout.toByteArray();
     } catch (IOException e) {
-      throw new InternalServiceError(Throwables.getStackTraceAsString(e));
+      throw new InternalServiceException(e);
     }
   }
 
-  static ActivityId fromBytes(byte[] serialized) throws InternalServiceError {
+  static ActivityId fromBytes(byte[] serialized) throws InternalServiceException {
     ByteArrayInputStream bin = new ByteArrayInputStream(serialized);
     DataInputStream in = new DataInputStream(bin);
     try {
@@ -110,7 +113,7 @@ final class ActivityId {
       String id = in.readUTF();
       return new ActivityId(domain, workflowId, runId, id);
     } catch (IOException e) {
-      throw new InternalServiceError(Throwables.getStackTraceAsString(e));
+      throw new InternalServiceException(Throwables.getStackTraceAsString(e));
     }
   }
 

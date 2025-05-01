@@ -372,6 +372,17 @@ public class WorkflowExecutionUtils {
             || event.getEventType() == EventType.WorkflowExecutionTerminated));
   }
 
+  public static boolean isWorkflowExecutionCompletedEvent(
+      com.uber.cadence.api.v1.HistoryEvent event) {
+    return ((event != null)
+        && (event.hasWorkflowExecutionCompletedEventAttributes()
+            || event.hasWorkflowExecutionCanceledEventAttributes()
+            || event.hasWorkflowExecutionFailedEventAttributes()
+            || event.hasWorkflowExecutionTimedOutEventAttributes()
+            || event.hasWorkflowExecutionContinuedAsNewEventAttributes()
+            || event.hasWorkflowExecutionTerminatedEventAttributes()));
+  }
+
   public static boolean isWorkflowExecutionCompleteDecision(Decision decision) {
     return ((decision != null)
         && (decision.getDecisionType() == DecisionType.CompleteWorkflowExecution

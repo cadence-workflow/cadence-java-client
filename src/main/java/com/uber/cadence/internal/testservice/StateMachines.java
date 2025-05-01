@@ -36,78 +36,13 @@ import static com.uber.cadence.internal.testservice.StateMachines.State.NONE;
 import static com.uber.cadence.internal.testservice.StateMachines.State.STARTED;
 import static com.uber.cadence.internal.testservice.StateMachines.State.TIMED_OUT;
 
-import com.uber.cadence.ActivityTaskCancelRequestedEventAttributes;
-import com.uber.cadence.ActivityTaskCanceledEventAttributes;
-import com.uber.cadence.ActivityTaskCompletedEventAttributes;
-import com.uber.cadence.ActivityTaskFailedEventAttributes;
-import com.uber.cadence.ActivityTaskScheduledEventAttributes;
-import com.uber.cadence.ActivityTaskStartedEventAttributes;
-import com.uber.cadence.ActivityTaskTimedOutEventAttributes;
-import com.uber.cadence.BadRequestError;
-import com.uber.cadence.CancelTimerDecisionAttributes;
-import com.uber.cadence.CancelWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.ChildWorkflowExecutionCanceledEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionCompletedEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionFailedCause;
-import com.uber.cadence.ChildWorkflowExecutionFailedEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionStartedEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionTimedOutEventAttributes;
-import com.uber.cadence.CompleteWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.ContinueAsNewWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.DecisionTaskCompletedEventAttributes;
-import com.uber.cadence.DecisionTaskFailedEventAttributes;
-import com.uber.cadence.DecisionTaskScheduledEventAttributes;
-import com.uber.cadence.DecisionTaskStartedEventAttributes;
-import com.uber.cadence.DecisionTaskTimedOutEventAttributes;
-import com.uber.cadence.EntityNotExistsError;
-import com.uber.cadence.EventType;
-import com.uber.cadence.ExternalWorkflowExecutionSignaledEventAttributes;
-import com.uber.cadence.FailWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.GetWorkflowExecutionHistoryRequest;
-import com.uber.cadence.History;
-import com.uber.cadence.HistoryEvent;
-import com.uber.cadence.InternalServiceError;
-import com.uber.cadence.PollForActivityTaskRequest;
-import com.uber.cadence.PollForActivityTaskResponse;
-import com.uber.cadence.PollForDecisionTaskRequest;
-import com.uber.cadence.PollForDecisionTaskResponse;
-import com.uber.cadence.RequestCancelActivityTaskDecisionAttributes;
-import com.uber.cadence.RequestCancelWorkflowExecutionRequest;
-import com.uber.cadence.RespondActivityTaskCanceledByIDRequest;
-import com.uber.cadence.RespondActivityTaskCanceledRequest;
-import com.uber.cadence.RespondActivityTaskCompletedByIDRequest;
-import com.uber.cadence.RespondActivityTaskCompletedRequest;
-import com.uber.cadence.RespondActivityTaskFailedByIDRequest;
-import com.uber.cadence.RespondActivityTaskFailedRequest;
-import com.uber.cadence.RespondDecisionTaskCompletedRequest;
-import com.uber.cadence.RespondDecisionTaskFailedRequest;
-import com.uber.cadence.RetryPolicy;
-import com.uber.cadence.ScheduleActivityTaskDecisionAttributes;
-import com.uber.cadence.SignalExternalWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.SignalExternalWorkflowExecutionFailedCause;
-import com.uber.cadence.SignalExternalWorkflowExecutionFailedEventAttributes;
-import com.uber.cadence.SignalExternalWorkflowExecutionInitiatedEventAttributes;
-import com.uber.cadence.StartChildWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.StartChildWorkflowExecutionFailedEventAttributes;
-import com.uber.cadence.StartChildWorkflowExecutionInitiatedEventAttributes;
-import com.uber.cadence.StartTimerDecisionAttributes;
-import com.uber.cadence.StartWorkflowExecutionRequest;
-import com.uber.cadence.TimeoutType;
-import com.uber.cadence.TimerCanceledEventAttributes;
-import com.uber.cadence.TimerFiredEventAttributes;
-import com.uber.cadence.TimerStartedEventAttributes;
-import com.uber.cadence.WorkflowExecution;
-import com.uber.cadence.WorkflowExecutionAlreadyStartedError;
-import com.uber.cadence.WorkflowExecutionCancelRequestedEventAttributes;
-import com.uber.cadence.WorkflowExecutionCanceledEventAttributes;
-import com.uber.cadence.WorkflowExecutionCompletedEventAttributes;
-import com.uber.cadence.WorkflowExecutionContinuedAsNewEventAttributes;
-import com.uber.cadence.WorkflowExecutionFailedEventAttributes;
-import com.uber.cadence.WorkflowExecutionStartedEventAttributes;
-import com.uber.cadence.WorkflowExecutionTimedOutEventAttributes;
+import com.uber.cadence.api.v1.*;
 import com.uber.cadence.internal.testservice.TestWorkflowStore.ActivityTask;
 import com.uber.cadence.internal.testservice.TestWorkflowStore.DecisionTask;
 import com.uber.cadence.internal.testservice.TestWorkflowStore.TaskListId;
+import com.uber.cadence.serviceclient.exceptions.BadRequestException;
+import com.uber.cadence.serviceclient.exceptions.EntityNotExistsException;
+import com.uber.cadence.serviceclient.exceptions.InternalServiceException;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -337,19 +272,17 @@ class StateMachines {
   private static void timeoutChildWorkflow(
       RequestContext ctx, ChildWorkflowData data, TimeoutType timeoutType, long notUsed) {
     StartChildWorkflowExecutionInitiatedEventAttributes ie = data.initiatedEvent;
-    ChildWorkflowExecutionTimedOutEventAttributes a =
-        new ChildWorkflowExecutionTimedOutEventAttributes()
+    ChildWorkflowExecutionTimedOutEventAttributes.Builder a =
+        ChildWorkflowExecutionTimedOutEventAttributes.newBuilder()
             .setDomain(ie.getDomain())
             .setStartedEventId(data.startedEventId)
             .setWorkflowExecution(data.execution)
             .setWorkflowType(ie.getWorkflowType())
             .setTimeoutType(timeoutType)
             .setInitiatedEventId(data.initiatedEventId);
-    HistoryEvent event =
-        new HistoryEvent()
-            .setEventType(EventType.ChildWorkflowExecutionTimedOut)
-            .setChildWorkflowExecutionTimedOutEventAttributes(a);
-    ctx.addEvent(event);
+    HistoryEvent.Builder event =
+        HistoryEvent.newBuilder().setChildWorkflowExecutionTimedOutEventAttributes(a);
+    ctx.addEvent(event.build());
   }
 
   private static void startChildWorkflowFailed(
@@ -357,16 +290,16 @@ class StateMachines {
       ChildWorkflowData data,
       StartChildWorkflowExecutionFailedEventAttributes a,
       long notUsed) {
-    a.setInitiatedEventId(data.initiatedEventId);
-    a.setWorkflowType(data.initiatedEvent.getWorkflowType());
-    a.setWorkflowId(data.initiatedEvent.getWorkflowId());
-    if (data.initiatedEvent.isSetDomain()) {
-      a.setDomain(data.initiatedEvent.getDomain());
+    StartChildWorkflowExecutionFailedEventAttributes.Builder builder = a.toBuilder();
+    builder.setInitiatedEventId(data.initiatedEventId);
+    builder.setWorkflowType(data.initiatedEvent.getWorkflowType());
+    builder.setWorkflowId(data.initiatedEvent.getWorkflowId());
+    if (!data.initiatedEvent.getDomain().isEmpty()) {
+      builder.setDomain(data.initiatedEvent.getDomain());
     }
     HistoryEvent event =
-        new HistoryEvent()
-            .setEventType(EventType.StartChildWorkflowExecutionFailed)
-            .setStartChildWorkflowExecutionFailedEventAttributes(a);
+        HistoryEvent.newBuilder()
+            .setStartChildWorkflowExecutionFailedEventAttributes(a).build();
     ctx.addEvent(event);
   }
 
@@ -406,8 +339,9 @@ class StateMachines {
       ChildWorkflowData data,
       ChildWorkflowExecutionFailedEventAttributes a,
       long notUsed) {
-    a.setInitiatedEventId(data.initiatedEventId);
-    a.setStartedEventId(data.startedEventId);
+    ChildWorkflowExecutionFailedEventAttributes.Builder builder = a.toBuilder();
+    builder.setInitiatedEventId(data.initiatedEventId);
+    builder.setStartedEventId(data.startedEventId);
     a.setWorkflowExecution(data.execution);
     a.setWorkflowType(data.initiatedEvent.getWorkflowType());
     if (data.initiatedEvent.domain != null) {
@@ -518,25 +452,25 @@ class StateMachines {
 
   private static void startWorkflow(
       RequestContext ctx, WorkflowData data, StartWorkflowExecutionRequest request, long notUsed)
-      throws BadRequestError {
+      throws BadRequestException {
     WorkflowExecutionStartedEventAttributes a = new WorkflowExecutionStartedEventAttributes();
     if (request.isSetIdentity()) {
       a.setIdentity(request.getIdentity());
     }
     if (!request.isSetTaskStartToCloseTimeoutSeconds()) {
-      throw new BadRequestError("missing taskStartToCloseTimeoutSeconds");
+      throw new BadRequestException("missing taskStartToCloseTimeoutSeconds");
     }
     a.setTaskStartToCloseTimeoutSeconds(request.getTaskStartToCloseTimeoutSeconds());
     if (!request.isSetWorkflowType()) {
-      throw new BadRequestError("missing workflowType");
+      throw new BadRequestException("missing workflowType");
     }
     a.setWorkflowType(request.getWorkflowType());
     if (!request.isSetTaskList()) {
-      throw new BadRequestError("missing taskList");
+      throw new BadRequestException("missing taskList");
     }
     a.setTaskList(request.getTaskList());
     if (!request.isSetExecutionStartToCloseTimeoutSeconds()) {
-      throw new BadRequestError("missing executionStartToCloseTimeoutSeconds");
+      throw new BadRequestException("missing executionStartToCloseTimeoutSeconds");
     }
     a.setExecutionStartToCloseTimeoutSeconds(request.getExecutionStartToCloseTimeoutSeconds());
     if (request.isSetInput()) {
@@ -686,7 +620,7 @@ class StateMachines {
       ActivityTaskData data,
       ScheduleActivityTaskDecisionAttributes d,
       long decisionTaskCompletedEventId)
-      throws BadRequestError {
+      throws BadRequestException {
     int scheduleToCloseTimeoutSeconds = d.getScheduleToCloseTimeoutSeconds();
     int scheduleToStartTimeoutSeconds = d.getScheduleToStartTimeoutSeconds();
     RetryState retryState;
@@ -839,8 +773,8 @@ class StateMachines {
               events = events.subList((int) data.previousStartedEventId, events.size());
             }
             // get it from pervious started event id.
-          } catch (EntityNotExistsError entityNotExistsError) {
-            throw new InternalServiceError(entityNotExistsError.toString());
+          } catch (EntityNotExistsException EntityNotExistsException) {
+            throw new InternalServiceException(EntityNotExistsException.toString());
           }
           data.decisionTask.setHistory(new History().setEvents(events));
           data.startedEventId = startedEventId;

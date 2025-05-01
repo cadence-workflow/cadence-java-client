@@ -19,54 +19,56 @@
 
 package com.uber.cadence.internal.testservice;
 
-import com.uber.cadence.*;
+import com.uber.cadence.api.v1.*;
+import com.uber.cadence.serviceclient.exceptions.BadRequestException;
 
 public class TestWorkflowMutableStateAttrUtil {
 
   static void validateScheduleActivityTask(ScheduleActivityTaskDecisionAttributes a)
-      throws BadRequestError {
+      throws BadRequestException {
     if (a == null) {
-      throw new BadRequestError("ScheduleActivityTaskDecisionAttributes is not set on decision.");
+      throw new BadRequestException(
+          "ScheduleActivityTaskDecisionAttributes is not set on decision.");
     }
 
-    if (a.getTaskList() == null || a.getTaskList().getName().isEmpty()) {
-      throw new BadRequestError("TaskList is not set on decision.");
+    if (!a.hasTaskList() || a.getTaskList().getName().isEmpty()) {
+      throw new BadRequestException("TaskList is not set on decision.");
     }
-    if (a.getActivityId() == null || a.getActivityId().isEmpty()) {
-      throw new BadRequestError("ActivityId is not set on decision.");
+    if (a.getActivityId().isEmpty() || a.getActivityId().isEmpty()) {
+      throw new BadRequestException("ActivityId is not set on decision.");
     }
-    if (a.getActivityType() == null
-        || a.getActivityType().getName() == null
-        || a.getActivityType().getName().isEmpty()) {
-      throw new BadRequestError("ActivityType is not set on decision.");
+    if (!a.hasActivityType() || a.getActivityType().getName().isEmpty()) {
+      throw new BadRequestException("ActivityType is not set on decision.");
     }
-    if (a.getStartToCloseTimeoutSeconds() <= 0) {
-      throw new BadRequestError("A valid StartToCloseTimeoutSeconds is not set on decision.");
+    if (a.getStartToCloseTimeout().getSeconds() <= 0) {
+      throw new BadRequestException("A valid StartToCloseTimeoutSeconds is not set on decision.");
     }
-    if (a.getScheduleToStartTimeoutSeconds() <= 0) {
-      throw new BadRequestError("A valid ScheduleToStartTimeoutSeconds is not set on decision.");
+    if (a.getScheduleToStartTimeout().getSeconds() <= 0) {
+      throw new BadRequestException(
+          "A valid ScheduleToStartTimeoutSeconds is not set on decision.");
     }
-    if (a.getScheduleToCloseTimeoutSeconds() <= 0) {
-      throw new BadRequestError("A valid ScheduleToCloseTimeoutSeconds is not set on decision.");
+    if (a.getScheduleToCloseTimeout().getSeconds() <= 0) {
+      throw new BadRequestException(
+          "A valid ScheduleToCloseTimeoutSeconds is not set on decision.");
     }
-    if (a.getHeartbeatTimeoutSeconds() < 0) {
-      throw new BadRequestError("Ac valid HeartbeatTimeoutSeconds is not set on decision.");
+    if (a.getHeartbeatTimeout().getSeconds() < 0) {
+      throw new BadRequestException("Ac valid HeartbeatTimeoutSeconds is not set on decision.");
     }
   }
 
   static void validateStartChildExecutionAttributes(StartChildWorkflowExecutionDecisionAttributes a)
-      throws BadRequestError {
+      throws BadRequestException {
     if (a == null) {
-      throw new BadRequestError(
+      throw new BadRequestException(
           "StartChildWorkflowExecutionDecisionAttributes is not set on decision.");
     }
 
     if (a.getWorkflowId().isEmpty()) {
-      throw new BadRequestError("Required field WorkflowID is not set on decision.");
+      throw new BadRequestException("Required field WorkflowID is not set on decision.");
     }
 
     if (a.getWorkflowType() == null || a.getWorkflowType().getName().isEmpty()) {
-      throw new BadRequestError("Required field WorkflowType is not set on decision.");
+      throw new BadRequestException("Required field WorkflowType is not set on decision.");
     }
 
     RetryPolicy retryPolicy = a.getRetryPolicy();
@@ -75,22 +77,25 @@ public class TestWorkflowMutableStateAttrUtil {
     }
   }
 
-  public static void inheritUnsetPropertiesFromParentWorkflow(
-      StartWorkflowExecutionRequest startRequest, StartChildWorkflowExecutionDecisionAttributes a) {
+  public static StartChildWorkflowExecutionDecisionAttributes
+      inheritUnsetPropertiesFromParentWorkflow(
+          StartWorkflowExecutionRequest startRequest,
+          StartChildWorkflowExecutionDecisionAttributes a) {
+    StartChildWorkflowExecutionDecisionAttributes.Builder res = a.toBuilder();
     // Inherit tasklist from parent workflow execution if not provided on decision
-    if (a.getTaskList() == null || a.getTaskList().getName().isEmpty()) {
-      a.setTaskList(startRequest.getTaskList());
+    if (!a.hasTaskList() || a.getTaskList().getName().isEmpty()) {
+      res.setTaskList(startRequest.getTaskList());
     }
 
     // Inherit workflow timeout from parent workflow execution if not provided on decision
-    if (a.getExecutionStartToCloseTimeoutSeconds() <= 0) {
-      a.setExecutionStartToCloseTimeoutSeconds(
-          startRequest.getExecutionStartToCloseTimeoutSeconds());
+    if (!a.hasExecutionStartToCloseTimeout()) {
+      res.setExecutionStartToCloseTimeout(startRequest.getExecutionStartToCloseTimeout());
     }
 
     // Inherit decision task timeout from parent workflow execution if not provided on decision
-    if (a.getTaskStartToCloseTimeoutSeconds() <= 0) {
-      a.setTaskStartToCloseTimeoutSeconds(startRequest.getTaskStartToCloseTimeoutSeconds());
+    if (!a.hasTaskStartToCloseTimeout()) {
+      res.setTaskStartToCloseTimeout(startRequest.getTaskStartToCloseTimeout());
     }
+    return res.build();
   }
 }

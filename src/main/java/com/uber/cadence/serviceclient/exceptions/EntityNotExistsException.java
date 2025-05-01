@@ -18,8 +18,31 @@
 package com.uber.cadence.serviceclient.exceptions;
 
 public class EntityNotExistsException extends ServiceClientException {
+  private final String currentCluster;
+  private final String activeCluster;
 
   public EntityNotExistsException(Throwable cause) {
     super(cause);
+    currentCluster = null;
+    activeCluster = null;
+  }
+
+  public EntityNotExistsException(String message) {
+    super(message);
+    currentCluster = null;
+    activeCluster = null;
+  }
+
+  public EntityNotExistsException(String currentCluster, String activeCluster) {
+    this.currentCluster = currentCluster;
+    this.activeCluster = activeCluster;
+  }
+
+  public String getCurrentCluster() {
+    return currentCluster;
+  }
+
+  public String getActiveCluster() {
+    return activeCluster;
   }
 }

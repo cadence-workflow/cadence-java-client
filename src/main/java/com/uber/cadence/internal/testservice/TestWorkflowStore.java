@@ -17,16 +17,10 @@
 
 package com.uber.cadence.internal.testservice;
 
-import com.uber.cadence.BadRequestError;
-import com.uber.cadence.EntityNotExistsError;
-import com.uber.cadence.GetWorkflowExecutionHistoryRequest;
-import com.uber.cadence.GetWorkflowExecutionHistoryResponse;
-import com.uber.cadence.InternalServiceError;
-import com.uber.cadence.PollForActivityTaskRequest;
-import com.uber.cadence.PollForActivityTaskResponse;
-import com.uber.cadence.PollForDecisionTaskRequest;
-import com.uber.cadence.PollForDecisionTaskResponse;
-import com.uber.cadence.WorkflowExecutionInfo;
+import com.uber.cadence.api.v1.*;
+import com.uber.cadence.serviceclient.exceptions.BadRequestException;
+import com.uber.cadence.serviceclient.exceptions.EntityNotExistsException;
+import com.uber.cadence.serviceclient.exceptions.InternalServiceException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
@@ -138,7 +132,7 @@ interface TestWorkflowStore {
   long currentTimeMillis();
 
   long save(RequestContext requestContext)
-      throws InternalServiceError, EntityNotExistsError, BadRequestError;
+      throws InternalServiceException, EntityNotExistsException, BadRequestException;
 
   void applyTimersAndLocks(RequestContext ctx);
 
@@ -152,11 +146,11 @@ interface TestWorkflowStore {
 
   /** @return queryId */
   void sendQueryTask(ExecutionId executionId, TaskListId taskList, PollForDecisionTaskResponse task)
-      throws EntityNotExistsError;
+      throws EntityNotExistsException;
 
   GetWorkflowExecutionHistoryResponse getWorkflowExecutionHistory(
       ExecutionId executionId, GetWorkflowExecutionHistoryRequest getRequest)
-      throws EntityNotExistsError;
+      throws EntityNotExistsException;
 
   void getDiagnostics(StringBuilder result);
 

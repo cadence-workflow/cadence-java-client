@@ -17,9 +17,8 @@
 
 package com.uber.cadence.internal.testservice;
 
-import com.google.common.base.Throwables;
-import com.uber.cadence.InternalServiceError;
-import com.uber.cadence.WorkflowExecution;
+import com.uber.cadence.api.v1.WorkflowExecution;
+import com.uber.cadence.serviceclient.exceptions.InternalServiceException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -40,7 +39,10 @@ final class ExecutionId {
   ExecutionId(String domain, String workflowId, String runId) {
     this(
         domain,
-        new WorkflowExecution().setWorkflowId(Objects.requireNonNull(workflowId)).setRunId(runId));
+        WorkflowExecution.newBuilder()
+            .setWorkflowId(Objects.requireNonNull(workflowId))
+            .setRunId(runId)
+            .build());
   }
 
   public String getDomain() {
@@ -81,13 +83,13 @@ final class ExecutionId {
   }
 
   /** Used for task tokens. */
-  byte[] toBytes() throws InternalServiceError {
+  byte[] toBytes() throws InternalServiceException {
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
     DataOutputStream out = new DataOutputStream(bout);
     try {
       addBytes(out);
     } catch (IOException e) {
-      throw new InternalServiceError(Throwables.getStackTraceAsString(e));
+      throw new InternalServiceException(e);
     }
     return bout.toByteArray();
   }
@@ -100,13 +102,13 @@ final class ExecutionId {
     }
   }
 
-  static ExecutionId fromBytes(byte[] serialized) throws InternalServiceError {
+  static ExecutionId fromBytes(byte[] serialized) throws InternalServiceException {
     ByteArrayInputStream bin = new ByteArrayInputStream(serialized);
     DataInputStream in = new DataInputStream(bin);
     try {
       return readFromBytes(in);
     } catch (IOException e) {
-      throw new InternalServiceError(Throwables.getStackTraceAsString(e));
+      throw new InternalServiceException(e);
     }
   }
 

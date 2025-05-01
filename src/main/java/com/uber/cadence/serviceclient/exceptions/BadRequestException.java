@@ -17,25 +17,12 @@
 
 package com.uber.cadence.serviceclient.exceptions;
 
-/**
- * Base class for all exceptions thrown by the service client.
- *
- * <p>This is a catchall for all other errors.
- */
-public class ServiceClientException extends RuntimeException {
-  ServiceClientException() {
-    super();
-  }
-
-  public ServiceClientException(String message) {
+public class BadRequestException extends ServiceClientException {
+  public BadRequestException(String message) {
     super(message);
   }
 
-  public ServiceClientException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public ServiceClientException(Throwable cause) {
+  public BadRequestException(Throwable cause) {
     super(cause);
   }
 }

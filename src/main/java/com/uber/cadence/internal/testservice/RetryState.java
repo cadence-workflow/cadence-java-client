@@ -17,8 +17,8 @@
 
 package com.uber.cadence.internal.testservice;
 
-import com.uber.cadence.BadRequestError;
-import com.uber.cadence.RetryPolicy;
+import com.uber.cadence.api.v1.RetryPolicy;
+import com.uber.cadence.serviceclient.exceptions.BadRequestException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -28,14 +28,14 @@ final class RetryState {
   private final long expirationTime;
   private final int attempt;
 
-  RetryState(RetryPolicy retryPolicy, long expirationTime) throws BadRequestError {
+  RetryState(RetryPolicy retryPolicy, long expirationTime) throws BadRequestException {
     this(validateRetryPolicy(retryPolicy), expirationTime, 0);
   }
 
   private RetryState(RetryPolicy retryPolicy, long expirationTime, int attempt) {
     this.retryPolicy = retryPolicy;
     this.expirationTime =
-        retryPolicy.getExpirationIntervalInSeconds() == 0 ? Long.MAX_VALUE : expirationTime;
+        retryPolicy.getExpirationInterval().getSeconds() == 0 ? Long.MAX_VALUE : expirationTime;
     this.attempt = attempt;
   }
 
@@ -68,10 +68,10 @@ final class RetryState {
       // MaximumAttempts is the total attempts, including initial (non-retry) attempt.
       return 0;
     }
-    long initInterval = TimeUnit.SECONDS.toMillis(retryPolicy.getInitialIntervalInSeconds());
+    long initInterval = TimeUnit.SECONDS.toMillis(retryPolicy.getInitialInterval().getSeconds());
     long nextInterval =
         (long) (initInterval * Math.pow(retryPolicy.getBackoffCoefficient(), getAttempt()));
-    long maxInterval = TimeUnit.SECONDS.toMillis(retryPolicy.getMaximumIntervalInSeconds());
+    long maxInterval = TimeUnit.SECONDS.toMillis(retryPolicy.getMaximumInterval().getSeconds());
     if (nextInterval <= 0) {
       // math.Pow() could overflow
       if (maxInterval > 0) {
@@ -93,37 +93,37 @@ final class RetryState {
     }
 
     // check if error is non-retriable
-    List<String> nonRetriableErrorReasons = retryPolicy.getNonRetriableErrorReasons();
-    if (nonRetriableErrorReasons != null) {
-      for (String err : nonRetriableErrorReasons) {
-        if (errReason.equals(err)) {
-          return 0;
-        }
+    List<String> nonRetriableErrorReasons = retryPolicy.getNonRetryableErrorReasonsList();
+    for (String err : nonRetriableErrorReasons) {
+      if (errReason.equals(err)) {
+        return 0;
       }
     }
     return (int) TimeUnit.MILLISECONDS.toSeconds((long) Math.ceil((double) backoffInterval));
   }
 
-  static RetryPolicy validateRetryPolicy(RetryPolicy policy) throws BadRequestError {
-    if (policy.getInitialIntervalInSeconds() <= 0) {
-      throw new BadRequestError("InitialIntervalInSeconds must be greater than 0 on retry policy.");
+  static RetryPolicy validateRetryPolicy(RetryPolicy policy) throws BadRequestException {
+    if (policy.getInitialInterval().getSeconds() <= 0) {
+      throw new BadRequestException(
+          "InitialIntervalInSeconds must be greater than 0 on retry policy.");
     }
     if (policy.getBackoffCoefficient() < 1) {
-      throw new BadRequestError("BackoffCoefficient cannot be less than 1 on retry policy.");
+      throw new BadRequestException("BackoffCoefficient cannot be less than 1 on retry policy.");
     }
-    if (policy.getMaximumIntervalInSeconds() < 0) {
-      throw new BadRequestError("MaximumIntervalInSeconds cannot be less than 0 on retry policy.");
+    if (policy.getMaximumInterval().getSeconds() < 0) {
+      throw new BadRequestException(
+          "MaximumIntervalInSeconds cannot be less than 0 on retry policy.");
     }
-    if (policy.getMaximumIntervalInSeconds() > 0
-        && policy.getMaximumIntervalInSeconds() < policy.getInitialIntervalInSeconds()) {
-      throw new BadRequestError(
+    if (policy.getMaximumInterval().getSeconds() > 0
+        && policy.getMaximumInterval().getSeconds() < policy.getInitialInterval().getSeconds()) {
+      throw new BadRequestException(
           "MaximumIntervalInSeconds cannot be less than InitialIntervalInSeconds on retry policy.");
     }
     if (policy.getMaximumAttempts() < 0) {
-      throw new BadRequestError("MaximumAttempts cannot be less than 0 on retry policy.");
+      throw new BadRequestException("MaximumAttempts cannot be less than 0 on retry policy.");
     }
-    if (policy.getMaximumAttempts() == 0 && policy.getExpirationIntervalInSeconds() == 0) {
-      throw new BadRequestError(
+    if (policy.getMaximumAttempts() == 0 && policy.getExpirationInterval().getSeconds() == 0) {
+      throw new BadRequestException(
           "MaximumAttempts and ExpirationIntervalInSeconds are both 0. At least one of them must be specified.");
     }
     return policy;

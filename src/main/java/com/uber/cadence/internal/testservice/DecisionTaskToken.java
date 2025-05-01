@@ -17,8 +17,7 @@
 
 package com.uber.cadence.internal.testservice;
 
-import com.google.common.base.Throwables;
-import com.uber.cadence.InternalServiceError;
+import com.uber.cadence.serviceclient.exceptions.InternalServiceException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -45,13 +44,13 @@ final class DecisionTaskToken {
   }
 
   /** Used for task tokens. */
-  byte[] toBytes() throws InternalServiceError {
+  byte[] toBytes() throws InternalServiceException {
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
     DataOutputStream out = new DataOutputStream(bout);
     try {
       addBytes(out);
     } catch (IOException e) {
-      throw new InternalServiceError(Throwables.getStackTraceAsString(e));
+      throw new InternalServiceException(e);
     }
     return bout.toByteArray();
   }
@@ -61,7 +60,7 @@ final class DecisionTaskToken {
     out.writeInt(historySize);
   }
 
-  static DecisionTaskToken fromBytes(byte[] serialized) throws InternalServiceError {
+  static DecisionTaskToken fromBytes(byte[] serialized) throws InternalServiceException {
     ByteArrayInputStream bin = new ByteArrayInputStream(serialized);
     DataInputStream in = new DataInputStream(bin);
     try {
@@ -69,7 +68,7 @@ final class DecisionTaskToken {
       int historySize = in.readInt();
       return new DecisionTaskToken(executionId, historySize);
     } catch (IOException e) {
-      throw new InternalServiceError(Throwables.getStackTraceAsString(e));
+      throw new InternalServiceException(e);
     }
   }
 }
