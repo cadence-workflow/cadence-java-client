@@ -48,4 +48,4 @@ Javadocs for the client API are located [here](https://www.javadoc.io/doc/com.ub
 We'd love your help in making the Cadence Java client great. Please review our [contribution guidelines](CONTRIBUTING.md).
 
 ## License
-Apache License, please see [LICENSE](LICENSE) for details.
+Apache 2.0 License, please see [LICENSE](LICENSE) for details.

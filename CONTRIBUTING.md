@@ -30,7 +30,7 @@ This project is Open Source Software, and requires a header at the beginning of
 all source files. To verify that all files contain the header execute:
 
 ```lang=bash
-./gradlew licenseCheck
+./gradlew license
 ```
 
 To generate licence headers execute
