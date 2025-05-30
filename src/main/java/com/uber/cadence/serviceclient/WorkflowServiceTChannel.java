@@ -28,7 +28,6 @@ import com.uber.cadence.*;
 import com.uber.cadence.WorkflowService.GetWorkflowExecutionHistory_result;
 import com.uber.cadence.internal.Version;
 import com.uber.cadence.internal.common.CheckedExceptionWrapper;
-import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.metrics.ServiceMethod;
@@ -766,10 +765,8 @@ public class WorkflowServiceTChannel implements IWorkflowService {
       if (response.getResponseCode() == ResponseCode.OK) {
         GetWorkflowExecutionHistoryResponse res = result.getSuccess();
         if (res.getRawHistory() != null) {
-          History history =
-              InternalUtils.DeserializeFromBlobDataToHistory(
-                  res.getRawHistory(), getRequest.getHistoryEventFilterType());
-          res.setHistory(history);
+          throw new TException(
+              "Raw history is not supported. Please turn off frontend.sendRawWorkflowHistory feature flag in frontend service to recover");
         }
         return res;
       }
@@ -2593,10 +2590,8 @@ public class WorkflowServiceTChannel implements IWorkflowService {
                 if (r.getResponseCode() == ResponseCode.OK) {
                   GetWorkflowExecutionHistoryResponse res = result.getSuccess();
                   if (res.getRawHistory() != null) {
-                    History history =
-                        InternalUtils.DeserializeFromBlobDataToHistory(
-                            res.getRawHistory(), getRequest.getHistoryEventFilterType());
-                    res.setHistory(history);
+                    throw new TException(
+                        "Raw history is not supported. Please turn off frontend.sendRawWorkflowHistory feature flag in frontend service to recover");
                   }
                   resultHandler.onComplete(res);
                   return;

@@ -19,12 +19,9 @@ import static com.uber.cadence.internal.errors.ErrorType.UNKNOWN_WORKFLOW_TYPE;
 
 import com.google.common.collect.Lists;
 import com.uber.cadence.GetWorkflowExecutionHistoryResponse;
-import com.uber.cadence.History;
 import com.uber.cadence.HistoryEvent;
-import com.uber.cadence.HistoryEventFilterType;
 import com.uber.cadence.activity.Activity;
 import com.uber.cadence.common.WorkflowExecutionHistory;
-import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.common.RpcRetryer;
 import com.uber.cadence.internal.common.WorkflowExecutionUtils;
 import com.uber.cadence.internal.metrics.MetricsType;
@@ -185,14 +182,10 @@ public final class ReplayWorkflowActivityImpl implements ReplayWorkflowActivity 
                       nextPageToken, this.serviceClient, domain, execution.toThrift()));
       pageToken = resp.getNextPageToken();
 
-      // handle raw history
+      // TODO support raw history feature once server removes default Thrift encoding
       if (resp.getRawHistory() != null && resp.getRawHistory().size() > 0) {
-        History history =
-            InternalUtils.DeserializeFromBlobDataToHistory(
-                resp.getRawHistory(), HistoryEventFilterType.ALL_EVENT);
-        if (history != null && history.getEvents() != null) {
-          histories.addAll(history.getEvents());
-        }
+        throw new UnsupportedOperationException(
+            "Raw history is not supported. Please turn off frontend.sendRawWorkflowHistory feature flag in frontend service to recover");
       } else {
         histories.addAll(resp.getHistory().getEvents());
       }

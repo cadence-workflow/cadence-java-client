@@ -20,9 +20,7 @@ import static com.uber.cadence.EventType.DecisionTaskScheduled;
 import static com.uber.cadence.EventType.DecisionTaskStarted;
 import static com.uber.cadence.EventType.TimerStarted;
 import static com.uber.cadence.EventType.WorkflowExecutionStarted;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,7 +40,6 @@ import com.uber.cadence.WorkflowExecutionStartedEventAttributes;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.common.WorkflowExecutionHistory;
 import com.uber.cadence.converter.JsonDataConverter;
-import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.testing.WorkflowTestingTest;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.testing.TestActivityEnvironment;
@@ -144,15 +141,22 @@ public class ReplayWorkflowActivityTest {
   }
 
   @Test
-  public void testGetFullHistory_RawHistory_ExpectedSuccessResponse() throws Exception {
+  public void testGetFullHistory_RawHistory_NotSupportedError() throws Exception {
     History history = new History().setEvents(Lists.newArrayList(historyEvents.get(0)));
-    DataBlob blob = InternalUtils.SerializeFromHistoryToBlobData(history);
+    DataBlob blob = new DataBlob().setData(new byte[] {1, 2, 3});
 
     GetWorkflowExecutionHistoryResponse response =
         new GetWorkflowExecutionHistoryResponse().setRawHistory(Lists.newArrayList(blob));
     when(mockServiceClient.GetWorkflowExecutionHistory(any())).thenReturn(response);
-    WorkflowExecutionHistory result = activity.getFullHistory(domain, execution);
-    assertEquals(1, result.getEvents().size());
+    try {
+      WorkflowExecutionHistory result = activity.getFullHistory(domain, execution);
+    } catch (Exception e) {
+      assertEquals(
+          "Raw history is not supported. Please turn off frontend.sendRawWorkflowHistory feature flag in frontend service to recover",
+          e.getMessage());
+      return;
+    }
+    fail("Expected exception not thrown");
   }
 
   @Test(expected = Error.class)
