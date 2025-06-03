@@ -18,9 +18,9 @@
 package com.uber.cadence.internal.compatibility;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TFieldIdEnum;
@@ -44,6 +44,35 @@ public class MapperTestUtil {
         "All fields expected to be set in " + message.getClass().getSimpleName(),
         Collections.emptySet(),
         getUnsetFields(message, fields));
+  }
+
+  public static void assertNoMissingFields(Object message) {
+    List<String> nullFields = getMissingFields(message.toString());
+
+    Assert.assertArrayEquals(
+        "All fields expected to be set in the text",
+        new String[0],
+        nullFields.toArray(new String[0]));
+  }
+
+  public static void assertMissingFields(Object message, Set<String> values) {
+    List<String> nullFields = getMissingFields(message.toString());
+    Assert.assertArrayEquals(
+        "Expected missing fields but get different",
+        values.toArray(new String[0]),
+        nullFields.toArray(new String[0]));
+  }
+
+  private static List<String> getMissingFields(String text) {
+    List<String> nullFields = new ArrayList<>();
+    // Regex to find fieldName=null
+    Pattern pattern = Pattern.compile("(\\w+)=null");
+    Matcher matcher = pattern.matcher(text);
+
+    while (matcher.find()) {
+      nullFields.add(matcher.group(1)); // group(1) captures the field name
+    }
+    return nullFields;
   }
 
   public static <E extends Enum<E> & TFieldIdEnum, M extends TBase<M, E>> void assertMissingFields(
