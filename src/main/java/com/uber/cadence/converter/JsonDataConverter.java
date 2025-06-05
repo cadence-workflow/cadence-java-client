@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
-import org.apache.thrift.protocol.TJSONProtocol;
 
 /**
  * Implements conversion through GSON JSON processor. To extend use {@link
