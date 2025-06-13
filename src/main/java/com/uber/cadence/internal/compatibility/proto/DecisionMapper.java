@@ -55,7 +55,7 @@ class DecisionMapper {
 
   static List<Decision> decisionArray(List<com.uber.cadence.Decision> t) {
     if (t == null) {
-      return null;
+      return new ArrayList<>();
     }
 
     List<Decision> v = new ArrayList<>();

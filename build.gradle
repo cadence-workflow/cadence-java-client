@@ -44,7 +44,7 @@ googleJavaFormat {
     exclude '**/generated-sources/*'
 }
 
-tasks.googleJavaFormat.dependsOn 'license'
+tasks.googleJavaFormat.dependsOn 'licenseFormat'
 
 group = 'com.uber.cadence'
 
@@ -89,6 +89,10 @@ dependencies {
     compile group: 'com.google.api.grpc', name: 'proto-google-common-protos', version: '2.10.0'
     compile group: 'com.google.protobuf', name: 'protobuf-java-util', version: '3.21.9'
     compile group: 'com.google.oauth-client', name: 'google-oauth-client', version: '1.35.0'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    testCompileOnly 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     implementation 'io.grpc:grpc-netty-shaded:1.54.2'
     implementation 'io.grpc:grpc-protobuf:1.54.2'
@@ -139,6 +143,7 @@ sourceSets {
         }
         java {
             srcDir 'src/main'
+            srcDir 'src/gen/java'
         }
     }
 }
