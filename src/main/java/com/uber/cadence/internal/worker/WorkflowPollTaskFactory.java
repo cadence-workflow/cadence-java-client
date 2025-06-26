@@ -18,6 +18,7 @@
 package com.uber.cadence.internal.worker;
 
 import com.uber.cadence.PollForDecisionTaskResponse;
+import com.uber.cadence.TaskListKind;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.m3.tally.Scope;
 import java.util.Objects;
