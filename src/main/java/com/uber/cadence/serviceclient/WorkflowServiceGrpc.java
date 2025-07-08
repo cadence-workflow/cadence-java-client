@@ -42,7 +42,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-public class WorkflowServiceGrpc implements IWorkflowServiceV4 {
+public class WorkflowServiceGrpc implements IWorkflowService {
 
   private final IGrpcServiceStubs grpcServiceStubs;
   private final Executor executor = MoreExecutors.directExecutor();
