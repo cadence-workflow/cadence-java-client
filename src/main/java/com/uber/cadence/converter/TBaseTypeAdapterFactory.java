@@ -65,8 +65,8 @@ public class TBaseTypeAdapterFactory implements TypeAdapterFactory {
                   newThriftSerializer().toString((TBase) value, StandardCharsets.UTF_8.name());
               jsonWriter.value(result);
               logger.warn(
-                  "TBase message will no longer be support in cadence-java-client V4, payload {}",
-                  result);
+                  "Thrift message will no longer be supported for data conversion in cadence-java-client V4, payload class name {}",
+                  result.getClass().getName());
             } catch (TException e) {
               throw new DataConverterException("Failed to serialize TBase", e);
             }
@@ -79,13 +79,13 @@ public class TBaseTypeAdapterFactory implements TypeAdapterFactory {
             }
             String value = jsonReader.nextString();
             try {
-              logger.warn(
-                  "TBase message will no longer be support in cadence-java-client V4, payload {}",
-                  value);
               @SuppressWarnings("unchecked")
               T instance = (T) typeToken.getRawType().getConstructor().newInstance();
               newThriftDeserializer()
                   .deserialize((TBase) instance, value, StandardCharsets.UTF_8.name());
+              logger.warn(
+                  "Thrift message will no longer be supported for data conversion in cadence-java-client V4, payload class name {}",
+                  instance.getClass().getName());
               return instance;
             } catch (Exception e) {
               throw new DataConverterException("Failed to deserialize TBase", e);

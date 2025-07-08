@@ -26,6 +26,8 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import org.apache.thrift.TEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Special handling of TEnum serialization and deserialization. This is to support for inline TEnum
@@ -33,6 +35,8 @@ import org.apache.thrift.TEnum;
  * representation, this adapter serialize the TEnum class with its int representation.
  */
 public class TEnumTypeAdapterFactory implements TypeAdapterFactory {
+
+  private static final Logger logger = LoggerFactory.getLogger(TEnumTypeAdapterFactory.class);
 
   @Override
   public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
@@ -44,6 +48,9 @@ public class TEnumTypeAdapterFactory implements TypeAdapterFactory {
         new TypeAdapter<T>() {
           @Override
           public void write(JsonWriter jsonWriter, T value) throws IOException {
+            logger.warn(
+                "Thrift message will no longer be supported for data conversion in cadence-java-client V4, payload class name {}",
+                value.getClass().getName());
             jsonWriter.value(((TEnum) value).getValue());
           }
 
@@ -54,6 +61,9 @@ public class TEnumTypeAdapterFactory implements TypeAdapterFactory {
               Method m = (typeToken.getRawType().getDeclaredMethod("findByValue", Integer.TYPE));
               @SuppressWarnings("unchecked")
               T instance = (T) m.invoke(null, value);
+              logger.warn(
+                  "Thrift message will no longer be supported for data conversion in cadence-java-client V4, payload class name {}",
+                  instance.getClass().getName());
               return instance;
             } catch (Exception e) {
               throw new DataConverterException("Failed to deserilize TEnum", e);
