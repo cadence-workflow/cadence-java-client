@@ -17,7 +17,7 @@
 
 package com.uber.cadence.serviceclient;
 
-import com.uber.cadence.entities.*;
+import com.uber.cadence.*;
 import java.util.concurrent.CompletableFuture;
 
 public interface IWorkflowServiceV4 extends Iface, AsyncIface {

@@ -18,8 +18,8 @@ import static com.uber.cadence.internal.compatibility.MapperTestUtil.assertNoMis
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import com.uber.cadence.entities.Decision;
-import com.uber.cadence.entities.DecisionType;
+import com.uber.cadence.Decision;
+import com.uber.cadence.DecisionType;
 import com.uber.cadence.internal.compatibility.ClientObjects;
 import com.uber.cadence.internal.compatibility.ProtoObjects;
 import java.util.Collections;

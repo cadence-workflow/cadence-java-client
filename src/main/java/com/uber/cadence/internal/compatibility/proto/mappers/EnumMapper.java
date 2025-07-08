@@ -49,7 +49,7 @@ public final class EnumMapper {
 
   private EnumMapper() {}
 
-  public static TaskListKind taskListKind(com.uber.cadence.entities.TaskListKind t) {
+  public static TaskListKind taskListKind(com.uber.cadence.TaskListKind t) {
     if (t == null) {
       return TaskListKind.TASK_LIST_KIND_INVALID;
     }
@@ -62,7 +62,7 @@ public final class EnumMapper {
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static TaskListType taskListType(com.uber.cadence.entities.TaskListType t) {
+  public static TaskListType taskListType(com.uber.cadence.TaskListType t) {
     if (t == null) {
       return TaskListType.TASK_LIST_TYPE_INVALID;
     }
@@ -76,7 +76,7 @@ public final class EnumMapper {
   }
 
   public static EventFilterType eventFilterType(
-      com.uber.cadence.entities.HistoryEventFilterType t) {
+      com.uber.cadence.HistoryEventFilterType t) {
     if (t == null) {
       return EventFilterType.EVENT_FILTER_TYPE_INVALID;
     }
@@ -90,7 +90,7 @@ public final class EnumMapper {
   }
 
   public static QueryRejectCondition queryRejectCondition(
-      com.uber.cadence.entities.QueryRejectCondition t) {
+      com.uber.cadence.QueryRejectCondition t) {
     if (t == null) {
       return QueryRejectCondition.QUERY_REJECT_CONDITION_INVALID;
     }
@@ -104,7 +104,7 @@ public final class EnumMapper {
   }
 
   public static QueryConsistencyLevel queryConsistencyLevel(
-      com.uber.cadence.entities.QueryConsistencyLevel t) {
+      com.uber.cadence.QueryConsistencyLevel t) {
     if (t == null) {
       return QueryConsistencyLevel.QUERY_CONSISTENCY_LEVEL_INVALID;
     }
@@ -118,7 +118,7 @@ public final class EnumMapper {
   }
 
   public static ContinueAsNewInitiator continueAsNewInitiator(
-      com.uber.cadence.entities.ContinueAsNewInitiator t) {
+      com.uber.cadence.ContinueAsNewInitiator t) {
     if (t == null) {
       return ContinueAsNewInitiator.CONTINUE_AS_NEW_INITIATOR_INVALID;
     }
@@ -134,7 +134,7 @@ public final class EnumMapper {
   }
 
   public static WorkflowIdReusePolicy workflowIdReusePolicy(
-      com.uber.cadence.entities.WorkflowIdReusePolicy t) {
+      com.uber.cadence.WorkflowIdReusePolicy t) {
     if (t == null) {
       return WorkflowIdReusePolicy.WORKFLOW_ID_REUSE_POLICY_INVALID;
     }
@@ -151,7 +151,7 @@ public final class EnumMapper {
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static QueryResultType queryResultType(com.uber.cadence.entities.QueryResultType t) {
+  public static QueryResultType queryResultType(com.uber.cadence.QueryResultType t) {
     if (t == null) {
       return QUERY_RESULT_TYPE_INVALID;
     }
@@ -164,7 +164,7 @@ public final class EnumMapper {
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static ArchivalStatus archivalStatus(com.uber.cadence.entities.ArchivalStatus t) {
+  public static ArchivalStatus archivalStatus(com.uber.cadence.ArchivalStatus t) {
     if (t == null) {
       return ArchivalStatus.ARCHIVAL_STATUS_INVALID;
     }
@@ -177,7 +177,7 @@ public final class EnumMapper {
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static ParentClosePolicy parentClosePolicy(com.uber.cadence.entities.ParentClosePolicy t) {
+  public static ParentClosePolicy parentClosePolicy(com.uber.cadence.ParentClosePolicy t) {
     if (t == null) {
       return ParentClosePolicy.PARENT_CLOSE_POLICY_INVALID;
     }
@@ -193,7 +193,7 @@ public final class EnumMapper {
   }
 
   public static DecisionTaskFailedCause decisionTaskFailedCause(
-      com.uber.cadence.entities.DecisionTaskFailedCause t) {
+      com.uber.cadence.DecisionTaskFailedCause t) {
     if (t == null) {
       return DECISION_TASK_FAILED_CAUSE_INVALID;
     }
@@ -249,7 +249,7 @@ public final class EnumMapper {
   }
 
   public static WorkflowExecutionCloseStatus workflowExecutionCloseStatus(
-      com.uber.cadence.entities.WorkflowExecutionCloseStatus t) {
+      com.uber.cadence.WorkflowExecutionCloseStatus t) {
     if (t == null) {
       return WorkflowExecutionCloseStatus.WORKFLOW_EXECUTION_CLOSE_STATUS_INVALID;
     }
@@ -271,7 +271,7 @@ public final class EnumMapper {
   }
 
   public static QueryResultType queryTaskCompletedType(
-      com.uber.cadence.entities.QueryTaskCompletedType t) {
+      com.uber.cadence.QueryTaskCompletedType t) {
     if (t == null) {
       return QUERY_RESULT_TYPE_INVALID;
     }
@@ -284,315 +284,315 @@ public final class EnumMapper {
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.TaskListKind taskListKind(TaskListKind t) {
+  public static com.uber.cadence.TaskListKind taskListKind(TaskListKind t) {
     switch (t) {
       case TASK_LIST_KIND_INVALID:
         return null;
       case TASK_LIST_KIND_NORMAL:
-        return com.uber.cadence.entities.TaskListKind.NORMAL;
+        return com.uber.cadence.TaskListKind.NORMAL;
       case TASK_LIST_KIND_STICKY:
-        return com.uber.cadence.entities.TaskListKind.STICKY;
+        return com.uber.cadence.TaskListKind.STICKY;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.QueryRejectCondition queryRejectCondition(
+  public static com.uber.cadence.QueryRejectCondition queryRejectCondition(
       QueryRejectCondition t) {
     if (t == QueryRejectCondition.QUERY_REJECT_CONDITION_INVALID) {
       return null;
     }
     switch (t) {
       case QUERY_REJECT_CONDITION_NOT_OPEN:
-        return com.uber.cadence.entities.QueryRejectCondition.NOT_OPEN;
+        return com.uber.cadence.QueryRejectCondition.NOT_OPEN;
       case QUERY_REJECT_CONDITION_NOT_COMPLETED_CLEANLY:
-        return com.uber.cadence.entities.QueryRejectCondition.NOT_COMPLETED_CLEANLY;
+        return com.uber.cadence.QueryRejectCondition.NOT_COMPLETED_CLEANLY;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.ContinueAsNewInitiator continueAsNewInitiator(
+  public static com.uber.cadence.ContinueAsNewInitiator continueAsNewInitiator(
       ContinueAsNewInitiator t) {
     switch (t) {
       case CONTINUE_AS_NEW_INITIATOR_INVALID:
         return null;
       case CONTINUE_AS_NEW_INITIATOR_DECIDER:
-        return com.uber.cadence.entities.ContinueAsNewInitiator.Decider;
+        return com.uber.cadence.ContinueAsNewInitiator.Decider;
       case CONTINUE_AS_NEW_INITIATOR_RETRY_POLICY:
-        return com.uber.cadence.entities.ContinueAsNewInitiator.RetryPolicy;
+        return com.uber.cadence.ContinueAsNewInitiator.RetryPolicy;
       case CONTINUE_AS_NEW_INITIATOR_CRON_SCHEDULE:
-        return com.uber.cadence.entities.ContinueAsNewInitiator.CronSchedule;
+        return com.uber.cadence.ContinueAsNewInitiator.CronSchedule;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.WorkflowIdReusePolicy workflowIdReusePolicy(
+  public static com.uber.cadence.WorkflowIdReusePolicy workflowIdReusePolicy(
       WorkflowIdReusePolicy t) {
     switch (t) {
       case WORKFLOW_ID_REUSE_POLICY_INVALID:
         return null;
       case WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY:
-        return com.uber.cadence.entities.WorkflowIdReusePolicy.AllowDuplicateFailedOnly;
+        return com.uber.cadence.WorkflowIdReusePolicy.AllowDuplicateFailedOnly;
       case WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE:
-        return com.uber.cadence.entities.WorkflowIdReusePolicy.AllowDuplicate;
+        return com.uber.cadence.WorkflowIdReusePolicy.AllowDuplicate;
       case WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE:
-        return com.uber.cadence.entities.WorkflowIdReusePolicy.RejectDuplicate;
+        return com.uber.cadence.WorkflowIdReusePolicy.RejectDuplicate;
       case WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING:
-        return com.uber.cadence.entities.WorkflowIdReusePolicy.TerminateIfRunning;
+        return com.uber.cadence.WorkflowIdReusePolicy.TerminateIfRunning;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.ArchivalStatus archivalStatus(ArchivalStatus t) {
+  public static com.uber.cadence.ArchivalStatus archivalStatus(ArchivalStatus t) {
     switch (t) {
       case ARCHIVAL_STATUS_INVALID:
         return null;
       case ARCHIVAL_STATUS_DISABLED:
-        return com.uber.cadence.entities.ArchivalStatus.DISABLED;
+        return com.uber.cadence.ArchivalStatus.DISABLED;
       case ARCHIVAL_STATUS_ENABLED:
-        return com.uber.cadence.entities.ArchivalStatus.ENABLED;
+        return com.uber.cadence.ArchivalStatus.ENABLED;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.ParentClosePolicy parentClosePolicy(ParentClosePolicy t) {
+  public static com.uber.cadence.ParentClosePolicy parentClosePolicy(ParentClosePolicy t) {
     switch (t) {
       case PARENT_CLOSE_POLICY_INVALID:
         return null;
       case PARENT_CLOSE_POLICY_ABANDON:
-        return com.uber.cadence.entities.ParentClosePolicy.ABANDON;
+        return com.uber.cadence.ParentClosePolicy.ABANDON;
       case PARENT_CLOSE_POLICY_REQUEST_CANCEL:
-        return com.uber.cadence.entities.ParentClosePolicy.REQUEST_CANCEL;
+        return com.uber.cadence.ParentClosePolicy.REQUEST_CANCEL;
       case PARENT_CLOSE_POLICY_TERMINATE:
-        return com.uber.cadence.entities.ParentClosePolicy.TERMINATE;
+        return com.uber.cadence.ParentClosePolicy.TERMINATE;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.DecisionTaskFailedCause decisionTaskFailedCause(
+  public static com.uber.cadence.DecisionTaskFailedCause decisionTaskFailedCause(
       DecisionTaskFailedCause t) {
     switch (t) {
       case DECISION_TASK_FAILED_CAUSE_INVALID:
         return null;
       case DECISION_TASK_FAILED_CAUSE_UNHANDLED_DECISION:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.UNHANDLED_DECISION;
+        return com.uber.cadence.DecisionTaskFailedCause.UNHANDLED_DECISION;
       case DECISION_TASK_FAILED_CAUSE_BAD_SCHEDULE_ACTIVITY_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.BAD_SCHEDULE_ACTIVITY_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_SCHEDULE_ACTIVITY_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_REQUEST_CANCEL_ACTIVITY_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause
+        return com.uber.cadence.DecisionTaskFailedCause
             .BAD_REQUEST_CANCEL_ACTIVITY_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_START_TIMER_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.BAD_START_TIMER_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_START_TIMER_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_CANCEL_TIMER_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.BAD_CANCEL_TIMER_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_CANCEL_TIMER_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_RECORD_MARKER_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.BAD_RECORD_MARKER_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_RECORD_MARKER_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_COMPLETE_WORKFLOW_EXECUTION_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause
+        return com.uber.cadence.DecisionTaskFailedCause
             .BAD_COMPLETE_WORKFLOW_EXECUTION_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_FAIL_WORKFLOW_EXECUTION_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause
+        return com.uber.cadence.DecisionTaskFailedCause
             .BAD_FAIL_WORKFLOW_EXECUTION_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_CANCEL_WORKFLOW_EXECUTION_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause
+        return com.uber.cadence.DecisionTaskFailedCause
             .BAD_CANCEL_WORKFLOW_EXECUTION_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause
+        return com.uber.cadence.DecisionTaskFailedCause
             .BAD_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_CONTINUE_AS_NEW_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.BAD_CONTINUE_AS_NEW_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_CONTINUE_AS_NEW_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_START_TIMER_DUPLICATE_ID:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.START_TIMER_DUPLICATE_ID;
+        return com.uber.cadence.DecisionTaskFailedCause.START_TIMER_DUPLICATE_ID;
       case DECISION_TASK_FAILED_CAUSE_RESET_STICKY_TASK_LIST:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.RESET_STICKY_TASKLIST;
+        return com.uber.cadence.DecisionTaskFailedCause.RESET_STICKY_TASKLIST;
       case DECISION_TASK_FAILED_CAUSE_WORKFLOW_WORKER_UNHANDLED_FAILURE:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.WORKFLOW_WORKER_UNHANDLED_FAILURE;
+        return com.uber.cadence.DecisionTaskFailedCause.WORKFLOW_WORKER_UNHANDLED_FAILURE;
       case DECISION_TASK_FAILED_CAUSE_BAD_SIGNAL_WORKFLOW_EXECUTION_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause
+        return com.uber.cadence.DecisionTaskFailedCause
             .BAD_SIGNAL_WORKFLOW_EXECUTION_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_START_CHILD_EXECUTION_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause
+        return com.uber.cadence.DecisionTaskFailedCause
             .BAD_START_CHILD_EXECUTION_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_FORCE_CLOSE_DECISION:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.FORCE_CLOSE_DECISION;
+        return com.uber.cadence.DecisionTaskFailedCause.FORCE_CLOSE_DECISION;
       case DECISION_TASK_FAILED_CAUSE_FAILOVER_CLOSE_DECISION:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.FAILOVER_CLOSE_DECISION;
+        return com.uber.cadence.DecisionTaskFailedCause.FAILOVER_CLOSE_DECISION;
       case DECISION_TASK_FAILED_CAUSE_BAD_SIGNAL_INPUT_SIZE:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.BAD_SIGNAL_INPUT_SIZE;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_SIGNAL_INPUT_SIZE;
       case DECISION_TASK_FAILED_CAUSE_RESET_WORKFLOW:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.RESET_WORKFLOW;
+        return com.uber.cadence.DecisionTaskFailedCause.RESET_WORKFLOW;
       case DECISION_TASK_FAILED_CAUSE_BAD_BINARY:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.BAD_BINARY;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_BINARY;
       case DECISION_TASK_FAILED_CAUSE_SCHEDULE_ACTIVITY_DUPLICATE_ID:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.SCHEDULE_ACTIVITY_DUPLICATE_ID;
+        return com.uber.cadence.DecisionTaskFailedCause.SCHEDULE_ACTIVITY_DUPLICATE_ID;
       case DECISION_TASK_FAILED_CAUSE_BAD_SEARCH_ATTRIBUTES:
-        return com.uber.cadence.entities.DecisionTaskFailedCause.BAD_SEARCH_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_SEARCH_ATTRIBUTES;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.WorkflowExecutionCloseStatus workflowExecutionCloseStatus(
+  public static com.uber.cadence.WorkflowExecutionCloseStatus workflowExecutionCloseStatus(
       WorkflowExecutionCloseStatus t) {
     switch (t) {
       case WORKFLOW_EXECUTION_CLOSE_STATUS_INVALID:
         return null;
       case WORKFLOW_EXECUTION_CLOSE_STATUS_COMPLETED:
-        return com.uber.cadence.entities.WorkflowExecutionCloseStatus.COMPLETED;
+        return com.uber.cadence.WorkflowExecutionCloseStatus.COMPLETED;
       case WORKFLOW_EXECUTION_CLOSE_STATUS_FAILED:
-        return com.uber.cadence.entities.WorkflowExecutionCloseStatus.FAILED;
+        return com.uber.cadence.WorkflowExecutionCloseStatus.FAILED;
       case WORKFLOW_EXECUTION_CLOSE_STATUS_CANCELED:
-        return com.uber.cadence.entities.WorkflowExecutionCloseStatus.CANCELED;
+        return com.uber.cadence.WorkflowExecutionCloseStatus.CANCELED;
       case WORKFLOW_EXECUTION_CLOSE_STATUS_TERMINATED:
-        return com.uber.cadence.entities.WorkflowExecutionCloseStatus.TERMINATED;
+        return com.uber.cadence.WorkflowExecutionCloseStatus.TERMINATED;
       case WORKFLOW_EXECUTION_CLOSE_STATUS_CONTINUED_AS_NEW:
-        return com.uber.cadence.entities.WorkflowExecutionCloseStatus.CONTINUED_AS_NEW;
+        return com.uber.cadence.WorkflowExecutionCloseStatus.CONTINUED_AS_NEW;
       case WORKFLOW_EXECUTION_CLOSE_STATUS_TIMED_OUT:
-        return com.uber.cadence.entities.WorkflowExecutionCloseStatus.TIMED_OUT;
+        return com.uber.cadence.WorkflowExecutionCloseStatus.TIMED_OUT;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.DomainStatus domainStatus(DomainStatus t) {
+  public static com.uber.cadence.DomainStatus domainStatus(DomainStatus t) {
     switch (t) {
       case DOMAIN_STATUS_INVALID:
         return null;
       case DOMAIN_STATUS_REGISTERED:
-        return com.uber.cadence.entities.DomainStatus.REGISTERED;
+        return com.uber.cadence.DomainStatus.REGISTERED;
       case DOMAIN_STATUS_DEPRECATED:
-        return com.uber.cadence.entities.DomainStatus.DEPRECATED;
+        return com.uber.cadence.DomainStatus.DEPRECATED;
       case DOMAIN_STATUS_DELETED:
-        return com.uber.cadence.entities.DomainStatus.DELETED;
+        return com.uber.cadence.DomainStatus.DELETED;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.PendingActivityState pendingActivityState(
+  public static com.uber.cadence.PendingActivityState pendingActivityState(
       PendingActivityState t) {
     switch (t) {
       case PENDING_ACTIVITY_STATE_INVALID:
         return null;
       case PENDING_ACTIVITY_STATE_SCHEDULED:
-        return com.uber.cadence.entities.PendingActivityState.SCHEDULED;
+        return com.uber.cadence.PendingActivityState.SCHEDULED;
       case PENDING_ACTIVITY_STATE_STARTED:
-        return com.uber.cadence.entities.PendingActivityState.STARTED;
+        return com.uber.cadence.PendingActivityState.STARTED;
       case PENDING_ACTIVITY_STATE_CANCEL_REQUESTED:
-        return com.uber.cadence.entities.PendingActivityState.CANCEL_REQUESTED;
+        return com.uber.cadence.PendingActivityState.CANCEL_REQUESTED;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.PendingDecisionState pendingDecisionState(
+  public static com.uber.cadence.PendingDecisionState pendingDecisionState(
       PendingDecisionState t) {
     switch (t) {
       case PENDING_DECISION_STATE_INVALID:
         return null;
       case PENDING_DECISION_STATE_SCHEDULED:
-        return com.uber.cadence.entities.PendingDecisionState.SCHEDULED;
+        return com.uber.cadence.PendingDecisionState.SCHEDULED;
       case PENDING_DECISION_STATE_STARTED:
-        return com.uber.cadence.entities.PendingDecisionState.STARTED;
+        return com.uber.cadence.PendingDecisionState.STARTED;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.IndexedValueType indexedValueType(IndexedValueType t) {
+  public static com.uber.cadence.IndexedValueType indexedValueType(IndexedValueType t) {
     switch (t) {
       case INDEXED_VALUE_TYPE_INVALID:
         throw new IllegalArgumentException("received IndexedValueType_INDEXED_VALUE_TYPE_INVALID");
       case INDEXED_VALUE_TYPE_STRING:
-        return com.uber.cadence.entities.IndexedValueType.STRING;
+        return com.uber.cadence.IndexedValueType.STRING;
       case INDEXED_VALUE_TYPE_KEYWORD:
-        return com.uber.cadence.entities.IndexedValueType.KEYWORD;
+        return com.uber.cadence.IndexedValueType.KEYWORD;
       case INDEXED_VALUE_TYPE_INT:
-        return com.uber.cadence.entities.IndexedValueType.INT;
+        return com.uber.cadence.IndexedValueType.INT;
       case INDEXED_VALUE_TYPE_DOUBLE:
-        return com.uber.cadence.entities.IndexedValueType.DOUBLE;
+        return com.uber.cadence.IndexedValueType.DOUBLE;
       case INDEXED_VALUE_TYPE_BOOL:
-        return com.uber.cadence.entities.IndexedValueType.BOOL;
+        return com.uber.cadence.IndexedValueType.BOOL;
       case INDEXED_VALUE_TYPE_DATETIME:
-        return com.uber.cadence.entities.IndexedValueType.DATETIME;
+        return com.uber.cadence.IndexedValueType.DATETIME;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.EncodingType encodingType(EncodingType t) {
+  public static com.uber.cadence.EncodingType encodingType(EncodingType t) {
     switch (t) {
       case ENCODING_TYPE_INVALID:
         return null;
       case ENCODING_TYPE_THRIFTRW:
-        return com.uber.cadence.entities.EncodingType.ThriftRW;
+        return com.uber.cadence.EncodingType.ThriftRW;
       case ENCODING_TYPE_JSON:
-        return com.uber.cadence.entities.EncodingType.JSON;
+        return com.uber.cadence.EncodingType.JSON;
       case ENCODING_TYPE_PROTO3:
         throw new UnsupportedOperationException();
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.TimeoutType timeoutType(TimeoutType t) {
+  public static com.uber.cadence.TimeoutType timeoutType(TimeoutType t) {
     switch (t) {
       case TIMEOUT_TYPE_INVALID:
         return null;
       case TIMEOUT_TYPE_START_TO_CLOSE:
-        return com.uber.cadence.entities.TimeoutType.START_TO_CLOSE;
+        return com.uber.cadence.TimeoutType.START_TO_CLOSE;
       case TIMEOUT_TYPE_SCHEDULE_TO_START:
-        return com.uber.cadence.entities.TimeoutType.SCHEDULE_TO_START;
+        return com.uber.cadence.TimeoutType.SCHEDULE_TO_START;
       case TIMEOUT_TYPE_SCHEDULE_TO_CLOSE:
-        return com.uber.cadence.entities.TimeoutType.SCHEDULE_TO_CLOSE;
+        return com.uber.cadence.TimeoutType.SCHEDULE_TO_CLOSE;
       case TIMEOUT_TYPE_HEARTBEAT:
-        return com.uber.cadence.entities.TimeoutType.HEARTBEAT;
+        return com.uber.cadence.TimeoutType.HEARTBEAT;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.DecisionTaskTimedOutCause decisionTaskTimedOutCause(
+  public static com.uber.cadence.DecisionTaskTimedOutCause decisionTaskTimedOutCause(
       DecisionTaskTimedOutCause t) {
     switch (t) {
       case DECISION_TASK_TIMED_OUT_CAUSE_INVALID:
         return null;
       case DECISION_TASK_TIMED_OUT_CAUSE_TIMEOUT:
-        return com.uber.cadence.entities.DecisionTaskTimedOutCause.TIMEOUT;
+        return com.uber.cadence.DecisionTaskTimedOutCause.TIMEOUT;
       case DECISION_TASK_TIMED_OUT_CAUSE_RESET:
-        return com.uber.cadence.entities.DecisionTaskTimedOutCause.RESET;
+        return com.uber.cadence.DecisionTaskTimedOutCause.RESET;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.CancelExternalWorkflowExecutionFailedCause
+  public static com.uber.cadence.CancelExternalWorkflowExecutionFailedCause
       cancelExternalWorkflowExecutionFailedCause(CancelExternalWorkflowExecutionFailedCause t) {
     switch (t) {
       case CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_INVALID:
         return null;
       case CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_UNKNOWN_EXTERNAL_WORKFLOW_EXECUTION:
-        return com.uber.cadence.entities.CancelExternalWorkflowExecutionFailedCause
+        return com.uber.cadence.CancelExternalWorkflowExecutionFailedCause
             .UNKNOWN_EXTERNAL_WORKFLOW_EXECUTION;
       case CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_COMPLETED:
-        return com.uber.cadence.entities.CancelExternalWorkflowExecutionFailedCause
+        return com.uber.cadence.CancelExternalWorkflowExecutionFailedCause
             .WORKFLOW_ALREADY_COMPLETED;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.SignalExternalWorkflowExecutionFailedCause
+  public static com.uber.cadence.SignalExternalWorkflowExecutionFailedCause
       signalExternalWorkflowExecutionFailedCause(SignalExternalWorkflowExecutionFailedCause t) {
     switch (t) {
       case SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_INVALID:
         return null;
       case SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_UNKNOWN_EXTERNAL_WORKFLOW_EXECUTION:
-        return com.uber.cadence.entities.SignalExternalWorkflowExecutionFailedCause
+        return com.uber.cadence.SignalExternalWorkflowExecutionFailedCause
             .UNKNOWN_EXTERNAL_WORKFLOW_EXECUTION;
       case SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_COMPLETED:
-        return com.uber.cadence.entities.SignalExternalWorkflowExecutionFailedCause
+        return com.uber.cadence.SignalExternalWorkflowExecutionFailedCause
             .WORKFLOW_ALREADY_COMPLETED;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.entities.ChildWorkflowExecutionFailedCause
+  public static com.uber.cadence.ChildWorkflowExecutionFailedCause
       childWorkflowExecutionFailedCause(ChildWorkflowExecutionFailedCause t) {
     switch (t) {
       case CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_INVALID:
         return null;
       case CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_RUNNING:
-        return com.uber.cadence.entities.ChildWorkflowExecutionFailedCause.WORKFLOW_ALREADY_RUNNING;
+        return com.uber.cadence.ChildWorkflowExecutionFailedCause.WORKFLOW_ALREADY_RUNNING;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }

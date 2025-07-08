@@ -54,52 +54,52 @@ import java.util.stream.Collectors;
 
 public class ResponseMapper {
 
-  public static com.uber.cadence.entities.StartWorkflowExecutionResponse
+  public static com.uber.cadence.StartWorkflowExecutionResponse
       startWorkflowExecutionResponse(StartWorkflowExecutionResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.StartWorkflowExecutionResponse startWorkflowExecutionResponse =
-        new com.uber.cadence.entities.StartWorkflowExecutionResponse();
+    com.uber.cadence.StartWorkflowExecutionResponse startWorkflowExecutionResponse =
+        new com.uber.cadence.StartWorkflowExecutionResponse();
     startWorkflowExecutionResponse.setRunId(t.getRunId());
     return startWorkflowExecutionResponse;
   }
 
-  public static com.uber.cadence.entities.StartWorkflowExecutionAsyncResponse
+  public static com.uber.cadence.StartWorkflowExecutionAsyncResponse
       startWorkflowExecutionAsyncResponse(StartWorkflowExecutionAsyncResponse t) {
-    return t == null ? null : new com.uber.cadence.entities.StartWorkflowExecutionAsyncResponse();
+    return t == null ? null : new com.uber.cadence.StartWorkflowExecutionAsyncResponse();
   }
 
-  public static com.uber.cadence.entities.DescribeTaskListResponse describeTaskListResponse(
+  public static com.uber.cadence.DescribeTaskListResponse describeTaskListResponse(
       DescribeTaskListResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.DescribeTaskListResponse describeTaskListResponse =
-        new com.uber.cadence.entities.DescribeTaskListResponse();
+    com.uber.cadence.DescribeTaskListResponse describeTaskListResponse =
+        new com.uber.cadence.DescribeTaskListResponse();
     describeTaskListResponse.setPollers(pollerInfoArray(t.getPollersList()));
     describeTaskListResponse.setTaskListStatus(taskListStatus(t.getTaskListStatus()));
     return describeTaskListResponse;
   }
 
-  public static com.uber.cadence.entities.RestartWorkflowExecutionResponse
+  public static com.uber.cadence.RestartWorkflowExecutionResponse
       restartWorkflowExecutionResponse(RestartWorkflowExecutionResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.RestartWorkflowExecutionResponse restartWorkflowExecutionResponse =
-        new com.uber.cadence.entities.RestartWorkflowExecutionResponse();
+    com.uber.cadence.RestartWorkflowExecutionResponse restartWorkflowExecutionResponse =
+        new com.uber.cadence.RestartWorkflowExecutionResponse();
     restartWorkflowExecutionResponse.setRunId(t.getRunId());
     return restartWorkflowExecutionResponse;
   }
 
-  public static com.uber.cadence.entities.DescribeWorkflowExecutionResponse
+  public static com.uber.cadence.DescribeWorkflowExecutionResponse
       describeWorkflowExecutionResponse(DescribeWorkflowExecutionResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.DescribeWorkflowExecutionResponse describeWorkflowExecutionResponse =
-        new com.uber.cadence.entities.DescribeWorkflowExecutionResponse();
+    com.uber.cadence.DescribeWorkflowExecutionResponse describeWorkflowExecutionResponse =
+        new com.uber.cadence.DescribeWorkflowExecutionResponse();
     describeWorkflowExecutionResponse.setExecutionConfiguration(
         workflowExecutionConfiguration(t.getExecutionConfiguration()));
     describeWorkflowExecutionResponse.setWorkflowExecutionInfo(
@@ -113,35 +113,35 @@ public class ResponseMapper {
     return describeWorkflowExecutionResponse;
   }
 
-  public static com.uber.cadence.entities.ClusterInfo getClusterInfoResponse(
+  public static com.uber.cadence.ClusterInfo getClusterInfoResponse(
       GetClusterInfoResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.ClusterInfo clusterInfo = new com.uber.cadence.entities.ClusterInfo();
+    com.uber.cadence.ClusterInfo clusterInfo = new com.uber.cadence.ClusterInfo();
     clusterInfo.setSupportedClientVersions(supportedClientVersions(t.getSupportedClientVersions()));
     return clusterInfo;
   }
 
-  public static com.uber.cadence.entities.GetSearchAttributesResponse getSearchAttributesResponse(
+  public static com.uber.cadence.GetSearchAttributesResponse getSearchAttributesResponse(
       GetSearchAttributesResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.GetSearchAttributesResponse getSearchAttributesResponse =
-        new com.uber.cadence.entities.GetSearchAttributesResponse();
+    com.uber.cadence.GetSearchAttributesResponse getSearchAttributesResponse =
+        new com.uber.cadence.GetSearchAttributesResponse();
     getSearchAttributesResponse.setKeys(indexedValueTypeMap(t.getKeysMap()));
     return getSearchAttributesResponse;
   }
 
-  public static com.uber.cadence.entities.GetWorkflowExecutionHistoryResponse
+  public static com.uber.cadence.GetWorkflowExecutionHistoryResponse
       getWorkflowExecutionHistoryResponse(GetWorkflowExecutionHistoryResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.GetWorkflowExecutionHistoryResponse
+    com.uber.cadence.GetWorkflowExecutionHistoryResponse
         getWorkflowExecutionHistoryResponse =
-            new com.uber.cadence.entities.GetWorkflowExecutionHistoryResponse();
+            new com.uber.cadence.GetWorkflowExecutionHistoryResponse();
     getWorkflowExecutionHistoryResponse.setHistory(history(t.getHistory()));
     getWorkflowExecutionHistoryResponse.setRawHistory(dataBlobArray(t.getRawHistoryList()));
     getWorkflowExecutionHistoryResponse.setNextPageToken(byteStringToArray(t.getNextPageToken()));
@@ -149,49 +149,49 @@ public class ResponseMapper {
     return getWorkflowExecutionHistoryResponse;
   }
 
-  public static com.uber.cadence.entities.ListArchivedWorkflowExecutionsResponse
+  public static com.uber.cadence.ListArchivedWorkflowExecutionsResponse
       listArchivedWorkflowExecutionsResponse(ListArchivedWorkflowExecutionsResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.ListArchivedWorkflowExecutionsResponse res =
-        new com.uber.cadence.entities.ListArchivedWorkflowExecutionsResponse();
+    com.uber.cadence.ListArchivedWorkflowExecutionsResponse res =
+        new com.uber.cadence.ListArchivedWorkflowExecutionsResponse();
     res.setExecutions(workflowExecutionInfoArray(t.getExecutionsList()));
     res.setNextPageToken(byteStringToArray(t.getNextPageToken()));
     return res;
   }
 
-  public static com.uber.cadence.entities.ListClosedWorkflowExecutionsResponse
+  public static com.uber.cadence.ListClosedWorkflowExecutionsResponse
       listClosedWorkflowExecutionsResponse(ListClosedWorkflowExecutionsResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.ListClosedWorkflowExecutionsResponse res =
-        new com.uber.cadence.entities.ListClosedWorkflowExecutionsResponse();
+    com.uber.cadence.ListClosedWorkflowExecutionsResponse res =
+        new com.uber.cadence.ListClosedWorkflowExecutionsResponse();
     res.setExecutions(workflowExecutionInfoArray(t.getExecutionsList()));
     res.setNextPageToken(byteStringToArray(t.getNextPageToken()));
     return res;
   }
 
-  public static com.uber.cadence.entities.ListOpenWorkflowExecutionsResponse
+  public static com.uber.cadence.ListOpenWorkflowExecutionsResponse
       listOpenWorkflowExecutionsResponse(ListOpenWorkflowExecutionsResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.ListOpenWorkflowExecutionsResponse res =
-        new com.uber.cadence.entities.ListOpenWorkflowExecutionsResponse();
+    com.uber.cadence.ListOpenWorkflowExecutionsResponse res =
+        new com.uber.cadence.ListOpenWorkflowExecutionsResponse();
     res.setExecutions(workflowExecutionInfoArray(t.getExecutionsList()));
     res.setNextPageToken(byteStringToArray(t.getNextPageToken()));
     return res;
   }
 
-  public static com.uber.cadence.entities.ListTaskListPartitionsResponse
+  public static com.uber.cadence.ListTaskListPartitionsResponse
       listTaskListPartitionsResponse(ListTaskListPartitionsResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.ListTaskListPartitionsResponse res =
-        new com.uber.cadence.entities.ListTaskListPartitionsResponse();
+    com.uber.cadence.ListTaskListPartitionsResponse res =
+        new com.uber.cadence.ListTaskListPartitionsResponse();
     res.setActivityTaskListPartitions(
         taskListPartitionMetadataArray(t.getActivityTaskListPartitionsList()));
     res.setDecisionTaskListPartitions(
@@ -199,25 +199,25 @@ public class ResponseMapper {
     return res;
   }
 
-  public static com.uber.cadence.entities.ListWorkflowExecutionsResponse
+  public static com.uber.cadence.ListWorkflowExecutionsResponse
       listWorkflowExecutionsResponse(ListWorkflowExecutionsResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.ListWorkflowExecutionsResponse res =
-        new com.uber.cadence.entities.ListWorkflowExecutionsResponse();
+    com.uber.cadence.ListWorkflowExecutionsResponse res =
+        new com.uber.cadence.ListWorkflowExecutionsResponse();
     res.setExecutions(workflowExecutionInfoArray(t.getExecutionsList()));
     res.setNextPageToken(byteStringToArray(t.getNextPageToken()));
     return res;
   }
 
-  public static com.uber.cadence.entities.PollForActivityTaskResponse pollForActivityTaskResponse(
+  public static com.uber.cadence.PollForActivityTaskResponse pollForActivityTaskResponse(
       PollForActivityTaskResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.PollForActivityTaskResponse res =
-        new com.uber.cadence.entities.PollForActivityTaskResponse();
+    com.uber.cadence.PollForActivityTaskResponse res =
+        new com.uber.cadence.PollForActivityTaskResponse();
     res.setTaskToken(byteStringToArray(t.getTaskToken()));
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
     res.setActivityId(t.getActivityId());
@@ -237,13 +237,13 @@ public class ResponseMapper {
     return res;
   }
 
-  public static com.uber.cadence.entities.PollForDecisionTaskResponse pollForDecisionTaskResponse(
+  public static com.uber.cadence.PollForDecisionTaskResponse pollForDecisionTaskResponse(
       PollForDecisionTaskResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.PollForDecisionTaskResponse res =
-        new com.uber.cadence.entities.PollForDecisionTaskResponse();
+    com.uber.cadence.PollForDecisionTaskResponse res =
+        new com.uber.cadence.PollForDecisionTaskResponse();
     res.setTaskToken(byteStringToArray(t.getTaskToken()));
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
     res.setWorkflowType(workflowType(t.getWorkflowType()));
@@ -264,95 +264,95 @@ public class ResponseMapper {
     return res;
   }
 
-  public static com.uber.cadence.entities.QueryWorkflowResponse queryWorkflowResponse(
+  public static com.uber.cadence.QueryWorkflowResponse queryWorkflowResponse(
       QueryWorkflowResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.QueryWorkflowResponse res =
-        new com.uber.cadence.entities.QueryWorkflowResponse();
+    com.uber.cadence.QueryWorkflowResponse res =
+        new com.uber.cadence.QueryWorkflowResponse();
     res.setQueryResult(payload(t.getQueryResult()));
     res.setQueryRejected(queryRejected(t.getQueryRejected()));
     return res;
   }
 
-  public static com.uber.cadence.entities.RecordActivityTaskHeartbeatResponse
+  public static com.uber.cadence.RecordActivityTaskHeartbeatResponse
       recordActivityTaskHeartbeatByIdResponse(RecordActivityTaskHeartbeatByIDResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.RecordActivityTaskHeartbeatResponse res =
-        new com.uber.cadence.entities.RecordActivityTaskHeartbeatResponse();
+    com.uber.cadence.RecordActivityTaskHeartbeatResponse res =
+        new com.uber.cadence.RecordActivityTaskHeartbeatResponse();
     res.setCancelRequested(t.getCancelRequested());
     return res;
   }
 
-  public static com.uber.cadence.entities.RecordActivityTaskHeartbeatResponse
+  public static com.uber.cadence.RecordActivityTaskHeartbeatResponse
       recordActivityTaskHeartbeatResponse(RecordActivityTaskHeartbeatResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.RecordActivityTaskHeartbeatResponse res =
-        new com.uber.cadence.entities.RecordActivityTaskHeartbeatResponse();
+    com.uber.cadence.RecordActivityTaskHeartbeatResponse res =
+        new com.uber.cadence.RecordActivityTaskHeartbeatResponse();
     res.setCancelRequested(t.getCancelRequested());
     return res;
   }
 
-  public static com.uber.cadence.entities.ResetWorkflowExecutionResponse
+  public static com.uber.cadence.ResetWorkflowExecutionResponse
       resetWorkflowExecutionResponse(ResetWorkflowExecutionResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.ResetWorkflowExecutionResponse res =
-        new com.uber.cadence.entities.ResetWorkflowExecutionResponse();
+    com.uber.cadence.ResetWorkflowExecutionResponse res =
+        new com.uber.cadence.ResetWorkflowExecutionResponse();
     res.setRunId(t.getRunId());
     return res;
   }
 
-  public static com.uber.cadence.entities.RespondDecisionTaskCompletedResponse
+  public static com.uber.cadence.RespondDecisionTaskCompletedResponse
       respondDecisionTaskCompletedResponse(RespondDecisionTaskCompletedResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.RespondDecisionTaskCompletedResponse res =
-        new com.uber.cadence.entities.RespondDecisionTaskCompletedResponse();
+    com.uber.cadence.RespondDecisionTaskCompletedResponse res =
+        new com.uber.cadence.RespondDecisionTaskCompletedResponse();
     res.setDecisionTask(pollForDecisionTaskResponse(t.getDecisionTask()));
     res.setActivitiesToDispatchLocally(
         activityLocalDispatchInfoMap(t.getActivitiesToDispatchLocallyMap()));
     return res;
   }
 
-  public static com.uber.cadence.entities.ListWorkflowExecutionsResponse
+  public static com.uber.cadence.ListWorkflowExecutionsResponse
       scanWorkflowExecutionsResponse(ScanWorkflowExecutionsResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.ListWorkflowExecutionsResponse res =
-        new com.uber.cadence.entities.ListWorkflowExecutionsResponse();
+    com.uber.cadence.ListWorkflowExecutionsResponse res =
+        new com.uber.cadence.ListWorkflowExecutionsResponse();
     res.setExecutions(workflowExecutionInfoArray(t.getExecutionsList()));
     res.setNextPageToken(byteStringToArray(t.getNextPageToken()));
     return res;
   }
 
-  public static com.uber.cadence.entities.CountWorkflowExecutionsResponse
+  public static com.uber.cadence.CountWorkflowExecutionsResponse
       countWorkflowExecutionsResponse(CountWorkflowExecutionsResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.CountWorkflowExecutionsResponse res =
-        new com.uber.cadence.entities.CountWorkflowExecutionsResponse();
+    com.uber.cadence.CountWorkflowExecutionsResponse res =
+        new com.uber.cadence.CountWorkflowExecutionsResponse();
     res.setCount(t.getCount());
     return res;
   }
 
-  public static com.uber.cadence.entities.DescribeDomainResponse describeDomainResponse(
+  public static com.uber.cadence.DescribeDomainResponse describeDomainResponse(
       DescribeDomainResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.DescribeDomainResponse response =
-        new com.uber.cadence.entities.DescribeDomainResponse();
-    com.uber.cadence.entities.DomainInfo domainInfo = new com.uber.cadence.entities.DomainInfo();
+    com.uber.cadence.DescribeDomainResponse response =
+        new com.uber.cadence.DescribeDomainResponse();
+    com.uber.cadence.DomainInfo domainInfo = new com.uber.cadence.DomainInfo();
     response.setDomainInfo(domainInfo);
 
     domainInfo.setName(t.getDomain().getName());
@@ -362,8 +362,8 @@ public class ResponseMapper {
     domainInfo.setData(t.getDomain().getDataMap());
     domainInfo.setUuid(t.getDomain().getId());
 
-    com.uber.cadence.entities.DomainConfiguration domainConfiguration =
-        new com.uber.cadence.entities.DomainConfiguration();
+    com.uber.cadence.DomainConfiguration domainConfiguration =
+        new com.uber.cadence.DomainConfiguration();
     response.setConfiguration(domainConfiguration);
 
     domainConfiguration.setWorkflowExecutionRetentionPeriodInDays(
@@ -377,8 +377,8 @@ public class ResponseMapper {
         archivalStatus(t.getDomain().getVisibilityArchivalStatus()));
     domainConfiguration.setVisibilityArchivalURI(t.getDomain().getVisibilityArchivalUri());
 
-    com.uber.cadence.entities.DomainReplicationConfiguration replicationConfiguration =
-        new com.uber.cadence.entities.DomainReplicationConfiguration();
+    com.uber.cadence.DomainReplicationConfiguration replicationConfiguration =
+        new com.uber.cadence.DomainReplicationConfiguration();
     response.setReplicationConfiguration(replicationConfiguration);
 
     replicationConfiguration.setActiveClusterName(t.getDomain().getActiveClusterName());
@@ -390,45 +390,45 @@ public class ResponseMapper {
     return response;
   }
 
-  public static com.uber.cadence.entities.ListDomainsResponse listDomainsResponse(
+  public static com.uber.cadence.ListDomainsResponse listDomainsResponse(
       ListDomainsResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.ListDomainsResponse res =
-        new com.uber.cadence.entities.ListDomainsResponse();
+    com.uber.cadence.ListDomainsResponse res =
+        new com.uber.cadence.ListDomainsResponse();
     res.setDomains(describeDomainResponseArray(t.getDomainsList()));
     res.setNextPageToken(byteStringToArray(t.getNextPageToken()));
     return res;
   }
 
-  public static com.uber.cadence.entities.StartWorkflowExecutionResponse
+  public static com.uber.cadence.StartWorkflowExecutionResponse
       signalWithStartWorkflowExecutionResponse(SignalWithStartWorkflowExecutionResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.StartWorkflowExecutionResponse startWorkflowExecutionResponse =
-        new com.uber.cadence.entities.StartWorkflowExecutionResponse();
+    com.uber.cadence.StartWorkflowExecutionResponse startWorkflowExecutionResponse =
+        new com.uber.cadence.StartWorkflowExecutionResponse();
     startWorkflowExecutionResponse.setRunId(t.getRunId());
     return startWorkflowExecutionResponse;
   }
 
-  public static com.uber.cadence.entities.SignalWithStartWorkflowExecutionAsyncResponse
+  public static com.uber.cadence.SignalWithStartWorkflowExecutionAsyncResponse
       signalWithStartWorkflowExecutionAsyncResponse(
           SignalWithStartWorkflowExecutionAsyncResponse t) {
     return t == null
         ? null
-        : new com.uber.cadence.entities.SignalWithStartWorkflowExecutionAsyncResponse();
+        : new com.uber.cadence.SignalWithStartWorkflowExecutionAsyncResponse();
   }
 
-  public static com.uber.cadence.entities.UpdateDomainResponse updateDomainResponse(
+  public static com.uber.cadence.UpdateDomainResponse updateDomainResponse(
       UpdateDomainResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.UpdateDomainResponse updateDomainResponse =
-        new com.uber.cadence.entities.UpdateDomainResponse();
-    com.uber.cadence.entities.DomainInfo domainInfo = new com.uber.cadence.entities.DomainInfo();
+    com.uber.cadence.UpdateDomainResponse updateDomainResponse =
+        new com.uber.cadence.UpdateDomainResponse();
+    com.uber.cadence.DomainInfo domainInfo = new com.uber.cadence.DomainInfo();
     updateDomainResponse.setDomainInfo(domainInfo);
 
     domainInfo.setName(t.getDomain().getName());
@@ -438,8 +438,8 @@ public class ResponseMapper {
     domainInfo.setData(t.getDomain().getDataMap());
     domainInfo.setUuid(t.getDomain().getId());
 
-    com.uber.cadence.entities.DomainConfiguration domainConfiguration =
-        new com.uber.cadence.entities.DomainConfiguration();
+    com.uber.cadence.DomainConfiguration domainConfiguration =
+        new com.uber.cadence.DomainConfiguration();
     updateDomainResponse.setConfiguration(domainConfiguration);
 
     domainConfiguration.setWorkflowExecutionRetentionPeriodInDays(
@@ -453,8 +453,8 @@ public class ResponseMapper {
         archivalStatus(t.getDomain().getVisibilityArchivalStatus()));
     domainConfiguration.setVisibilityArchivalURI(t.getDomain().getVisibilityArchivalUri());
 
-    com.uber.cadence.entities.DomainReplicationConfiguration domainReplicationConfiguration =
-        new com.uber.cadence.entities.DomainReplicationConfiguration();
+    com.uber.cadence.DomainReplicationConfiguration domainReplicationConfiguration =
+        new com.uber.cadence.DomainReplicationConfiguration();
     updateDomainResponse.setReplicationConfiguration(domainReplicationConfiguration);
 
     domainReplicationConfiguration.setActiveClusterName(t.getDomain().getActiveClusterName());
@@ -465,46 +465,46 @@ public class ResponseMapper {
     return updateDomainResponse;
   }
 
-  public static com.uber.cadence.entities.RecordActivityTaskHeartbeatResponse
+  public static com.uber.cadence.RecordActivityTaskHeartbeatResponse
       recordActivityTaskHeartbeatResponse(
           RecordActivityTaskHeartbeatByIDResponse recordActivityTaskHeartbeatByID) {
     if (recordActivityTaskHeartbeatByID == null) {
       return null;
     }
-    com.uber.cadence.entities.RecordActivityTaskHeartbeatResponse res =
-        new com.uber.cadence.entities.RecordActivityTaskHeartbeatResponse();
+    com.uber.cadence.RecordActivityTaskHeartbeatResponse res =
+        new com.uber.cadence.RecordActivityTaskHeartbeatResponse();
     res.setCancelRequested(recordActivityTaskHeartbeatByID.getCancelRequested());
     return res;
   }
 
-  public static com.uber.cadence.entities.ResetStickyTaskListResponse resetStickyTaskListResponse(
+  public static com.uber.cadence.ResetStickyTaskListResponse resetStickyTaskListResponse(
       ResetStickyTaskListResponse resetStickyTaskList) {
     if (resetStickyTaskList == null) {
       return null;
     }
-    com.uber.cadence.entities.ResetStickyTaskListResponse res =
-        new com.uber.cadence.entities.ResetStickyTaskListResponse();
+    com.uber.cadence.ResetStickyTaskListResponse res =
+        new com.uber.cadence.ResetStickyTaskListResponse();
     return res;
   }
 
-  public static com.uber.cadence.entities.ClusterInfo clusterInfoResponse(
+  public static com.uber.cadence.ClusterInfo clusterInfoResponse(
       GetClusterInfoResponse clusterInfo) {
     if (clusterInfo == null) {
       return null;
     }
-    com.uber.cadence.entities.ClusterInfo res = new com.uber.cadence.entities.ClusterInfo();
+    com.uber.cadence.ClusterInfo res = new com.uber.cadence.ClusterInfo();
     res.setSupportedClientVersions(
         TypeMapper.supportedClientVersions(clusterInfo.getSupportedClientVersions()));
     return res;
   }
 
-  public static com.uber.cadence.entities.GetTaskListsByDomainResponse getTaskListsByDomainResponse(
+  public static com.uber.cadence.GetTaskListsByDomainResponse getTaskListsByDomainResponse(
       GetTaskListsByDomainResponse taskListsByDomain) {
     if (taskListsByDomain == null) {
       return null;
     }
-    com.uber.cadence.entities.GetTaskListsByDomainResponse res =
-        new com.uber.cadence.entities.GetTaskListsByDomainResponse();
+    com.uber.cadence.GetTaskListsByDomainResponse res =
+        new com.uber.cadence.GetTaskListsByDomainResponse();
 
     res.setActivityTaskListMap(
         taskListsByDomain
