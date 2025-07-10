@@ -299,9 +299,9 @@ publishing {
                 password ossrhPassword
             }
             if(project.version.endsWith('-SNAPSHOT')) {
-                url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                url 'https://ossrh-staging-api.central.sonatype.com/content/repositories/snapshots/'
             } else {
-                url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                url 'https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/'
             }
         }
     }
@@ -312,8 +312,8 @@ nexusPublishing {
         sonatype {
             username.set(ossrhUsername)
             password.set(ossrhPassword)
-            nexusUrl.set(uri("https://oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://oss.sonatype.org/content/repositories/snapshots/"))
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/content/repositories/snapshots/"))
         }
     }
 }

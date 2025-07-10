@@ -53,7 +53,7 @@ jobs:
           OSSATUBER_PASSWORD: ${{ secrets.OSSATUBER_PASSWORD }}
           OSSATUBER_USERNAME: ${{ secrets.OSSATUBER_USERNAME }}
         run: | # TODO old way of setting the properties from environment variables in gradle
-          ./gradlew publishToSonatype closeSonatypeStagingRepository --info \
+          ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --info \
            -Psigning.keyId="${SIGNING_KEY_ID}" \
             -Psigning.password="${SIGNING_PASSWORD}" \
             -Psigning.key="${SIGNING_KEY}" \
