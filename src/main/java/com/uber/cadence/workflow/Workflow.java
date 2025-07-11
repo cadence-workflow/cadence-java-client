@@ -353,7 +353,7 @@ import org.slf4j.Logger;
  *       executed in parallel.
  *   <li>Do not call any non deterministic functions like non seeded random or {@link
  *       UUID#randomUUID()} directly form the workflow code. Always do this in activities.
- *   <li>Don’t perform any IO or service calls as they are not usually deterministic. Use activities
+ *   <li>Don't perform any IO or service calls as they are not usually deterministic. Use activities
  *       for this.
  *   <li>Only use {@link #currentTimeMillis()} to get the current time inside a workflow.
  *   <li>Do not use native Java {@link Thread} or any other multi-threaded classes like {@link
@@ -369,7 +369,7 @@ import org.slf4j.Logger;
  *   <li>Use {@link WorkflowQueue} instead of {@link java.util.concurrent.BlockingQueue}.
  *   <li>Don't change workflow code when there are open workflows. The ability to do updates through
  *       visioning is TBD.
- *   <li>Don’t access configuration APIs directly from a workflow because changes in the
+ *   <li>Don't access configuration APIs directly from a workflow because changes in the
  *       configuration might affect a workflow execution path. Pass it as an argument to a workflow
  *       function or use an activity to load it.
  * </ul>
@@ -1123,15 +1123,15 @@ public final class Workflow {
    * </code></pre>
    *
    * The reason to keep it is: 1) it ensures that if there is older version execution still running,
-   * it will fail here and not proceed; 2) if you ever need to make more changes for “fooChange”,
+   * it will fail here and not proceed; 2) if you ever need to make more changes for "fooChange",
    * for example change activity3 to activity4, you just need to update the maxVersion from 2 to 3.
    *
    * <p>Note that, you only need to preserve the first call to GetVersion() for each changeID. All
    * subsequent call to GetVersion() with same changeID are safe to remove. However, if you really
    * want to get rid of the first GetVersion() call as well, you can do so, but you need to make
-   * sure: 1) all older version executions are completed; 2) you can no longer use “fooChange” as
+   * sure: 1) all older version executions are completed; 2) you can no longer use "fooChange" as
    * changeID. If you ever need to make changes to that same part, you would need to use a different
-   * changeID like “fooChange-fix2”, and start minVersion from DefaultVersion again.
+   * changeID like "fooChange-fix2", and start minVersion from DefaultVersion again.
    *
    * @param changeID identifier of a particular change. All calls to getVersion that share a
    *     changeID are guaranteed to return the same version number. Use this to perform multiple
@@ -1142,6 +1142,66 @@ public final class Workflow {
    */
   public static int getVersion(String changeID, int minSupported, int maxSupported) {
     return WorkflowInternal.getVersion(changeID, minSupported, maxSupported);
+  }
+
+  /**
+   * Enhanced version of {@code getVersion} with additional options for version control. This method
+   * provides more granular control over version execution and enables safer deployment strategies.
+   *
+   * <p>Example usage with custom version:
+   *
+   * <pre><code>
+   * int version = Workflow.getVersion("changeId", 1, 3,
+   *     GetVersionOptions.newBuilder().executeWithVersion(2).build());
+   * </code></pre>
+   *
+   * <p>Example usage with minimum version:
+   *
+   * <pre><code>
+   * int version = Workflow.getVersion("changeId", 1, 3,
+   *     GetVersionOptions.newBuilder().executeWithMinVersion().build());
+   * </code></pre>
+   *
+   * @param changeID identifier of a particular change
+   * @param minSupported min version supported for the change
+   * @param maxSupported max version supported for the change
+   * @param options version control options
+   * @return version
+   */
+  public static int getVersion(
+      String changeID, int minSupported, int maxSupported, GetVersionOptions options) {
+    return WorkflowInternal.getVersion(changeID, minSupported, maxSupported, options);
+  }
+
+  /**
+   * Convenience method that forces a specific version to be returned when executed for the first
+   * time.
+   *
+   * @param changeID identifier of a particular change
+   * @param minSupported min version supported for the change
+   * @param maxSupported max version supported for the change
+   * @param customVersion the specific version to use
+   * @return version
+   */
+  public static int getVersionWithCustomVersion(
+      String changeID, int minSupported, int maxSupported, int customVersion) {
+    GetVersionOptions options =
+        GetVersionOptions.newBuilder().executeWithVersion(customVersion).build();
+    return getVersion(changeID, minSupported, maxSupported, options);
+  }
+
+  /**
+   * Convenience method that makes GetVersion return minSupported version when executed for the
+   * first time.
+   *
+   * @param changeID identifier of a particular change
+   * @param minSupported min version supported for the change
+   * @param maxSupported max version supported for the change
+   * @return version
+   */
+  public static int getVersionWithMinVersion(String changeID, int minSupported, int maxSupported) {
+    GetVersionOptions options = GetVersionOptions.newBuilder().executeWithMinVersion().build();
+    return getVersion(changeID, minSupported, maxSupported, options);
   }
 
   /**
