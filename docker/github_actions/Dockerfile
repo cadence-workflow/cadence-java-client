@@ -11,11 +11,6 @@ RUN apk update && apk add --virtual wget ca-certificates wget && apk add --virtu
 # Git is needed in order to update the dls submodule
 RUN apk add git libstdc++ bash curl
 
-# Install buildkite agent
-# https://buildkite.com/docs/agent/v3/linux
-RUN bash -c "`curl -sL https://raw.githubusercontent.com/buildkite/agent/main/install.sh`"
-RUN ln -s /root/.buildkite-agent/bin/buildkite-agent /usr/bin/buildkite-agent
-
 # Compile source
 RUN set -ex ;\
 	wget https://archive.apache.org/dist/thrift/${APACHE_THRIFT_VERSION}/thrift-${APACHE_THRIFT_VERSION}.tar.gz && \
@@ -33,5 +28,3 @@ RUN apk del build-dependencies wget && rm -rf /var/cache/apk/*
 
 RUN mkdir /cadence-java-client
 WORKDIR /cadence-java-client
-
-# TODO: delete this file after migration to github actions

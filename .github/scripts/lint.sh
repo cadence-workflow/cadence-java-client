@@ -10,5 +10,3 @@ if [ -n "$(git status --porcelain)" ]; then
   git status --porcelain
   exit 1
 fi
-
-# TODO: delete this file after migration to github actions

@@ -46,7 +46,7 @@ services:
   unit-test-docker-sticky-off:
     build:
       context: ../../
-      dockerfile: ./docker/buildkite/Dockerfile
+      dockerfile: ./docker/github_actions/Dockerfile
     command: "./gradlew --no-daemon test"
     deploy:
       resources:
@@ -66,7 +66,7 @@ services:
   unit-test-docker-sticky-on:
     build:
       context: ../../
-      dockerfile: ./docker/buildkite/Dockerfile
+      dockerfile: ./docker/github_actions/Dockerfile
     command: "./gradlew --no-daemon test"
     deploy:
       resources:
@@ -86,12 +86,10 @@ services:
   unit-test-test-service:
     build:
       context: ../../
-      dockerfile: ./docker/buildkite/Dockerfile
+      dockerfile: ./docker/github_actions/Dockerfile
     command: "./gradlew --no-daemon test"
     environment:
       - "USER=unittest"
       - "USE_DOCKER_SERVICE=false"
     volumes:
       - "../../:/cadence-java-client"
-
-# TODO: delete this file after migration to github actions

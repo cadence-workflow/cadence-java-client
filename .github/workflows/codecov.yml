@@ -9,7 +9,7 @@ jobs:
         with:
           submodules: 'true'
       - name: Install dependencies, run tests, and collect coverage
-        run: docker compose -f docker/buildkite/docker-compose.yaml run unit-test-test-service
+        run: docker compose -f docker/github_actions/docker-compose.yml run unit-test-test-service
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         env:
