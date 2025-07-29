@@ -19,3 +19,4 @@ And finally make sure to shutdown all docker resources:
 ```bash
 docker-compose  down
 ```
+TODO: delete this file after migration to github actions

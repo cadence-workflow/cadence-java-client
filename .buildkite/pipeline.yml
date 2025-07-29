@@ -118,3 +118,5 @@ steps:
       - docker-compose#v3.0.0:
           run: unit-test-docker-sticky-off
           config: docker/buildkite/docker-compose.yaml
+
+# TODO: delete this file after migration to github actions

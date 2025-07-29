@@ -9,5 +9,3 @@ output_path="$1"
 echo "commit-sha: $(git rev-parse HEAD)" > "$output_path"
 echo "timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$output_path"
 echo "Coverage metadata written to $output_path"
-
-# TODO: delete this file after migration to github actions

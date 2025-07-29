@@ -1,0 +1,102 @@
+name: CI Checks
+on: 
+  push:
+  pull_request:
+
+jobs:
+  lint-check:
+    name: Lint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0 # get full history for branch checking
+
+      - name: Run lint check
+        run: docker compose -f docker/github_actions/docker-compose.yml run unit-test-test-service bash -c ".github/scripts/lint.sh"
+
+  unit-test-with-test-service:
+    name: Unit Test with Test Service
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0 # get full history for branch checking
+
+      - name: Run unit test with test service
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 30
+          command: |
+            docker compose -f docker/github_actions/docker-compose.yml run unit-test-test-service bash -c "./gradlew --no-daemon test jacocoTestReport && .github/scripts/coverage_metadata.sh build/reports/metadata.txt"
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-with-test-service-coverage
+          path: |
+            build/reports/tests/test/**/*
+            build/reports/jacoco/test/jacocoTestReport.xml
+            build/reports/metadata.txt
+          include-hidden-files: true
+
+  unit-test-with-docker-service-sticky-on:
+    name: Unit Test with Docker Service (Sticky On)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0 # get full history for branch checking
+
+      - name: Run unit test with docker service (sticky on)
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 50
+          command: |
+            docker compose -f docker/github_actions/docker-compose.yml run unit-test-docker-sticky-on bash -c "./gradlew --no-daemon test"
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-with-docker-service-sticky-on-coverage
+          path: |
+            build/reports/tests/test/**/*
+          include-hidden-files: true
+
+  unit-test-with-docker-service-sticky-off:
+    name: Unit Test with Docker Service (Sticky Off)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0 # get full history for branch checking
+
+      - name: Run unit test with docker service (sticky off)
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 50
+          command: |
+            docker compose -f docker/github_actions/docker-compose.yml run unit-test-docker-sticky-off bash -c "./gradlew --no-daemon test"
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-with-docker-service-sticky-off-coverage
+          path: |
+            build/reports/tests/test/**/*
+          include-hidden-files: true
