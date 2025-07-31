@@ -984,6 +984,7 @@ public final class ProtoObjects {
       DescribeWorkflowExecutionRequest.newBuilder()
           .setDomain("domain")
           .setWorkflowExecution(WORKFLOW_EXECUTION)
+          .setQueryConsistencyLevel(QueryConsistencyLevel.QUERY_CONSISTENCY_LEVEL_STRONG)
           .build();
 
   public static final GetWorkflowExecutionHistoryRequest GET_WORKFLOW_EXECUTION_HISTORY_REQUEST =
@@ -995,6 +996,7 @@ public final class ProtoObjects {
           .setHistoryEventFilterType(EventFilterType.EVENT_FILTER_TYPE_CLOSE_EVENT)
           .setSkipArchival(true)
           .setNextPageToken(utf8("nextPageToken"))
+          .setQueryConsistencyLevel(QueryConsistencyLevel.QUERY_CONSISTENCY_LEVEL_STRONG)
           .build();
 
   public static final StartWorkflowExecutionRequest START_WORKFLOW_EXECUTION =
@@ -1016,6 +1018,7 @@ public final class ProtoObjects {
           .setHeader(HEADER)
           .setDelayStart(seconds(3))
           .setJitterStart(seconds(0))
+          .setFirstRunAt(timestampNanos(123456789))
           .build();
 
   public static final SignalWithStartWorkflowExecutionRequest SIGNAL_WITH_START_WORKFLOW_EXECUTION =

@@ -843,7 +843,10 @@ public final class ThriftObjects {
           .setQuery("query");
 
   public static final DescribeWorkflowExecutionRequest DESCRIBE_WORKFLOW_EXECUTION_REQUEST =
-      new DescribeWorkflowExecutionRequest().setDomain("domain").setExecution(WORKFLOW_EXECUTION);
+      new DescribeWorkflowExecutionRequest()
+          .setDomain("domain")
+          .setExecution(WORKFLOW_EXECUTION)
+          .setQueryConsistencyLevel(QueryConsistencyLevel.STRONG);
 
   public static final GetWorkflowExecutionHistoryRequest GET_WORKFLOW_EXECUTION_HISTORY_REQUEST =
       new GetWorkflowExecutionHistoryRequest()
@@ -853,7 +856,8 @@ public final class ThriftObjects {
           .setWaitForNewEvent(true)
           .setHistoryEventFilterType(HistoryEventFilterType.CLOSE_EVENT)
           .setSkipArchival(true)
-          .setNextPageToken(utf8("nextPageToken"));
+          .setNextPageToken(utf8("nextPageToken"))
+          .setQueryConsistencyLevel(QueryConsistencyLevel.STRONG);
 
   public static final com.uber.cadence.StartWorkflowExecutionRequest START_WORKFLOW_EXECUTION =
       new com.uber.cadence.StartWorkflowExecutionRequest()
@@ -873,7 +877,8 @@ public final class ThriftObjects {
           .setSearchAttributes(SEARCH_ATTRIBUTES)
           .setHeader(HEADER)
           .setJitterStartSeconds(0)
-          .setDelayStartSeconds(3);
+          .setDelayStartSeconds(3)
+          .setFirstRunAtTimestamp(123456789L);
   public static final com.uber.cadence.SignalWithStartWorkflowExecutionRequest
       SIGNAL_WITH_START_WORKFLOW_EXECUTION =
           new SignalWithStartWorkflowExecutionRequest()
@@ -896,7 +901,8 @@ public final class ThriftObjects {
               .setSearchAttributes(SEARCH_ATTRIBUTES)
               .setHeader(HEADER)
               .setDelayStartSeconds(3)
-              .setJitterStartSeconds(0);
+              .setJitterStartSeconds(0)
+              .setFirstRunAtTimestamp(123456789L);
 
   public static final StartWorkflowExecutionAsyncRequest START_WORKFLOW_EXECUTION_ASYNC_REQUEST =
       new StartWorkflowExecutionAsyncRequest().setRequest(START_WORKFLOW_EXECUTION);

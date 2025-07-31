@@ -29,6 +29,7 @@ import static com.uber.cadence.internal.compatibility.proto.Helpers.daysToDurati
 import static com.uber.cadence.internal.compatibility.proto.Helpers.newFieldMask;
 import static com.uber.cadence.internal.compatibility.proto.Helpers.nullToEmpty;
 import static com.uber.cadence.internal.compatibility.proto.Helpers.secondsToDuration;
+import static com.uber.cadence.internal.compatibility.proto.Helpers.unixNanoToTime;
 import static com.uber.cadence.internal.compatibility.proto.TypeMapper.badBinaries;
 import static com.uber.cadence.internal.compatibility.proto.TypeMapper.clusterReplicationConfigurationArray;
 import static com.uber.cadence.internal.compatibility.proto.TypeMapper.failure;
@@ -403,6 +404,7 @@ public class RequestMapper {
     return DescribeWorkflowExecutionRequest.newBuilder()
         .setDomain(t.getDomain())
         .setWorkflowExecution(workflowExecution(t.getExecution()))
+        .setQueryConsistencyLevel(queryConsistencyLevel(t.getQueryConsistencyLevel()))
         .build();
   }
 
@@ -418,7 +420,8 @@ public class RequestMapper {
             .setPageSize(t.getMaximumPageSize())
             .setWaitForNewEvent(t.isWaitForNewEvent())
             .setHistoryEventFilterType(eventFilterType(t.HistoryEventFilterType))
-            .setSkipArchival(t.isSkipArchival());
+            .setSkipArchival(t.isSkipArchival())
+            .setQueryConsistencyLevel(queryConsistencyLevel(t.getQueryConsistencyLevel()));
     if (t.getNextPageToken() != null) {
       builder.setNextPageToken(arrayToByteString(t.getNextPageToken()));
     }
@@ -445,6 +448,9 @@ public class RequestMapper {
             .setSearchAttributes(searchAttributes(t.getSearchAttributes()))
             .setHeader(header(t.getHeader()))
             .setJitterStart(secondsToDuration(t.getJitterStartSeconds()));
+    if (t.isSetFirstRunAtTimestamp()) {
+      builder.setFirstRunAt(unixNanoToTime(t.getFirstRunAtTimestamp()));
+    }
     if (t.getRetryPolicy() != null) {
       builder.setRetryPolicy(retryPolicy(t.getRetryPolicy()));
     }
@@ -530,6 +536,9 @@ public class RequestMapper {
             .setHeader(header(t.getHeader()))
             .setDelayStart(secondsToDuration(t.getDelayStartSeconds()))
             .setJitterStart(secondsToDuration(t.getJitterStartSeconds()));
+    if (t.isSetFirstRunAtTimestamp()) {
+      request.setFirstRunAt(unixNanoToTime(t.getFirstRunAtTimestamp()));
+    }
     if (t.getRetryPolicy() != null) {
       request.setRetryPolicy(retryPolicy(t.getRetryPolicy()));
     }
