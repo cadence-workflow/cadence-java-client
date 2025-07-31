@@ -786,9 +786,11 @@ public class Thrift2ProtoAdapterTest {
   @Test
   public void testAsyncUnsupported() {
     assertUnsupported(WorkflowService.Iface::RestartWorkflowExecution);
+    assertUnsupported(WorkflowService.Iface::DiagnoseWorkflowExecution);
     assertUnsupported(WorkflowService.Iface::GetTaskListsByDomain);
     assertAsyncUnsupported(WorkflowService.AsyncIface::RegisterDomain);
     assertAsyncUnsupported(WorkflowService.AsyncIface::DescribeDomain);
+    assertAsyncUnsupported(WorkflowService.AsyncIface::DiagnoseWorkflowExecution);
     assertAsyncUnsupported(WorkflowService.AsyncIface::ListDomains);
     assertAsyncUnsupported(WorkflowService.AsyncIface::UpdateDomain);
     assertAsyncUnsupported(WorkflowService.AsyncIface::DeprecateDomain);

@@ -44,6 +44,14 @@ public class IWorkflowServiceBase implements IWorkflowService {
   }
 
   @Override
+  public DiagnoseWorkflowExecutionResponse DiagnoseWorkflowExecution(
+      DiagnoseWorkflowExecutionRequest diagnoseRequest)
+      throws DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
+          ClientVersionNotSupportedError, TException {
+    throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
+  }
+
+  @Override
   public ListDomainsResponse ListDomains(ListDomainsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
           ClientVersionNotSupportedError, TException {
@@ -375,6 +383,13 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public void DescribeDomain(
       DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler) throws TException {
     throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void DiagnoseWorkflowExecution(
+      DiagnoseWorkflowExecutionRequest diagnoseRequest, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
   }
 
   @Override

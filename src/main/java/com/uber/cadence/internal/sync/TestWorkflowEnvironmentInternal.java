@@ -29,6 +29,8 @@ import com.uber.cadence.DescribeTaskListRequest;
 import com.uber.cadence.DescribeTaskListResponse;
 import com.uber.cadence.DescribeWorkflowExecutionRequest;
 import com.uber.cadence.DescribeWorkflowExecutionResponse;
+import com.uber.cadence.DiagnoseWorkflowExecutionRequest;
+import com.uber.cadence.DiagnoseWorkflowExecutionResponse;
 import com.uber.cadence.DomainAlreadyExistsError;
 import com.uber.cadence.DomainNotActiveError;
 import com.uber.cadence.EntityNotExistsError;
@@ -476,6 +478,13 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     }
 
     @Override
+    public void DiagnoseWorkflowExecution(
+        DiagnoseWorkflowExecutionRequest diagnoseRequest, AsyncMethodCallback resultHandler)
+        throws TException {
+      throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
+    }
+
+    @Override
     public void ListDomains(ListDomainsRequest listRequest, AsyncMethodCallback resultHandler)
         throws TException {
       impl.ListDomains(listRequest, resultHandler);
@@ -807,6 +816,14 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     public DescribeDomainResponse DescribeDomain(DescribeDomainRequest describeRequest)
         throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
       return impl.DescribeDomain(describeRequest);
+    }
+
+    @Override
+    public DiagnoseWorkflowExecutionResponse DiagnoseWorkflowExecution(
+        DiagnoseWorkflowExecutionRequest diagnoseRequest)
+        throws DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
+            ClientVersionNotSupportedError, TException {
+      throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
     }
 
     @Override
