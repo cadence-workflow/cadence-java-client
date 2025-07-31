@@ -38,6 +38,7 @@ jobs:
             docker compose -f docker/github_actions/docker-compose.yml run unit-test-test-service bash -c "./gradlew --no-daemon test jacocoTestReport && .github/scripts/coverage_metadata.sh build/reports/metadata.txt"
 
       - name: Upload coverage artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: unit-test-with-test-service-coverage
@@ -67,6 +68,7 @@ jobs:
             docker compose -f docker/github_actions/docker-compose.yml run unit-test-docker-sticky-on bash -c "./gradlew --no-daemon test"
 
       - name: Upload coverage artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: unit-test-with-docker-service-sticky-on-coverage
@@ -94,6 +96,7 @@ jobs:
             docker compose -f docker/github_actions/docker-compose.yml run unit-test-docker-sticky-off bash -c "./gradlew --no-daemon test"
 
       - name: Upload coverage artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: unit-test-with-docker-service-sticky-off-coverage
