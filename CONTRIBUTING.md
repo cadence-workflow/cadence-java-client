@@ -97,5 +97,5 @@ And sometimes it's important to test the non-sticky mode
 STICKY_OFF=true USE_DOCKER_SERVICE=true ./gradlew test
 ```
 
-Also, if there is any Buildkite test failure that you cannot reproduce locally, 
-follow [buildkite docker-compose](./docker/buildkite/README.md) instructions to run the tests.
+Also, if there is any Github Actions test failure that you cannot reproduce locally, 
+follow [github action docker-compose](./docker/github_actions/README.md) instructions to run the tests.
