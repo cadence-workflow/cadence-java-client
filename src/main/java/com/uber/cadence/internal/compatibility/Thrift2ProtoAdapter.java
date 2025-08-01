@@ -843,7 +843,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
   public void DiagnoseWorkflowExecution(
       DiagnoseWorkflowExecutionRequest diagnoseRequest, AsyncMethodCallback resultHandler)
       throws TException {
-    throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
+    throw new UnsupportedOperationException("not implemented");
   }
 
   @Override

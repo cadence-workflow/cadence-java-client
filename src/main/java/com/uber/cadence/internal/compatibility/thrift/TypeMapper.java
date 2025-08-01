@@ -31,6 +31,7 @@ import static com.uber.cadence.internal.compatibility.thrift.Helpers.timeToUnixN
 
 import com.uber.cadence.ActivityLocalDispatchInfo;
 import com.uber.cadence.ActivityType;
+import com.uber.cadence.AutoConfigHint;
 import com.uber.cadence.BadBinaries;
 import com.uber.cadence.BadBinaryInfo;
 import com.uber.cadence.ClusterReplicationConfiguration;
@@ -685,5 +686,15 @@ class TypeMapper {
       v.put(key, activityLocalDispatchInfo(t.get(key)));
     }
     return v;
+  }
+
+  static AutoConfigHint autoConfigHint(com.uber.cadence.api.v1.AutoConfigHint t) {
+    if (t == null) {
+      return null;
+    }
+    AutoConfigHint autoConfigHint = new AutoConfigHint();
+    autoConfigHint.setEnableAutoConfig(t.getEnableAutoConfig());
+    autoConfigHint.setPollerWaitTimeInMs(t.getPollerWaitTimeInMs());
+    return autoConfigHint;
   }
 }

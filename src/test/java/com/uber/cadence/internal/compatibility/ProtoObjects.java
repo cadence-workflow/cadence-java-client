@@ -80,6 +80,8 @@ public final class ProtoObjects {
   public static final Header HEADER =
       Header.newBuilder().putFields("key", payload("value")).build();
   public static final Memo MEMO = Memo.newBuilder().putFields("memo", payload("memoValue")).build();
+  public static final AutoConfigHint AUTO_CONFIG_HINT =
+      AutoConfigHint.newBuilder().setEnableAutoConfig(true).setPollerWaitTimeInMs(100).build();
   public static final SearchAttributes SEARCH_ATTRIBUTES =
       SearchAttributes.newBuilder().putIndexedFields("search", payload("attributes")).build();
   public static final Map<String, String> DATA = ImmutableMap.of("dataKey", "dataValue");
@@ -629,6 +631,8 @@ public final class ProtoObjects {
               .setMemo(MEMO)
               .setSearchAttributes(SEARCH_ATTRIBUTES)
               .setDelayStart(seconds(4))
+              .setJitterStart(seconds(5))
+              .setFirstRunAt(timestampNanos(123456789))
               .build();
 
   public static final StartChildWorkflowExecutionFailedEventAttributes
@@ -1304,6 +1308,7 @@ public final class ProtoObjects {
           .setWorkflowType(WORKFLOW_TYPE)
           .setWorkflowDomain("domain")
           .setHeader(HEADER)
+          .setAutoConfigHint(AUTO_CONFIG_HINT)
           .build();
   public static final PollForDecisionTaskResponse POLL_FOR_DECISION_TASK_RESPONSE =
       PollForDecisionTaskResponse.newBuilder()
@@ -1322,6 +1327,7 @@ public final class ProtoObjects {
           .setStartedTime(timestampNanos(6))
           .putAllQueries(ImmutableMap.of("query", WORKFLOW_QUERY))
           .setNextEventId(7)
+          .setAutoConfigHint(AUTO_CONFIG_HINT)
           .build();
 
   public static final QueryWorkflowResponse QUERY_WORKFLOW_RESPONSE =

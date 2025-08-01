@@ -597,7 +597,7 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
     public void DiagnoseWorkflowExecution(
         DiagnoseWorkflowExecutionRequest diagnoseRequest, AsyncMethodCallback resultHandler)
         throws TException {
-      throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
+      impl.DiagnoseWorkflowExecution(diagnoseRequest, resultHandler);
     }
 
     @Override
@@ -933,7 +933,7 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
         DiagnoseWorkflowExecutionRequest diagnoseRequest)
         throws DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
             ClientVersionNotSupportedError, TException {
-      throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
+      return impl.DiagnoseWorkflowExecution(diagnoseRequest);
     }
 
     @Override
