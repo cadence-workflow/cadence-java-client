@@ -67,6 +67,8 @@ public final class ThriftObjects {
           .setErrorMessage("error");
   public static final Header HEADER = new Header().setFields(ImmutableMap.of("key", utf8("value")));
   public static final Memo MEMO = new Memo().setFields(ImmutableMap.of("memo", utf8("memoValue")));
+  public static final AutoConfigHint AUTO_CONFIG_HINT =
+      new AutoConfigHint().setEnableAutoConfig(true).setPollerWaitTimeInMs(100);
   public static final SearchAttributes SEARCH_ATTRIBUTES =
       new SearchAttributes().setIndexedFields(ImmutableMap.of("search", utf8("attributes")));
   public static final Map<String, String> DATA = ImmutableMap.of("dataKey", "dataValue");
@@ -539,7 +541,9 @@ public final class ThriftObjects {
               .setHeader(HEADER)
               .setMemo(MEMO)
               .setSearchAttributes(SEARCH_ATTRIBUTES)
-              .setDelayStartSeconds(4);
+              .setDelayStartSeconds(4)
+              .setJitterStartSeconds(5)
+              .setFirstRunAtTimestamp(123456789L);
 
   public static final StartChildWorkflowExecutionFailedEventAttributes
       START_CHILD_WORKFLOW_EXECUTION_FAILED_EVENT_ATTRIBUTES =
@@ -843,7 +847,10 @@ public final class ThriftObjects {
           .setQuery("query");
 
   public static final DescribeWorkflowExecutionRequest DESCRIBE_WORKFLOW_EXECUTION_REQUEST =
-      new DescribeWorkflowExecutionRequest().setDomain("domain").setExecution(WORKFLOW_EXECUTION);
+      new DescribeWorkflowExecutionRequest()
+          .setDomain("domain")
+          .setExecution(WORKFLOW_EXECUTION)
+          .setQueryConsistencyLevel(QueryConsistencyLevel.STRONG);
 
   public static final GetWorkflowExecutionHistoryRequest GET_WORKFLOW_EXECUTION_HISTORY_REQUEST =
       new GetWorkflowExecutionHistoryRequest()
@@ -853,7 +860,8 @@ public final class ThriftObjects {
           .setWaitForNewEvent(true)
           .setHistoryEventFilterType(HistoryEventFilterType.CLOSE_EVENT)
           .setSkipArchival(true)
-          .setNextPageToken(utf8("nextPageToken"));
+          .setNextPageToken(utf8("nextPageToken"))
+          .setQueryConsistencyLevel(QueryConsistencyLevel.STRONG);
 
   public static final com.uber.cadence.StartWorkflowExecutionRequest START_WORKFLOW_EXECUTION =
       new com.uber.cadence.StartWorkflowExecutionRequest()
@@ -873,7 +881,8 @@ public final class ThriftObjects {
           .setSearchAttributes(SEARCH_ATTRIBUTES)
           .setHeader(HEADER)
           .setJitterStartSeconds(0)
-          .setDelayStartSeconds(3);
+          .setDelayStartSeconds(3)
+          .setFirstRunAtTimestamp(123456789L);
   public static final com.uber.cadence.SignalWithStartWorkflowExecutionRequest
       SIGNAL_WITH_START_WORKFLOW_EXECUTION =
           new SignalWithStartWorkflowExecutionRequest()
@@ -896,7 +905,8 @@ public final class ThriftObjects {
               .setSearchAttributes(SEARCH_ATTRIBUTES)
               .setHeader(HEADER)
               .setDelayStartSeconds(3)
-              .setJitterStartSeconds(0);
+              .setJitterStartSeconds(0)
+              .setFirstRunAtTimestamp(123456789L);
 
   public static final StartWorkflowExecutionAsyncRequest START_WORKFLOW_EXECUTION_ASYNC_REQUEST =
       new StartWorkflowExecutionAsyncRequest().setRequest(START_WORKFLOW_EXECUTION);
@@ -1103,7 +1113,8 @@ public final class ThriftObjects {
           .setHeartbeatDetails(utf8("heartbeatDetails"))
           .setWorkflowType(WORKFLOW_TYPE)
           .setWorkflowDomain("domain")
-          .setHeader(HEADER);
+          .setHeader(HEADER)
+          .setAutoConfigHint(AUTO_CONFIG_HINT);
   public static final PollForDecisionTaskResponse POLL_FOR_DECISION_TASK_RESPONSE =
       new PollForDecisionTaskResponse()
           .setTaskToken(utf8("taskToken"))
@@ -1120,7 +1131,8 @@ public final class ThriftObjects {
           .setScheduledTimestamp(5)
           .setStartedTimestamp(6)
           .setQueries(ImmutableMap.of("query", WORKFLOW_QUERY))
-          .setNextEventId(7);
+          .setNextEventId(7)
+          .setAutoConfigHint(AUTO_CONFIG_HINT);
 
   public static final QueryWorkflowResponse QUERY_WORKFLOW_RESPONSE =
       new QueryWorkflowResponse()

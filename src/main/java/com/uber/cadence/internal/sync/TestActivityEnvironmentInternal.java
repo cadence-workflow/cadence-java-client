@@ -600,6 +600,13 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
     }
 
     @Override
+    public void DiagnoseWorkflowExecution(
+        DiagnoseWorkflowExecutionRequest diagnoseRequest, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.DiagnoseWorkflowExecution(diagnoseRequest, resultHandler);
+    }
+
+    @Override
     public void ListDomains(ListDomainsRequest listRequest, AsyncMethodCallback resultHandler)
         throws TException {
       impl.ListDomains(listRequest, resultHandler);
@@ -925,6 +932,14 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
     public DescribeDomainResponse DescribeDomain(DescribeDomainRequest describeRequest)
         throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
       return impl.DescribeDomain(describeRequest);
+    }
+
+    @Override
+    public DiagnoseWorkflowExecutionResponse DiagnoseWorkflowExecution(
+        DiagnoseWorkflowExecutionRequest diagnoseRequest)
+        throws DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
+            ClientVersionNotSupportedError, TException {
+      return impl.DiagnoseWorkflowExecution(diagnoseRequest);
     }
 
     @Override

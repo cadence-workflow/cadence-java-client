@@ -947,6 +947,8 @@ class HistoryMapper {
     res.setMemo(memo(t.getMemo()));
     res.setSearchAttributes(searchAttributes(t.getSearchAttributes()));
     res.setDelayStartSeconds(durationToSeconds(t.getDelayStart()));
+    res.setJitterStartSeconds(durationToSeconds(t.getJitterStart()));
+    res.setFirstRunAtTimestamp(timeToUnixNano(t.getFirstRunAt()));
     return res;
   }
 

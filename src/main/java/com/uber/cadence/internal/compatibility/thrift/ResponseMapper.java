@@ -25,6 +25,7 @@ import static com.uber.cadence.internal.compatibility.thrift.Helpers.toInt64Valu
 import static com.uber.cadence.internal.compatibility.thrift.HistoryMapper.history;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.activityLocalDispatchInfoMap;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.activityType;
+import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.autoConfigHint;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.badBinaries;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.clusterReplicationConfigurationArray;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.dataBlobArray;
@@ -239,6 +240,7 @@ public class ResponseMapper {
     res.setWorkflowType(workflowType(t.getWorkflowType()));
     res.setWorkflowDomain(t.getWorkflowDomain());
     res.setHeader(header(t.getHeader()));
+    res.setAutoConfigHint(autoConfigHint(t.getAutoConfigHint()));
     return res;
   }
 
@@ -265,6 +267,7 @@ public class ResponseMapper {
     res.setStartedTimestamp(timeToUnixNano(t.getStartedTime()));
     res.setQueries(workflowQueryMap(t.getQueriesMap()));
     res.setNextEventId(t.getNextEventId());
+    res.setAutoConfigHint(autoConfigHint(t.getAutoConfigHint()));
     return res;
   }
 

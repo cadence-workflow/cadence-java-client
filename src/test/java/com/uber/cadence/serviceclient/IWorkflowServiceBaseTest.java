@@ -36,6 +36,13 @@ public class IWorkflowServiceBaseTest extends TestCase {
     assertThrows(UnsupportedOperationException.class, () -> service.DescribeDomain(null, null));
   }
 
+  public void testDiagnoseWorkflowExecution() {
+    assertThrows(
+        UnsupportedOperationException.class, () -> service.DiagnoseWorkflowExecution(null));
+    assertThrows(
+        UnsupportedOperationException.class, () -> service.DiagnoseWorkflowExecution(null, null));
+  }
+
   public void testListDomains() {
     assertThrows(UnsupportedOperationException.class, () -> service.ListDomains(null));
     assertThrows(UnsupportedOperationException.class, () -> service.ListDomains(null, null));

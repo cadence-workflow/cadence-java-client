@@ -29,6 +29,8 @@ import com.uber.cadence.DescribeTaskListRequest;
 import com.uber.cadence.DescribeTaskListResponse;
 import com.uber.cadence.DescribeWorkflowExecutionRequest;
 import com.uber.cadence.DescribeWorkflowExecutionResponse;
+import com.uber.cadence.DiagnoseWorkflowExecutionRequest;
+import com.uber.cadence.DiagnoseWorkflowExecutionResponse;
 import com.uber.cadence.DomainAlreadyExistsError;
 import com.uber.cadence.DomainNotActiveError;
 import com.uber.cadence.EntityNotExistsError;
@@ -204,6 +206,14 @@ public final class TestWorkflowService implements IWorkflowService {
   public DescribeDomainResponse DescribeDomain(DescribeDomainRequest describeRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
     throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public DiagnoseWorkflowExecutionResponse DiagnoseWorkflowExecution(
+      DiagnoseWorkflowExecutionRequest diagnoseRequest)
+      throws DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
+          ClientVersionNotSupportedError, TException {
+    throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
   }
 
   @Override
@@ -832,6 +842,13 @@ public final class TestWorkflowService implements IWorkflowService {
   public void DescribeDomain(
       DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler) throws TException {
     throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public void DiagnoseWorkflowExecution(
+      DiagnoseWorkflowExecutionRequest diagnoseRequest, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
   }
 
   @Override

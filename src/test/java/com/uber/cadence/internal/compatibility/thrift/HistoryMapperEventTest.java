@@ -283,8 +283,7 @@ public class HistoryMapperEventTest<
       testCase(
           EventType.StartChildWorkflowExecutionInitiated,
           ProtoObjects.START_CHILD_WORKFLOW_EXECUTION_INITIATED_EVENT_ATTRIBUTES,
-          ThriftObjects.START_CHILD_WORKFLOW_EXECUTION_INITIATED_EVENT_ATTRIBUTES,
-          "jitterStartSeconds"),
+          ThriftObjects.START_CHILD_WORKFLOW_EXECUTION_INITIATED_EVENT_ATTRIBUTES),
       testCase(
           EventType.StartChildWorkflowExecutionFailed,
           ProtoObjects.START_CHILD_WORKFLOW_EXECUTION_FAILED_EVENT_ATTRIBUTES,
