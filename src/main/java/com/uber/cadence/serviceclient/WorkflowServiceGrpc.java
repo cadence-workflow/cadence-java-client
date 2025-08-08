@@ -47,7 +47,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   private final IGrpcServiceStubs grpcServiceStubs;
   private final Executor executor = MoreExecutors.directExecutor();
 
-  WorkflowServiceGrpc(ClientOptions options) {
+  public WorkflowServiceGrpc(ClientOptions options) {
     this.grpcServiceStubs = IGrpcServiceStubs.newInstance(options);
   }
 

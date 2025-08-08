@@ -20,10 +20,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableMap;
-import com.uber.cadence.InternalServiceError;
-import com.uber.cadence.PollForActivityTaskRequest;
-import com.uber.cadence.PollForActivityTaskResponse;
-import com.uber.cadence.ServiceBusyError;
+import com.uber.cadence.*;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.serviceclient.IWorkflowService;
@@ -31,7 +28,6 @@ import com.uber.m3.tally.Counter;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.tally.Timer;
-import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -75,7 +71,7 @@ public class ActivityPollTaskTest {
   }
 
   @Test
-  public void testPollTaskSuccess() throws TException {
+  public void testPollTaskSuccess() throws BaseError {
     PollForActivityTaskResponse response =
         new PollForActivityTaskResponse().setTaskToken("testToken".getBytes());
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
@@ -100,7 +96,7 @@ public class ActivityPollTaskTest {
   }
 
   @Test(expected = InternalServiceError.class)
-  public void testPollTaskInternalServiceError() throws TException {
+  public void testPollTaskInternalServiceError() throws BaseError {
     // Set up mockService to throw an InternalServiceError exception
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
         .thenThrow(new InternalServiceError());
@@ -126,7 +122,7 @@ public class ActivityPollTaskTest {
   }
 
   @Test(expected = ServiceBusyError.class)
-  public void testPollTaskServiceBusyError() throws TException {
+  public void testPollTaskServiceBusyError() throws BaseError {
     // Set up mockService to throw a ServiceBusyError exception
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
         .thenThrow(new ServiceBusyError());
@@ -151,11 +147,11 @@ public class ActivityPollTaskTest {
     }
   }
 
-  @Test(expected = TException.class)
-  public void testPollTaskGeneralTException() throws TException {
-    // Set up mockService to throw a TException
+  @Test(expected = BaseError.class)
+  public void testPollTaskGeneralTException() throws BaseError {
+    // Set up mockService to throw a BaseError
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
-        .thenThrow(new TException());
+        .thenThrow(new BaseError());
 
     // Mock the metricsScope and counter to ensure proper behavior
     Scope metricsScope = options.getMetricsScope();
@@ -163,7 +159,7 @@ public class ActivityPollTaskTest {
     when(metricsScope.counter(MetricsType.ACTIVITY_POLL_FAILED_COUNTER)).thenReturn(failedCounter);
 
     try {
-      // Call pollTask.pollTask(), expecting a TException to be thrown
+      // Call pollTask.pollTask(), expecting a BaseError to be thrown
       pollTask.pollTask();
     } finally {
       // Verify that failedCounter.inc(1) is called once
@@ -172,7 +168,7 @@ public class ActivityPollTaskTest {
   }
 
   @Test
-  public void testPollTaskNoTask() throws TException {
+  public void testPollTaskNoTask() throws BaseError {
     // Set up mockService to return an empty PollForActivityTaskResponse
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
         .thenReturn(new PollForActivityTaskResponse());

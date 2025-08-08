@@ -15,7 +15,7 @@
  */
 package com.uber.cadence.internal.shadowing;
 
-import static com.uber.cadence.shadower.shadowerConstants.ScanWorkflowActivityName;
+import static com.uber.cadence.shadower.Constants.ScanWorkflowActivityName;
 
 import com.uber.cadence.activity.ActivityMethod;
 

@@ -72,8 +72,7 @@ class HistoryMapper {
     return v;
   }
 
-  static com.uber.cadence.HistoryEvent historyEvent(
-      com.uber.cadence.api.v1.HistoryEvent e) {
+  static com.uber.cadence.HistoryEvent historyEvent(com.uber.cadence.api.v1.HistoryEvent e) {
     if (e == null || e == com.uber.cadence.api.v1.HistoryEvent.getDefaultInstance()) {
       return null;
     }
@@ -359,9 +358,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.ActivityTaskCanceledEventAttributes
-      activityTaskCanceledEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskCanceledEventAttributes t) {
+  static com.uber.cadence.ActivityTaskCanceledEventAttributes activityTaskCanceledEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskCanceledEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskCanceledEventAttributes.getDefaultInstance()) {
       return null;
@@ -376,9 +374,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.ActivityTaskCompletedEventAttributes
-      activityTaskCompletedEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskCompletedEventAttributes t) {
+  static com.uber.cadence.ActivityTaskCompletedEventAttributes activityTaskCompletedEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskCompletedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskCompletedEventAttributes.getDefaultInstance()) {
       return null;
@@ -392,9 +389,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.ActivityTaskFailedEventAttributes
-      activityTaskFailedEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskFailedEventAttributes t) {
+  static com.uber.cadence.ActivityTaskFailedEventAttributes activityTaskFailedEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskFailedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskFailedEventAttributes.getDefaultInstance()) {
       return null;
@@ -409,9 +405,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.ActivityTaskScheduledEventAttributes
-      activityTaskScheduledEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskScheduledEventAttributes t) {
+  static com.uber.cadence.ActivityTaskScheduledEventAttributes activityTaskScheduledEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskScheduledEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskScheduledEventAttributes.getDefaultInstance()) {
       return null;
@@ -433,9 +428,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.ActivityTaskStartedEventAttributes
-      activityTaskStartedEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskStartedEventAttributes t) {
+  static com.uber.cadence.ActivityTaskStartedEventAttributes activityTaskStartedEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskStartedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskStartedEventAttributes.getDefaultInstance()) {
       return null;
@@ -451,9 +445,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.ActivityTaskTimedOutEventAttributes
-      activityTaskTimedOutEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskTimedOutEventAttributes t) {
+  static com.uber.cadence.ActivityTaskTimedOutEventAttributes activityTaskTimedOutEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskTimedOutEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskTimedOutEventAttributes.getDefaultInstance()) {
       return null;
@@ -469,8 +462,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.CancelTimerFailedEventAttributes
-      cancelTimerFailedEventAttributes(com.uber.cadence.api.v1.CancelTimerFailedEventAttributes t) {
+  static com.uber.cadence.CancelTimerFailedEventAttributes cancelTimerFailedEventAttributes(
+      com.uber.cadence.api.v1.CancelTimerFailedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.CancelTimerFailedEventAttributes.getDefaultInstance()) {
       return null;
@@ -603,9 +596,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.DecisionTaskFailedEventAttributes
-      decisionTaskFailedEventAttributes(
-          com.uber.cadence.api.v1.DecisionTaskFailedEventAttributes t) {
+  static com.uber.cadence.DecisionTaskFailedEventAttributes decisionTaskFailedEventAttributes(
+      com.uber.cadence.api.v1.DecisionTaskFailedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.DecisionTaskFailedEventAttributes.getDefaultInstance()) {
       return null;
@@ -625,9 +617,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.DecisionTaskScheduledEventAttributes
-      decisionTaskScheduledEventAttributes(
-          com.uber.cadence.api.v1.DecisionTaskScheduledEventAttributes t) {
+  static com.uber.cadence.DecisionTaskScheduledEventAttributes decisionTaskScheduledEventAttributes(
+      com.uber.cadence.api.v1.DecisionTaskScheduledEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.DecisionTaskScheduledEventAttributes.getDefaultInstance()) {
       return null;
@@ -640,9 +631,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.DecisionTaskStartedEventAttributes
-      decisionTaskStartedEventAttributes(
-          com.uber.cadence.api.v1.DecisionTaskStartedEventAttributes t) {
+  static com.uber.cadence.DecisionTaskStartedEventAttributes decisionTaskStartedEventAttributes(
+      com.uber.cadence.api.v1.DecisionTaskStartedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.DecisionTaskStartedEventAttributes.getDefaultInstance()) {
       return null;
@@ -655,9 +645,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.DecisionTaskCompletedEventAttributes
-      decisionTaskCompletedEventAttributes(
-          com.uber.cadence.api.v1.DecisionTaskCompletedEventAttributes t) {
+  static com.uber.cadence.DecisionTaskCompletedEventAttributes decisionTaskCompletedEventAttributes(
+      com.uber.cadence.api.v1.DecisionTaskCompletedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.DecisionTaskCompletedEventAttributes.getDefaultInstance()) {
       return null;
@@ -672,9 +661,8 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.DecisionTaskTimedOutEventAttributes
-      decisionTaskTimedOutEventAttributes(
-          com.uber.cadence.api.v1.DecisionTaskTimedOutEventAttributes t) {
+  static com.uber.cadence.DecisionTaskTimedOutEventAttributes decisionTaskTimedOutEventAttributes(
+      com.uber.cadence.api.v1.DecisionTaskTimedOutEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.DecisionTaskTimedOutEventAttributes.getDefaultInstance()) {
       return null;

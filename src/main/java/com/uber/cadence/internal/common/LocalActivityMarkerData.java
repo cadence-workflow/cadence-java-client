@@ -25,7 +25,6 @@ import com.uber.cadence.RespondActivityTaskCanceledRequest;
 import com.uber.cadence.RespondActivityTaskFailedRequest;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.m3.util.ImmutableMap;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
@@ -190,14 +189,13 @@ public final class LocalActivityMarkerData {
   public Header getHeader(DataConverter converter) {
     byte[] headerData = converter.toData(headers);
     Header header = new Header();
-    header.setFields(ImmutableMap.of(LOCAL_ACTIVITY_HEADER_KEY, ByteBuffer.wrap(headerData)));
+    header.setFields(ImmutableMap.of(LOCAL_ACTIVITY_HEADER_KEY, headerData));
     return header;
   }
 
   public static LocalActivityMarkerData fromEventAttributes(
       MarkerRecordedEventAttributes attributes, DataConverter converter) {
-    ByteBuffer byteBuffer = attributes.getHeader().getFields().get(LOCAL_ACTIVITY_HEADER_KEY);
-    byte[] bytes = org.apache.thrift.TBaseHelper.byteBufferToByteArray(byteBuffer);
+    byte[] bytes = attributes.getHeader().getFields().get(LOCAL_ACTIVITY_HEADER_KEY);
     LocalActivityMarkerHeader header =
         converter.fromData(bytes, LocalActivityMarkerHeader.class, LocalActivityMarkerHeader.class);
     return new LocalActivityMarkerData(header, attributes.getDetails());

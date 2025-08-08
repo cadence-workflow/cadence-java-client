@@ -18,22 +18,7 @@
 package com.uber.cadence.internal.worker;
 
 import com.google.common.base.Strings;
-import com.uber.cadence.ActivityLocalDispatchInfo;
-import com.uber.cadence.Decision;
-import com.uber.cadence.GetWorkflowExecutionHistoryResponse;
-import com.uber.cadence.History;
-import com.uber.cadence.HistoryEvent;
-import com.uber.cadence.PollForDecisionTaskResponse;
-import com.uber.cadence.RespondDecisionTaskCompletedRequest;
-import com.uber.cadence.RespondDecisionTaskCompletedResponse;
-import com.uber.cadence.RespondDecisionTaskFailedRequest;
-import com.uber.cadence.RespondQueryTaskCompletedRequest;
-import com.uber.cadence.ScheduleActivityTaskDecisionAttributes;
-import com.uber.cadence.TaskListKind;
-import com.uber.cadence.WorkflowExecution;
-import com.uber.cadence.WorkflowExecutionStartedEventAttributes;
-import com.uber.cadence.WorkflowQuery;
-import com.uber.cadence.WorkflowType;
+import com.uber.cadence.*;
 import com.uber.cadence.common.BinaryChecksum;
 import com.uber.cadence.common.WorkflowExecutionHistory;
 import com.uber.cadence.internal.common.RpcRetryer;
@@ -46,6 +31,7 @@ import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.util.ImmutableMap;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -53,7 +39,6 @@ import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import org.apache.thrift.TException;
 import org.slf4j.MDC;
 
 public final class WorkflowWorker extends SuspendableWorkerBase
@@ -251,7 +236,7 @@ public final class WorkflowWorker extends SuspendableWorkerBase
         IWorkflowService service,
         PollForDecisionTaskResponse task,
         DecisionTaskHandler.Result response)
-        throws TException {
+        throws BaseError {
       RespondDecisionTaskCompletedRequest taskCompleted = response.getTaskCompleted();
       if (taskCompleted != null) {
         taskCompleted.setIdentity(options.getIdentity());
@@ -273,7 +258,9 @@ public final class WorkflowWorker extends SuspendableWorkerBase
                           new Task(
                               attr.getActivityId(),
                               attr.getActivityType(),
-                              attr.bufferForInput(),
+                              attr.getInput() != null
+                                  ? ByteBuffer.wrap(attr.getInput())
+                                  : ByteBuffer.allocate(0),
                               attr.getScheduleToCloseTimeoutSeconds(),
                               attr.getStartToCloseTimeoutSeconds(),
                               attr.getHeartbeatTimeoutSeconds(),
@@ -317,7 +304,8 @@ public final class WorkflowWorker extends SuspendableWorkerBase
                           activityLocalDispatchInfo.getStartedTimestamp();
                       activityTask.scheduledTimestampOfThisAttempt =
                           activityLocalDispatchInfo.getScheduledTimestampOfThisAttempt();
-                      activityTask.taskToken = activityLocalDispatchInfo.bufferForTaskToken();
+                      activityTask.taskToken =
+                          ByteBuffer.wrap(activityLocalDispatchInfo.getTaskToken());
                       started = true;
                     }
                   }

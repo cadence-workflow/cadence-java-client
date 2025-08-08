@@ -25,7 +25,6 @@ import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.internal.sync.WorkflowInternal;
 import com.uber.cadence.workflow.Functions.Func1;
 import com.uber.m3.util.ImmutableMap;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -73,8 +72,7 @@ class MarkerHandler {
       if (attributes.getHeader() != null
           && attributes.getHeader().getFields() != null
           && attributes.getHeader().getFields().containsKey(MUTABLE_MARKER_HEADER_KEY)) {
-        ByteBuffer byteBuffer = attributes.getHeader().getFields().get(MUTABLE_MARKER_HEADER_KEY);
-        byte[] bytes = org.apache.thrift.TBaseHelper.byteBufferToByteArray(byteBuffer);
+        byte[] bytes = attributes.getHeader().getFields().get(MUTABLE_MARKER_HEADER_KEY);
         MarkerData.MarkerHeader header =
             converter.fromData(bytes, MarkerData.MarkerHeader.class, MarkerData.MarkerHeader.class);
         return new MarkerData(header, attributes.getDetails());
@@ -135,7 +133,7 @@ class MarkerHandler {
     Header getHeader(DataConverter converter) {
       byte[] headerData = converter.toData(header);
       Header header = new Header();
-      header.setFields(ImmutableMap.of(MUTABLE_MARKER_HEADER_KEY, ByteBuffer.wrap(headerData)));
+      header.setFields(ImmutableMap.of(MUTABLE_MARKER_HEADER_KEY, headerData));
       return header;
     }
   }

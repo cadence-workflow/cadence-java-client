@@ -14,6 +14,10 @@ public class WorkflowExecutionAlreadyCompletedError extends BaseError {
     super();
   }
 
+  public WorkflowExecutionAlreadyCompletedError(String message) {
+    super(message);
+  }
+
   public WorkflowExecutionAlreadyCompletedError(String message, Throwable cause) {
     super(message, cause);
   }

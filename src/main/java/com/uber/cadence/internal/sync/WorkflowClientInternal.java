@@ -19,6 +19,7 @@ package com.uber.cadence.internal.sync;
 
 import com.google.common.base.Strings;
 import com.google.common.reflect.TypeToken;
+import com.uber.cadence.BaseError;
 import com.uber.cadence.RefreshWorkflowTasksRequest;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.client.ActivityCompletionClient;
@@ -46,7 +47,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import org.apache.thrift.TException;
 
 public final class WorkflowClientInternal implements WorkflowClient {
 
@@ -220,7 +220,7 @@ public final class WorkflowClientInternal implements WorkflowClient {
 
   @Override
   public void refreshWorkflowTasks(RefreshWorkflowTasksRequest refreshWorkflowTasksRequest)
-      throws TException {
+      throws BaseError {
     workflowService.RefreshWorkflowTasks(refreshWorkflowTasksRequest);
   }
 

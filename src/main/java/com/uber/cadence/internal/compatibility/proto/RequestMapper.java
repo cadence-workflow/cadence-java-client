@@ -417,7 +417,7 @@ public class RequestMapper {
             .setWorkflowExecution(workflowExecution(t.getExecution()))
             .setPageSize(t.getMaximumPageSize())
             .setWaitForNewEvent(t.isWaitForNewEvent())
-            .setHistoryEventFilterType(eventFilterType(t.HistoryEventFilterType))
+            .setHistoryEventFilterType(eventFilterType(t.getHistoryEventFilterType()))
             .setSkipArchival(t.isSkipArchival());
     if (t.getNextPageToken() != null) {
       builder.setNextPageToken(arrayToByteString(t.getNextPageToken()));
@@ -591,11 +591,11 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    if (t.uuid != null) {
-      return DescribeDomainRequest.newBuilder().setId(t.uuid).build();
+    if (t.getUuid() != null) {
+      return DescribeDomainRequest.newBuilder().setId(t.getUuid()).build();
     }
-    if (t.name != null) {
-      return DescribeDomainRequest.newBuilder().setName(t.name).build();
+    if (t.getName() != null) {
+      return DescribeDomainRequest.newBuilder().setName(t.getName()).build();
     }
     throw new IllegalArgumentException("neither one of field is set for DescribeDomainRequest");
   }
@@ -604,7 +604,8 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    ListDomainsRequest.Builder request = ListDomainsRequest.newBuilder().setPageSize(t.pageSize);
+    ListDomainsRequest.Builder request =
+        ListDomainsRequest.newBuilder().setPageSize(t.getPageSize());
     if (t.getNextPageToken() != null) {
       request.setNextPageToken(arrayToByteString(t.getNextPageToken()));
     }
@@ -736,7 +737,7 @@ public class RequestMapper {
             .setActiveClusterName(Helpers.nullToEmpty(t.getActiveClusterName()))
             .putAllData(Helpers.nullToEmpty(t.getData()))
             .setSecurityToken(Helpers.nullToEmpty(t.getSecurityToken()))
-            .setIsGlobalDomain(nullToEmpty(t.isIsGlobalDomain()))
+            .setIsGlobalDomain(nullToEmpty(t.isGlobalDomain()))
             .setHistoryArchivalStatus(archivalStatus(t.getHistoryArchivalStatus()))
             .setHistoryArchivalUri(Helpers.nullToEmpty(t.getHistoryArchivalURI()))
             .setVisibilityArchivalStatus(archivalStatus(t.getVisibilityArchivalStatus()))

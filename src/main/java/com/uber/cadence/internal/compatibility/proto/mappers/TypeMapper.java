@@ -332,8 +332,7 @@ class TypeMapper {
     if (t == null || t == WorkflowExecution.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.WorkflowExecution we =
-        new com.uber.cadence.WorkflowExecution();
+    com.uber.cadence.WorkflowExecution we = new com.uber.cadence.WorkflowExecution();
     we.setWorkflowId(t.getWorkflowId());
     we.setRunId(t.getRunId());
     return we;
@@ -357,8 +356,7 @@ class TypeMapper {
     if (t == null || t == ActivityType.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.ActivityType activityType =
-        new com.uber.cadence.ActivityType();
+    com.uber.cadence.ActivityType activityType = new com.uber.cadence.ActivityType();
     activityType.setName(t.getName());
     return activityType;
   }
@@ -418,8 +416,7 @@ class TypeMapper {
     if (t == null || t.getAllFields().size() == 0 || t == SearchAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.SearchAttributes res =
-        new com.uber.cadence.SearchAttributes();
+    com.uber.cadence.SearchAttributes res = new com.uber.cadence.SearchAttributes();
     res.setIndexedFields(payloadMap(t.getIndexedFieldsMap()));
     return res;
   }
@@ -514,8 +511,7 @@ class TypeMapper {
     return t.getInitiatedId();
   }
 
-  static com.uber.cadence.WorkflowExecution externalWorkflowExecution(
-      ExternalExecutionInfo t) {
+  static com.uber.cadence.WorkflowExecution externalWorkflowExecution(ExternalExecutionInfo t) {
     if (t == null || t == ExternalExecutionInfo.getDefaultInstance()) {
       return null;
     }
@@ -593,13 +589,11 @@ class TypeMapper {
     return res;
   }
 
-  static com.uber.cadence.WorkflowExecutionInfo workflowExecutionInfo(
-      WorkflowExecutionInfo t) {
+  static com.uber.cadence.WorkflowExecutionInfo workflowExecutionInfo(WorkflowExecutionInfo t) {
     if (t == null || t == WorkflowExecutionInfo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.WorkflowExecutionInfo res =
-        new com.uber.cadence.WorkflowExecutionInfo();
+    com.uber.cadence.WorkflowExecutionInfo res = new com.uber.cadence.WorkflowExecutionInfo();
     res.setExecution(workflowExecution(t.getWorkflowExecution()));
     res.setType(workflowType(t.getType()));
     res.setStartTime(timeToUnixNano(t.getStartTime()));
@@ -639,8 +633,7 @@ class TypeMapper {
     return t.getInitiatedId();
   }
 
-  static com.uber.cadence.WorkflowExecution parentWorkflowExecution(
-      ParentExecutionInfo t) {
+  static com.uber.cadence.WorkflowExecution parentWorkflowExecution(ParentExecutionInfo t) {
     if (t == null || t == ParentExecutionInfo.getDefaultInstance()) {
       return null;
     }
@@ -651,8 +644,7 @@ class TypeMapper {
     if (t == null || t == PendingActivityInfo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.PendingActivityInfo res =
-        new com.uber.cadence.PendingActivityInfo();
+    com.uber.cadence.PendingActivityInfo res = new com.uber.cadence.PendingActivityInfo();
     res.setActivityID(t.getActivityId());
     res.setActivityType(activityType(t.getActivityType()));
     res.setState(pendingActivityState(t.getState()));
@@ -688,8 +680,7 @@ class TypeMapper {
     if (t == null || t == PendingDecisionInfo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.PendingDecisionInfo res =
-        new com.uber.cadence.PendingDecisionInfo();
+    com.uber.cadence.PendingDecisionInfo res = new com.uber.cadence.PendingDecisionInfo();
     res.setState(pendingDecisionState(t.getState()));
     res.setScheduledTimestamp(timeToUnixNano(t.getScheduledTime()));
     res.setStartedTimestamp(timeToUnixNano(t.getStartedTime()));
@@ -718,8 +709,7 @@ class TypeMapper {
     if (t == null || t == SupportedClientVersions.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.SupportedClientVersions res =
-        new com.uber.cadence.SupportedClientVersions();
+    com.uber.cadence.SupportedClientVersions res = new com.uber.cadence.SupportedClientVersions();
     res.setGoSdk(t.getGoSdk());
     res.setJavaSdk(t.getJavaSdk());
     return res;
@@ -729,8 +719,7 @@ class TypeMapper {
     if (t == null || t == Domain.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.DescribeDomainResponse res =
-        new com.uber.cadence.DescribeDomainResponse();
+    com.uber.cadence.DescribeDomainResponse res = new com.uber.cadence.DescribeDomainResponse();
     com.uber.cadence.DomainInfo domainInfo = new com.uber.cadence.DomainInfo();
     res.setDomainInfo(domainInfo);
 
@@ -772,8 +761,7 @@ class TypeMapper {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.TaskListMetadata res =
-        new com.uber.cadence.TaskListMetadata();
+    com.uber.cadence.TaskListMetadata res = new com.uber.cadence.TaskListMetadata();
     res.setMaxTasksPerSecond(t.getMaxTasksPerSecond().getValue());
     return res;
   }
@@ -810,8 +798,7 @@ class TypeMapper {
     return v;
   }
 
-  static List<com.uber.cadence.ResetPointInfo> resetPointInfoArray(
-      List<ResetPointInfo> t) {
+  static List<com.uber.cadence.ResetPointInfo> resetPointInfoArray(List<ResetPointInfo> t) {
     if (t == null) {
       return null;
     }
@@ -881,8 +868,7 @@ class TypeMapper {
     return v;
   }
 
-  static List<com.uber.cadence.DescribeDomainResponse> describeDomainResponseArray(
-      List<Domain> t) {
+  static List<com.uber.cadence.DescribeDomainResponse> describeDomainResponseArray(List<Domain> t) {
     if (t == null) {
       return null;
     }
@@ -917,8 +903,8 @@ class TypeMapper {
     return v;
   }
 
-  static Map<String, com.uber.cadence.ActivityLocalDispatchInfo>
-      activityLocalDispatchInfoMap(Map<String, ActivityLocalDispatchInfo> t) {
+  static Map<String, com.uber.cadence.ActivityLocalDispatchInfo> activityLocalDispatchInfoMap(
+      Map<String, ActivityLocalDispatchInfo> t) {
     if (t == null) {
       return null;
     }

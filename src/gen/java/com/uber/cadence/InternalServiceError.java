@@ -14,6 +14,10 @@ public class InternalServiceError extends BaseError {
     super();
   }
 
+  public InternalServiceError(String message) {
+    super(message);
+  }
+
   public InternalServiceError(String message, Throwable cause) {
     super(message, cause);
   }

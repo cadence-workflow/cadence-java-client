@@ -14,6 +14,10 @@ public class QueryFailedError extends BaseError {
     super();
   }
 
+  public QueryFailedError(String message) {
+    super(message);
+  }
+
   public QueryFailedError(String message, Throwable cause) {
     super(message, cause);
   }

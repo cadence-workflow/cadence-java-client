@@ -75,8 +75,7 @@ public final class EnumMapper {
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static EventFilterType eventFilterType(
-      com.uber.cadence.HistoryEventFilterType t) {
+  public static EventFilterType eventFilterType(com.uber.cadence.HistoryEventFilterType t) {
     if (t == null) {
       return EventFilterType.EVENT_FILTER_TYPE_INVALID;
     }
@@ -89,8 +88,7 @@ public final class EnumMapper {
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static QueryRejectCondition queryRejectCondition(
-      com.uber.cadence.QueryRejectCondition t) {
+  public static QueryRejectCondition queryRejectCondition(com.uber.cadence.QueryRejectCondition t) {
     if (t == null) {
       return QueryRejectCondition.QUERY_REJECT_CONDITION_INVALID;
     }
@@ -270,8 +268,7 @@ public final class EnumMapper {
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static QueryResultType queryTaskCompletedType(
-      com.uber.cadence.QueryTaskCompletedType t) {
+  public static QueryResultType queryTaskCompletedType(com.uber.cadence.QueryTaskCompletedType t) {
     if (t == null) {
       return QUERY_RESULT_TYPE_INVALID;
     }
@@ -296,8 +293,7 @@ public final class EnumMapper {
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.QueryRejectCondition queryRejectCondition(
-      QueryRejectCondition t) {
+  public static com.uber.cadence.QueryRejectCondition queryRejectCondition(QueryRejectCondition t) {
     if (t == QueryRejectCondition.QUERY_REJECT_CONDITION_INVALID) {
       return null;
     }
@@ -378,8 +374,7 @@ public final class EnumMapper {
       case DECISION_TASK_FAILED_CAUSE_BAD_SCHEDULE_ACTIVITY_ATTRIBUTES:
         return com.uber.cadence.DecisionTaskFailedCause.BAD_SCHEDULE_ACTIVITY_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_REQUEST_CANCEL_ACTIVITY_ATTRIBUTES:
-        return com.uber.cadence.DecisionTaskFailedCause
-            .BAD_REQUEST_CANCEL_ACTIVITY_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_REQUEST_CANCEL_ACTIVITY_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_START_TIMER_ATTRIBUTES:
         return com.uber.cadence.DecisionTaskFailedCause.BAD_START_TIMER_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_CANCEL_TIMER_ATTRIBUTES:
@@ -387,14 +382,11 @@ public final class EnumMapper {
       case DECISION_TASK_FAILED_CAUSE_BAD_RECORD_MARKER_ATTRIBUTES:
         return com.uber.cadence.DecisionTaskFailedCause.BAD_RECORD_MARKER_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_COMPLETE_WORKFLOW_EXECUTION_ATTRIBUTES:
-        return com.uber.cadence.DecisionTaskFailedCause
-            .BAD_COMPLETE_WORKFLOW_EXECUTION_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_COMPLETE_WORKFLOW_EXECUTION_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_FAIL_WORKFLOW_EXECUTION_ATTRIBUTES:
-        return com.uber.cadence.DecisionTaskFailedCause
-            .BAD_FAIL_WORKFLOW_EXECUTION_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_FAIL_WORKFLOW_EXECUTION_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_CANCEL_WORKFLOW_EXECUTION_ATTRIBUTES:
-        return com.uber.cadence.DecisionTaskFailedCause
-            .BAD_CANCEL_WORKFLOW_EXECUTION_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_CANCEL_WORKFLOW_EXECUTION_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_ATTRIBUTES:
         return com.uber.cadence.DecisionTaskFailedCause
             .BAD_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_ATTRIBUTES;
@@ -407,11 +399,9 @@ public final class EnumMapper {
       case DECISION_TASK_FAILED_CAUSE_WORKFLOW_WORKER_UNHANDLED_FAILURE:
         return com.uber.cadence.DecisionTaskFailedCause.WORKFLOW_WORKER_UNHANDLED_FAILURE;
       case DECISION_TASK_FAILED_CAUSE_BAD_SIGNAL_WORKFLOW_EXECUTION_ATTRIBUTES:
-        return com.uber.cadence.DecisionTaskFailedCause
-            .BAD_SIGNAL_WORKFLOW_EXECUTION_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_SIGNAL_WORKFLOW_EXECUTION_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_BAD_START_CHILD_EXECUTION_ATTRIBUTES:
-        return com.uber.cadence.DecisionTaskFailedCause
-            .BAD_START_CHILD_EXECUTION_ATTRIBUTES;
+        return com.uber.cadence.DecisionTaskFailedCause.BAD_START_CHILD_EXECUTION_ATTRIBUTES;
       case DECISION_TASK_FAILED_CAUSE_FORCE_CLOSE_DECISION:
         return com.uber.cadence.DecisionTaskFailedCause.FORCE_CLOSE_DECISION;
       case DECISION_TASK_FAILED_CAUSE_FAILOVER_CLOSE_DECISION:
@@ -465,8 +455,7 @@ public final class EnumMapper {
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.PendingActivityState pendingActivityState(
-      PendingActivityState t) {
+  public static com.uber.cadence.PendingActivityState pendingActivityState(PendingActivityState t) {
     switch (t) {
       case PENDING_ACTIVITY_STATE_INVALID:
         return null;
@@ -480,8 +469,7 @@ public final class EnumMapper {
     throw new IllegalArgumentException("unexpected enum value");
   }
 
-  public static com.uber.cadence.PendingDecisionState pendingDecisionState(
-      PendingDecisionState t) {
+  public static com.uber.cadence.PendingDecisionState pendingDecisionState(PendingDecisionState t) {
     switch (t) {
       case PENDING_DECISION_STATE_INVALID:
         return null;

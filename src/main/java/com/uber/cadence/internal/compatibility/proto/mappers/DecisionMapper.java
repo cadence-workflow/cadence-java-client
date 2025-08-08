@@ -108,8 +108,7 @@ class DecisionMapper {
         break;
       case StartTimer:
         {
-          com.uber.cadence.StartTimerDecisionAttributes attr =
-              d.getStartTimerDecisionAttributes();
+          com.uber.cadence.StartTimerDecisionAttributes attr = d.getStartTimerDecisionAttributes();
           decision.setStartTimerDecisionAttributes(
               StartTimerDecisionAttributes.newBuilder()
                   .setTimerId(attr.getTimerId())

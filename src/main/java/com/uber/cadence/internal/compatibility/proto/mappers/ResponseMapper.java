@@ -54,8 +54,8 @@ import java.util.stream.Collectors;
 
 public class ResponseMapper {
 
-  public static com.uber.cadence.StartWorkflowExecutionResponse
-      startWorkflowExecutionResponse(StartWorkflowExecutionResponse t) {
+  public static com.uber.cadence.StartWorkflowExecutionResponse startWorkflowExecutionResponse(
+      StartWorkflowExecutionResponse t) {
     if (t == null) {
       return null;
     }
@@ -82,8 +82,8 @@ public class ResponseMapper {
     return describeTaskListResponse;
   }
 
-  public static com.uber.cadence.RestartWorkflowExecutionResponse
-      restartWorkflowExecutionResponse(RestartWorkflowExecutionResponse t) {
+  public static com.uber.cadence.RestartWorkflowExecutionResponse restartWorkflowExecutionResponse(
+      RestartWorkflowExecutionResponse t) {
     if (t == null) {
       return null;
     }
@@ -113,8 +113,7 @@ public class ResponseMapper {
     return describeWorkflowExecutionResponse;
   }
 
-  public static com.uber.cadence.ClusterInfo getClusterInfoResponse(
-      GetClusterInfoResponse t) {
+  public static com.uber.cadence.ClusterInfo getClusterInfoResponse(GetClusterInfoResponse t) {
     if (t == null) {
       return null;
     }
@@ -139,9 +138,8 @@ public class ResponseMapper {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.GetWorkflowExecutionHistoryResponse
-        getWorkflowExecutionHistoryResponse =
-            new com.uber.cadence.GetWorkflowExecutionHistoryResponse();
+    com.uber.cadence.GetWorkflowExecutionHistoryResponse getWorkflowExecutionHistoryResponse =
+        new com.uber.cadence.GetWorkflowExecutionHistoryResponse();
     getWorkflowExecutionHistoryResponse.setHistory(history(t.getHistory()));
     getWorkflowExecutionHistoryResponse.setRawHistory(dataBlobArray(t.getRawHistoryList()));
     getWorkflowExecutionHistoryResponse.setNextPageToken(byteStringToArray(t.getNextPageToken()));
@@ -185,8 +183,8 @@ public class ResponseMapper {
     return res;
   }
 
-  public static com.uber.cadence.ListTaskListPartitionsResponse
-      listTaskListPartitionsResponse(ListTaskListPartitionsResponse t) {
+  public static com.uber.cadence.ListTaskListPartitionsResponse listTaskListPartitionsResponse(
+      ListTaskListPartitionsResponse t) {
     if (t == null) {
       return null;
     }
@@ -199,8 +197,8 @@ public class ResponseMapper {
     return res;
   }
 
-  public static com.uber.cadence.ListWorkflowExecutionsResponse
-      listWorkflowExecutionsResponse(ListWorkflowExecutionsResponse t) {
+  public static com.uber.cadence.ListWorkflowExecutionsResponse listWorkflowExecutionsResponse(
+      ListWorkflowExecutionsResponse t) {
     if (t == null) {
       return null;
     }
@@ -269,8 +267,7 @@ public class ResponseMapper {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.QueryWorkflowResponse res =
-        new com.uber.cadence.QueryWorkflowResponse();
+    com.uber.cadence.QueryWorkflowResponse res = new com.uber.cadence.QueryWorkflowResponse();
     res.setQueryResult(payload(t.getQueryResult()));
     res.setQueryRejected(queryRejected(t.getQueryRejected()));
     return res;
@@ -298,8 +295,8 @@ public class ResponseMapper {
     return res;
   }
 
-  public static com.uber.cadence.ResetWorkflowExecutionResponse
-      resetWorkflowExecutionResponse(ResetWorkflowExecutionResponse t) {
+  public static com.uber.cadence.ResetWorkflowExecutionResponse resetWorkflowExecutionResponse(
+      ResetWorkflowExecutionResponse t) {
     if (t == null) {
       return null;
     }
@@ -322,8 +319,8 @@ public class ResponseMapper {
     return res;
   }
 
-  public static com.uber.cadence.ListWorkflowExecutionsResponse
-      scanWorkflowExecutionsResponse(ScanWorkflowExecutionsResponse t) {
+  public static com.uber.cadence.ListWorkflowExecutionsResponse scanWorkflowExecutionsResponse(
+      ScanWorkflowExecutionsResponse t) {
     if (t == null) {
       return null;
     }
@@ -334,8 +331,8 @@ public class ResponseMapper {
     return res;
   }
 
-  public static com.uber.cadence.CountWorkflowExecutionsResponse
-      countWorkflowExecutionsResponse(CountWorkflowExecutionsResponse t) {
+  public static com.uber.cadence.CountWorkflowExecutionsResponse countWorkflowExecutionsResponse(
+      CountWorkflowExecutionsResponse t) {
     if (t == null) {
       return null;
     }
@@ -390,13 +387,11 @@ public class ResponseMapper {
     return response;
   }
 
-  public static com.uber.cadence.ListDomainsResponse listDomainsResponse(
-      ListDomainsResponse t) {
+  public static com.uber.cadence.ListDomainsResponse listDomainsResponse(ListDomainsResponse t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.ListDomainsResponse res =
-        new com.uber.cadence.ListDomainsResponse();
+    com.uber.cadence.ListDomainsResponse res = new com.uber.cadence.ListDomainsResponse();
     res.setDomains(describeDomainResponseArray(t.getDomainsList()));
     res.setNextPageToken(byteStringToArray(t.getNextPageToken()));
     return res;
@@ -416,13 +411,10 @@ public class ResponseMapper {
   public static com.uber.cadence.SignalWithStartWorkflowExecutionAsyncResponse
       signalWithStartWorkflowExecutionAsyncResponse(
           SignalWithStartWorkflowExecutionAsyncResponse t) {
-    return t == null
-        ? null
-        : new com.uber.cadence.SignalWithStartWorkflowExecutionAsyncResponse();
+    return t == null ? null : new com.uber.cadence.SignalWithStartWorkflowExecutionAsyncResponse();
   }
 
-  public static com.uber.cadence.UpdateDomainResponse updateDomainResponse(
-      UpdateDomainResponse t) {
+  public static com.uber.cadence.UpdateDomainResponse updateDomainResponse(UpdateDomainResponse t) {
     if (t == null) {
       return null;
     }

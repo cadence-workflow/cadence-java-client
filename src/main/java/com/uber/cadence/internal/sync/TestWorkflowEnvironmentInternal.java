@@ -17,85 +17,7 @@
 
 package com.uber.cadence.internal.sync;
 
-import com.uber.cadence.BadRequestError;
-import com.uber.cadence.ClientVersionNotSupportedError;
-import com.uber.cadence.ClusterInfo;
-import com.uber.cadence.CountWorkflowExecutionsRequest;
-import com.uber.cadence.CountWorkflowExecutionsResponse;
-import com.uber.cadence.DeprecateDomainRequest;
-import com.uber.cadence.DescribeDomainRequest;
-import com.uber.cadence.DescribeDomainResponse;
-import com.uber.cadence.DescribeTaskListRequest;
-import com.uber.cadence.DescribeTaskListResponse;
-import com.uber.cadence.DescribeWorkflowExecutionRequest;
-import com.uber.cadence.DescribeWorkflowExecutionResponse;
-import com.uber.cadence.DomainAlreadyExistsError;
-import com.uber.cadence.DomainNotActiveError;
-import com.uber.cadence.EntityNotExistsError;
-import com.uber.cadence.GetSearchAttributesResponse;
-import com.uber.cadence.GetTaskListsByDomainRequest;
-import com.uber.cadence.GetTaskListsByDomainResponse;
-import com.uber.cadence.GetWorkflowExecutionHistoryRequest;
-import com.uber.cadence.GetWorkflowExecutionHistoryResponse;
-import com.uber.cadence.InternalServiceError;
-import com.uber.cadence.LimitExceededError;
-import com.uber.cadence.ListArchivedWorkflowExecutionsRequest;
-import com.uber.cadence.ListArchivedWorkflowExecutionsResponse;
-import com.uber.cadence.ListClosedWorkflowExecutionsRequest;
-import com.uber.cadence.ListClosedWorkflowExecutionsResponse;
-import com.uber.cadence.ListDomainsRequest;
-import com.uber.cadence.ListDomainsResponse;
-import com.uber.cadence.ListOpenWorkflowExecutionsRequest;
-import com.uber.cadence.ListOpenWorkflowExecutionsResponse;
-import com.uber.cadence.ListTaskListPartitionsRequest;
-import com.uber.cadence.ListTaskListPartitionsResponse;
-import com.uber.cadence.ListWorkflowExecutionsRequest;
-import com.uber.cadence.ListWorkflowExecutionsResponse;
-import com.uber.cadence.PollForActivityTaskRequest;
-import com.uber.cadence.PollForActivityTaskResponse;
-import com.uber.cadence.PollForDecisionTaskRequest;
-import com.uber.cadence.PollForDecisionTaskResponse;
-import com.uber.cadence.QueryFailedError;
-import com.uber.cadence.QueryRejectCondition;
-import com.uber.cadence.QueryWorkflowRequest;
-import com.uber.cadence.QueryWorkflowResponse;
-import com.uber.cadence.RecordActivityTaskHeartbeatByIDRequest;
-import com.uber.cadence.RecordActivityTaskHeartbeatRequest;
-import com.uber.cadence.RecordActivityTaskHeartbeatResponse;
-import com.uber.cadence.RefreshWorkflowTasksRequest;
-import com.uber.cadence.RegisterDomainRequest;
-import com.uber.cadence.RequestCancelWorkflowExecutionRequest;
-import com.uber.cadence.ResetStickyTaskListRequest;
-import com.uber.cadence.ResetStickyTaskListResponse;
-import com.uber.cadence.ResetWorkflowExecutionRequest;
-import com.uber.cadence.ResetWorkflowExecutionResponse;
-import com.uber.cadence.RespondActivityTaskCanceledByIDRequest;
-import com.uber.cadence.RespondActivityTaskCanceledRequest;
-import com.uber.cadence.RespondActivityTaskCompletedByIDRequest;
-import com.uber.cadence.RespondActivityTaskCompletedRequest;
-import com.uber.cadence.RespondActivityTaskFailedByIDRequest;
-import com.uber.cadence.RespondActivityTaskFailedRequest;
-import com.uber.cadence.RespondDecisionTaskCompletedRequest;
-import com.uber.cadence.RespondDecisionTaskCompletedResponse;
-import com.uber.cadence.RespondDecisionTaskFailedRequest;
-import com.uber.cadence.RespondQueryTaskCompletedRequest;
-import com.uber.cadence.RestartWorkflowExecutionRequest;
-import com.uber.cadence.RestartWorkflowExecutionResponse;
-import com.uber.cadence.ServiceBusyError;
-import com.uber.cadence.SignalWithStartWorkflowExecutionAsyncRequest;
-import com.uber.cadence.SignalWithStartWorkflowExecutionAsyncResponse;
-import com.uber.cadence.SignalWithStartWorkflowExecutionRequest;
-import com.uber.cadence.SignalWorkflowExecutionRequest;
-import com.uber.cadence.StartWorkflowExecutionAsyncRequest;
-import com.uber.cadence.StartWorkflowExecutionAsyncResponse;
-import com.uber.cadence.StartWorkflowExecutionRequest;
-import com.uber.cadence.StartWorkflowExecutionResponse;
-import com.uber.cadence.TerminateWorkflowExecutionRequest;
-import com.uber.cadence.UpdateDomainRequest;
-import com.uber.cadence.UpdateDomainResponse;
-import com.uber.cadence.WorkflowExecution;
-import com.uber.cadence.WorkflowExecutionAlreadyCompletedError;
-import com.uber.cadence.WorkflowExecutionAlreadyStartedError;
+import com.uber.cadence.*;
 import com.uber.cadence.client.ActivityCompletionClient;
 import com.uber.cadence.client.QueryOptions;
 import com.uber.cadence.client.WorkflowClient;
@@ -104,6 +26,7 @@ import com.uber.cadence.client.WorkflowClientOptions;
 import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.client.WorkflowStub;
 import com.uber.cadence.internal.testservice.TestWorkflowService;
+import com.uber.cadence.serviceclient.AsyncMethodCallback;
 import com.uber.cadence.serviceclient.ClientOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.testing.TestEnvironmentOptions;
@@ -119,8 +42,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
-import org.apache.thrift.TException;
-import org.apache.thrift.async.AsyncMethodCallback;
 
 public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnvironment {
 
@@ -286,67 +207,67 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
 
     @Override
     public RecordActivityTaskHeartbeatResponse RecordActivityTaskHeartbeat(
-        RecordActivityTaskHeartbeatRequest heartbeatRequest) throws TException {
+        RecordActivityTaskHeartbeatRequest heartbeatRequest) throws BaseError {
       return impl.RecordActivityTaskHeartbeat(heartbeatRequest);
     }
 
     @Override
     public RecordActivityTaskHeartbeatResponse RecordActivityTaskHeartbeatByID(
-        RecordActivityTaskHeartbeatByIDRequest heartbeatRequest) throws TException {
+        RecordActivityTaskHeartbeatByIDRequest heartbeatRequest) throws BaseError {
       return impl.RecordActivityTaskHeartbeatByID(heartbeatRequest);
     }
 
     @Override
     public void RespondActivityTaskCompleted(RespondActivityTaskCompletedRequest completeRequest)
-        throws TException {
+        throws BaseError {
       impl.RespondActivityTaskCompleted(completeRequest);
     }
 
     @Override
     public void RespondActivityTaskCompletedByID(
-        RespondActivityTaskCompletedByIDRequest completeRequest) throws TException {
+        RespondActivityTaskCompletedByIDRequest completeRequest) throws BaseError {
       impl.RespondActivityTaskCompletedByID(completeRequest);
     }
 
     @Override
     public void RespondActivityTaskFailed(RespondActivityTaskFailedRequest failRequest)
-        throws TException {
+        throws BaseError {
       impl.RespondActivityTaskFailed(failRequest);
     }
 
     @Override
     public void RespondActivityTaskFailedByID(RespondActivityTaskFailedByIDRequest failRequest)
-        throws TException {
+        throws BaseError {
       impl.RespondActivityTaskFailedByID(failRequest);
     }
 
     @Override
     public void RespondActivityTaskCanceled(RespondActivityTaskCanceledRequest canceledRequest)
-        throws TException {
+        throws BaseError {
       impl.RespondActivityTaskCanceled(canceledRequest);
     }
 
     @Override
     public void RespondActivityTaskCanceledByID(
-        RespondActivityTaskCanceledByIDRequest canceledRequest) throws TException {
+        RespondActivityTaskCanceledByIDRequest canceledRequest) throws BaseError {
       impl.RespondActivityTaskCanceledByID(canceledRequest);
     }
 
     @Override
     public void RequestCancelWorkflowExecution(RequestCancelWorkflowExecutionRequest cancelRequest)
-        throws TException {
+        throws BaseError {
       impl.RequestCancelWorkflowExecution(cancelRequest);
     }
 
     @Override
     public void SignalWorkflowExecution(SignalWorkflowExecutionRequest signalRequest)
-        throws TException {
+        throws BaseError {
       impl.SignalWorkflowExecution(signalRequest);
     }
 
     @Override
     public StartWorkflowExecutionResponse SignalWithStartWorkflowExecution(
-        SignalWithStartWorkflowExecutionRequest signalWithStartRequest) throws TException {
+        SignalWithStartWorkflowExecutionRequest signalWithStartRequest) throws BaseError {
       return impl.SignalWithStartWorkflowExecution(signalWithStartRequest);
     }
 
@@ -355,170 +276,167 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
         SignalWithStartWorkflowExecutionAsyncRequest signalWithStartRequest)
         throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
             DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-            ClientVersionNotSupportedError, TException {
+            ClientVersionNotSupportedError, BaseError {
       return impl.SignalWithStartWorkflowExecutionAsync(signalWithStartRequest);
     }
 
     @Override
     public ResetWorkflowExecutionResponse ResetWorkflowExecution(
-        ResetWorkflowExecutionRequest resetRequest) throws TException {
+        ResetWorkflowExecutionRequest resetRequest) throws BaseError {
       return impl.ResetWorkflowExecution(resetRequest);
     }
 
     @Override
     public void TerminateWorkflowExecution(TerminateWorkflowExecutionRequest terminateRequest)
-        throws TException {
+        throws BaseError {
       impl.TerminateWorkflowExecution(terminateRequest);
     }
 
     @Override
     public ListOpenWorkflowExecutionsResponse ListOpenWorkflowExecutions(
-        ListOpenWorkflowExecutionsRequest listRequest) throws TException {
+        ListOpenWorkflowExecutionsRequest listRequest) throws BaseError {
       return impl.ListOpenWorkflowExecutions(listRequest);
     }
 
     @Override
     public ListClosedWorkflowExecutionsResponse ListClosedWorkflowExecutions(
-        ListClosedWorkflowExecutionsRequest listRequest) throws TException {
+        ListClosedWorkflowExecutionsRequest listRequest) throws BaseError {
       return impl.ListClosedWorkflowExecutions(listRequest);
     }
 
     @Override
     public ListWorkflowExecutionsResponse ListWorkflowExecutions(
-        ListWorkflowExecutionsRequest listRequest) throws TException {
+        ListWorkflowExecutionsRequest listRequest) throws BaseError {
       return impl.ListWorkflowExecutions(listRequest);
     }
 
     @Override
     public ListArchivedWorkflowExecutionsResponse ListArchivedWorkflowExecutions(
-        ListArchivedWorkflowExecutionsRequest listRequest) throws TException {
+        ListArchivedWorkflowExecutionsRequest listRequest) throws BaseError {
       return impl.ListArchivedWorkflowExecutions(listRequest);
     }
 
     @Override
     public ListWorkflowExecutionsResponse ScanWorkflowExecutions(
-        ListWorkflowExecutionsRequest listRequest) throws TException {
+        ListWorkflowExecutionsRequest listRequest) throws BaseError {
       return impl.ScanWorkflowExecutions(listRequest);
     }
 
     @Override
     public CountWorkflowExecutionsResponse CountWorkflowExecutions(
-        CountWorkflowExecutionsRequest countRequest) throws TException {
+        CountWorkflowExecutionsRequest countRequest) throws BaseError {
       return impl.CountWorkflowExecutions(countRequest);
     }
 
     @Override
-    public GetSearchAttributesResponse GetSearchAttributes() throws TException {
+    public GetSearchAttributesResponse GetSearchAttributes() throws BaseError {
       return impl.GetSearchAttributes();
     }
 
     @Override
     public void RespondQueryTaskCompleted(RespondQueryTaskCompletedRequest completeRequest)
-        throws TException {
+        throws BaseError {
       impl.RespondQueryTaskCompleted(completeRequest);
     }
 
     @Override
     public ResetStickyTaskListResponse ResetStickyTaskList(ResetStickyTaskListRequest resetRequest)
-        throws TException {
+        throws BaseError {
       return impl.ResetStickyTaskList(resetRequest);
     }
 
     @Override
     public QueryWorkflowResponse QueryWorkflow(QueryWorkflowRequest queryRequest)
         throws BadRequestError, InternalServiceError, EntityNotExistsError, QueryFailedError,
-            TException {
+            BaseError {
       return impl.QueryWorkflow(queryRequest);
     }
 
     @Override
     public DescribeWorkflowExecutionResponse DescribeWorkflowExecution(
-        DescribeWorkflowExecutionRequest describeRequest) throws TException {
+        DescribeWorkflowExecutionRequest describeRequest) throws BaseError {
       return impl.DescribeWorkflowExecution(describeRequest);
     }
 
     @Override
     public DescribeTaskListResponse DescribeTaskList(DescribeTaskListRequest request)
-        throws TException {
+        throws BaseError {
       return impl.DescribeTaskList(request);
     }
 
     @Override
-    public ClusterInfo GetClusterInfo() throws InternalServiceError, ServiceBusyError, TException {
+    public ClusterInfo GetClusterInfo() throws InternalServiceError, ServiceBusyError, BaseError {
       return impl.GetClusterInfo();
     }
 
     @Override
     public ListTaskListPartitionsResponse ListTaskListPartitions(
-        ListTaskListPartitionsRequest request) throws TException {
+        ListTaskListPartitionsRequest request) throws BaseError {
       return impl.ListTaskListPartitions(request);
     }
 
     @Override
     public void RefreshWorkflowTasks(RefreshWorkflowTasksRequest request)
         throws BadRequestError, DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
-            TException {
+            BaseError {
       impl.RefreshWorkflowTasks(request);
     }
 
     @Override
     public void RegisterDomain(
-        RegisterDomainRequest registerRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        RegisterDomainRequest registerRequest, AsyncMethodCallback resultHandler) throws BaseError {
       impl.RegisterDomain(registerRequest, resultHandler);
     }
 
     @Override
     public void DescribeDomain(
-        DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler) throws BaseError {
       impl.DescribeDomain(describeRequest, resultHandler);
     }
 
     @Override
     public void ListDomains(ListDomainsRequest listRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.ListDomains(listRequest, resultHandler);
     }
 
     @Override
     public void UpdateDomain(UpdateDomainRequest updateRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.UpdateDomain(updateRequest, resultHandler);
     }
 
     @Override
     public void DeprecateDomain(
         DeprecateDomainRequest deprecateRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.DeprecateDomain(deprecateRequest, resultHandler);
     }
 
     @Override
     public void RestartWorkflowExecution(
         RestartWorkflowExecutionRequest restartRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RestartWorkflowExecution(restartRequest, resultHandler);
     }
 
     @Override
     public void GetTaskListsByDomain(
-        GetTaskListsByDomainRequest request, AsyncMethodCallback resultHandler)
-        throws org.apache.thrift.TException {
+        GetTaskListsByDomainRequest request, AsyncMethodCallback resultHandler) throws BaseError {
       impl.GetTaskListsByDomain(request, resultHandler);
     }
 
     @Override
     public void StartWorkflowExecution(
         StartWorkflowExecutionRequest startRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.StartWorkflowExecution(startRequest, resultHandler);
     }
 
     @Override
     public void StartWorkflowExecutionAsync(
         StartWorkflowExecutionAsyncRequest startRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.StartWorkflowExecutionAsync(startRequest, resultHandler);
     }
 
@@ -527,7 +445,7 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
         StartWorkflowExecutionRequest startRequest,
         AsyncMethodCallback resultHandler,
         Long timeoutInMillis)
-        throws TException {
+        throws BaseError {
       impl.StartWorkflowExecutionWithTimeout(startRequest, resultHandler, timeoutInMillis);
     }
 
@@ -536,7 +454,7 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
         StartWorkflowExecutionAsyncRequest startAsyncRequest,
         AsyncMethodCallback resultHandler,
         Long timeoutInMillis)
-        throws TException {
+        throws BaseError {
       impl.StartWorkflowExecutionAsyncWithTimeout(
           startAsyncRequest, resultHandler, timeoutInMillis);
     }
@@ -544,7 +462,7 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     @Override
     public void GetWorkflowExecutionHistory(
         GetWorkflowExecutionHistoryRequest getRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.GetWorkflowExecutionHistory(getRequest, resultHandler);
     }
 
@@ -553,7 +471,7 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
         GetWorkflowExecutionHistoryRequest getRequest,
         AsyncMethodCallback resultHandler,
         Long timeoutInMillis)
-        throws TException {
+        throws BaseError {
       impl.GetWorkflowExecutionHistoryWithTimeout(getRequest, resultHandler, timeoutInMillis);
     }
 
@@ -565,98 +483,98 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     @Override
     public void PollForDecisionTask(
         PollForDecisionTaskRequest pollRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.PollForDecisionTask(pollRequest, resultHandler);
     }
 
     @Override
     public void RespondDecisionTaskCompleted(
         RespondDecisionTaskCompletedRequest completeRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RespondDecisionTaskCompleted(completeRequest, resultHandler);
     }
 
     @Override
     public void RespondDecisionTaskFailed(
         RespondDecisionTaskFailedRequest failedRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RespondDecisionTaskFailed(failedRequest, resultHandler);
     }
 
     @Override
     public void PollForActivityTask(
         PollForActivityTaskRequest pollRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.PollForActivityTask(pollRequest, resultHandler);
     }
 
     @Override
     public void RecordActivityTaskHeartbeat(
         RecordActivityTaskHeartbeatRequest heartbeatRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RecordActivityTaskHeartbeat(heartbeatRequest, resultHandler);
     }
 
     @Override
     public void RecordActivityTaskHeartbeatByID(
         RecordActivityTaskHeartbeatByIDRequest heartbeatRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RecordActivityTaskHeartbeatByID(heartbeatRequest, resultHandler);
     }
 
     @Override
     public void RespondActivityTaskCompleted(
         RespondActivityTaskCompletedRequest completeRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RespondActivityTaskCompleted(completeRequest, resultHandler);
     }
 
     @Override
     public void RespondActivityTaskCompletedByID(
         RespondActivityTaskCompletedByIDRequest completeRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RespondActivityTaskCompletedByID(completeRequest, resultHandler);
     }
 
     @Override
     public void RespondActivityTaskFailed(
         RespondActivityTaskFailedRequest failRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RespondActivityTaskFailed(failRequest, resultHandler);
     }
 
     @Override
     public void RespondActivityTaskFailedByID(
         RespondActivityTaskFailedByIDRequest failRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RespondActivityTaskFailedByID(failRequest, resultHandler);
     }
 
     @Override
     public void RespondActivityTaskCanceled(
         RespondActivityTaskCanceledRequest canceledRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RespondActivityTaskCanceled(canceledRequest, resultHandler);
     }
 
     @Override
     public void RespondActivityTaskCanceledByID(
         RespondActivityTaskCanceledByIDRequest canceledRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RespondActivityTaskCanceledByID(canceledRequest, resultHandler);
     }
 
     @Override
     public void RequestCancelWorkflowExecution(
         RequestCancelWorkflowExecutionRequest cancelRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RequestCancelWorkflowExecution(cancelRequest, resultHandler);
     }
 
     @Override
     public void SignalWorkflowExecution(
         SignalWorkflowExecutionRequest signalRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.SignalWorkflowExecution(signalRequest, resultHandler);
     }
 
@@ -665,7 +583,7 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
         SignalWorkflowExecutionRequest signalRequest,
         AsyncMethodCallback resultHandler,
         Long timeoutInMillis)
-        throws TException {
+        throws BaseError {
       impl.SignalWorkflowExecutionWithTimeout(signalRequest, resultHandler, timeoutInMillis);
     }
 
@@ -673,7 +591,7 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     public void SignalWithStartWorkflowExecution(
         SignalWithStartWorkflowExecutionRequest signalWithStartRequest,
         AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.SignalWithStartWorkflowExecution(signalWithStartRequest, resultHandler);
     }
 
@@ -681,150 +599,149 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     public void SignalWithStartWorkflowExecutionAsync(
         SignalWithStartWorkflowExecutionAsyncRequest signalWithStartRequest,
         AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.SignalWithStartWorkflowExecutionAsync(signalWithStartRequest, resultHandler);
     }
 
     @Override
     public void ResetWorkflowExecution(
         ResetWorkflowExecutionRequest resetRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.ResetWorkflowExecution(resetRequest, resultHandler);
     }
 
     @Override
     public void TerminateWorkflowExecution(
         TerminateWorkflowExecutionRequest terminateRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.TerminateWorkflowExecution(terminateRequest, resultHandler);
     }
 
     @Override
     public void ListOpenWorkflowExecutions(
         ListOpenWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.ListOpenWorkflowExecutions(listRequest, resultHandler);
     }
 
     @Override
     public void ListClosedWorkflowExecutions(
         ListClosedWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.ListClosedWorkflowExecutions(listRequest, resultHandler);
     }
 
     @Override
     public void ListWorkflowExecutions(
         ListWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.ListWorkflowExecutions(listRequest, resultHandler);
     }
 
     @Override
     public void ListArchivedWorkflowExecutions(
         ListArchivedWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.ListArchivedWorkflowExecutions(listRequest, resultHandler);
     }
 
     @Override
     public void ScanWorkflowExecutions(
         ListWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.ScanWorkflowExecutions(listRequest, resultHandler);
     }
 
     @Override
     public void CountWorkflowExecutions(
         CountWorkflowExecutionsRequest countRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.CountWorkflowExecutions(countRequest, resultHandler);
     }
 
     @Override
-    public void GetSearchAttributes(AsyncMethodCallback resultHandler) throws TException {
+    public void GetSearchAttributes(AsyncMethodCallback resultHandler) throws BaseError {
       impl.GetSearchAttributes(resultHandler);
     }
 
     @Override
     public void RespondQueryTaskCompleted(
         RespondQueryTaskCompletedRequest completeRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.RespondQueryTaskCompleted(completeRequest, resultHandler);
     }
 
     @Override
     public void ResetStickyTaskList(
         ResetStickyTaskListRequest resetRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.ResetStickyTaskList(resetRequest, resultHandler);
     }
 
     @Override
     public void QueryWorkflow(QueryWorkflowRequest queryRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.QueryWorkflow(queryRequest, resultHandler);
     }
 
     @Override
     public void DescribeWorkflowExecution(
         DescribeWorkflowExecutionRequest describeRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.DescribeWorkflowExecution(describeRequest, resultHandler);
     }
 
     @Override
     public void DescribeTaskList(DescribeTaskListRequest request, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws BaseError {
       impl.DescribeTaskList(request, resultHandler);
     }
 
     @Override
-    public void GetClusterInfo(AsyncMethodCallback resultHandler) throws TException {
+    public void GetClusterInfo(AsyncMethodCallback resultHandler) throws BaseError {
       impl.GetClusterInfo(resultHandler);
     }
 
     @Override
     public void ListTaskListPartitions(
-        ListTaskListPartitionsRequest request, AsyncMethodCallback resultHandler)
-        throws TException {
+        ListTaskListPartitionsRequest request, AsyncMethodCallback resultHandler) throws BaseError {
       impl.ListTaskListPartitions(request, resultHandler);
     }
 
     @Override
     public void RefreshWorkflowTasks(
-        RefreshWorkflowTasksRequest request, AsyncMethodCallback resultHandler) throws TException {
+        RefreshWorkflowTasksRequest request, AsyncMethodCallback resultHandler) throws BaseError {
       impl.RefreshWorkflowTasks(request, resultHandler);
     }
 
     @Override
     public void RegisterDomain(RegisterDomainRequest registerRequest)
-        throws BadRequestError, InternalServiceError, DomainAlreadyExistsError, TException {
+        throws BadRequestError, InternalServiceError, DomainAlreadyExistsError, BaseError {
       impl.RegisterDomain(registerRequest);
     }
 
     @Override
     public DescribeDomainResponse DescribeDomain(DescribeDomainRequest describeRequest)
-        throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+        throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
       return impl.DescribeDomain(describeRequest);
     }
 
     @Override
     public ListDomainsResponse ListDomains(ListDomainsRequest listRequest)
         throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-            TException {
+            BaseError {
       return impl.ListDomains(listRequest);
     }
 
     @Override
     public UpdateDomainResponse UpdateDomain(UpdateDomainRequest updateRequest)
-        throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+        throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
       return impl.UpdateDomain(updateRequest);
     }
 
     @Override
     public void DeprecateDomain(DeprecateDomainRequest deprecateRequest)
-        throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+        throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
       impl.DeprecateDomain(deprecateRequest);
     }
 
@@ -832,14 +749,14 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     public RestartWorkflowExecutionResponse RestartWorkflowExecution(
         RestartWorkflowExecutionRequest restartRequest)
         throws BadRequestError, ServiceBusyError, DomainNotActiveError, LimitExceededError,
-            EntityNotExistsError, ClientVersionNotSupportedError, TException {
+            EntityNotExistsError, ClientVersionNotSupportedError, BaseError {
       return impl.RestartWorkflowExecution(restartRequest);
     }
 
     @Override
     public GetTaskListsByDomainResponse GetTaskListsByDomain(GetTaskListsByDomainRequest request)
         throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-            ClientVersionNotSupportedError, TException {
+            ClientVersionNotSupportedError, BaseError {
       return impl.GetTaskListsByDomain(request);
     }
 
@@ -847,7 +764,7 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     public StartWorkflowExecutionResponse StartWorkflowExecution(
         StartWorkflowExecutionRequest startRequest)
         throws BadRequestError, InternalServiceError, WorkflowExecutionAlreadyStartedError,
-            ServiceBusyError, TException {
+            ServiceBusyError, BaseError {
       return impl.StartWorkflowExecution(startRequest);
     }
 
@@ -856,7 +773,7 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
         StartWorkflowExecutionAsyncRequest startRequest)
         throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
             DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-            ClientVersionNotSupportedError, TException {
+            ClientVersionNotSupportedError, BaseError {
       return impl.StartWorkflowExecutionAsync(startRequest);
     }
 
@@ -864,7 +781,7 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     public GetWorkflowExecutionHistoryResponse GetWorkflowExecutionHistory(
         GetWorkflowExecutionHistoryRequest getRequest)
         throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-            TException {
+            BaseError {
       return impl.GetWorkflowExecutionHistory(getRequest);
     }
 
@@ -872,13 +789,13 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     public GetWorkflowExecutionHistoryResponse GetWorkflowExecutionHistoryWithTimeout(
         GetWorkflowExecutionHistoryRequest getRequest, Long timeoutInMillis)
         throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-            TException {
+            BaseError {
       return impl.GetWorkflowExecutionHistoryWithTimeout(getRequest, timeoutInMillis);
     }
 
     @Override
     public PollForDecisionTaskResponse PollForDecisionTask(PollForDecisionTaskRequest pollRequest)
-        throws BadRequestError, InternalServiceError, ServiceBusyError, TException {
+        throws BadRequestError, InternalServiceError, ServiceBusyError, BaseError {
       return impl.PollForDecisionTask(pollRequest);
     }
 
@@ -886,20 +803,20 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     public RespondDecisionTaskCompletedResponse RespondDecisionTaskCompleted(
         RespondDecisionTaskCompletedRequest completeRequest)
         throws BadRequestError, InternalServiceError, EntityNotExistsError,
-            WorkflowExecutionAlreadyCompletedError, TException {
+            WorkflowExecutionAlreadyCompletedError, BaseError {
       return impl.RespondDecisionTaskCompleted(completeRequest);
     }
 
     @Override
     public void RespondDecisionTaskFailed(RespondDecisionTaskFailedRequest failedRequest)
         throws BadRequestError, InternalServiceError, EntityNotExistsError,
-            WorkflowExecutionAlreadyCompletedError, TException {
+            WorkflowExecutionAlreadyCompletedError, BaseError {
       impl.RespondDecisionTaskFailed(failedRequest);
     }
 
     @Override
     public PollForActivityTaskResponse PollForActivityTask(PollForActivityTaskRequest pollRequest)
-        throws BadRequestError, InternalServiceError, ServiceBusyError, TException {
+        throws BadRequestError, InternalServiceError, ServiceBusyError, BaseError {
       return impl.PollForActivityTask(pollRequest);
     }
 

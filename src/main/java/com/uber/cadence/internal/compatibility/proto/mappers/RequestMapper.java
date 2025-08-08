@@ -600,8 +600,7 @@ public class RequestMapper {
     throw new IllegalArgumentException("neither one of field is set for DescribeDomainRequest");
   }
 
-  public static ListDomainsRequest listDomainsRequest(
-      com.uber.cadence.ListDomainsRequest t) {
+  public static ListDomainsRequest listDomainsRequest(com.uber.cadence.ListDomainsRequest t) {
     if (t == null) {
       return null;
     }
@@ -676,8 +675,7 @@ public class RequestMapper {
     return builder.build();
   }
 
-  public static QueryWorkflowRequest queryWorkflowRequest(
-      com.uber.cadence.QueryWorkflowRequest t) {
+  public static QueryWorkflowRequest queryWorkflowRequest(com.uber.cadence.QueryWorkflowRequest t) {
     if (t == null) {
       return null;
     }
@@ -761,8 +759,7 @@ public class RequestMapper {
         .build();
   }
 
-  public static UpdateDomainRequest updateDomainRequest(
-      com.uber.cadence.UpdateDomainRequest t) {
+  public static UpdateDomainRequest updateDomainRequest(com.uber.cadence.UpdateDomainRequest t) {
     if (t == null) {
       return null;
     }

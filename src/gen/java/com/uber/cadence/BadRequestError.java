@@ -14,6 +14,10 @@ public class BadRequestError extends BaseError {
     super();
   }
 
+  public BadRequestError(String message) {
+    super(message);
+  }
+
   public BadRequestError(String message, Throwable cause) {
     super(message, cause);
   }

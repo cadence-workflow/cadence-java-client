@@ -18,6 +18,10 @@ public class EntityNotExistsError extends BaseError {
     super();
   }
 
+  public EntityNotExistsError(String message) {
+    super(message);
+  }
+
   public EntityNotExistsError(String message, Throwable cause) {
     super(message, cause);
   }

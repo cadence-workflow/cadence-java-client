@@ -30,7 +30,6 @@ import io.opentracing.Tracer;
 import io.opentracing.noop.NoopSpan;
 import io.opentracing.propagation.*;
 import io.opentracing.propagation.Format;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -83,15 +82,19 @@ public class TracingPropagator {
         .addReference(
             References.FOLLOWS_FROM, parent != NoopSpan.INSTANCE.context() ? parent : null)
         .withTag(
-            TAG_WORKFLOW_TYPE, task.isSetWorkflowType() ? task.getWorkflowType().getName() : "null")
+            TAG_WORKFLOW_TYPE,
+            task.getWorkflowType() != null ? task.getWorkflowType().getName() : "null")
         .withTag(
             TAG_WORKFLOW_ID,
-            task.isSetWorkflowExecution() ? task.getWorkflowExecution().getWorkflowId() : "null")
+            task.getWorkflowExecution() != null
+                ? task.getWorkflowExecution().getWorkflowId()
+                : "null")
         .withTag(
             TAG_WORKFLOW_RUN_ID,
-            task.isSetWorkflowExecution() ? task.getWorkflowExecution().getRunId() : "null")
+            task.getWorkflowExecution() != null ? task.getWorkflowExecution().getRunId() : "null")
         .withTag(
-            TAG_ACTIVITY_TYPE, task.isSetActivityType() ? task.getActivityType().getName() : "null")
+            TAG_ACTIVITY_TYPE,
+            task.getActivityType() != null ? task.getActivityType().getName() : "null")
         .start();
   }
 
@@ -123,7 +126,7 @@ public class TracingPropagator {
     Map<String, String> context = getCurrentContext();
     context.forEach(
         (k, v) -> {
-          header.putToFields(k, ByteBuffer.wrap(v.getBytes()));
+          header.getFields().put(k, v.getBytes());
         });
   }
 
@@ -160,9 +163,7 @@ public class TracingPropagator {
                     Collectors.toMap(
                         Map.Entry::getKey,
                         e -> {
-                          byte[] bytes = new byte[e.getValue().remaining()];
-                          e.getValue().duplicate().get(bytes);
-                          return new String(bytes);
+                          return new String(e.getValue());
                         }))));
   }
 }

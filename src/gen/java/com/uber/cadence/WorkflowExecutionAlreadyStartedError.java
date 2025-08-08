@@ -18,6 +18,10 @@ public class WorkflowExecutionAlreadyStartedError extends BaseError {
     super();
   }
 
+  public WorkflowExecutionAlreadyStartedError(String message) {
+    super(message);
+  }
+
   public WorkflowExecutionAlreadyStartedError(String message, Throwable cause) {
     super(message, cause);
   }

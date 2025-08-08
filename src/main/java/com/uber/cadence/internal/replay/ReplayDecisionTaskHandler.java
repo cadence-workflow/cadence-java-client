@@ -119,7 +119,7 @@ public final class ReplayDecisionTaskHandler implements DecisionTaskHandler {
 
   private Result handleDecisionTaskImpl(PollForDecisionTaskResponse decisionTask) throws Throwable {
 
-    if (decisionTask.isSetQuery()) {
+    if (decisionTask.getQuery() != null) {
       return processQuery(decisionTask);
     } else {
       return processDecision(decisionTask);
