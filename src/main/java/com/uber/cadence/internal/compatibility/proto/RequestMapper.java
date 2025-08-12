@@ -545,7 +545,6 @@ public class RequestMapper {
     if (t.getCronSchedule() != null) {
       request.setCronSchedule(t.getCronSchedule());
     }
-    // cronOverlapPolicy not mapped in proto path yet
     if (t.getIdentity() != null) {
       request.setIdentity(t.getIdentity());
     }

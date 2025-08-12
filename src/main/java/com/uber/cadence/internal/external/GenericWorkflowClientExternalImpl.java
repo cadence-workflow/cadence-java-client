@@ -275,7 +275,6 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     if (!Strings.isNullOrEmpty(startParameters.getCronSchedule())) {
       request.setCronSchedule(startParameters.getCronSchedule());
     }
-    // cronOverlapPolicy not supported in thrift request yet
     request.setMemo(toMemoThrift(startParameters.getMemo()));
     request.setSearchAttributes(toSearchAttributesThrift(startParameters.getSearchAttributes()));
     request.setHeader(toHeaderThrift(startParameters.getContext()));
@@ -505,7 +504,6 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     if (!Strings.isNullOrEmpty(startParameters.getCronSchedule())) {
       request.setCronSchedule(startParameters.getCronSchedule());
     }
-    // cronOverlapPolicy not supported in thrift request yet
     if (startParameters.getDelayStart() != null) {
       request.setDelayStartSeconds((int) startParameters.getDelayStart().getSeconds());
     }
