@@ -56,6 +56,8 @@ public final class StartWorkflowExecutionParameters {
 
   private Duration delayStart;
 
+  private int cronOverlapPolicy;
+
   /**
    * Returns the value of the WorkflowId property for this object.
    *
@@ -317,6 +319,14 @@ public final class StartWorkflowExecutionParameters {
     return delayStart;
   }
 
+  public int getCronOverlapPolicy() {
+    return cronOverlapPolicy;
+  }
+
+  public void setCronOverlapPolicy(int cronOverlapPolicy) {
+    this.cronOverlapPolicy = cronOverlapPolicy;
+  }
+
   public StartWorkflowExecutionParameters withRetryParameters(RetryParameters retryParameters) {
     this.retryParameters = retryParameters;
     return this;
@@ -352,6 +362,7 @@ public final class StartWorkflowExecutionParameters {
     if (options.getCronSchedule() != null) {
       parameters.setCronSchedule(options.getCronSchedule());
     }
+    parameters.setCronOverlapPolicy(options.getCronOverlapPolicy());
     return parameters;
   }
 
@@ -386,6 +397,8 @@ public final class StartWorkflowExecutionParameters {
         + ", cronSchedule='"
         + cronSchedule
         + '\''
+        + ", cronOverlapPolicy="
+        + cronOverlapPolicy
         + ", memo='"
         + memo
         + '\''
@@ -413,6 +426,7 @@ public final class StartWorkflowExecutionParameters {
         && workflowIdReusePolicy == that.workflowIdReusePolicy
         && Objects.equals(retryParameters, that.retryParameters)
         && Objects.equals(cronSchedule, that.cronSchedule)
+        && cronOverlapPolicy == that.cronOverlapPolicy
         && Objects.equals(memo, that.memo)
         && Objects.equals(searchAttributes, that.searchAttributes)
         && Objects.equals(context, that.context)
@@ -431,6 +445,7 @@ public final class StartWorkflowExecutionParameters {
             workflowIdReusePolicy,
             retryParameters,
             cronSchedule,
+            cronOverlapPolicy,
             memo,
             searchAttributes,
             context,
@@ -452,6 +467,7 @@ public final class StartWorkflowExecutionParameters {
       result.setRetryParameters(retryParameters.copy());
     }
     result.setCronSchedule(cronSchedule);
+    result.setCronOverlapPolicy(cronOverlapPolicy);
     result.setMemo(memo);
     result.setSearchAttributes(searchAttributes);
     result.setContext(context);

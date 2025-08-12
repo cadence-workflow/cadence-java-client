@@ -194,6 +194,7 @@ class DecisionMapper {
           if (attr.getCronSchedule() != null) {
             builder.setCronSchedule(attr.getCronSchedule());
           }
+          // cronOverlapPolicy not mapped in proto path yet
           decision.setContinueAsNewWorkflowExecutionDecisionAttributes(builder);
         }
         break;
@@ -226,6 +227,7 @@ class DecisionMapper {
           if (attr.getCronSchedule() != null) {
             builder.setCronSchedule(attr.getCronSchedule());
           }
+          // cronOverlapPolicy not mapped in proto path yet
           decision.setStartChildWorkflowExecutionDecisionAttributes(builder);
         }
         break;

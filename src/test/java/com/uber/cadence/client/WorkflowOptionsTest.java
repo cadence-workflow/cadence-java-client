@@ -17,6 +17,10 @@
 
 package com.uber.cadence.client;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.common.CronSchedule;
 import com.uber.cadence.common.MethodRetry;
@@ -44,6 +48,7 @@ public class WorkflowOptionsTest {
             .setExecutionStartToCloseTimeout(Duration.ofSeconds(321))
             .setTaskStartToCloseTimeout(Duration.ofSeconds(13))
             .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.RejectDuplicate)
+            .setCronOverlapPolicy(2)
             .setMemo(getTestMemo())
             .setSearchAttributes(getTestSearchAttributes())
             .build();
@@ -52,6 +57,7 @@ public class WorkflowOptionsTest {
             .getMethod("defaultWorkflowOptions")
             .getAnnotation(WorkflowMethod.class);
     Assert.assertEquals(o, WorkflowOptions.merge(a, null, null, o));
+    Assert.assertEquals(2, o.getCronOverlapPolicy());
   }
 
   @WorkflowMethod(
@@ -190,6 +196,97 @@ public class WorkflowOptionsTest {
     }
 
     Assert.fail("invalid cron schedule not caught");
+  }
+
+  @Test
+  public void testCronOverlapPolicy() {
+    WorkflowOptions options =
+        new WorkflowOptions.Builder()
+            .setTaskList("test-task-list")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
+            .setCronOverlapPolicy(2)
+            .build();
+
+    assertEquals(2, options.getCronOverlapPolicy());
+  }
+
+  @Test
+  public void testCronOverlapPolicyInMerge() {
+    WorkflowOptions base =
+        new WorkflowOptions.Builder()
+            .setTaskList("test-task-list")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
+            .setCronOverlapPolicy(1)
+            .build();
+
+    WorkflowOptions override =
+        new WorkflowOptions.Builder()
+            .setTaskList("test-task-list")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
+            .setCronOverlapPolicy(3)
+            .build();
+
+    WorkflowOptions merged = WorkflowOptions.merge(null, null, null, override);
+    assertEquals(3, merged.getCronOverlapPolicy());
+
+    WorkflowOptions mergedWithBase = WorkflowOptions.merge(null, null, null, base);
+    assertEquals(1, mergedWithBase.getCronOverlapPolicy());
+  }
+
+  @Test
+  public void testCronOverlapPolicyEqualsAndHashCode() {
+    WorkflowOptions options1 =
+        new WorkflowOptions.Builder()
+            .setTaskList("test-task-list")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
+            .setCronOverlapPolicy(2)
+            .build();
+
+    WorkflowOptions options2 =
+        new WorkflowOptions.Builder()
+            .setTaskList("test-task-list")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
+            .setCronOverlapPolicy(2)
+            .build();
+
+    WorkflowOptions options3 =
+        new WorkflowOptions.Builder()
+            .setTaskList("test-task-list")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
+            .setCronOverlapPolicy(3)
+            .build();
+
+    assertEquals(options1, options2);
+    assertNotEquals(options1, options3);
+    assertEquals(options1.hashCode(), options2.hashCode());
+    assertNotEquals(options1.hashCode(), options3.hashCode());
+  }
+
+  @Test
+  public void testCronOverlapPolicyToString() {
+    WorkflowOptions options =
+        new WorkflowOptions.Builder()
+            .setTaskList("test-task-list")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
+            .setCronOverlapPolicy(2)
+            .build();
+
+    String toString = options.toString();
+    assertTrue(toString.contains("cronOverlapPolicy=2"));
+  }
+
+  @Test
+  public void testCronOverlapPolicyCopy() {
+    WorkflowOptions original =
+        new WorkflowOptions.Builder()
+            .setTaskList("test-task-list")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
+            .setCronOverlapPolicy(2)
+            .build();
+
+    WorkflowOptions copy = new WorkflowOptions.Builder(original).build();
+    assertEquals(original.getCronOverlapPolicy(), copy.getCronOverlapPolicy());
+    assertEquals(original, copy);
   }
 
   private Map<String, Object> getTestMemo() {

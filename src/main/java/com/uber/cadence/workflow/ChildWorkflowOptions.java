@@ -56,6 +56,7 @@ public final class ChildWorkflowOptions {
         .setTaskList(OptionsUtils.merge(a.taskList(), o.getTaskList(), String.class))
         .setRetryOptions(RetryOptions.merge(r, o.getRetryOptions()))
         .setCronSchedule(OptionsUtils.merge(cronAnnotation, o.getCronSchedule(), String.class))
+        .setCronOverlapPolicy(o.getCronOverlapPolicy())
         .setParentClosePolicy(o.getParentClosePolicy())
         .setMemo(o.getMemo())
         .setSearchAttributes(o.getSearchAttributes())
@@ -81,6 +82,8 @@ public final class ChildWorkflowOptions {
 
     private String cronSchedule;
 
+    private int cronOverlapPolicy;
+
     private ParentClosePolicy parentClosePolicy;
 
     private Map<String, Object> memo;
@@ -103,6 +106,7 @@ public final class ChildWorkflowOptions {
       this.taskList = source.getTaskList();
       this.retryOptions = source.getRetryOptions();
       this.cronSchedule = source.getCronSchedule();
+      this.cronOverlapPolicy = source.getCronOverlapPolicy();
       this.parentClosePolicy = source.getParentClosePolicy();
       this.memo = source.getMemo();
       this.searchAttributes = source.getSearchAttributes();
@@ -199,6 +203,11 @@ public final class ChildWorkflowOptions {
       return this;
     }
 
+    public Builder setCronOverlapPolicy(int cronOverlapPolicy) {
+      this.cronOverlapPolicy = cronOverlapPolicy;
+      return this;
+    }
+
     /** Specifies how this workflow reacts to the death of the parent workflow. */
     public Builder setParentClosePolicy(ParentClosePolicy parentClosePolicy) {
       this.parentClosePolicy = parentClosePolicy;
@@ -233,6 +242,7 @@ public final class ChildWorkflowOptions {
           taskList,
           retryOptions,
           cronSchedule,
+          cronOverlapPolicy,
           parentClosePolicy,
           memo,
           searchAttributes,
@@ -249,6 +259,7 @@ public final class ChildWorkflowOptions {
           taskList,
           retryOptions,
           cronSchedule,
+          cronOverlapPolicy,
           parentClosePolicy,
           memo,
           searchAttributes,
@@ -272,6 +283,8 @@ public final class ChildWorkflowOptions {
 
   private final String cronSchedule;
 
+  private final int cronOverlapPolicy;
+
   private final ParentClosePolicy parentClosePolicy;
 
   private final Map<String, Object> memo;
@@ -289,6 +302,7 @@ public final class ChildWorkflowOptions {
       String taskList,
       RetryOptions retryOptions,
       String cronSchedule,
+      int cronOverlapPolicy,
       ParentClosePolicy parentClosePolicy,
       Map<String, Object> memo,
       Map<String, Object> searchAttributes,
@@ -301,6 +315,7 @@ public final class ChildWorkflowOptions {
     this.taskList = taskList;
     this.retryOptions = retryOptions;
     this.cronSchedule = cronSchedule;
+    this.cronOverlapPolicy = cronOverlapPolicy;
     this.parentClosePolicy = parentClosePolicy;
     this.memo = memo;
     this.searchAttributes = searchAttributes;
@@ -339,6 +354,10 @@ public final class ChildWorkflowOptions {
     return cronSchedule;
   }
 
+  public int getCronOverlapPolicy() {
+    return cronOverlapPolicy;
+  }
+
   public ParentClosePolicy getParentClosePolicy() {
     return parentClosePolicy;
   }
@@ -369,6 +388,7 @@ public final class ChildWorkflowOptions {
         && Objects.equals(taskList, that.taskList)
         && Objects.equals(retryOptions, that.retryOptions)
         && Objects.equals(cronSchedule, that.cronSchedule)
+        && cronOverlapPolicy == that.cronOverlapPolicy
         && Objects.equals(parentClosePolicy, that.parentClosePolicy)
         && Objects.equals(memo, that.memo)
         && Objects.equals(searchAttributes, that.searchAttributes)
@@ -386,6 +406,7 @@ public final class ChildWorkflowOptions {
         taskList,
         retryOptions,
         cronSchedule,
+        cronOverlapPolicy,
         parentClosePolicy,
         memo,
         searchAttributes,
@@ -414,6 +435,8 @@ public final class ChildWorkflowOptions {
         + retryOptions
         + ", cronSchedule="
         + cronSchedule
+        + ", cronOverlapPolicy="
+        + cronOverlapPolicy
         + ", parentClosePolicy="
         + parentClosePolicy
         + ", memo='"

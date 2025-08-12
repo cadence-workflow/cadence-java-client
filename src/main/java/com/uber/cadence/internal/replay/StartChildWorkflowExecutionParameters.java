@@ -51,6 +51,8 @@ public final class StartChildWorkflowExecutionParameters {
 
     private String cronSchedule;
 
+    private int cronOverlapPolicy;
+
     private Map<String, Object> memo;
 
     private Map<String, Object> searchAttributes;
@@ -115,6 +117,11 @@ public final class StartChildWorkflowExecutionParameters {
       return this;
     }
 
+    public Builder setCronOverlapPolicy(int cronOverlapPolicy) {
+      this.cronOverlapPolicy = cronOverlapPolicy;
+      return this;
+    }
+
     public Builder setMemo(Map<String, Object> memo) {
       this.memo = memo;
       return this;
@@ -148,6 +155,7 @@ public final class StartChildWorkflowExecutionParameters {
           workflowIdReusePolicy,
           retryParameters,
           cronSchedule,
+          cronOverlapPolicy,
           memo,
           searchAttributes,
           context,
@@ -177,6 +185,8 @@ public final class StartChildWorkflowExecutionParameters {
 
   private final String cronSchedule;
 
+  private final int cronOverlapPolicy;
+
   private Map<String, Object> memo;
 
   private Map<String, Object> searchAttributes;
@@ -197,6 +207,7 @@ public final class StartChildWorkflowExecutionParameters {
       WorkflowIdReusePolicy workflowIdReusePolicy,
       RetryParameters retryParameters,
       String cronSchedule,
+      int cronOverlapPolicy,
       Map<String, Object> memo,
       Map<String, Object> searchAttributes,
       Map<String, byte[]> context,
@@ -212,6 +223,7 @@ public final class StartChildWorkflowExecutionParameters {
     this.workflowIdReusePolicy = workflowIdReusePolicy;
     this.retryParameters = retryParameters;
     this.cronSchedule = cronSchedule;
+    this.cronOverlapPolicy = cronOverlapPolicy;
     this.memo = memo;
     this.searchAttributes = searchAttributes;
     this.context = context;
@@ -262,6 +274,10 @@ public final class StartChildWorkflowExecutionParameters {
     return cronSchedule;
   }
 
+  public int getCronOverlapPolicy() {
+    return cronOverlapPolicy;
+  }
+
   public Map<String, Object> getMemo() {
     return memo;
   }
@@ -278,6 +294,28 @@ public final class StartChildWorkflowExecutionParameters {
     return parentClosePolicy;
   }
 
+  public StartChildWorkflowExecutionParameters copy() {
+    StartChildWorkflowExecutionParameters result =
+        new StartChildWorkflowExecutionParameters(
+            domain,
+            input,
+            control,
+            executionStartToCloseTimeoutSeconds,
+            taskList,
+            taskStartToCloseTimeoutSeconds,
+            workflowId,
+            workflowType,
+            workflowIdReusePolicy,
+            retryParameters,
+            cronSchedule,
+            cronOverlapPolicy,
+            memo,
+            searchAttributes,
+            context,
+            parentClosePolicy);
+    return result;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -286,18 +324,19 @@ public final class StartChildWorkflowExecutionParameters {
     return executionStartToCloseTimeoutSeconds == that.executionStartToCloseTimeoutSeconds
         && taskStartToCloseTimeoutSeconds == that.taskStartToCloseTimeoutSeconds
         && Objects.equals(domain, that.domain)
-        && Objects.equals(control, that.control)
         && Arrays.equals(input, that.input)
+        && Objects.equals(control, that.control)
         && Objects.equals(taskList, that.taskList)
         && Objects.equals(workflowId, that.workflowId)
         && Objects.equals(workflowType, that.workflowType)
         && workflowIdReusePolicy == that.workflowIdReusePolicy
         && Objects.equals(retryParameters, that.retryParameters)
         && Objects.equals(cronSchedule, that.cronSchedule)
+        && cronOverlapPolicy == that.cronOverlapPolicy
         && Objects.equals(memo, that.memo)
         && Objects.equals(searchAttributes, that.searchAttributes)
         && Objects.equals(context, that.context)
-        && Objects.equals(parentClosePolicy, that.parentClosePolicy);
+        && parentClosePolicy == that.parentClosePolicy;
   }
 
   @Override
@@ -314,6 +353,7 @@ public final class StartChildWorkflowExecutionParameters {
             workflowIdReusePolicy,
             retryParameters,
             cronSchedule,
+            cronOverlapPolicy,
             memo,
             searchAttributes,
             context,
@@ -349,13 +389,16 @@ public final class StartChildWorkflowExecutionParameters {
         + workflowIdReusePolicy
         + ", retryParameters="
         + retryParameters
-        + ", cronSchedule="
+        + ", cronSchedule='"
         + cronSchedule
+        + '\''
+        + ", cronOverlapPolicy="
+        + cronOverlapPolicy
         + ", memo="
         + memo
         + ", searchAttributes="
         + searchAttributes
-        + ", context='"
+        + ", context="
         + context
         + ", parentClosePolicy="
         + parentClosePolicy
