@@ -23,7 +23,7 @@ If this does not work, see instructions for running the Cadence Server at https:
 ## Get CLI
 
 [CLI is avaialable as an executable or as a docker image](https://github.com/uber/cadence/blob/master/tools/cli/README.md)
-
+balalaafa 
 ## Build a configuration
 
 Add *cadence-client* as a dependency to your *pom.xml*:
@@ -33,7 +33,7 @@ Add *cadence-client* as a dependency to your *pom.xml*:
       <artifactId>cadence-client</artifactId>
       <version>V.V.V</version>
     </dependency>
-    
+
 or to *build.gradle*:
 
     compile group: 'com.uber.cadence', name: 'cadence-client', version: 'V.V.V'
