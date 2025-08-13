@@ -144,6 +144,7 @@ public class ActivityWorker extends SuspendableWorkerBase {
       MDC.put(LoggerTag.ACTIVITY_TYPE, task.getActivityType().getName());
       MDC.put(LoggerTag.WORKFLOW_ID, task.getWorkflowExecution().getWorkflowId());
       MDC.put(LoggerTag.RUN_ID, task.getWorkflowExecution().getRunId());
+      MDC.put(LoggerTag.ATTEMPT, String.valueOf(task.getAttempt()));
 
       propagateContext(task);
       Span span = spanFactory.spanForExecuteActivity(task);
@@ -175,6 +176,7 @@ public class ActivityWorker extends SuspendableWorkerBase {
         MDC.remove(LoggerTag.ACTIVITY_TYPE);
         MDC.remove(LoggerTag.WORKFLOW_ID);
         MDC.remove(LoggerTag.RUN_ID);
+        MDC.remove(LoggerTag.ATTEMPT);
         unsetCurrentContext();
       }
     }
