@@ -25,4 +25,5 @@ public class LoggerTag {
   public static final String TASK_LIST = "TaskList";
   public static final String WORKFLOW_ID = "WorkflowID";
   public static final String WORKFLOW_TYPE = "WorkflowType";
+  public static final String ATTEMPT = "Attempt";
 }
