@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.common.CronSchedule;
 import com.uber.cadence.common.MethodRetry;
@@ -48,7 +49,7 @@ public class WorkflowOptionsTest {
             .setExecutionStartToCloseTimeout(Duration.ofSeconds(321))
             .setTaskStartToCloseTimeout(Duration.ofSeconds(13))
             .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.RejectDuplicate)
-            .setCronOverlapPolicy(2)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
             .setMemo(getTestMemo())
             .setSearchAttributes(getTestSearchAttributes())
             .build();
@@ -57,7 +58,7 @@ public class WorkflowOptionsTest {
             .getMethod("defaultWorkflowOptions")
             .getAnnotation(WorkflowMethod.class);
     Assert.assertEquals(o, WorkflowOptions.merge(a, null, null, o));
-    Assert.assertEquals(2, o.getCronOverlapPolicy());
+    Assert.assertEquals(CronOverlapPolicy.BUFFERONE, o.getCronOverlapPolicy());
   }
 
   @WorkflowMethod(
@@ -204,10 +205,10 @@ public class WorkflowOptionsTest {
         new WorkflowOptions.Builder()
             .setTaskList("test-task-list")
             .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
-            .setCronOverlapPolicy(2)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
             .build();
 
-    assertEquals(2, options.getCronOverlapPolicy());
+    assertEquals(CronOverlapPolicy.BUFFERONE, options.getCronOverlapPolicy());
   }
 
   @Test
@@ -216,21 +217,21 @@ public class WorkflowOptionsTest {
         new WorkflowOptions.Builder()
             .setTaskList("test-task-list")
             .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
-            .setCronOverlapPolicy(1)
+            .setCronOverlapPolicy(CronOverlapPolicy.SKIPPED)
             .build();
 
     WorkflowOptions override =
         new WorkflowOptions.Builder()
             .setTaskList("test-task-list")
             .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
-            .setCronOverlapPolicy(3)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
             .build();
 
     WorkflowOptions merged = WorkflowOptions.merge(null, null, null, override);
-    assertEquals(3, merged.getCronOverlapPolicy());
+    assertEquals(CronOverlapPolicy.BUFFERONE, merged.getCronOverlapPolicy());
 
     WorkflowOptions mergedWithBase = WorkflowOptions.merge(null, null, null, base);
-    assertEquals(1, mergedWithBase.getCronOverlapPolicy());
+    assertEquals(CronOverlapPolicy.SKIPPED, mergedWithBase.getCronOverlapPolicy());
   }
 
   @Test
@@ -239,21 +240,21 @@ public class WorkflowOptionsTest {
         new WorkflowOptions.Builder()
             .setTaskList("test-task-list")
             .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
-            .setCronOverlapPolicy(2)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
             .build();
 
     WorkflowOptions options2 =
         new WorkflowOptions.Builder()
             .setTaskList("test-task-list")
             .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
-            .setCronOverlapPolicy(2)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
             .build();
 
     WorkflowOptions options3 =
         new WorkflowOptions.Builder()
             .setTaskList("test-task-list")
             .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
-            .setCronOverlapPolicy(3)
+            .setCronOverlapPolicy(CronOverlapPolicy.SKIPPED)
             .build();
 
     assertEquals(options1, options2);
@@ -268,11 +269,11 @@ public class WorkflowOptionsTest {
         new WorkflowOptions.Builder()
             .setTaskList("test-task-list")
             .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
-            .setCronOverlapPolicy(2)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
             .build();
 
     String toString = options.toString();
-    assertTrue(toString.contains("cronOverlapPolicy=2"));
+    assertTrue(toString.contains("cronOverlapPolicy=BUFFERONE"));
   }
 
   @Test
@@ -281,7 +282,7 @@ public class WorkflowOptionsTest {
         new WorkflowOptions.Builder()
             .setTaskList("test-task-list")
             .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
-            .setCronOverlapPolicy(2)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
             .build();
 
     WorkflowOptions copy = new WorkflowOptions.Builder(original).build();

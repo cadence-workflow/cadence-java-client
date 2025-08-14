@@ -25,6 +25,7 @@ import com.cronutils.model.definition.CronDefinition;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
 import com.google.common.base.Strings;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.common.CronSchedule;
 import com.uber.cadence.common.MethodRetry;
@@ -64,7 +65,7 @@ public final class WorkflowOptions {
         .setRetryOptions(RetryOptions.merge(methodRetry, o.getRetryOptions()))
         .setCronSchedule(OptionsUtils.merge(cronAnnotation, o.getCronSchedule(), String.class))
         .setMemo(o.getMemo())
-        .setCronOverlapPolicy(o.cronOverlapPolicy)
+        .setCronOverlapPolicy(o.getCronOverlapPolicy())
         .setSearchAttributes(o.getSearchAttributes())
         .setContextPropagators(o.getContextPropagators())
         .setDelayStart(o.delayStart)
@@ -87,7 +88,7 @@ public final class WorkflowOptions {
 
     private String cronSchedule;
 
-    private int cronOverlapPolicy;
+    private CronOverlapPolicy cronOverlapPolicy;
 
     private Map<String, Object> memo;
 
@@ -198,7 +199,7 @@ public final class WorkflowOptions {
       return this;
     }
 
-    public Builder setCronOverlapPolicy(int cronOverlapPolicy) {
+    public Builder setCronOverlapPolicy(CronOverlapPolicy cronOverlapPolicy) {
       this.cronOverlapPolicy = cronOverlapPolicy;
       return this;
     }
@@ -319,7 +320,7 @@ public final class WorkflowOptions {
 
   private String cronSchedule;
 
-  private int cronOverlapPolicy;
+  private CronOverlapPolicy cronOverlapPolicy;
 
   private Map<String, Object> memo;
 
@@ -341,7 +342,7 @@ public final class WorkflowOptions {
       Map<String, Object> searchAttributes,
       List<ContextPropagator> contextPropagators,
       Duration delayStart,
-      int cronOverlapPolicy) {
+      CronOverlapPolicy cronOverlapPolicy) {
     this.workflowId = workflowId;
     this.workflowIdReusePolicy = workflowIdReusePolicy;
     this.executionStartToCloseTimeout = executionStartToCloseTimeout;
@@ -384,7 +385,7 @@ public final class WorkflowOptions {
     return cronSchedule;
   }
 
-  public int getCronOverlapPolicy() {
+  public CronOverlapPolicy getCronOverlapPolicy() {
     return cronOverlapPolicy;
   }
 

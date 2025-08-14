@@ -17,6 +17,7 @@
 
 package com.uber.cadence.internal.replay;
 
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.ParentClosePolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.WorkflowType;
@@ -51,7 +52,7 @@ public final class StartChildWorkflowExecutionParameters {
 
     private String cronSchedule;
 
-    private int cronOverlapPolicy;
+    private CronOverlapPolicy cronOverlapPolicy;
 
     private Map<String, Object> memo;
 
@@ -117,7 +118,7 @@ public final class StartChildWorkflowExecutionParameters {
       return this;
     }
 
-    public Builder setCronOverlapPolicy(int cronOverlapPolicy) {
+    public Builder setCronOverlapPolicy(CronOverlapPolicy cronOverlapPolicy) {
       this.cronOverlapPolicy = cronOverlapPolicy;
       return this;
     }
@@ -185,7 +186,7 @@ public final class StartChildWorkflowExecutionParameters {
 
   private final String cronSchedule;
 
-  private final int cronOverlapPolicy;
+  private final CronOverlapPolicy cronOverlapPolicy;
 
   private Map<String, Object> memo;
 
@@ -207,7 +208,7 @@ public final class StartChildWorkflowExecutionParameters {
       WorkflowIdReusePolicy workflowIdReusePolicy,
       RetryParameters retryParameters,
       String cronSchedule,
-      int cronOverlapPolicy,
+      CronOverlapPolicy cronOverlapPolicy,
       Map<String, Object> memo,
       Map<String, Object> searchAttributes,
       Map<String, byte[]> context,
@@ -274,7 +275,7 @@ public final class StartChildWorkflowExecutionParameters {
     return cronSchedule;
   }
 
-  public int getCronOverlapPolicy() {
+  public CronOverlapPolicy getCronOverlapPolicy() {
     return cronOverlapPolicy;
   }
 

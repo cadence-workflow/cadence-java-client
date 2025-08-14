@@ -17,6 +17,7 @@
 
 package com.uber.cadence.internal.common;
 
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.client.WorkflowOptions;
@@ -56,7 +57,7 @@ public final class StartWorkflowExecutionParameters {
 
   private Duration delayStart;
 
-  private int cronOverlapPolicy;
+  private CronOverlapPolicy cronOverlapPolicy;
 
   /**
    * Returns the value of the WorkflowId property for this object.
@@ -319,12 +320,18 @@ public final class StartWorkflowExecutionParameters {
     return delayStart;
   }
 
-  public int getCronOverlapPolicy() {
+  public CronOverlapPolicy getCronOverlapPolicy() {
     return cronOverlapPolicy;
   }
 
-  public void setCronOverlapPolicy(int cronOverlapPolicy) {
+  public void setCronOverlapPolicy(CronOverlapPolicy cronOverlapPolicy) {
     this.cronOverlapPolicy = cronOverlapPolicy;
+  }
+
+  public StartWorkflowExecutionParameters withCronOverlapPolicy(
+      CronOverlapPolicy cronOverlapPolicy) {
+    this.cronOverlapPolicy = cronOverlapPolicy;
+    return this;
   }
 
   public StartWorkflowExecutionParameters withRetryParameters(RetryParameters retryParameters) {

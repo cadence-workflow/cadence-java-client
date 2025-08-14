@@ -17,6 +17,7 @@ package com.uber.cadence.internal.common;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.client.WorkflowOptions;
 import java.time.Duration;
@@ -66,7 +67,7 @@ public class StartWorkflowExecutionParametersTest {
             + "maximumAttempts=0, "
             + "nonRetriableErrorReasons=null, expirationIntervalInSeconds=0}, "
             + "cronSchedule='* * * * *', "
-            + "cronOverlapPolicy=0, "
+            + "cronOverlapPolicy=null, "
             + "memo='null', searchAttributes='null, context='null, delayStart='null'}";
 
     assertEquals(expectedString, params1.toString());
@@ -133,8 +134,8 @@ public class StartWorkflowExecutionParametersTest {
   @Test
   public void testCronOverlapPolicyField() {
     StartWorkflowExecutionParameters params = new StartWorkflowExecutionParameters();
-    params.setCronOverlapPolicy(2);
-    assertEquals(2, params.getCronOverlapPolicy());
+    params.setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE);
+    assertEquals(CronOverlapPolicy.BUFFERONE, params.getCronOverlapPolicy());
   }
 
   @Test
@@ -146,7 +147,7 @@ public class StartWorkflowExecutionParametersTest {
     params1.setInput(new byte[] {1, 2, 3});
     params1.setExecutionStartToCloseTimeoutSeconds(60);
     params1.setTaskStartToCloseTimeoutSeconds(30);
-    params1.setCronOverlapPolicy(2);
+    params1.setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE);
 
     StartWorkflowExecutionParameters params2 = new StartWorkflowExecutionParameters();
     params2.setWorkflowId("workflow123");
@@ -155,7 +156,7 @@ public class StartWorkflowExecutionParametersTest {
     params2.setInput(new byte[] {1, 2, 3});
     params2.setExecutionStartToCloseTimeoutSeconds(60);
     params2.setTaskStartToCloseTimeoutSeconds(30);
-    params2.setCronOverlapPolicy(2);
+    params2.setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE);
 
     StartWorkflowExecutionParameters params3 = new StartWorkflowExecutionParameters();
     params3.setWorkflowId("workflow123");
@@ -164,7 +165,7 @@ public class StartWorkflowExecutionParametersTest {
     params3.setInput(new byte[] {1, 2, 3});
     params3.setExecutionStartToCloseTimeoutSeconds(60);
     params3.setTaskStartToCloseTimeoutSeconds(30);
-    params3.setCronOverlapPolicy(3);
+    params3.setCronOverlapPolicy(CronOverlapPolicy.SKIPPED);
 
     assertEquals(params1, params2);
     assertNotEquals(params1, params3);
@@ -181,10 +182,10 @@ public class StartWorkflowExecutionParametersTest {
     params.setInput(new byte[] {1, 2, 3});
     params.setExecutionStartToCloseTimeoutSeconds(60);
     params.setTaskStartToCloseTimeoutSeconds(30);
-    params.setCronOverlapPolicy(2);
+    params.setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE);
 
     String toString = params.toString();
-    assertTrue(toString.contains("cronOverlapPolicy=2"));
+    assertTrue(toString.contains("cronOverlapPolicy=BUFFERONE"));
   }
 
   @Test
@@ -196,7 +197,7 @@ public class StartWorkflowExecutionParametersTest {
     original.setInput(new byte[] {1, 2, 3});
     original.setExecutionStartToCloseTimeoutSeconds(60);
     original.setTaskStartToCloseTimeoutSeconds(30);
-    original.setCronOverlapPolicy(2);
+    original.setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE);
 
     StartWorkflowExecutionParameters copy = original.copy();
     assertEquals(original.getCronOverlapPolicy(), copy.getCronOverlapPolicy());
@@ -209,12 +210,12 @@ public class StartWorkflowExecutionParametersTest {
         new WorkflowOptions.Builder()
             .setTaskList("test-task-list")
             .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
-            .setCronOverlapPolicy(2)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
             .build();
 
     StartWorkflowExecutionParameters params =
         StartWorkflowExecutionParameters.fromWorkflowOptions(options);
-    assertEquals(2, params.getCronOverlapPolicy());
+    assertEquals(CronOverlapPolicy.BUFFERONE, params.getCronOverlapPolicy());
   }
 
   @Test
@@ -227,12 +228,12 @@ public class StartWorkflowExecutionParametersTest {
 
     StartWorkflowExecutionParameters params =
         StartWorkflowExecutionParameters.fromWorkflowOptions(options);
-    assertEquals(0, params.getCronOverlapPolicy()); // default value
+    assertEquals(null, params.getCronOverlapPolicy()); // default value
   }
 
   @Test
   public void testCronOverlapPolicyDefaultValue() {
     StartWorkflowExecutionParameters params = new StartWorkflowExecutionParameters();
-    assertEquals(0, params.getCronOverlapPolicy()); // should default to 0
+    assertEquals(null, params.getCronOverlapPolicy()); // should default to null
   }
 }

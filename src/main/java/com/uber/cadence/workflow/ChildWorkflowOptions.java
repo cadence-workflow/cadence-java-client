@@ -19,6 +19,7 @@ package com.uber.cadence.workflow;
 
 import static com.uber.cadence.internal.common.OptionsUtils.roundUpToSeconds;
 
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.ParentClosePolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.common.CronSchedule;
@@ -82,7 +83,7 @@ public final class ChildWorkflowOptions {
 
     private String cronSchedule;
 
-    private int cronOverlapPolicy;
+    private CronOverlapPolicy cronOverlapPolicy;
 
     private ParentClosePolicy parentClosePolicy;
 
@@ -203,7 +204,7 @@ public final class ChildWorkflowOptions {
       return this;
     }
 
-    public Builder setCronOverlapPolicy(int cronOverlapPolicy) {
+    public Builder setCronOverlapPolicy(CronOverlapPolicy cronOverlapPolicy) {
       this.cronOverlapPolicy = cronOverlapPolicy;
       return this;
     }
@@ -283,7 +284,7 @@ public final class ChildWorkflowOptions {
 
   private final String cronSchedule;
 
-  private final int cronOverlapPolicy;
+  private final CronOverlapPolicy cronOverlapPolicy;
 
   private final ParentClosePolicy parentClosePolicy;
 
@@ -302,7 +303,7 @@ public final class ChildWorkflowOptions {
       String taskList,
       RetryOptions retryOptions,
       String cronSchedule,
-      int cronOverlapPolicy,
+      CronOverlapPolicy cronOverlapPolicy,
       ParentClosePolicy parentClosePolicy,
       Map<String, Object> memo,
       Map<String, Object> searchAttributes,
@@ -354,7 +355,7 @@ public final class ChildWorkflowOptions {
     return cronSchedule;
   }
 
-  public int getCronOverlapPolicy() {
+  public CronOverlapPolicy getCronOverlapPolicy() {
     return cronOverlapPolicy;
   }
 
