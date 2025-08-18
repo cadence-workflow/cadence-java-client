@@ -33,6 +33,7 @@ import com.uber.cadence.internal.worker.LocalActivityWorker;
 import com.uber.cadence.workflow.ActivityFailureException;
 import com.uber.cadence.workflow.Functions.Func;
 import com.uber.cadence.workflow.Functions.Func1;
+import com.uber.cadence.workflow.GetVersionOptions;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -320,6 +321,16 @@ public final class ClockDecisionContext {
 
   GetVersionResult getVersion(
       String changeId, DataConverter converter, int minSupported, int maxSupported) {
+    return getVersion(
+        changeId, converter, minSupported, maxSupported, GetVersionOptions.newBuilder().build());
+  }
+
+  GetVersionResult getVersion(
+      String changeId,
+      DataConverter converter,
+      int minSupported,
+      int maxSupported,
+      GetVersionOptions options) {
     Predicate<MarkerRecordedEventAttributes> changeIdEquals =
         (attributes) -> {
           MarkerHandler.MarkerInterface markerData =
@@ -327,6 +338,9 @@ public final class ClockDecisionContext {
           return markerData.getId().equals(changeId);
         };
     decisions.addAllMissingVersionMarker(true, Optional.of(changeIdEquals));
+
+    // Determine which version to use based on options
+    int versionToUse = determineVersionToUse(minSupported, maxSupported, options);
 
     final MarkerHandler.HandleResult result =
         versionHandler.handle(
@@ -336,14 +350,14 @@ public final class ClockDecisionContext {
               if (stored.isPresent()) {
                 return Optional.empty();
               }
-              return Optional.of(converter.toData(maxSupported));
+              return Optional.of(converter.toData(versionToUse));
             });
 
     final boolean isNewlyAdded = result.isNewlyStored();
     Map<String, Object> searchAttributesForChangeVersion = null;
     if (isNewlyAdded) {
       searchAttributesForChangeVersion =
-          createSearchAttributesForChangeVersion(changeId, maxSupported, versionMap);
+          createSearchAttributesForChangeVersion(changeId, versionToUse, versionMap);
     }
 
     Integer version = versionMap.get(changeId);
@@ -359,6 +373,22 @@ public final class ClockDecisionContext {
     version = converter.fromData(result.getStoredData().get(), Integer.class, Integer.class);
     validateVersion(changeId, version, minSupported, maxSupported);
     return new GetVersionResult(version, isNewlyAdded, searchAttributesForChangeVersion);
+  }
+
+  private int determineVersionToUse(int minSupported, int maxSupported, GetVersionOptions options) {
+    if (isReplaying()) {
+      return WorkflowInternal.DEFAULT_VERSION;
+    }
+
+    if (options.getCustomVersion().isPresent()) {
+      return options.getCustomVersion().get();
+    }
+
+    if (options.isUseMinVersion()) {
+      return minSupported;
+    }
+
+    return maxSupported;
   }
 
   private void validateVersion(String changeID, int version, int minSupported, int maxSupported) {

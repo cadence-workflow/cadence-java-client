@@ -243,6 +243,12 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
     }
 
     @Override
+    public int getVersion(
+        String changeID, int minSupported, int maxSupported, GetVersionOptions options) {
+      throw new UnsupportedOperationException("not implemented");
+    }
+
+    @Override
     public void continueAsNew(
         Optional<String> workflowType, Optional<ContinueAsNewOptions> options, Object[] args) {
       throw new UnsupportedOperationException("not implemented");

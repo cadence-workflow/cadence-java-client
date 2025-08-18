@@ -158,6 +158,12 @@ public class SignalWorkflowInterceptor implements WorkflowInterceptor {
   }
 
   @Override
+  public int getVersion(
+      String changeID, int minSupported, int maxSupported, GetVersionOptions options) {
+    return next.getVersion(changeID, minSupported, maxSupported, options);
+  }
+
+  @Override
   public void continueAsNew(
       Optional<String> workflowType, Optional<ContinueAsNewOptions> options, Object[] args) {
     next.continueAsNew(workflowType, options, args);

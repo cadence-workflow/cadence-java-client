@@ -54,6 +54,7 @@ import com.uber.cadence.workflow.CompletablePromise;
 import com.uber.cadence.workflow.ContinueAsNewOptions;
 import com.uber.cadence.workflow.Functions;
 import com.uber.cadence.workflow.Functions.Func;
+import com.uber.cadence.workflow.GetVersionOptions;
 import com.uber.cadence.workflow.Promise;
 import com.uber.cadence.workflow.SignalExternalWorkflowException;
 import com.uber.cadence.workflow.Workflow;
@@ -618,6 +619,12 @@ final class SyncDecisionContext implements WorkflowInterceptor {
   @Override
   public int getVersion(String changeID, int minSupported, int maxSupported) {
     return context.getVersion(changeID, converter, minSupported, maxSupported);
+  }
+
+  @Override
+  public int getVersion(
+      String changeID, int minSupported, int maxSupported, GetVersionOptions options) {
+    return context.getVersion(changeID, converter, minSupported, maxSupported, options);
   }
 
   void fireTimers() {

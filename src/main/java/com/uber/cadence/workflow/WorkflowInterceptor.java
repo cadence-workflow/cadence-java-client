@@ -127,6 +127,17 @@ public interface WorkflowInterceptor {
 
   int getVersion(String changeID, int minSupported, int maxSupported);
 
+  /**
+   * Enhanced version of getVersion with additional options for version control.
+   *
+   * @param changeID identifier of a particular change
+   * @param minSupported min version supported for the change
+   * @param maxSupported max version supported for the change
+   * @param options version control options
+   * @return version
+   */
+  int getVersion(String changeID, int minSupported, int maxSupported, GetVersionOptions options);
+
   void continueAsNew(
       Optional<String> workflowType, Optional<ContinueAsNewOptions> options, Object[] args);
 
