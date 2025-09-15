@@ -17,7 +17,7 @@ package com.uber.cadence.internal.testservice;
 import static org.junit.Assert.assertThrows;
 
 import com.uber.cadence.DiagnoseWorkflowExecutionRequest;
-import org.apache.thrift.async.AsyncMethodCallback;
+import com.uber.cadence.serviceclient.AsyncMethodCallback;
 import org.junit.Test;
 
 public class TestWorkflowServiceDiagnoseTest {

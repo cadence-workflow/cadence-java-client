@@ -21,19 +21,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.uber.cadence.*;
-import com.uber.cadence.BadRequestError;
-import com.uber.cadence.CadenceError;
-import com.uber.cadence.CancellationAlreadyRequestedError;
-import com.uber.cadence.ClientVersionNotSupportedError;
-import com.uber.cadence.DomainAlreadyExistsError;
-import com.uber.cadence.DomainNotActiveError;
-import com.uber.cadence.EntityNotExistsError;
-import com.uber.cadence.InternalServiceError;
-import com.uber.cadence.LimitExceededError;
-import com.uber.cadence.QueryFailedError;
-import com.uber.cadence.ServiceBusyError;
-import com.uber.cadence.WorkflowExecutionAlreadyCompletedError;
-import com.uber.cadence.WorkflowExecutionAlreadyStartedError;
 import com.uber.cadence.internal.compatibility.proto.mappers.*;
 import com.uber.cadence.internal.compatibility.proto.serviceclient.IGrpcServiceStubs;
 import io.grpc.*;
@@ -185,6 +172,14 @@ public class WorkflowServiceGrpc implements IWorkflowService {
     } catch (Exception e) {
       throw toServiceClientException(e);
     }
+  }
+
+  @Override
+  public DiagnoseWorkflowExecutionResponse DiagnoseWorkflowExecution(
+      DiagnoseWorkflowExecutionRequest diagnoseRequest)
+      throws DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
+          ClientVersionNotSupportedError, CadenceError {
+    throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
   }
 
   @Override
@@ -1389,5 +1384,12 @@ public class WorkflowServiceGrpc implements IWorkflowService {
         resultHandler.onError(toServiceClientException(throwable));
       }
     };
+  }
+
+  @Override
+  public void DiagnoseWorkflowExecution(
+      DiagnoseWorkflowExecutionRequest diagnoseRequest, AsyncMethodCallback resultHandler)
+      throws CadenceError {
+    throw new UnsupportedOperationException("Unimplemented method 'DiagnoseWorkflowExecution'");
   }
 }
