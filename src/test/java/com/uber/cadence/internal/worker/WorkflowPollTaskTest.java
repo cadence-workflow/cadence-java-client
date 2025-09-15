@@ -80,7 +80,7 @@ public class WorkflowPollTaskTest {
             mockService,
             "test-domain",
             "test-taskList",
-            TaskListKind.TASK_LIST_KIND_NORMAL,
+            TaskListKind.NORMAL,
             mockMetricScope,
             "test-identity");
   }
