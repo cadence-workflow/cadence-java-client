@@ -1,0 +1,16 @@
+package com.uber.cadence;
+
+import java.util.*;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+@Data
+@Accessors(chain = true)
+public class RequestCancelExternalWorkflowExecutionFailedEventAttributes {
+  private CancelExternalWorkflowExecutionFailedCause cause;
+  private long decisionTaskCompletedEventId;
+  private String domain;
+  private WorkflowExecution workflowExecution;
+  private long initiatedEventId;
+  private byte[] control;
+}

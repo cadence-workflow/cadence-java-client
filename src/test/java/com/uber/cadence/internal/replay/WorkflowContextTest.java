@@ -24,7 +24,6 @@ import com.uber.cadence.WorkflowExecutionStartedEventAttributes;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.converter.JsonDataConverter;
 import com.uber.cadence.workflow.WorkflowUtils;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
@@ -38,8 +37,8 @@ public class WorkflowContextTest {
     WorkflowContext workflowContext = new WorkflowContext("domain", null, startAttr, null);
 
     DataConverter converter = JsonDataConverter.getInstance();
-    Map<String, ByteBuffer> indexedFields = new HashMap<>();
-    indexedFields.put("CustomKeywordField", ByteBuffer.wrap(converter.toData("key")));
+    Map<String, byte[]> indexedFields = new HashMap<>();
+    indexedFields.put("CustomKeywordField", converter.toData("key"));
 
     SearchAttributes searchAttributes = new SearchAttributes();
     searchAttributes.setIndexedFields(indexedFields);

@@ -46,7 +46,6 @@ import com.uber.cadence.api.v1.WorkflowQuery;
 import com.uber.cadence.api.v1.WorkflowQueryResult;
 import com.uber.cadence.api.v1.WorkflowType;
 import com.uber.cadence.api.v1.WorkflowTypeFilter;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -264,13 +263,13 @@ class TypeMapper {
     return StatusFilter.newBuilder().setStatus(workflowExecutionCloseStatus(t)).build();
   }
 
-  static Map<String, Payload> payloadByteBufferMap(Map<String, ByteBuffer> t) {
+  static Map<String, Payload> payloadByteBufferMap(Map<String, byte[]> t) {
     if (t == null) {
       return Collections.emptyMap();
     }
     Map<String, Payload> v = new HashMap<>();
     for (String key : t.keySet()) {
-      v.put(key, payload(t.get(key).array()));
+      v.put(key, payload(t.get(key)));
     }
     return v;
   }

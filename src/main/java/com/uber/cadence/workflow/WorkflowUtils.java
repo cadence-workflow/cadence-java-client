@@ -21,7 +21,7 @@ import com.cronutils.utils.StringUtils;
 import com.uber.cadence.SearchAttributes;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.converter.JsonDataConverter;
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class WorkflowUtils {
   private static final DataConverter jsonConverter = JsonDataConverter.getInstance();
@@ -35,9 +35,7 @@ public class WorkflowUtils {
   }
 
   private static byte[] getValueBytes(SearchAttributes searchAttributes, String key) {
-    ByteBuffer byteBuffer = searchAttributes.getIndexedFields().get(key).duplicate();
-    final byte[] valueBytes = new byte[byteBuffer.remaining()];
-    byteBuffer.get(valueBytes);
-    return valueBytes;
+    byte[] original = searchAttributes.getIndexedFields().get(key);
+    return Arrays.copyOf(original, original.length);
   }
 }

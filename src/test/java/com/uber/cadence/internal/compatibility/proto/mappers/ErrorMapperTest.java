@@ -47,77 +47,77 @@ public class ErrorMapperTest {
   public static Collection<Object[]> data() {
     Object[][] data =
         new Object[][] {
-          {Status.PERMISSION_DENIED, null, com.uber.cadence.entities.AccessDeniedError.class},
-          {Status.INTERNAL, null, com.uber.cadence.entities.InternalServiceError.class},
-          {Status.NOT_FOUND, null, com.uber.cadence.entities.EntityNotExistsError.class},
+          {Status.PERMISSION_DENIED, null, com.uber.cadence.AccessDeniedError.class},
+          {Status.INTERNAL, null, com.uber.cadence.InternalServiceError.class},
+          {Status.NOT_FOUND, null, com.uber.cadence.EntityNotExistsError.class},
           {
             Status.ALREADY_EXISTS,
             DomainAlreadyExistsError.getDefaultInstance(),
-            com.uber.cadence.entities.DomainAlreadyExistsError.class
+            com.uber.cadence.DomainAlreadyExistsError.class
           },
           {
             Status.FAILED_PRECONDITION,
             FeatureNotEnabledError.getDefaultInstance(),
-            com.uber.cadence.entities.FeatureNotEnabledError.class
+            com.uber.cadence.FeatureNotEnabledError.class
           },
           {
             Status.RESOURCE_EXHAUSTED,
             LimitExceededError.getDefaultInstance(),
-            com.uber.cadence.entities.LimitExceededError.class
+            com.uber.cadence.LimitExceededError.class
           },
-          {Status.UNKNOWN, null, com.uber.cadence.entities.BaseError.class},
+          {Status.UNKNOWN, null, com.uber.cadence.BaseError.class},
           {
             Status.NOT_FOUND,
             WorkflowExecutionAlreadyCompletedError.getDefaultInstance(),
-            com.uber.cadence.entities.WorkflowExecutionAlreadyCompletedError.class
+            com.uber.cadence.WorkflowExecutionAlreadyCompletedError.class
           },
           {
             Status.ALREADY_EXISTS,
             WorkflowExecutionAlreadyStartedError.getDefaultInstance(),
-            com.uber.cadence.entities.WorkflowExecutionAlreadyStartedError.class
+            com.uber.cadence.WorkflowExecutionAlreadyStartedError.class
           },
           {
             Status.FAILED_PRECONDITION,
             DomainNotActiveError.getDefaultInstance(),
-            com.uber.cadence.entities.DomainNotActiveError.class
+            com.uber.cadence.DomainNotActiveError.class
           },
           {
             Status.FAILED_PRECONDITION,
             ClientVersionNotSupportedError.getDefaultInstance(),
-            com.uber.cadence.entities.ClientVersionNotSupportedError.class
+            com.uber.cadence.ClientVersionNotSupportedError.class
           },
           {
             Status.FAILED_PRECONDITION,
             FeatureNotEnabledError.getDefaultInstance(),
-            com.uber.cadence.entities.FeatureNotEnabledError.class
+            com.uber.cadence.FeatureNotEnabledError.class
           },
           {
             Status.FAILED_PRECONDITION,
             DomainNotActiveError.getDefaultInstance(),
-            com.uber.cadence.entities.DomainNotActiveError.class
+            com.uber.cadence.DomainNotActiveError.class
           },
           {
             Status.FAILED_PRECONDITION,
             ClientVersionNotSupportedError.getDefaultInstance(),
-            com.uber.cadence.entities.ClientVersionNotSupportedError.class
+            com.uber.cadence.ClientVersionNotSupportedError.class
           },
           {
             Status.FAILED_PRECONDITION,
             FeatureNotEnabledError.getDefaultInstance(),
-            com.uber.cadence.entities.FeatureNotEnabledError.class
+            com.uber.cadence.FeatureNotEnabledError.class
           },
           {
             Status.RESOURCE_EXHAUSTED,
             LimitExceededError.getDefaultInstance(),
-            com.uber.cadence.entities.LimitExceededError.class
+            com.uber.cadence.LimitExceededError.class
           },
-          {Status.DATA_LOSS, null, com.uber.cadence.entities.InternalDataInconsistencyError.class},
+          {Status.DATA_LOSS, null, com.uber.cadence.InternalDataInconsistencyError.class},
           {
             Status.RESOURCE_EXHAUSTED,
             ServiceBusyError.getDefaultInstance(),
-            com.uber.cadence.entities.ServiceBusyError.class
+            com.uber.cadence.ServiceBusyError.class
           },
-          {Status.INTERNAL, null, com.uber.cadence.entities.InternalServiceError.class}
+          {Status.INTERNAL, null, com.uber.cadence.InternalServiceError.class}
         };
     return Arrays.asList(data);
   }
@@ -132,7 +132,7 @@ public class ErrorMapperTest {
     }
 
     StatusRuntimeException ex = StatusProto.toStatusRuntimeException(builder.build());
-    com.uber.cadence.entities.BaseError result = ErrorMapper.Error(ex);
+    com.uber.cadence.BaseError result = ErrorMapper.Error(ex);
     assertEquals(expectedException, result.getClass());
   }
 }

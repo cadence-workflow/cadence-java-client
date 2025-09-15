@@ -15,7 +15,7 @@
  */
 package com.uber.cadence.internal.compatibility.proto.mappers;
 
-import static com.uber.cadence.entities.EventType.*;
+import static com.uber.cadence.EventType.*;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.cancelExternalWorkflowExecutionFailedCause;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.childWorkflowExecutionFailedCause;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.continueAsNewInitiator;
@@ -51,33 +51,32 @@ import java.util.List;
 
 class HistoryMapper {
 
-  static com.uber.cadence.entities.History history(com.uber.cadence.api.v1.History t) {
+  static com.uber.cadence.History history(com.uber.cadence.api.v1.History t) {
     if (t == null || t == com.uber.cadence.api.v1.History.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.History history = new com.uber.cadence.entities.History();
+    com.uber.cadence.History history = new com.uber.cadence.History();
     history.setEvents(historyEventArray(t.getEventsList()));
     return history;
   }
 
-  static List<com.uber.cadence.entities.HistoryEvent> historyEventArray(
+  static List<com.uber.cadence.HistoryEvent> historyEventArray(
       List<com.uber.cadence.api.v1.HistoryEvent> t) {
     if (t == null) {
       return null;
     }
-    List<com.uber.cadence.entities.HistoryEvent> v = new ArrayList<>();
+    List<com.uber.cadence.HistoryEvent> v = new ArrayList<>();
     for (int i = 0; i < t.size(); i++) {
       v.add(historyEvent(t.get(i)));
     }
     return v;
   }
 
-  static com.uber.cadence.entities.HistoryEvent historyEvent(
-      com.uber.cadence.api.v1.HistoryEvent e) {
+  static com.uber.cadence.HistoryEvent historyEvent(com.uber.cadence.api.v1.HistoryEvent e) {
     if (e == null || e == com.uber.cadence.api.v1.HistoryEvent.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.HistoryEvent event = new com.uber.cadence.entities.HistoryEvent();
+    com.uber.cadence.HistoryEvent event = new com.uber.cadence.HistoryEvent();
     event.setEventId(e.getEventId());
     event.setTimestamp(timeToUnixNano(e.getEventTime()));
     event.setVersion(e.getVersion());
@@ -343,7 +342,7 @@ class HistoryMapper {
     return event;
   }
 
-  static com.uber.cadence.entities.ActivityTaskCancelRequestedEventAttributes
+  static com.uber.cadence.ActivityTaskCancelRequestedEventAttributes
       activityTaskCancelRequestedEventAttributes(
           com.uber.cadence.api.v1.ActivityTaskCancelRequestedEventAttributes t) {
     if (t == null
@@ -352,22 +351,21 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ActivityTaskCancelRequestedEventAttributes res =
-        new com.uber.cadence.entities.ActivityTaskCancelRequestedEventAttributes();
+    com.uber.cadence.ActivityTaskCancelRequestedEventAttributes res =
+        new com.uber.cadence.ActivityTaskCancelRequestedEventAttributes();
     res.setActivityId(t.getActivityId());
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
     return res;
   }
 
-  static com.uber.cadence.entities.ActivityTaskCanceledEventAttributes
-      activityTaskCanceledEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskCanceledEventAttributes t) {
+  static com.uber.cadence.ActivityTaskCanceledEventAttributes activityTaskCanceledEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskCanceledEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskCanceledEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ActivityTaskCanceledEventAttributes res =
-        new com.uber.cadence.entities.ActivityTaskCanceledEventAttributes();
+    com.uber.cadence.ActivityTaskCanceledEventAttributes res =
+        new com.uber.cadence.ActivityTaskCanceledEventAttributes();
     res.setDetails(payload(t.getDetails()));
     res.setLatestCancelRequestedEventId(t.getLatestCancelRequestedEventId());
     res.setScheduledEventId(t.getScheduledEventId());
@@ -376,15 +374,14 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ActivityTaskCompletedEventAttributes
-      activityTaskCompletedEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskCompletedEventAttributes t) {
+  static com.uber.cadence.ActivityTaskCompletedEventAttributes activityTaskCompletedEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskCompletedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskCompletedEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ActivityTaskCompletedEventAttributes res =
-        new com.uber.cadence.entities.ActivityTaskCompletedEventAttributes();
+    com.uber.cadence.ActivityTaskCompletedEventAttributes res =
+        new com.uber.cadence.ActivityTaskCompletedEventAttributes();
     res.setResult(payload(t.getResult()));
     res.setScheduledEventId(t.getScheduledEventId());
     res.setStartedEventId(t.getStartedEventId());
@@ -392,15 +389,14 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ActivityTaskFailedEventAttributes
-      activityTaskFailedEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskFailedEventAttributes t) {
+  static com.uber.cadence.ActivityTaskFailedEventAttributes activityTaskFailedEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskFailedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskFailedEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ActivityTaskFailedEventAttributes res =
-        new com.uber.cadence.entities.ActivityTaskFailedEventAttributes();
+    com.uber.cadence.ActivityTaskFailedEventAttributes res =
+        new com.uber.cadence.ActivityTaskFailedEventAttributes();
     res.setReason(failureReason(t.getFailure()));
     res.setDetails(failureDetails(t.getFailure()));
     res.setScheduledEventId(t.getScheduledEventId());
@@ -409,15 +405,14 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ActivityTaskScheduledEventAttributes
-      activityTaskScheduledEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskScheduledEventAttributes t) {
+  static com.uber.cadence.ActivityTaskScheduledEventAttributes activityTaskScheduledEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskScheduledEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskScheduledEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ActivityTaskScheduledEventAttributes res =
-        new com.uber.cadence.entities.ActivityTaskScheduledEventAttributes();
+    com.uber.cadence.ActivityTaskScheduledEventAttributes res =
+        new com.uber.cadence.ActivityTaskScheduledEventAttributes();
     res.setActivityId(t.getActivityId());
     res.setActivityType(activityType(t.getActivityType()));
     res.setDomain(t.getDomain());
@@ -433,15 +428,14 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ActivityTaskStartedEventAttributes
-      activityTaskStartedEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskStartedEventAttributes t) {
+  static com.uber.cadence.ActivityTaskStartedEventAttributes activityTaskStartedEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskStartedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskStartedEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ActivityTaskStartedEventAttributes res =
-        new com.uber.cadence.entities.ActivityTaskStartedEventAttributes();
+    com.uber.cadence.ActivityTaskStartedEventAttributes res =
+        new com.uber.cadence.ActivityTaskStartedEventAttributes();
     res.setScheduledEventId(t.getScheduledEventId());
     res.setIdentity(t.getIdentity());
     res.setRequestId(t.getRequestId());
@@ -451,15 +445,14 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ActivityTaskTimedOutEventAttributes
-      activityTaskTimedOutEventAttributes(
-          com.uber.cadence.api.v1.ActivityTaskTimedOutEventAttributes t) {
+  static com.uber.cadence.ActivityTaskTimedOutEventAttributes activityTaskTimedOutEventAttributes(
+      com.uber.cadence.api.v1.ActivityTaskTimedOutEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.ActivityTaskTimedOutEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ActivityTaskTimedOutEventAttributes res =
-        new com.uber.cadence.entities.ActivityTaskTimedOutEventAttributes();
+    com.uber.cadence.ActivityTaskTimedOutEventAttributes res =
+        new com.uber.cadence.ActivityTaskTimedOutEventAttributes();
     res.setDetails(payload(t.getDetails()));
     res.setScheduledEventId(t.getScheduledEventId());
     res.setStartedEventId(t.getStartedEventId());
@@ -469,14 +462,14 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.CancelTimerFailedEventAttributes
-      cancelTimerFailedEventAttributes(com.uber.cadence.api.v1.CancelTimerFailedEventAttributes t) {
+  static com.uber.cadence.CancelTimerFailedEventAttributes cancelTimerFailedEventAttributes(
+      com.uber.cadence.api.v1.CancelTimerFailedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.CancelTimerFailedEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.CancelTimerFailedEventAttributes res =
-        new com.uber.cadence.entities.CancelTimerFailedEventAttributes();
+    com.uber.cadence.CancelTimerFailedEventAttributes res =
+        new com.uber.cadence.CancelTimerFailedEventAttributes();
     res.setTimerId(t.getTimerId());
     res.setCause(t.getCause());
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
@@ -484,7 +477,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ChildWorkflowExecutionCanceledEventAttributes
+  static com.uber.cadence.ChildWorkflowExecutionCanceledEventAttributes
       childWorkflowExecutionCanceledEventAttributes(
           com.uber.cadence.api.v1.ChildWorkflowExecutionCanceledEventAttributes t) {
     if (t == null
@@ -493,8 +486,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ChildWorkflowExecutionCanceledEventAttributes res =
-        new com.uber.cadence.entities.ChildWorkflowExecutionCanceledEventAttributes();
+    com.uber.cadence.ChildWorkflowExecutionCanceledEventAttributes res =
+        new com.uber.cadence.ChildWorkflowExecutionCanceledEventAttributes();
     res.setDomain(t.getDomain());
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
     res.setWorkflowType(workflowType(t.getWorkflowType()));
@@ -504,7 +497,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ChildWorkflowExecutionCompletedEventAttributes
+  static com.uber.cadence.ChildWorkflowExecutionCompletedEventAttributes
       childWorkflowExecutionCompletedEventAttributes(
           com.uber.cadence.api.v1.ChildWorkflowExecutionCompletedEventAttributes t) {
     if (t == null
@@ -513,8 +506,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ChildWorkflowExecutionCompletedEventAttributes res =
-        new com.uber.cadence.entities.ChildWorkflowExecutionCompletedEventAttributes();
+    com.uber.cadence.ChildWorkflowExecutionCompletedEventAttributes res =
+        new com.uber.cadence.ChildWorkflowExecutionCompletedEventAttributes();
     res.setDomain(t.getDomain());
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
     res.setWorkflowType(workflowType(t.getWorkflowType()));
@@ -524,7 +517,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ChildWorkflowExecutionFailedEventAttributes
+  static com.uber.cadence.ChildWorkflowExecutionFailedEventAttributes
       childWorkflowExecutionFailedEventAttributes(
           com.uber.cadence.api.v1.ChildWorkflowExecutionFailedEventAttributes t) {
     if (t == null
@@ -533,8 +526,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ChildWorkflowExecutionFailedEventAttributes res =
-        new com.uber.cadence.entities.ChildWorkflowExecutionFailedEventAttributes();
+    com.uber.cadence.ChildWorkflowExecutionFailedEventAttributes res =
+        new com.uber.cadence.ChildWorkflowExecutionFailedEventAttributes();
     res.setDomain(t.getDomain());
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
     res.setWorkflowType(workflowType(t.getWorkflowType()));
@@ -545,7 +538,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ChildWorkflowExecutionStartedEventAttributes
+  static com.uber.cadence.ChildWorkflowExecutionStartedEventAttributes
       childWorkflowExecutionStartedEventAttributes(
           com.uber.cadence.api.v1.ChildWorkflowExecutionStartedEventAttributes t) {
     if (t == null
@@ -554,8 +547,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ChildWorkflowExecutionStartedEventAttributes res =
-        new com.uber.cadence.entities.ChildWorkflowExecutionStartedEventAttributes();
+    com.uber.cadence.ChildWorkflowExecutionStartedEventAttributes res =
+        new com.uber.cadence.ChildWorkflowExecutionStartedEventAttributes();
     res.setDomain(t.getDomain());
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
     res.setWorkflowType(workflowType(t.getWorkflowType()));
@@ -564,7 +557,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ChildWorkflowExecutionTerminatedEventAttributes
+  static com.uber.cadence.ChildWorkflowExecutionTerminatedEventAttributes
       childWorkflowExecutionTerminatedEventAttributes(
           com.uber.cadence.api.v1.ChildWorkflowExecutionTerminatedEventAttributes t) {
     if (t == null
@@ -573,8 +566,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ChildWorkflowExecutionTerminatedEventAttributes res =
-        new com.uber.cadence.entities.ChildWorkflowExecutionTerminatedEventAttributes();
+    com.uber.cadence.ChildWorkflowExecutionTerminatedEventAttributes res =
+        new com.uber.cadence.ChildWorkflowExecutionTerminatedEventAttributes();
     res.setDomain(t.getDomain());
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
     res.setWorkflowType(workflowType(t.getWorkflowType()));
@@ -583,7 +576,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ChildWorkflowExecutionTimedOutEventAttributes
+  static com.uber.cadence.ChildWorkflowExecutionTimedOutEventAttributes
       childWorkflowExecutionTimedOutEventAttributes(
           com.uber.cadence.api.v1.ChildWorkflowExecutionTimedOutEventAttributes t) {
     if (t == null
@@ -592,8 +585,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ChildWorkflowExecutionTimedOutEventAttributes res =
-        new com.uber.cadence.entities.ChildWorkflowExecutionTimedOutEventAttributes();
+    com.uber.cadence.ChildWorkflowExecutionTimedOutEventAttributes res =
+        new com.uber.cadence.ChildWorkflowExecutionTimedOutEventAttributes();
     res.setDomain(t.getDomain());
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
     res.setWorkflowType(workflowType(t.getWorkflowType()));
@@ -603,15 +596,14 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.DecisionTaskFailedEventAttributes
-      decisionTaskFailedEventAttributes(
-          com.uber.cadence.api.v1.DecisionTaskFailedEventAttributes t) {
+  static com.uber.cadence.DecisionTaskFailedEventAttributes decisionTaskFailedEventAttributes(
+      com.uber.cadence.api.v1.DecisionTaskFailedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.DecisionTaskFailedEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.DecisionTaskFailedEventAttributes res =
-        new com.uber.cadence.entities.DecisionTaskFailedEventAttributes();
+    com.uber.cadence.DecisionTaskFailedEventAttributes res =
+        new com.uber.cadence.DecisionTaskFailedEventAttributes();
     res.setScheduledEventId(t.getScheduledEventId());
     res.setStartedEventId(t.getStartedEventId());
     res.setCause(decisionTaskFailedCause(t.getCause()));
@@ -625,45 +617,42 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.DecisionTaskScheduledEventAttributes
-      decisionTaskScheduledEventAttributes(
-          com.uber.cadence.api.v1.DecisionTaskScheduledEventAttributes t) {
+  static com.uber.cadence.DecisionTaskScheduledEventAttributes decisionTaskScheduledEventAttributes(
+      com.uber.cadence.api.v1.DecisionTaskScheduledEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.DecisionTaskScheduledEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.DecisionTaskScheduledEventAttributes res =
-        new com.uber.cadence.entities.DecisionTaskScheduledEventAttributes();
+    com.uber.cadence.DecisionTaskScheduledEventAttributes res =
+        new com.uber.cadence.DecisionTaskScheduledEventAttributes();
     res.setTaskList(taskList(t.getTaskList()));
     res.setStartToCloseTimeoutSeconds(durationToSeconds(t.getStartToCloseTimeout()));
     res.setAttempt(t.getAttempt());
     return res;
   }
 
-  static com.uber.cadence.entities.DecisionTaskStartedEventAttributes
-      decisionTaskStartedEventAttributes(
-          com.uber.cadence.api.v1.DecisionTaskStartedEventAttributes t) {
+  static com.uber.cadence.DecisionTaskStartedEventAttributes decisionTaskStartedEventAttributes(
+      com.uber.cadence.api.v1.DecisionTaskStartedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.DecisionTaskStartedEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.DecisionTaskStartedEventAttributes res =
-        new com.uber.cadence.entities.DecisionTaskStartedEventAttributes();
+    com.uber.cadence.DecisionTaskStartedEventAttributes res =
+        new com.uber.cadence.DecisionTaskStartedEventAttributes();
     res.setScheduledEventId(t.getScheduledEventId());
     res.setIdentity(t.getIdentity());
     res.setRequestId(t.getRequestId());
     return res;
   }
 
-  static com.uber.cadence.entities.DecisionTaskCompletedEventAttributes
-      decisionTaskCompletedEventAttributes(
-          com.uber.cadence.api.v1.DecisionTaskCompletedEventAttributes t) {
+  static com.uber.cadence.DecisionTaskCompletedEventAttributes decisionTaskCompletedEventAttributes(
+      com.uber.cadence.api.v1.DecisionTaskCompletedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.DecisionTaskCompletedEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.DecisionTaskCompletedEventAttributes res =
-        new com.uber.cadence.entities.DecisionTaskCompletedEventAttributes();
+    com.uber.cadence.DecisionTaskCompletedEventAttributes res =
+        new com.uber.cadence.DecisionTaskCompletedEventAttributes();
     res.setScheduledEventId(t.getScheduledEventId());
     res.setStartedEventId(t.getStartedEventId());
     res.setIdentity(t.getIdentity());
@@ -672,15 +661,14 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.DecisionTaskTimedOutEventAttributes
-      decisionTaskTimedOutEventAttributes(
-          com.uber.cadence.api.v1.DecisionTaskTimedOutEventAttributes t) {
+  static com.uber.cadence.DecisionTaskTimedOutEventAttributes decisionTaskTimedOutEventAttributes(
+      com.uber.cadence.api.v1.DecisionTaskTimedOutEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.DecisionTaskTimedOutEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.DecisionTaskTimedOutEventAttributes res =
-        new com.uber.cadence.entities.DecisionTaskTimedOutEventAttributes();
+    com.uber.cadence.DecisionTaskTimedOutEventAttributes res =
+        new com.uber.cadence.DecisionTaskTimedOutEventAttributes();
     res.setScheduledEventId(t.getScheduledEventId());
     res.setStartedEventId(t.getStartedEventId());
     res.setTimeoutType(timeoutType(t.getTimeoutType()));
@@ -692,7 +680,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ExternalWorkflowExecutionCancelRequestedEventAttributes
+  static com.uber.cadence.ExternalWorkflowExecutionCancelRequestedEventAttributes
       externalWorkflowExecutionCancelRequestedEventAttributes(
           com.uber.cadence.api.v1.ExternalWorkflowExecutionCancelRequestedEventAttributes t) {
     if (t == null
@@ -701,15 +689,15 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ExternalWorkflowExecutionCancelRequestedEventAttributes res =
-        new com.uber.cadence.entities.ExternalWorkflowExecutionCancelRequestedEventAttributes();
+    com.uber.cadence.ExternalWorkflowExecutionCancelRequestedEventAttributes res =
+        new com.uber.cadence.ExternalWorkflowExecutionCancelRequestedEventAttributes();
     res.setInitiatedEventId(t.getInitiatedEventId());
     res.setDomain(t.getDomain());
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
     return res;
   }
 
-  static com.uber.cadence.entities.ExternalWorkflowExecutionSignaledEventAttributes
+  static com.uber.cadence.ExternalWorkflowExecutionSignaledEventAttributes
       externalWorkflowExecutionSignaledEventAttributes(
           com.uber.cadence.api.v1.ExternalWorkflowExecutionSignaledEventAttributes t) {
     if (t == null
@@ -718,8 +706,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ExternalWorkflowExecutionSignaledEventAttributes res =
-        new com.uber.cadence.entities.ExternalWorkflowExecutionSignaledEventAttributes();
+    com.uber.cadence.ExternalWorkflowExecutionSignaledEventAttributes res =
+        new com.uber.cadence.ExternalWorkflowExecutionSignaledEventAttributes();
     res.setInitiatedEventId(t.getInitiatedEventId());
     res.setDomain(t.getDomain());
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
@@ -727,14 +715,14 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.MarkerRecordedEventAttributes markerRecordedEventAttributes(
+  static com.uber.cadence.MarkerRecordedEventAttributes markerRecordedEventAttributes(
       com.uber.cadence.api.v1.MarkerRecordedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.MarkerRecordedEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.MarkerRecordedEventAttributes res =
-        new com.uber.cadence.entities.MarkerRecordedEventAttributes();
+    com.uber.cadence.MarkerRecordedEventAttributes res =
+        new com.uber.cadence.MarkerRecordedEventAttributes();
     res.setMarkerName(t.getMarkerName());
     res.setDetails(payload(t.getDetails()));
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
@@ -742,7 +730,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.RequestCancelActivityTaskFailedEventAttributes
+  static com.uber.cadence.RequestCancelActivityTaskFailedEventAttributes
       requestCancelActivityTaskFailedEventAttributes(
           com.uber.cadence.api.v1.RequestCancelActivityTaskFailedEventAttributes t) {
     if (t == null
@@ -751,15 +739,15 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.RequestCancelActivityTaskFailedEventAttributes res =
-        new com.uber.cadence.entities.RequestCancelActivityTaskFailedEventAttributes();
+    com.uber.cadence.RequestCancelActivityTaskFailedEventAttributes res =
+        new com.uber.cadence.RequestCancelActivityTaskFailedEventAttributes();
     res.setActivityId(t.getActivityId());
     res.setCause(t.getCause());
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
     return res;
   }
 
-  static com.uber.cadence.entities.RequestCancelExternalWorkflowExecutionFailedEventAttributes
+  static com.uber.cadence.RequestCancelExternalWorkflowExecutionFailedEventAttributes
       requestCancelExternalWorkflowExecutionFailedEventAttributes(
           com.uber.cadence.api.v1.RequestCancelExternalWorkflowExecutionFailedEventAttributes t) {
     if (t == null
@@ -768,8 +756,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.RequestCancelExternalWorkflowExecutionFailedEventAttributes res =
-        new com.uber.cadence.entities.RequestCancelExternalWorkflowExecutionFailedEventAttributes();
+    com.uber.cadence.RequestCancelExternalWorkflowExecutionFailedEventAttributes res =
+        new com.uber.cadence.RequestCancelExternalWorkflowExecutionFailedEventAttributes();
     res.setCause(cancelExternalWorkflowExecutionFailedCause(t.getCause()));
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
     res.setDomain(t.getDomain());
@@ -779,7 +767,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.RequestCancelExternalWorkflowExecutionInitiatedEventAttributes
+  static com.uber.cadence.RequestCancelExternalWorkflowExecutionInitiatedEventAttributes
       requestCancelExternalWorkflowExecutionInitiatedEventAttributes(
           com.uber.cadence.api.v1.RequestCancelExternalWorkflowExecutionInitiatedEventAttributes
               t) {
@@ -790,9 +778,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.RequestCancelExternalWorkflowExecutionInitiatedEventAttributes res =
-        new com.uber.cadence.entities
-            .RequestCancelExternalWorkflowExecutionInitiatedEventAttributes();
+    com.uber.cadence.RequestCancelExternalWorkflowExecutionInitiatedEventAttributes res =
+        new com.uber.cadence.RequestCancelExternalWorkflowExecutionInitiatedEventAttributes();
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
     res.setDomain(t.getDomain());
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
@@ -801,7 +788,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.SignalExternalWorkflowExecutionFailedEventAttributes
+  static com.uber.cadence.SignalExternalWorkflowExecutionFailedEventAttributes
       signalExternalWorkflowExecutionFailedEventAttributes(
           com.uber.cadence.api.v1.SignalExternalWorkflowExecutionFailedEventAttributes t) {
     if (t == null
@@ -810,8 +797,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.SignalExternalWorkflowExecutionFailedEventAttributes res =
-        new com.uber.cadence.entities.SignalExternalWorkflowExecutionFailedEventAttributes();
+    com.uber.cadence.SignalExternalWorkflowExecutionFailedEventAttributes res =
+        new com.uber.cadence.SignalExternalWorkflowExecutionFailedEventAttributes();
     res.setCause(signalExternalWorkflowExecutionFailedCause(t.getCause()));
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
     res.setDomain(t.getDomain());
@@ -821,7 +808,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.SignalExternalWorkflowExecutionInitiatedEventAttributes
+  static com.uber.cadence.SignalExternalWorkflowExecutionInitiatedEventAttributes
       signalExternalWorkflowExecutionInitiatedEventAttributes(
           com.uber.cadence.api.v1.SignalExternalWorkflowExecutionInitiatedEventAttributes t) {
     if (t == null
@@ -830,8 +817,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.SignalExternalWorkflowExecutionInitiatedEventAttributes res =
-        new com.uber.cadence.entities.SignalExternalWorkflowExecutionInitiatedEventAttributes();
+    com.uber.cadence.SignalExternalWorkflowExecutionInitiatedEventAttributes res =
+        new com.uber.cadence.SignalExternalWorkflowExecutionInitiatedEventAttributes();
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
     res.setDomain(t.getDomain());
     res.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
@@ -842,7 +829,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.StartChildWorkflowExecutionFailedEventAttributes
+  static com.uber.cadence.StartChildWorkflowExecutionFailedEventAttributes
       startChildWorkflowExecutionFailedEventAttributes(
           com.uber.cadence.api.v1.StartChildWorkflowExecutionFailedEventAttributes t) {
     if (t == null
@@ -851,8 +838,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.StartChildWorkflowExecutionFailedEventAttributes res =
-        new com.uber.cadence.entities.StartChildWorkflowExecutionFailedEventAttributes();
+    com.uber.cadence.StartChildWorkflowExecutionFailedEventAttributes res =
+        new com.uber.cadence.StartChildWorkflowExecutionFailedEventAttributes();
     res.setDomain(t.getDomain());
     res.setWorkflowId(t.getWorkflowId());
     res.setWorkflowType(workflowType(t.getWorkflowType()));
@@ -863,7 +850,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.StartChildWorkflowExecutionInitiatedEventAttributes
+  static com.uber.cadence.StartChildWorkflowExecutionInitiatedEventAttributes
       startChildWorkflowExecutionInitiatedEventAttributes(
           com.uber.cadence.api.v1.StartChildWorkflowExecutionInitiatedEventAttributes t) {
     if (t == null
@@ -872,8 +859,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.StartChildWorkflowExecutionInitiatedEventAttributes res =
-        new com.uber.cadence.entities.StartChildWorkflowExecutionInitiatedEventAttributes();
+    com.uber.cadence.StartChildWorkflowExecutionInitiatedEventAttributes res =
+        new com.uber.cadence.StartChildWorkflowExecutionInitiatedEventAttributes();
     res.setDomain(t.getDomain());
     res.setWorkflowId(t.getWorkflowId());
     res.setWorkflowType(workflowType(t.getWorkflowType()));
@@ -895,14 +882,14 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.TimerCanceledEventAttributes timerCanceledEventAttributes(
+  static com.uber.cadence.TimerCanceledEventAttributes timerCanceledEventAttributes(
       com.uber.cadence.api.v1.TimerCanceledEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.TimerCanceledEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.TimerCanceledEventAttributes res =
-        new com.uber.cadence.entities.TimerCanceledEventAttributes();
+    com.uber.cadence.TimerCanceledEventAttributes res =
+        new com.uber.cadence.TimerCanceledEventAttributes();
     res.setTimerId(t.getTimerId());
     res.setStartedEventId(t.getStartedEventId());
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
@@ -910,33 +897,33 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.TimerFiredEventAttributes timerFiredEventAttributes(
+  static com.uber.cadence.TimerFiredEventAttributes timerFiredEventAttributes(
       com.uber.cadence.api.v1.TimerFiredEventAttributes t) {
     if (t == null || t == com.uber.cadence.api.v1.TimerFiredEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.TimerFiredEventAttributes res =
-        new com.uber.cadence.entities.TimerFiredEventAttributes();
+    com.uber.cadence.TimerFiredEventAttributes res =
+        new com.uber.cadence.TimerFiredEventAttributes();
     res.setTimerId(t.getTimerId());
     res.setStartedEventId(t.getStartedEventId());
     return res;
   }
 
-  static com.uber.cadence.entities.TimerStartedEventAttributes timerStartedEventAttributes(
+  static com.uber.cadence.TimerStartedEventAttributes timerStartedEventAttributes(
       com.uber.cadence.api.v1.TimerStartedEventAttributes t) {
     if (t == null
         || t == com.uber.cadence.api.v1.TimerStartedEventAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.TimerStartedEventAttributes res =
-        new com.uber.cadence.entities.TimerStartedEventAttributes();
+    com.uber.cadence.TimerStartedEventAttributes res =
+        new com.uber.cadence.TimerStartedEventAttributes();
     res.setTimerId(t.getTimerId());
     res.setStartToFireTimeoutSeconds(durationToSeconds(t.getStartToFireTimeout()));
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
     return res;
   }
 
-  static com.uber.cadence.entities.UpsertWorkflowSearchAttributesEventAttributes
+  static com.uber.cadence.UpsertWorkflowSearchAttributesEventAttributes
       upsertWorkflowSearchAttributesEventAttributes(
           com.uber.cadence.api.v1.UpsertWorkflowSearchAttributesEventAttributes t) {
     if (t == null
@@ -945,14 +932,14 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.UpsertWorkflowSearchAttributesEventAttributes res =
-        new com.uber.cadence.entities.UpsertWorkflowSearchAttributesEventAttributes();
+    com.uber.cadence.UpsertWorkflowSearchAttributesEventAttributes res =
+        new com.uber.cadence.UpsertWorkflowSearchAttributesEventAttributes();
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
     res.setSearchAttributes(searchAttributes(t.getSearchAttributes()));
     return res;
   }
 
-  static com.uber.cadence.entities.WorkflowExecutionCancelRequestedEventAttributes
+  static com.uber.cadence.WorkflowExecutionCancelRequestedEventAttributes
       workflowExecutionCancelRequestedEventAttributes(
           com.uber.cadence.api.v1.WorkflowExecutionCancelRequestedEventAttributes t) {
     if (t == null
@@ -961,8 +948,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecutionCancelRequestedEventAttributes res =
-        new com.uber.cadence.entities.WorkflowExecutionCancelRequestedEventAttributes();
+    com.uber.cadence.WorkflowExecutionCancelRequestedEventAttributes res =
+        new com.uber.cadence.WorkflowExecutionCancelRequestedEventAttributes();
     res.setCause(t.getCause());
     res.setExternalInitiatedEventId(externalInitiatedId(t.getExternalExecutionInfo()));
     res.setExternalWorkflowExecution(externalWorkflowExecution(t.getExternalExecutionInfo()));
@@ -970,7 +957,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.WorkflowExecutionCanceledEventAttributes
+  static com.uber.cadence.WorkflowExecutionCanceledEventAttributes
       workflowExecutionCanceledEventAttributes(
           com.uber.cadence.api.v1.WorkflowExecutionCanceledEventAttributes t) {
     if (t == null
@@ -979,14 +966,14 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecutionCanceledEventAttributes res =
-        new com.uber.cadence.entities.WorkflowExecutionCanceledEventAttributes();
+    com.uber.cadence.WorkflowExecutionCanceledEventAttributes res =
+        new com.uber.cadence.WorkflowExecutionCanceledEventAttributes();
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
     res.setDetails(payload(t.getDetails()));
     return res;
   }
 
-  static com.uber.cadence.entities.WorkflowExecutionCompletedEventAttributes
+  static com.uber.cadence.WorkflowExecutionCompletedEventAttributes
       workflowExecutionCompletedEventAttributes(
           com.uber.cadence.api.v1.WorkflowExecutionCompletedEventAttributes t) {
     if (t == null
@@ -995,14 +982,14 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecutionCompletedEventAttributes res =
-        new com.uber.cadence.entities.WorkflowExecutionCompletedEventAttributes();
+    com.uber.cadence.WorkflowExecutionCompletedEventAttributes res =
+        new com.uber.cadence.WorkflowExecutionCompletedEventAttributes();
     res.setResult(payload(t.getResult()));
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
     return res;
   }
 
-  static com.uber.cadence.entities.WorkflowExecutionContinuedAsNewEventAttributes
+  static com.uber.cadence.WorkflowExecutionContinuedAsNewEventAttributes
       workflowExecutionContinuedAsNewEventAttributes(
           com.uber.cadence.api.v1.WorkflowExecutionContinuedAsNewEventAttributes t) {
     if (t == null
@@ -1011,8 +998,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecutionContinuedAsNewEventAttributes res =
-        new com.uber.cadence.entities.WorkflowExecutionContinuedAsNewEventAttributes();
+    com.uber.cadence.WorkflowExecutionContinuedAsNewEventAttributes res =
+        new com.uber.cadence.WorkflowExecutionContinuedAsNewEventAttributes();
     res.setNewExecutionRunId(t.getNewExecutionRunId());
     res.setWorkflowType(workflowType(t.getWorkflowType()));
     res.setTaskList(taskList(t.getTaskList()));
@@ -1032,7 +1019,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.WorkflowExecutionFailedEventAttributes
+  static com.uber.cadence.WorkflowExecutionFailedEventAttributes
       workflowExecutionFailedEventAttributes(
           com.uber.cadence.api.v1.WorkflowExecutionFailedEventAttributes t) {
     if (t == null
@@ -1041,15 +1028,15 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecutionFailedEventAttributes res =
-        new com.uber.cadence.entities.WorkflowExecutionFailedEventAttributes();
+    com.uber.cadence.WorkflowExecutionFailedEventAttributes res =
+        new com.uber.cadence.WorkflowExecutionFailedEventAttributes();
     res.setReason(failureReason(t.getFailure()));
     res.setDetails(failureDetails(t.getFailure()));
     res.setDecisionTaskCompletedEventId(t.getDecisionTaskCompletedEventId());
     return res;
   }
 
-  static com.uber.cadence.entities.WorkflowExecutionSignaledEventAttributes
+  static com.uber.cadence.WorkflowExecutionSignaledEventAttributes
       workflowExecutionSignaledEventAttributes(
           com.uber.cadence.api.v1.WorkflowExecutionSignaledEventAttributes t) {
     if (t == null
@@ -1058,15 +1045,15 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecutionSignaledEventAttributes res =
-        new com.uber.cadence.entities.WorkflowExecutionSignaledEventAttributes();
+    com.uber.cadence.WorkflowExecutionSignaledEventAttributes res =
+        new com.uber.cadence.WorkflowExecutionSignaledEventAttributes();
     res.setSignalName(t.getSignalName());
     res.setInput(payload(t.getInput()));
     res.setIdentity(t.getIdentity());
     return res;
   }
 
-  static com.uber.cadence.entities.WorkflowExecutionStartedEventAttributes
+  static com.uber.cadence.WorkflowExecutionStartedEventAttributes
       workflowExecutionStartedEventAttributes(
           com.uber.cadence.api.v1.WorkflowExecutionStartedEventAttributes t) {
     if (t == null
@@ -1075,8 +1062,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecutionStartedEventAttributes res =
-        new com.uber.cadence.entities.WorkflowExecutionStartedEventAttributes();
+    com.uber.cadence.WorkflowExecutionStartedEventAttributes res =
+        new com.uber.cadence.WorkflowExecutionStartedEventAttributes();
     res.setWorkflowType(workflowType(t.getWorkflowType()));
     res.setParentWorkflowDomain(parentDomainName(t.getParentExecutionInfo()));
     res.setParentWorkflowExecution(parentWorkflowExecution(t.getParentExecutionInfo()));
@@ -1106,7 +1093,7 @@ class HistoryMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.WorkflowExecutionTerminatedEventAttributes
+  static com.uber.cadence.WorkflowExecutionTerminatedEventAttributes
       workflowExecutionTerminatedEventAttributes(
           com.uber.cadence.api.v1.WorkflowExecutionTerminatedEventAttributes t) {
     if (t == null
@@ -1115,15 +1102,15 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecutionTerminatedEventAttributes res =
-        new com.uber.cadence.entities.WorkflowExecutionTerminatedEventAttributes();
+    com.uber.cadence.WorkflowExecutionTerminatedEventAttributes res =
+        new com.uber.cadence.WorkflowExecutionTerminatedEventAttributes();
     res.setReason(t.getReason());
     res.setDetails(payload(t.getDetails()));
     res.setIdentity(t.getIdentity());
     return res;
   }
 
-  static com.uber.cadence.entities.WorkflowExecutionTimedOutEventAttributes
+  static com.uber.cadence.WorkflowExecutionTimedOutEventAttributes
       workflowExecutionTimedOutEventAttributes(
           com.uber.cadence.api.v1.WorkflowExecutionTimedOutEventAttributes t) {
     if (t == null
@@ -1132,8 +1119,8 @@ class HistoryMapper {
                 .getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecutionTimedOutEventAttributes res =
-        new com.uber.cadence.entities.WorkflowExecutionTimedOutEventAttributes();
+    com.uber.cadence.WorkflowExecutionTimedOutEventAttributes res =
+        new com.uber.cadence.WorkflowExecutionTimedOutEventAttributes();
     res.setTimeoutType(timeoutType(t.getTimeoutType()));
     return res;
   }

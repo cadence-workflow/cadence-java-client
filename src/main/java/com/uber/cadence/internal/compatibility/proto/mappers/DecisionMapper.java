@@ -52,7 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class DecisionMapper {
-  static List<Decision> decisionArray(List<com.uber.cadence.entities.Decision> t) {
+  static List<Decision> decisionArray(List<com.uber.cadence.Decision> t) {
     if (t == null) {
       return null;
     }
@@ -64,7 +64,7 @@ class DecisionMapper {
     return v;
   }
 
-  static Decision decision(com.uber.cadence.entities.Decision d) {
+  static Decision decision(com.uber.cadence.Decision d) {
     if (d == null) {
       return null;
     }
@@ -72,7 +72,7 @@ class DecisionMapper {
     switch (d.getDecisionType()) {
       case ScheduleActivityTask:
         {
-          com.uber.cadence.entities.ScheduleActivityTaskDecisionAttributes attr =
+          com.uber.cadence.ScheduleActivityTaskDecisionAttributes attr =
               d.getScheduleActivityTaskDecisionAttributes();
           ScheduleActivityTaskDecisionAttributes.Builder builder =
               ScheduleActivityTaskDecisionAttributes.newBuilder()
@@ -99,7 +99,7 @@ class DecisionMapper {
         break;
       case RequestCancelActivityTask:
         {
-          com.uber.cadence.entities.RequestCancelActivityTaskDecisionAttributes attr =
+          com.uber.cadence.RequestCancelActivityTaskDecisionAttributes attr =
               d.getRequestCancelActivityTaskDecisionAttributes();
           decision.setRequestCancelActivityTaskDecisionAttributes(
               RequestCancelActivityTaskDecisionAttributes.newBuilder()
@@ -108,8 +108,7 @@ class DecisionMapper {
         break;
       case StartTimer:
         {
-          com.uber.cadence.entities.StartTimerDecisionAttributes attr =
-              d.getStartTimerDecisionAttributes();
+          com.uber.cadence.StartTimerDecisionAttributes attr = d.getStartTimerDecisionAttributes();
           decision.setStartTimerDecisionAttributes(
               StartTimerDecisionAttributes.newBuilder()
                   .setTimerId(attr.getTimerId())
@@ -119,7 +118,7 @@ class DecisionMapper {
         break;
       case CompleteWorkflowExecution:
         {
-          com.uber.cadence.entities.CompleteWorkflowExecutionDecisionAttributes attr =
+          com.uber.cadence.CompleteWorkflowExecutionDecisionAttributes attr =
               d.getCompleteWorkflowExecutionDecisionAttributes();
           decision.setCompleteWorkflowExecutionDecisionAttributes(
               CompleteWorkflowExecutionDecisionAttributes.newBuilder()
@@ -128,7 +127,7 @@ class DecisionMapper {
         break;
       case FailWorkflowExecution:
         {
-          com.uber.cadence.entities.FailWorkflowExecutionDecisionAttributes attr =
+          com.uber.cadence.FailWorkflowExecutionDecisionAttributes attr =
               d.getFailWorkflowExecutionDecisionAttributes();
           decision.setFailWorkflowExecutionDecisionAttributes(
               FailWorkflowExecutionDecisionAttributes.newBuilder()
@@ -137,7 +136,7 @@ class DecisionMapper {
         break;
       case CancelTimer:
         {
-          com.uber.cadence.entities.CancelTimerDecisionAttributes attr =
+          com.uber.cadence.CancelTimerDecisionAttributes attr =
               d.getCancelTimerDecisionAttributes();
           decision.setCancelTimerDecisionAttributes(
               CancelTimerDecisionAttributes.newBuilder().setTimerId(attr.getTimerId()));
@@ -145,7 +144,7 @@ class DecisionMapper {
         break;
       case CancelWorkflowExecution:
         {
-          com.uber.cadence.entities.CancelWorkflowExecutionDecisionAttributes attr =
+          com.uber.cadence.CancelWorkflowExecutionDecisionAttributes attr =
               d.getCancelWorkflowExecutionDecisionAttributes();
           decision.setCancelWorkflowExecutionDecisionAttributes(
               CancelWorkflowExecutionDecisionAttributes.newBuilder()
@@ -154,7 +153,7 @@ class DecisionMapper {
         break;
       case RequestCancelExternalWorkflowExecution:
         {
-          com.uber.cadence.entities.RequestCancelExternalWorkflowExecutionDecisionAttributes attr =
+          com.uber.cadence.RequestCancelExternalWorkflowExecutionDecisionAttributes attr =
               d.getRequestCancelExternalWorkflowExecutionDecisionAttributes();
           RequestCancelExternalWorkflowExecutionDecisionAttributes.Builder builder =
               RequestCancelExternalWorkflowExecutionDecisionAttributes.newBuilder()
@@ -169,7 +168,7 @@ class DecisionMapper {
         break;
       case ContinueAsNewWorkflowExecution:
         {
-          com.uber.cadence.entities.ContinueAsNewWorkflowExecutionDecisionAttributes attr =
+          com.uber.cadence.ContinueAsNewWorkflowExecutionDecisionAttributes attr =
               d.getContinueAsNewWorkflowExecutionDecisionAttributes();
           ContinueAsNewWorkflowExecutionDecisionAttributes.Builder builder =
               ContinueAsNewWorkflowExecutionDecisionAttributes.newBuilder()
@@ -199,7 +198,7 @@ class DecisionMapper {
         break;
       case StartChildWorkflowExecution:
         {
-          com.uber.cadence.entities.StartChildWorkflowExecutionDecisionAttributes attr =
+          com.uber.cadence.StartChildWorkflowExecutionDecisionAttributes attr =
               d.getStartChildWorkflowExecutionDecisionAttributes();
           StartChildWorkflowExecutionDecisionAttributes.Builder builder =
               StartChildWorkflowExecutionDecisionAttributes.newBuilder()
@@ -231,7 +230,7 @@ class DecisionMapper {
         break;
       case SignalExternalWorkflowExecution:
         {
-          com.uber.cadence.entities.SignalExternalWorkflowExecutionDecisionAttributes attr =
+          com.uber.cadence.SignalExternalWorkflowExecutionDecisionAttributes attr =
               d.getSignalExternalWorkflowExecutionDecisionAttributes();
           SignalExternalWorkflowExecutionDecisionAttributes.Builder builder =
               SignalExternalWorkflowExecutionDecisionAttributes.newBuilder()
@@ -248,7 +247,7 @@ class DecisionMapper {
         break;
       case UpsertWorkflowSearchAttributes:
         {
-          com.uber.cadence.entities.UpsertWorkflowSearchAttributesDecisionAttributes attr =
+          com.uber.cadence.UpsertWorkflowSearchAttributesDecisionAttributes attr =
               d.getUpsertWorkflowSearchAttributesDecisionAttributes();
           decision.setUpsertWorkflowSearchAttributesDecisionAttributes(
               UpsertWorkflowSearchAttributesDecisionAttributes.newBuilder()
@@ -257,7 +256,7 @@ class DecisionMapper {
         break;
       case RecordMarker:
         {
-          com.uber.cadence.entities.RecordMarkerDecisionAttributes attr =
+          com.uber.cadence.RecordMarkerDecisionAttributes attr =
               d.getRecordMarkerDecisionAttributes();
           decision.setRecordMarkerDecisionAttributes(
               RecordMarkerDecisionAttributes.newBuilder()

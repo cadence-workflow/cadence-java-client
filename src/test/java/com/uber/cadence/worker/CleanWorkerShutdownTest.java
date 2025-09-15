@@ -21,11 +21,7 @@ import static com.uber.cadence.testUtils.TestEnvironment.DOMAIN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.uber.cadence.EventType;
-import com.uber.cadence.GetWorkflowExecutionHistoryRequest;
-import com.uber.cadence.GetWorkflowExecutionHistoryResponse;
-import com.uber.cadence.HistoryEvent;
-import com.uber.cadence.WorkflowExecution;
+import com.uber.cadence.*;
 import com.uber.cadence.activity.Activity;
 import com.uber.cadence.activity.ActivityMethod;
 import com.uber.cadence.client.ActivityWorkerShutdownException;
@@ -44,7 +40,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import org.apache.thrift.TException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -128,7 +123,7 @@ public class CleanWorkerShutdownTest {
   }
 
   @Test
-  public void testShutdown() throws ExecutionException, InterruptedException, TException {
+  public void testShutdown() throws ExecutionException, InterruptedException, BaseError {
     String taskList =
         "CleanWorkerShutdownTest-" + testName.getMethodName() + "-" + UUID.randomUUID().toString();
     WorkflowClient workflowClient;
@@ -182,7 +177,7 @@ public class CleanWorkerShutdownTest {
   }
 
   @Test
-  public void testShutdownNow() throws ExecutionException, InterruptedException, TException {
+  public void testShutdownNow() throws ExecutionException, InterruptedException, BaseError {
     String taskList =
         "CleanWorkerShutdownTest-" + testName.getMethodName() + "-" + UUID.randomUUID().toString();
     WorkflowClient workflowClient;
@@ -263,7 +258,7 @@ public class CleanWorkerShutdownTest {
    */
   @Test
   public void testShutdownHeartbeatingActivity()
-      throws ExecutionException, InterruptedException, TException {
+      throws ExecutionException, InterruptedException, BaseError {
     String taskList =
         "CleanWorkerShutdownTest-" + testName.getMethodName() + "-" + UUID.randomUUID().toString();
     WorkflowClient workflowClient;

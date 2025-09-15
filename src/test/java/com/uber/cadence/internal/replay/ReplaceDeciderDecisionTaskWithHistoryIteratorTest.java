@@ -29,7 +29,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.*;
-import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -114,7 +113,7 @@ public class ReplaceDeciderDecisionTaskWithHistoryIteratorTest {
 
   @Test
   public void testGetHistoryWithSinglePageOfEvents()
-      throws TException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+      throws BaseError, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     // Arrange
     List<HistoryEvent> events = Arrays.asList(createMockHistoryEvent(2), createMockHistoryEvent(3));
     History mockHistory = new History().setEvents(events);
@@ -142,7 +141,7 @@ public class ReplaceDeciderDecisionTaskWithHistoryIteratorTest {
 
   @Test
   public void testGetHistoryWithMultiplePages()
-      throws TException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+      throws BaseError, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     // First page events
     List<HistoryEvent> firstPageEvents =
         Arrays.asList(createMockHistoryEvent(1), createMockHistoryEvent(2));
@@ -192,14 +191,14 @@ public class ReplaceDeciderDecisionTaskWithHistoryIteratorTest {
 
   @Test(expected = Error.class)
   public void testGetHistoryFailure()
-      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, TException {
+      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, BaseError {
     when(mockService.GetWorkflowExecutionHistory(
             new GetWorkflowExecutionHistoryRequest()
                 .setDomain(DOMAIN)
                 .setNextPageToken(START_PAGE_TOKEN.getBytes())
                 .setExecution(WORKFLOW_EXECUTION)
                 .setMaximumPageSize(MAXIMUM_PAGE_SIZE)))
-        .thenThrow(new TException());
+        .thenThrow(new BaseError());
 
     // Act & Assert
     Method wrapperMethod = iterator.getClass().getMethod("getHistory");
@@ -213,7 +212,7 @@ public class ReplaceDeciderDecisionTaskWithHistoryIteratorTest {
 
   @Test(expected = Error.class)
   public void testEmptyHistory()
-      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, TException {
+      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, BaseError {
     when(mockService.GetWorkflowExecutionHistory(
             new GetWorkflowExecutionHistoryRequest()
                 .setDomain(DOMAIN)

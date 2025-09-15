@@ -360,7 +360,7 @@ class StateMachines {
     a.setInitiatedEventId(data.initiatedEventId);
     a.setWorkflowType(data.initiatedEvent.getWorkflowType());
     a.setWorkflowId(data.initiatedEvent.getWorkflowId());
-    if (data.initiatedEvent.isSetDomain()) {
+    if (data.initiatedEvent.getDomain() != null) {
       a.setDomain(data.initiatedEvent.getDomain());
     }
     HistoryEvent event =
@@ -410,8 +410,8 @@ class StateMachines {
     a.setStartedEventId(data.startedEventId);
     a.setWorkflowExecution(data.execution);
     a.setWorkflowType(data.initiatedEvent.getWorkflowType());
-    if (data.initiatedEvent.domain != null) {
-      a.setDomain(data.initiatedEvent.domain);
+    if (data.initiatedEvent.getDomain() != null) {
+      a.setDomain(data.initiatedEvent.getDomain());
     }
     HistoryEvent event =
         new HistoryEvent()
@@ -477,7 +477,7 @@ class StateMachines {
                   .setRetryPolicy(d.getRetryPolicy())
                   .setCronSchedule(d.getCronSchedule())
                   .setHeader(d.getHeader());
-          if (d.isSetInput()) {
+          if (d.getInput() != null) {
             startChild.setInput(d.getInput());
           }
           addStartChildTask(ctx, data, initiatedEventId, startChild);
@@ -520,26 +520,26 @@ class StateMachines {
       RequestContext ctx, WorkflowData data, StartWorkflowExecutionRequest request, long notUsed)
       throws BadRequestError {
     WorkflowExecutionStartedEventAttributes a = new WorkflowExecutionStartedEventAttributes();
-    if (request.isSetIdentity()) {
+    if (request.getIdentity() != null) {
       a.setIdentity(request.getIdentity());
     }
-    if (!request.isSetTaskStartToCloseTimeoutSeconds()) {
+    if (request.getTaskStartToCloseTimeoutSeconds() == 0) {
       throw new BadRequestError("missing taskStartToCloseTimeoutSeconds");
     }
     a.setTaskStartToCloseTimeoutSeconds(request.getTaskStartToCloseTimeoutSeconds());
-    if (!request.isSetWorkflowType()) {
+    if (request.getWorkflowType() == null) {
       throw new BadRequestError("missing workflowType");
     }
     a.setWorkflowType(request.getWorkflowType());
-    if (!request.isSetTaskList()) {
+    if (request.getTaskList() == null) {
       throw new BadRequestError("missing taskList");
     }
     a.setTaskList(request.getTaskList());
-    if (!request.isSetExecutionStartToCloseTimeoutSeconds()) {
+    if (request.getExecutionStartToCloseTimeoutSeconds() == 0) {
       throw new BadRequestError("missing executionStartToCloseTimeoutSeconds");
     }
     a.setExecutionStartToCloseTimeoutSeconds(request.getExecutionStartToCloseTimeoutSeconds());
-    if (request.isSetInput()) {
+    if (request.getInput() != null) {
       a.setInput(request.getInput());
     }
     if (data.retryState.isPresent()) {
@@ -592,22 +592,22 @@ class StateMachines {
     WorkflowExecutionContinuedAsNewEventAttributes a =
         new WorkflowExecutionContinuedAsNewEventAttributes();
     a.setInput(d.getInput());
-    if (d.isSetExecutionStartToCloseTimeoutSeconds()) {
+    if (d.getExecutionStartToCloseTimeoutSeconds() > 0) {
       a.setExecutionStartToCloseTimeoutSeconds(d.getExecutionStartToCloseTimeoutSeconds());
     } else {
       a.setExecutionStartToCloseTimeoutSeconds(sr.getExecutionStartToCloseTimeoutSeconds());
     }
-    if (d.isSetTaskList()) {
+    if (d.getTaskList() != null) {
       a.setTaskList(d.getTaskList());
     } else {
       a.setTaskList(sr.getTaskList());
     }
-    if (d.isSetWorkflowType()) {
+    if (d.getWorkflowType() != null) {
       a.setWorkflowType(d.getWorkflowType());
     } else {
       a.setWorkflowType(sr.getWorkflowType());
     }
-    if (d.isSetTaskStartToCloseTimeoutSeconds()) {
+    if (d.getTaskStartToCloseTimeoutSeconds() > 0) {
       a.setTaskStartToCloseTimeoutSeconds(d.getTaskStartToCloseTimeoutSeconds());
     } else {
       a.setTaskStartToCloseTimeoutSeconds(sr.getTaskStartToCloseTimeoutSeconds());
@@ -735,7 +735,7 @@ class StateMachines {
     PollForActivityTaskResponse taskResponse =
         new PollForActivityTaskResponse()
             .setWorkflowDomain(ctx.getDomain())
-            .setWorkflowType(data.startWorkflowExecutionRequest.workflowType)
+            .setWorkflowType(data.startWorkflowExecutionRequest.getWorkflowType())
             .setActivityType(d.getActivityType())
             .setWorkflowExecution(ctx.getExecution())
             .setActivityId(d.getActivityId())
@@ -1155,16 +1155,16 @@ class StateMachines {
     SignalExternalWorkflowExecutionInitiatedEventAttributes a =
         new SignalExternalWorkflowExecutionInitiatedEventAttributes();
     a.setDecisionTaskCompletedEventId(decisionTaskCompletedEventId);
-    if (d.isSetControl()) {
+    if (d.getControl() != null) {
       a.setControl(d.getControl());
     }
-    if (d.isSetInput()) {
+    if (d.getInput() != null) {
       a.setInput(d.getInput());
     }
-    if (d.isSetDomain()) {
+    if (d.getDomain() != null) {
       a.setDomain(d.getDomain());
     }
-    if (d.isSetChildWorkflowOnly()) {
+    if (d.isChildWorkflowOnly()) {
       a.setChildWorkflowOnly(d.isChildWorkflowOnly());
     }
     a.setSignalName(d.getSignalName());
@@ -1205,7 +1205,9 @@ class StateMachines {
       RequestContext ctx, SignalExternalData data, String runId, long notUsed) {
     SignalExternalWorkflowExecutionInitiatedEventAttributes initiatedEvent = data.initiatedEvent;
     WorkflowExecution signaledExecution =
-        initiatedEvent.getWorkflowExecution().deepCopy().setRunId(runId);
+        new WorkflowExecution()
+            .setWorkflowId(initiatedEvent.getWorkflowExecution().getWorkflowId())
+            .setRunId(runId);
     ExternalWorkflowExecutionSignaledEventAttributes a =
         new ExternalWorkflowExecutionSignaledEventAttributes()
             .setInitiatedEventId(data.initiatedEventId)

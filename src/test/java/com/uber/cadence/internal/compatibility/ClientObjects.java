@@ -16,7 +16,7 @@ package com.uber.cadence.internal.compatibility;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.uber.cadence.entities.*;
+import com.uber.cadence.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;

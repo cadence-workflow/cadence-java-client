@@ -44,7 +44,7 @@ import java.util.Map;
 
 class TypeMapper {
 
-  static BadBinaryInfo badBinaryInfo(com.uber.cadence.entities.BadBinaryInfo t) {
+  static BadBinaryInfo badBinaryInfo(com.uber.cadence.BadBinaryInfo t) {
     if (t == null) {
       return null;
     }
@@ -69,7 +69,7 @@ class TypeMapper {
     return Failure.newBuilder().setReason(reason).setDetails(arrayToByteString(details)).build();
   }
 
-  static WorkflowExecution workflowExecution(com.uber.cadence.entities.WorkflowExecution t) {
+  static WorkflowExecution workflowExecution(com.uber.cadence.WorkflowExecution t) {
     if (t == null) {
       return WorkflowExecution.newBuilder().build();
     }
@@ -91,28 +91,28 @@ class TypeMapper {
     return WorkflowExecution.newBuilder().setWorkflowId(workflowId).setRunId(runId).build();
   }
 
-  static ActivityType activityType(com.uber.cadence.entities.ActivityType t) {
+  static ActivityType activityType(com.uber.cadence.ActivityType t) {
     if (t == null) {
       return ActivityType.newBuilder().build();
     }
     return ActivityType.newBuilder().setName(t.getName()).build();
   }
 
-  static WorkflowType workflowType(com.uber.cadence.entities.WorkflowType t) {
+  static WorkflowType workflowType(com.uber.cadence.WorkflowType t) {
     if (t == null) {
       return WorkflowType.newBuilder().build();
     }
     return WorkflowType.newBuilder().setName(t.getName()).build();
   }
 
-  static TaskList taskList(com.uber.cadence.entities.TaskList t) {
+  static TaskList taskList(com.uber.cadence.TaskList t) {
     if (t == null) {
       return TaskList.newBuilder().build();
     }
     return TaskList.newBuilder().setName(t.getName()).setKind(taskListKind(t.getKind())).build();
   }
 
-  static TaskListMetadata taskListMetadata(com.uber.cadence.entities.TaskListMetadata t) {
+  static TaskListMetadata taskListMetadata(com.uber.cadence.TaskListMetadata t) {
     if (t == null) {
       return TaskListMetadata.newBuilder().build();
     }
@@ -121,7 +121,7 @@ class TypeMapper {
         .build();
   }
 
-  static RetryPolicy retryPolicy(com.uber.cadence.entities.RetryPolicy t) {
+  static RetryPolicy retryPolicy(com.uber.cadence.RetryPolicy t) {
     if (t == null) {
       return null;
     }
@@ -138,21 +138,21 @@ class TypeMapper {
     return builder.build();
   }
 
-  static Header header(com.uber.cadence.entities.Header t) {
+  static Header header(com.uber.cadence.Header t) {
     if (t == null) {
       return Header.newBuilder().build();
     }
     return Header.newBuilder().putAllFields(payloadByteBufferMap(t.getFields())).build();
   }
 
-  static Memo memo(com.uber.cadence.entities.Memo t) {
+  static Memo memo(com.uber.cadence.Memo t) {
     if (t == null) {
       return Memo.newBuilder().build();
     }
     return Memo.newBuilder().putAllFields(payloadByteBufferMap(t.getFields())).build();
   }
 
-  static SearchAttributes searchAttributes(com.uber.cadence.entities.SearchAttributes t) {
+  static SearchAttributes searchAttributes(com.uber.cadence.SearchAttributes t) {
     if (t == null) {
       return SearchAttributes.newBuilder().build();
     }
@@ -161,7 +161,7 @@ class TypeMapper {
         .build();
   }
 
-  static BadBinaries badBinaries(com.uber.cadence.entities.BadBinaries t) {
+  static BadBinaries badBinaries(com.uber.cadence.BadBinaries t) {
     if (t == null) {
       return BadBinaries.newBuilder().build();
     }
@@ -169,14 +169,14 @@ class TypeMapper {
   }
 
   static ClusterReplicationConfiguration clusterReplicationConfiguration(
-      com.uber.cadence.entities.ClusterReplicationConfiguration t) {
+      com.uber.cadence.ClusterReplicationConfiguration t) {
     if (t == null) {
       return ClusterReplicationConfiguration.newBuilder().build();
     }
     return ClusterReplicationConfiguration.newBuilder().setClusterName(t.getClusterName()).build();
   }
 
-  static WorkflowQuery workflowQuery(com.uber.cadence.entities.WorkflowQuery t) {
+  static WorkflowQuery workflowQuery(com.uber.cadence.WorkflowQuery t) {
     if (t == null) {
       return null;
     }
@@ -186,7 +186,7 @@ class TypeMapper {
         .build();
   }
 
-  static WorkflowQueryResult workflowQueryResult(com.uber.cadence.entities.WorkflowQueryResult t) {
+  static WorkflowQueryResult workflowQueryResult(com.uber.cadence.WorkflowQueryResult t) {
     if (t == null) {
       return WorkflowQueryResult.newBuilder().build();
     }
@@ -198,7 +198,7 @@ class TypeMapper {
   }
 
   static StickyExecutionAttributes stickyExecutionAttributes(
-      com.uber.cadence.entities.StickyExecutionAttributes t) {
+      com.uber.cadence.StickyExecutionAttributes t) {
     if (t == null) {
       return StickyExecutionAttributes.newBuilder().build();
     }
@@ -208,7 +208,7 @@ class TypeMapper {
         .build();
   }
 
-  static WorkerVersionInfo workerVersionInfo(com.uber.cadence.entities.WorkerVersionInfo t) {
+  static WorkerVersionInfo workerVersionInfo(com.uber.cadence.WorkerVersionInfo t) {
     if (t == null) {
       return WorkerVersionInfo.newBuilder().build();
     }
@@ -218,7 +218,7 @@ class TypeMapper {
         .build();
   }
 
-  static StartTimeFilter startTimeFilter(com.uber.cadence.entities.StartTimeFilter t) {
+  static StartTimeFilter startTimeFilter(com.uber.cadence.StartTimeFilter t) {
     if (t == null) {
       return null;
     }
@@ -229,7 +229,7 @@ class TypeMapper {
   }
 
   static WorkflowExecutionFilter workflowExecutionFilter(
-      com.uber.cadence.entities.WorkflowExecutionFilter t) {
+      com.uber.cadence.WorkflowExecutionFilter t) {
     if (t == null) {
       return WorkflowExecutionFilter.newBuilder().build();
     }
@@ -239,14 +239,14 @@ class TypeMapper {
         .build();
   }
 
-  static WorkflowTypeFilter workflowTypeFilter(com.uber.cadence.entities.WorkflowTypeFilter t) {
+  static WorkflowTypeFilter workflowTypeFilter(com.uber.cadence.WorkflowTypeFilter t) {
     if (t == null) {
       return WorkflowTypeFilter.newBuilder().build();
     }
     return WorkflowTypeFilter.newBuilder().setName(t.getName()).build();
   }
 
-  static StatusFilter statusFilter(com.uber.cadence.entities.WorkflowExecutionCloseStatus t) {
+  static StatusFilter statusFilter(com.uber.cadence.WorkflowExecutionCloseStatus t) {
     if (t == null) {
       return null;
     }
@@ -265,7 +265,7 @@ class TypeMapper {
   }
 
   static Map<String, BadBinaryInfo> badBinaryInfoMap(
-      Map<String, com.uber.cadence.entities.BadBinaryInfo> t) {
+      Map<String, com.uber.cadence.BadBinaryInfo> t) {
     if (t == null) {
       return Collections.emptyMap();
     }
@@ -277,7 +277,7 @@ class TypeMapper {
   }
 
   static List<ClusterReplicationConfiguration> clusterReplicationConfigurationArray(
-      List<com.uber.cadence.entities.ClusterReplicationConfiguration> t) {
+      List<com.uber.cadence.ClusterReplicationConfiguration> t) {
     if (t == null) {
       return Collections.emptyList();
     }
@@ -289,7 +289,7 @@ class TypeMapper {
   }
 
   static Map<String, WorkflowQueryResult> workflowQueryResultMap(
-      Map<String, com.uber.cadence.entities.WorkflowQueryResult> t) {
+      Map<String, com.uber.cadence.WorkflowQueryResult> t) {
     if (t == null) {
       return Collections.emptyMap();
     }
@@ -328,12 +328,11 @@ class TypeMapper {
     return byteStringToArray(t.getDetails());
   }
 
-  static com.uber.cadence.entities.WorkflowExecution workflowExecution(WorkflowExecution t) {
+  static com.uber.cadence.WorkflowExecution workflowExecution(WorkflowExecution t) {
     if (t == null || t == WorkflowExecution.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecution we =
-        new com.uber.cadence.entities.WorkflowExecution();
+    com.uber.cadence.WorkflowExecution we = new com.uber.cadence.WorkflowExecution();
     we.setWorkflowId(t.getWorkflowId());
     we.setRunId(t.getRunId());
     return we;
@@ -353,40 +352,39 @@ class TypeMapper {
     return t.getRunId();
   }
 
-  static com.uber.cadence.entities.ActivityType activityType(ActivityType t) {
+  static com.uber.cadence.ActivityType activityType(ActivityType t) {
     if (t == null || t == ActivityType.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ActivityType activityType =
-        new com.uber.cadence.entities.ActivityType();
+    com.uber.cadence.ActivityType activityType = new com.uber.cadence.ActivityType();
     activityType.setName(t.getName());
     return activityType;
   }
 
-  static com.uber.cadence.entities.WorkflowType workflowType(WorkflowType t) {
+  static com.uber.cadence.WorkflowType workflowType(WorkflowType t) {
     if (t == null || t == WorkflowType.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowType wt = new com.uber.cadence.entities.WorkflowType();
+    com.uber.cadence.WorkflowType wt = new com.uber.cadence.WorkflowType();
     wt.setName(t.getName());
     return wt;
   }
 
-  static com.uber.cadence.entities.TaskList taskList(TaskList t) {
+  static com.uber.cadence.TaskList taskList(TaskList t) {
     if (t == null || t == TaskList.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.TaskList taskList = new com.uber.cadence.entities.TaskList();
+    com.uber.cadence.TaskList taskList = new com.uber.cadence.TaskList();
     taskList.setName(t.getName());
     taskList.setKind(taskListKind(t.getKind()));
     return taskList;
   }
 
-  static com.uber.cadence.entities.RetryPolicy retryPolicy(RetryPolicy t) {
+  static com.uber.cadence.RetryPolicy retryPolicy(RetryPolicy t) {
     if (t == null || t == RetryPolicy.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.RetryPolicy res = new com.uber.cadence.entities.RetryPolicy();
+    com.uber.cadence.RetryPolicy res = new com.uber.cadence.RetryPolicy();
     res.setInitialIntervalInSeconds(durationToSeconds(t.getInitialInterval()));
     res.setBackoffCoefficient(t.getBackoffCoefficient());
     res.setMaximumIntervalInSeconds(durationToSeconds(t.getMaximumInterval()));
@@ -396,71 +394,70 @@ class TypeMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.Header header(Header t) {
+  static com.uber.cadence.Header header(Header t) {
     if (t == null || t == Header.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.Header res = new com.uber.cadence.entities.Header();
+    com.uber.cadence.Header res = new com.uber.cadence.Header();
     res.setFields(payloadMap(t.getFieldsMap()));
     return res;
   }
 
-  static com.uber.cadence.entities.Memo memo(Memo t) {
+  static com.uber.cadence.Memo memo(Memo t) {
     if (t == null || t == Memo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.Memo res = new com.uber.cadence.entities.Memo();
+    com.uber.cadence.Memo res = new com.uber.cadence.Memo();
     res.setFields(payloadMap(t.getFieldsMap()));
     return res;
   }
 
-  static com.uber.cadence.entities.SearchAttributes searchAttributes(SearchAttributes t) {
+  static com.uber.cadence.SearchAttributes searchAttributes(SearchAttributes t) {
     if (t == null || t.getAllFields().size() == 0 || t == SearchAttributes.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.SearchAttributes res =
-        new com.uber.cadence.entities.SearchAttributes();
+    com.uber.cadence.SearchAttributes res = new com.uber.cadence.SearchAttributes();
     res.setIndexedFields(payloadMap(t.getIndexedFieldsMap()));
     return res;
   }
 
-  static com.uber.cadence.entities.BadBinaries badBinaries(BadBinaries t) {
+  static com.uber.cadence.BadBinaries badBinaries(BadBinaries t) {
     if (t == null || t == BadBinaries.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.BadBinaries badBinaries = new com.uber.cadence.entities.BadBinaries();
+    com.uber.cadence.BadBinaries badBinaries = new com.uber.cadence.BadBinaries();
     badBinaries.setBinaries(badBinaryInfoMapFromProto(t.getBinariesMap()));
     return badBinaries;
   }
 
-  static com.uber.cadence.entities.BadBinaryInfo badBinaryInfo(BadBinaryInfo t) {
+  static com.uber.cadence.BadBinaryInfo badBinaryInfo(BadBinaryInfo t) {
     if (t == null || t == BadBinaryInfo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.BadBinaryInfo res = new com.uber.cadence.entities.BadBinaryInfo();
+    com.uber.cadence.BadBinaryInfo res = new com.uber.cadence.BadBinaryInfo();
     res.setReason(t.getReason());
     res.setOperator(t.getOperator());
     res.setCreatedTimeNano(timeToUnixNano(t.getCreatedTime()));
     return res;
   }
 
-  static Map<String, com.uber.cadence.entities.BadBinaryInfo> badBinaryInfoMapFromProto(
+  static Map<String, com.uber.cadence.BadBinaryInfo> badBinaryInfoMapFromProto(
       Map<String, BadBinaryInfo> t) {
     if (t == null) {
       return null;
     }
-    Map<String, com.uber.cadence.entities.BadBinaryInfo> v = new HashMap<>();
+    Map<String, com.uber.cadence.BadBinaryInfo> v = new HashMap<>();
     for (String key : t.keySet()) {
       v.put(key, badBinaryInfo(t.get(key)));
     }
     return v;
   }
 
-  static com.uber.cadence.entities.WorkflowQuery workflowQuery(WorkflowQuery t) {
+  static com.uber.cadence.WorkflowQuery workflowQuery(WorkflowQuery t) {
     if (t == null || t == WorkflowQuery.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowQuery res = new com.uber.cadence.entities.WorkflowQuery();
+    com.uber.cadence.WorkflowQuery res = new com.uber.cadence.WorkflowQuery();
     res.setQueryType(t.getQueryType());
     res.setQueryArgs(payload(t.getQueryArgs()));
     return res;
@@ -477,34 +474,34 @@ class TypeMapper {
     return v;
   }
 
-  static List<com.uber.cadence.entities.ClusterReplicationConfiguration>
+  static List<com.uber.cadence.ClusterReplicationConfiguration>
       clusterReplicationConfigurationArrayFromProto(List<ClusterReplicationConfiguration> t) {
     if (t == null) {
       return null;
     }
-    List<com.uber.cadence.entities.ClusterReplicationConfiguration> v = new ArrayList<>();
+    List<com.uber.cadence.ClusterReplicationConfiguration> v = new ArrayList<>();
     for (int i = 0; i < t.size(); i++) {
       v.add(clusterReplicationConfiguration(t.get(i)));
     }
     return v;
   }
 
-  static com.uber.cadence.entities.ClusterReplicationConfiguration clusterReplicationConfiguration(
+  static com.uber.cadence.ClusterReplicationConfiguration clusterReplicationConfiguration(
       ClusterReplicationConfiguration t) {
     if (t == null || t == ClusterReplicationConfiguration.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ClusterReplicationConfiguration res =
-        new com.uber.cadence.entities.ClusterReplicationConfiguration();
+    com.uber.cadence.ClusterReplicationConfiguration res =
+        new com.uber.cadence.ClusterReplicationConfiguration();
     res.setClusterName(t.getClusterName());
     return res;
   }
 
-  static com.uber.cadence.entities.DataBlob dataBlob(DataBlob t) {
+  static com.uber.cadence.DataBlob dataBlob(DataBlob t) {
     if (t == null || t == DataBlob.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.DataBlob dataBlob = new com.uber.cadence.entities.DataBlob();
+    com.uber.cadence.DataBlob dataBlob = new com.uber.cadence.DataBlob();
     dataBlob.setEncodingType(encodingType(t.getEncodingType()));
     dataBlob.setData(byteStringToArray(t.getData()));
     return dataBlob;
@@ -514,28 +511,27 @@ class TypeMapper {
     return t.getInitiatedId();
   }
 
-  static com.uber.cadence.entities.WorkflowExecution externalWorkflowExecution(
-      ExternalExecutionInfo t) {
+  static com.uber.cadence.WorkflowExecution externalWorkflowExecution(ExternalExecutionInfo t) {
     if (t == null || t == ExternalExecutionInfo.getDefaultInstance()) {
       return null;
     }
     return workflowExecution(t.getWorkflowExecution());
   }
 
-  static com.uber.cadence.entities.ResetPoints resetPoints(ResetPoints t) {
+  static com.uber.cadence.ResetPoints resetPoints(ResetPoints t) {
     if (t == null || t == ResetPoints.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ResetPoints res = new com.uber.cadence.entities.ResetPoints();
+    com.uber.cadence.ResetPoints res = new com.uber.cadence.ResetPoints();
     res.setPoints(resetPointInfoArray(t.getPointsList()));
     return res;
   }
 
-  static com.uber.cadence.entities.ResetPointInfo resetPointInfo(ResetPointInfo t) {
+  static com.uber.cadence.ResetPointInfo resetPointInfo(ResetPointInfo t) {
     if (t == null || t == ResetPointInfo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ResetPointInfo res = new com.uber.cadence.entities.ResetPointInfo();
+    com.uber.cadence.ResetPointInfo res = new com.uber.cadence.ResetPointInfo();
     res.setBinaryChecksum(t.getBinaryChecksum());
     res.setRunId(t.getRunId());
     res.setFirstDecisionCompletedId(t.getFirstDecisionCompletedId());
@@ -545,22 +541,22 @@ class TypeMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.PollerInfo pollerInfo(PollerInfo t) {
+  static com.uber.cadence.PollerInfo pollerInfo(PollerInfo t) {
     if (t == null || t == PollerInfo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.PollerInfo res = new com.uber.cadence.entities.PollerInfo();
+    com.uber.cadence.PollerInfo res = new com.uber.cadence.PollerInfo();
     res.setLastAccessTime(timeToUnixNano(t.getLastAccessTime()));
     res.setIdentity(t.getIdentity());
     res.setRatePerSecond(t.getRatePerSecond());
     return res;
   }
 
-  static com.uber.cadence.entities.TaskListStatus taskListStatus(TaskListStatus t) {
+  static com.uber.cadence.TaskListStatus taskListStatus(TaskListStatus t) {
     if (t == null || t == TaskListStatus.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.TaskListStatus res = new com.uber.cadence.entities.TaskListStatus();
+    com.uber.cadence.TaskListStatus res = new com.uber.cadence.TaskListStatus();
     res.setBacklogCountHint(t.getBacklogCountHint());
     res.setReadLevel(t.getReadLevel());
     res.setAckLevel(t.getAckLevel());
@@ -569,23 +565,23 @@ class TypeMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.TaskIDBlock taskIdBlock(TaskIDBlock t) {
+  static com.uber.cadence.TaskIDBlock taskIdBlock(TaskIDBlock t) {
     if (t == null || t == TaskIDBlock.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.TaskIDBlock res = new com.uber.cadence.entities.TaskIDBlock();
+    com.uber.cadence.TaskIDBlock res = new com.uber.cadence.TaskIDBlock();
     res.setStartID(t.getStartId());
     res.setEndID(t.getEndId());
     return res;
   }
 
-  static com.uber.cadence.entities.WorkflowExecutionConfiguration workflowExecutionConfiguration(
+  static com.uber.cadence.WorkflowExecutionConfiguration workflowExecutionConfiguration(
       WorkflowExecutionConfiguration t) {
     if (t == null || t == WorkflowExecutionConfiguration.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecutionConfiguration res =
-        new com.uber.cadence.entities.WorkflowExecutionConfiguration();
+    com.uber.cadence.WorkflowExecutionConfiguration res =
+        new com.uber.cadence.WorkflowExecutionConfiguration();
     res.setTaskList(taskList(t.getTaskList()));
     res.setExecutionStartToCloseTimeoutSeconds(
         durationToSeconds(t.getExecutionStartToCloseTimeout()));
@@ -593,13 +589,11 @@ class TypeMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.WorkflowExecutionInfo workflowExecutionInfo(
-      WorkflowExecutionInfo t) {
+  static com.uber.cadence.WorkflowExecutionInfo workflowExecutionInfo(WorkflowExecutionInfo t) {
     if (t == null || t == WorkflowExecutionInfo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.WorkflowExecutionInfo res =
-        new com.uber.cadence.entities.WorkflowExecutionInfo();
+    com.uber.cadence.WorkflowExecutionInfo res = new com.uber.cadence.WorkflowExecutionInfo();
     res.setExecution(workflowExecution(t.getWorkflowExecution()));
     res.setType(workflowType(t.getType()));
     res.setStartTime(timeToUnixNano(t.getStartTime()));
@@ -639,20 +633,18 @@ class TypeMapper {
     return t.getInitiatedId();
   }
 
-  static com.uber.cadence.entities.WorkflowExecution parentWorkflowExecution(
-      ParentExecutionInfo t) {
+  static com.uber.cadence.WorkflowExecution parentWorkflowExecution(ParentExecutionInfo t) {
     if (t == null || t == ParentExecutionInfo.getDefaultInstance()) {
       return null;
     }
     return workflowExecution(t.getWorkflowExecution());
   }
 
-  static com.uber.cadence.entities.PendingActivityInfo pendingActivityInfo(PendingActivityInfo t) {
+  static com.uber.cadence.PendingActivityInfo pendingActivityInfo(PendingActivityInfo t) {
     if (t == null || t == PendingActivityInfo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.PendingActivityInfo res =
-        new com.uber.cadence.entities.PendingActivityInfo();
+    com.uber.cadence.PendingActivityInfo res = new com.uber.cadence.PendingActivityInfo();
     res.setActivityID(t.getActivityId());
     res.setActivityType(activityType(t.getActivityType()));
     res.setState(pendingActivityState(t.getState()));
@@ -669,13 +661,13 @@ class TypeMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.PendingChildExecutionInfo pendingChildExecutionInfo(
+  static com.uber.cadence.PendingChildExecutionInfo pendingChildExecutionInfo(
       PendingChildExecutionInfo t) {
     if (t == null || t == PendingChildExecutionInfo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.PendingChildExecutionInfo res =
-        new com.uber.cadence.entities.PendingChildExecutionInfo();
+    com.uber.cadence.PendingChildExecutionInfo res =
+        new com.uber.cadence.PendingChildExecutionInfo();
     res.setWorkflowID(workflowId(t.getWorkflowExecution()));
     res.setRunID(runId(t.getWorkflowExecution()));
     res.setWorkflowTypName(t.getWorkflowTypeName());
@@ -684,12 +676,11 @@ class TypeMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.PendingDecisionInfo pendingDecisionInfo(PendingDecisionInfo t) {
+  static com.uber.cadence.PendingDecisionInfo pendingDecisionInfo(PendingDecisionInfo t) {
     if (t == null || t == PendingDecisionInfo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.PendingDecisionInfo res =
-        new com.uber.cadence.entities.PendingDecisionInfo();
+    com.uber.cadence.PendingDecisionInfo res = new com.uber.cadence.PendingDecisionInfo();
     res.setState(pendingDecisionState(t.getState()));
     res.setScheduledTimestamp(timeToUnixNano(t.getScheduledTime()));
     res.setStartedTimestamp(timeToUnixNano(t.getStartedTime()));
@@ -698,13 +689,13 @@ class TypeMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.ActivityLocalDispatchInfo activityLocalDispatchInfo(
+  static com.uber.cadence.ActivityLocalDispatchInfo activityLocalDispatchInfo(
       ActivityLocalDispatchInfo t) {
     if (t == null || t == ActivityLocalDispatchInfo.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.ActivityLocalDispatchInfo res =
-        new com.uber.cadence.entities.ActivityLocalDispatchInfo();
+    com.uber.cadence.ActivityLocalDispatchInfo res =
+        new com.uber.cadence.ActivityLocalDispatchInfo();
     res.setActivityId(t.getActivityId());
     res.setScheduledTimestamp(timeToUnixNano(t.getScheduledTime()));
     res.setStartedTimestamp(timeToUnixNano(t.getStartedTime()));
@@ -713,25 +704,23 @@ class TypeMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.SupportedClientVersions supportedClientVersions(
+  static com.uber.cadence.SupportedClientVersions supportedClientVersions(
       SupportedClientVersions t) {
     if (t == null || t == SupportedClientVersions.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.SupportedClientVersions res =
-        new com.uber.cadence.entities.SupportedClientVersions();
+    com.uber.cadence.SupportedClientVersions res = new com.uber.cadence.SupportedClientVersions();
     res.setGoSdk(t.getGoSdk());
     res.setJavaSdk(t.getJavaSdk());
     return res;
   }
 
-  static com.uber.cadence.entities.DescribeDomainResponse describeDomainResponseDomain(Domain t) {
+  static com.uber.cadence.DescribeDomainResponse describeDomainResponseDomain(Domain t) {
     if (t == null || t == Domain.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.DescribeDomainResponse res =
-        new com.uber.cadence.entities.DescribeDomainResponse();
-    com.uber.cadence.entities.DomainInfo domainInfo = new com.uber.cadence.entities.DomainInfo();
+    com.uber.cadence.DescribeDomainResponse res = new com.uber.cadence.DescribeDomainResponse();
+    com.uber.cadence.DomainInfo domainInfo = new com.uber.cadence.DomainInfo();
     res.setDomainInfo(domainInfo);
 
     domainInfo.setName(t.getName());
@@ -741,8 +730,8 @@ class TypeMapper {
     domainInfo.setData(t.getDataMap());
     domainInfo.setUuid(t.getId());
 
-    com.uber.cadence.entities.DomainConfiguration domainConfiguration =
-        new com.uber.cadence.entities.DomainConfiguration();
+    com.uber.cadence.DomainConfiguration domainConfiguration =
+        new com.uber.cadence.DomainConfiguration();
     res.setConfiguration(domainConfiguration);
 
     domainConfiguration.setWorkflowExecutionRetentionPeriodInDays(
@@ -755,8 +744,8 @@ class TypeMapper {
         archivalStatus(t.getVisibilityArchivalStatus()));
     domainConfiguration.setVisibilityArchivalURI(t.getVisibilityArchivalUri());
 
-    com.uber.cadence.entities.DomainReplicationConfiguration domainReplicationConfiguration =
-        new com.uber.cadence.entities.DomainReplicationConfiguration();
+    com.uber.cadence.DomainReplicationConfiguration domainReplicationConfiguration =
+        new com.uber.cadence.DomainReplicationConfiguration();
     res.setReplicationConfiguration(domainReplicationConfiguration);
 
     domainReplicationConfiguration.setActiveClusterName(t.getActiveClusterName());
@@ -768,161 +757,158 @@ class TypeMapper {
     return res;
   }
 
-  static com.uber.cadence.entities.TaskListMetadata taskListMetadata(TaskListMetadata t) {
+  static com.uber.cadence.TaskListMetadata taskListMetadata(TaskListMetadata t) {
     if (t == null) {
       return null;
     }
-    com.uber.cadence.entities.TaskListMetadata res =
-        new com.uber.cadence.entities.TaskListMetadata();
+    com.uber.cadence.TaskListMetadata res = new com.uber.cadence.TaskListMetadata();
     res.setMaxTasksPerSecond(t.getMaxTasksPerSecond().getValue());
     return res;
   }
 
-  static com.uber.cadence.entities.TaskListPartitionMetadata taskListPartitionMetadata(
+  static com.uber.cadence.TaskListPartitionMetadata taskListPartitionMetadata(
       TaskListPartitionMetadata t) {
     if (t == null || t == TaskListPartitionMetadata.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.TaskListPartitionMetadata res =
-        new com.uber.cadence.entities.TaskListPartitionMetadata();
+    com.uber.cadence.TaskListPartitionMetadata res =
+        new com.uber.cadence.TaskListPartitionMetadata();
     res.setKey(t.getKey());
     res.setOwnerHostName(t.getOwnerHostName());
     return res;
   }
 
-  static com.uber.cadence.entities.QueryRejected queryRejected(QueryRejected t) {
+  static com.uber.cadence.QueryRejected queryRejected(QueryRejected t) {
     if (t == null || t == QueryRejected.getDefaultInstance()) {
       return null;
     }
-    com.uber.cadence.entities.QueryRejected res = new com.uber.cadence.entities.QueryRejected();
+    com.uber.cadence.QueryRejected res = new com.uber.cadence.QueryRejected();
     res.setCloseStatus(workflowExecutionCloseStatus(t.getCloseStatus()));
     return res;
   }
 
-  static List<com.uber.cadence.entities.PollerInfo> pollerInfoArray(List<PollerInfo> t) {
+  static List<com.uber.cadence.PollerInfo> pollerInfoArray(List<PollerInfo> t) {
     if (t == null) {
       return null;
     }
-    List<com.uber.cadence.entities.PollerInfo> v = new ArrayList<>();
+    List<com.uber.cadence.PollerInfo> v = new ArrayList<>();
     for (PollerInfo pollerInfo : t) {
       v.add(pollerInfo(pollerInfo));
     }
     return v;
   }
 
-  static List<com.uber.cadence.entities.ResetPointInfo> resetPointInfoArray(
-      List<ResetPointInfo> t) {
+  static List<com.uber.cadence.ResetPointInfo> resetPointInfoArray(List<ResetPointInfo> t) {
     if (t == null) {
       return null;
     }
-    List<com.uber.cadence.entities.ResetPointInfo> v = new ArrayList<>();
+    List<com.uber.cadence.ResetPointInfo> v = new ArrayList<>();
     for (ResetPointInfo resetPointInfo : t) {
       v.add(resetPointInfo(resetPointInfo));
     }
     return v;
   }
 
-  static List<com.uber.cadence.entities.PendingActivityInfo> pendingActivityInfoArray(
+  static List<com.uber.cadence.PendingActivityInfo> pendingActivityInfoArray(
       List<PendingActivityInfo> t) {
     if (t == null) {
       return null;
     }
-    List<com.uber.cadence.entities.PendingActivityInfo> v = new ArrayList<>();
+    List<com.uber.cadence.PendingActivityInfo> v = new ArrayList<>();
     for (PendingActivityInfo pendingActivityInfo : t) {
       v.add(pendingActivityInfo(pendingActivityInfo));
     }
     return v;
   }
 
-  static List<com.uber.cadence.entities.PendingChildExecutionInfo> pendingChildExecutionInfoArray(
+  static List<com.uber.cadence.PendingChildExecutionInfo> pendingChildExecutionInfoArray(
       List<PendingChildExecutionInfo> t) {
     if (t == null) {
       return null;
     }
-    List<com.uber.cadence.entities.PendingChildExecutionInfo> v = new ArrayList<>();
+    List<com.uber.cadence.PendingChildExecutionInfo> v = new ArrayList<>();
     for (PendingChildExecutionInfo pendingChildExecutionInfo : t) {
       v.add(pendingChildExecutionInfo(pendingChildExecutionInfo));
     }
     return v;
   }
 
-  static Map<String, com.uber.cadence.entities.IndexedValueType> indexedValueTypeMap(
+  static Map<String, com.uber.cadence.IndexedValueType> indexedValueTypeMap(
       Map<String, IndexedValueType> t) {
     if (t == null) {
       return null;
     }
-    Map<String, com.uber.cadence.entities.IndexedValueType> v = new HashMap<>();
+    Map<String, com.uber.cadence.IndexedValueType> v = new HashMap<>();
     for (String key : t.keySet()) {
       v.put(key, indexedValueType(t.get(key)));
     }
     return v;
   }
 
-  static List<com.uber.cadence.entities.DataBlob> dataBlobArray(List<DataBlob> t) {
+  static List<com.uber.cadence.DataBlob> dataBlobArray(List<DataBlob> t) {
     if (t == null || t.size() == 0) {
       return null;
     }
-    List<com.uber.cadence.entities.DataBlob> v = new ArrayList<>();
+    List<com.uber.cadence.DataBlob> v = new ArrayList<>();
     for (DataBlob dataBlob : t) {
       v.add(dataBlob(dataBlob));
     }
     return v;
   }
 
-  static List<com.uber.cadence.entities.WorkflowExecutionInfo> workflowExecutionInfoArray(
+  static List<com.uber.cadence.WorkflowExecutionInfo> workflowExecutionInfoArray(
       List<WorkflowExecutionInfo> t) {
     if (t == null) {
       return null;
     }
-    List<com.uber.cadence.entities.WorkflowExecutionInfo> v = new ArrayList<>();
+    List<com.uber.cadence.WorkflowExecutionInfo> v = new ArrayList<>();
     for (WorkflowExecutionInfo workflowExecutionInfo : t) {
       v.add(workflowExecutionInfo(workflowExecutionInfo));
     }
     return v;
   }
 
-  static List<com.uber.cadence.entities.DescribeDomainResponse> describeDomainResponseArray(
-      List<Domain> t) {
+  static List<com.uber.cadence.DescribeDomainResponse> describeDomainResponseArray(List<Domain> t) {
     if (t == null) {
       return null;
     }
-    List<com.uber.cadence.entities.DescribeDomainResponse> v = new ArrayList<>();
+    List<com.uber.cadence.DescribeDomainResponse> v = new ArrayList<>();
     for (Domain domain : t) {
       v.add(describeDomainResponseDomain(domain));
     }
     return v;
   }
 
-  static List<com.uber.cadence.entities.TaskListPartitionMetadata> taskListPartitionMetadataArray(
+  static List<com.uber.cadence.TaskListPartitionMetadata> taskListPartitionMetadataArray(
       List<TaskListPartitionMetadata> t) {
     if (t == null) {
       return null;
     }
-    List<com.uber.cadence.entities.TaskListPartitionMetadata> v = new ArrayList<>();
+    List<com.uber.cadence.TaskListPartitionMetadata> v = new ArrayList<>();
     for (TaskListPartitionMetadata taskListPartitionMetadata : t) {
       v.add(taskListPartitionMetadata(taskListPartitionMetadata));
     }
     return v;
   }
 
-  static Map<String, com.uber.cadence.entities.WorkflowQuery> workflowQueryMap(
+  static Map<String, com.uber.cadence.WorkflowQuery> workflowQueryMap(
       Map<String, WorkflowQuery> t) {
     if (t == null) {
       return null;
     }
-    Map<String, com.uber.cadence.entities.WorkflowQuery> v = new HashMap<>();
+    Map<String, com.uber.cadence.WorkflowQuery> v = new HashMap<>();
     for (String key : t.keySet()) {
       v.put(key, workflowQuery(t.get(key)));
     }
     return v;
   }
 
-  static Map<String, com.uber.cadence.entities.ActivityLocalDispatchInfo>
-      activityLocalDispatchInfoMap(Map<String, ActivityLocalDispatchInfo> t) {
+  static Map<String, com.uber.cadence.ActivityLocalDispatchInfo> activityLocalDispatchInfoMap(
+      Map<String, ActivityLocalDispatchInfo> t) {
     if (t == null) {
       return null;
     }
-    Map<String, com.uber.cadence.entities.ActivityLocalDispatchInfo> v = new HashMap<>();
+    Map<String, com.uber.cadence.ActivityLocalDispatchInfo> v = new HashMap<>();
     for (String key : t.keySet()) {
       v.put(key, activityLocalDispatchInfo(t.get(key)));
     }

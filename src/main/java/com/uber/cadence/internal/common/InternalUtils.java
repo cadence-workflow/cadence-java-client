@@ -27,7 +27,6 @@ import com.uber.cadence.converter.JsonDataConverter;
 import com.uber.cadence.internal.worker.Shutdownable;
 import com.uber.cadence.workflow.WorkflowMethod;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -135,10 +134,10 @@ public final class InternalUtils {
 
   public static Memo convertMapToMemo(Map<String, Object> memo) {
     DataConverter converter = JsonDataConverter.getInstance();
-    Map<String, ByteBuffer> mapOfByteBuffer = new HashMap<>();
+    Map<String, byte[]> mapOfByteBuffer = new HashMap<>();
     memo.forEach(
         (key, value) -> {
-          mapOfByteBuffer.put(key, ByteBuffer.wrap(converter.toData(value)));
+          mapOfByteBuffer.put(key, converter.toData(value));
         });
     return new Memo().setFields(mapOfByteBuffer);
   }
@@ -146,10 +145,10 @@ public final class InternalUtils {
   public static SearchAttributes convertMapToSearchAttributes(
       Map<String, Object> searchAttributes) {
     DataConverter converter = JsonDataConverter.getInstance();
-    Map<String, ByteBuffer> mapOfByteBuffer = new HashMap<>();
+    Map<String, byte[]> mapOfByteBuffer = new HashMap<>();
     searchAttributes.forEach(
         (key, value) -> {
-          mapOfByteBuffer.put(key, ByteBuffer.wrap(converter.toData(value)));
+          mapOfByteBuffer.put(key, converter.toData(value));
         });
     return new SearchAttributes().setIndexedFields(mapOfByteBuffer);
   }

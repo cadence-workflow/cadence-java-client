@@ -29,7 +29,6 @@ import com.uber.m3.tally.Scope;
 import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.tally.Timer;
 import com.uber.m3.util.Duration;
-import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -86,7 +85,7 @@ public class WorkflowPollTaskTest {
   }
 
   @Test
-  public void testPollSuccess() throws TException {
+  public void testPollSuccess() throws BaseError {
     // Mock a successful response with all necessary fields
     WorkflowType workflowType = new WorkflowType().setName("testWorkflowType");
 
@@ -142,7 +141,7 @@ public class WorkflowPollTaskTest {
   }
 
   @Test(expected = InternalServiceError.class)
-  public void testPollInternalServiceError() throws TException {
+  public void testPollInternalServiceError() throws BaseError {
     when(mockService.PollForDecisionTask(any(PollForDecisionTaskRequest.class)))
         .thenThrow(new InternalServiceError());
 
@@ -161,7 +160,7 @@ public class WorkflowPollTaskTest {
   }
 
   @Test(expected = ServiceBusyError.class)
-  public void testPollServiceBusyError() throws TException {
+  public void testPollServiceBusyError() throws BaseError {
     when(mockService.PollForDecisionTask(any(PollForDecisionTaskRequest.class)))
         .thenThrow(new ServiceBusyError());
 
@@ -179,10 +178,10 @@ public class WorkflowPollTaskTest {
     }
   }
 
-  @Test(expected = TException.class)
-  public void testPollGeneralTException() throws TException {
+  @Test(expected = BaseError.class)
+  public void testPollGeneralTException() throws BaseError {
     when(mockService.PollForDecisionTask(any(PollForDecisionTaskRequest.class)))
-        .thenThrow(new TException());
+        .thenThrow(new BaseError());
 
     Counter failedCounter = mock(Counter.class);
     when(mockMetricScope.counter(MetricsType.DECISION_POLL_FAILED_COUNTER))
@@ -196,7 +195,7 @@ public class WorkflowPollTaskTest {
   }
 
   @Test
-  public void testPollNoTask() throws TException {
+  public void testPollNoTask() throws BaseError {
     when(mockService.PollForDecisionTask(any(PollForDecisionTaskRequest.class)))
         .thenReturn(new PollForDecisionTaskResponse());
 

@@ -41,7 +41,7 @@ public interface WorkflowInterceptor {
 
     public WorkflowExecuteInput(WorkflowExecutionStartedEventAttributes workflowEventStart) {
       this.workflowEventStart = workflowEventStart;
-      this.workflowType = workflowEventStart.workflowType;
+      this.workflowType = workflowEventStart.getWorkflowType();
       this.input = workflowEventStart.getInput();
     }
 

@@ -19,7 +19,6 @@ package com.uber.cadence.internal.replay;
 
 import com.uber.cadence.*;
 import com.uber.cadence.context.ContextPropagator;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,7 +155,7 @@ final class WorkflowContext {
       return new HashMap<>();
     }
 
-    Map<String, ByteBuffer> fields = headers.getFields();
+    Map<String, byte[]> fields = headers.getFields();
     if (fields == null) {
       return new HashMap<>();
     }
@@ -164,7 +163,7 @@ final class WorkflowContext {
     Map<String, byte[]> headerData = new HashMap<>();
     fields.forEach(
         (k, v) -> {
-          headerData.put(k, org.apache.thrift.TBaseHelper.byteBufferToByteArray(v));
+          headerData.put(k, v);
         });
 
     Map<String, Object> contextData = new HashMap<>();
@@ -182,7 +181,7 @@ final class WorkflowContext {
     if (this.searchAttributes == null) {
       this.searchAttributes = newSearchAttributes();
     }
-    Map<String, ByteBuffer> current = this.searchAttributes.getIndexedFields();
+    Map<String, byte[]> current = this.searchAttributes.getIndexedFields();
     searchAttributes
         .getIndexedFields()
         .forEach(
@@ -193,7 +192,7 @@ final class WorkflowContext {
 
   private SearchAttributes newSearchAttributes() {
     SearchAttributes result = new SearchAttributes();
-    result.setIndexedFields(new HashMap<String, ByteBuffer>());
+    result.setIndexedFields(new HashMap<String, byte[]>());
     return result;
   }
 }
