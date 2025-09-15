@@ -1,0 +1,15 @@
+package com.uber.cadence;
+
+import java.util.*;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+@Data
+@Accessors(chain = true)
+public class UpdateDomainResponse {
+  private DomainInfo domainInfo;
+  private DomainConfiguration configuration;
+  private DomainReplicationConfiguration replicationConfiguration;
+  private long failoverVersion;
+  private boolean isGlobalDomain;
+}
