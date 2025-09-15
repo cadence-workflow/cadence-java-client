@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.protobuf.Message;
-import com.uber.cadence.entities.WorkflowExecutionCloseStatus;
+import com.uber.cadence.WorkflowExecutionCloseStatus;
 import com.uber.cadence.internal.compatibility.ClientObjects;
 import com.uber.cadence.internal.compatibility.ProtoObjects;
 import java.util.Arrays;

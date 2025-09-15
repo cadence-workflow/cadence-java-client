@@ -18,6 +18,7 @@
 package com.uber.cadence.internal.testservice;
 
 import com.uber.cadence.BadRequestError;
+import com.uber.cadence.BaseError;
 import com.uber.cadence.ClientVersionNotSupportedError;
 import com.uber.cadence.ClusterInfo;
 import com.uber.cadence.CountWorkflowExecutionsRequest;
@@ -105,6 +106,7 @@ import com.uber.cadence.WorkflowExecutionInfo;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.internal.testservice.TestWorkflowMutableStateImpl.QueryId;
 import com.uber.cadence.internal.testservice.TestWorkflowStore.WorkflowState;
+import com.uber.cadence.serviceclient.AsyncMethodCallback;
 import com.uber.cadence.serviceclient.ClientOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.time.Duration;
@@ -119,8 +121,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import org.apache.thrift.TException;
-import org.apache.thrift.async.AsyncMethodCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,32 +196,32 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void RegisterDomain(RegisterDomainRequest registerRequest)
-      throws BadRequestError, InternalServiceError, DomainAlreadyExistsError, TException {
+      throws BadRequestError, InternalServiceError, DomainAlreadyExistsError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public DescribeDomainResponse DescribeDomain(DescribeDomainRequest describeRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public ListDomainsResponse ListDomains(ListDomainsRequest listRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-          TException {
+          BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public UpdateDomainResponse UpdateDomain(UpdateDomainRequest updateRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void DeprecateDomain(DeprecateDomainRequest deprecateRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -229,20 +229,20 @@ public final class TestWorkflowService implements IWorkflowService {
   public RestartWorkflowExecutionResponse RestartWorkflowExecution(
       RestartWorkflowExecutionRequest restartRequest)
       throws BadRequestError, ServiceBusyError, DomainNotActiveError, LimitExceededError,
-          EntityNotExistsError, ClientVersionNotSupportedError, TException {
+          EntityNotExistsError, ClientVersionNotSupportedError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public GetTaskListsByDomainResponse GetTaskListsByDomain(GetTaskListsByDomainRequest request)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          ClientVersionNotSupportedError, TException {
+          ClientVersionNotSupportedError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public StartWorkflowExecutionResponse StartWorkflowExecution(
-      StartWorkflowExecutionRequest startRequest) throws TException {
+      StartWorkflowExecutionRequest startRequest) throws BaseError {
     return startWorkflowExecutionImpl(
         startRequest, 0, Optional.empty(), OptionalLong.empty(), Optional.empty());
   }
@@ -252,7 +252,7 @@ public final class TestWorkflowService implements IWorkflowService {
       StartWorkflowExecutionAsyncRequest startRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, TException {
+          ClientVersionNotSupportedError, BaseError {
     // Just run it
     StartWorkflowExecution(startRequest.getRequest());
     return new StartWorkflowExecutionAsyncResponse();
@@ -275,7 +275,7 @@ public final class TestWorkflowService implements IWorkflowService {
       if (existing != null) {
         Optional<WorkflowExecutionCloseStatus> statusOptional = existing.getCloseStatus();
         WorkflowIdReusePolicy policy =
-            startRequest.isSetWorkflowIdReusePolicy()
+            startRequest.getWorkflowIdReusePolicy() != null
                 ? startRequest.getWorkflowIdReusePolicy()
                 : WorkflowIdReusePolicy.AllowDuplicateFailedOnly;
         if (!statusOptional.isPresent() || policy == WorkflowIdReusePolicy.RejectDuplicate) {
@@ -318,11 +318,11 @@ public final class TestWorkflowService implements IWorkflowService {
   private StartWorkflowExecutionResponse throwDuplicatedWorkflow(
       StartWorkflowExecutionRequest startRequest, TestWorkflowMutableState existing)
       throws WorkflowExecutionAlreadyStartedError {
-    WorkflowExecutionAlreadyStartedError error = new WorkflowExecutionAlreadyStartedError();
     WorkflowExecution execution = existing.getExecutionId().getExecution();
-    error.setMessage(
-        String.format(
-            "WorkflowId: %s, " + "RunId: %s", execution.getWorkflowId(), execution.getRunId()));
+    WorkflowExecutionAlreadyStartedError error =
+        new WorkflowExecutionAlreadyStartedError(
+            String.format(
+                "WorkflowId: %s, " + "RunId: %s", execution.getWorkflowId(), execution.getRunId()));
     error.setRunId(execution.getRunId());
     error.setStartRequestId(startRequest.getRequestId());
     throw error;
@@ -363,7 +363,7 @@ public final class TestWorkflowService implements IWorkflowService {
   public GetWorkflowExecutionHistoryResponse GetWorkflowExecutionHistory(
       GetWorkflowExecutionHistoryRequest getRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-          TException {
+          BaseError {
     ExecutionId executionId = new ExecutionId(getRequest.getDomain(), getRequest.getExecution());
     TestWorkflowMutableState mutableState = getMutableState(executionId);
 
@@ -374,14 +374,14 @@ public final class TestWorkflowService implements IWorkflowService {
   public GetWorkflowExecutionHistoryResponse GetWorkflowExecutionHistoryWithTimeout(
       GetWorkflowExecutionHistoryRequest getRequest, Long timeoutInMillis)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-          TException {
+          BaseError {
 
     return GetWorkflowExecutionHistory(getRequest);
   }
 
   @Override
   public PollForDecisionTaskResponse PollForDecisionTask(PollForDecisionTaskRequest pollRequest)
-      throws BadRequestError, InternalServiceError, ServiceBusyError, TException {
+      throws BadRequestError, InternalServiceError, ServiceBusyError, BaseError {
     PollForDecisionTaskResponse task;
     try {
       task = store.pollForDecisionTask(pollRequest);
@@ -395,7 +395,7 @@ public final class TestWorkflowService implements IWorkflowService {
       // The task always has the original tasklist is was created on as part of the response. This
       // may different
       // then the task list it was scheduled on as in the case of sticky execution.
-      task.setWorkflowExecutionTaskList(mutableState.getStartRequest().taskList);
+      task.setWorkflowExecutionTaskList(mutableState.getStartRequest().getTaskList());
       return task;
     } catch (EntityNotExistsError e) {
       if (log.isDebugEnabled()) {
@@ -403,14 +403,14 @@ public final class TestWorkflowService implements IWorkflowService {
       }
       // skip the task
     }
-    task.setWorkflowExecutionTaskList(mutableState.getStartRequest().taskList);
+    task.setWorkflowExecutionTaskList(mutableState.getStartRequest().getTaskList());
     return task;
   }
 
   @Override
   public RespondDecisionTaskCompletedResponse RespondDecisionTaskCompleted(
       RespondDecisionTaskCompletedRequest request)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     DecisionTaskToken taskToken = DecisionTaskToken.fromBytes(request.getTaskToken());
     TestWorkflowMutableState mutableState = getMutableState(taskToken.getExecutionId());
     mutableState.completeDecisionTask(taskToken.getHistorySize(), request);
@@ -419,7 +419,7 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void RespondDecisionTaskFailed(RespondDecisionTaskFailedRequest failedRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     DecisionTaskToken taskToken = DecisionTaskToken.fromBytes(failedRequest.getTaskToken());
     TestWorkflowMutableState mutableState = getMutableState(taskToken.getExecutionId());
     mutableState.failDecisionTask(failedRequest);
@@ -427,7 +427,7 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public PollForActivityTaskResponse PollForActivityTask(PollForActivityTaskRequest pollRequest)
-      throws BadRequestError, InternalServiceError, ServiceBusyError, TException {
+      throws BadRequestError, InternalServiceError, ServiceBusyError, BaseError {
     PollForActivityTaskResponse task;
     while (true) {
       try {
@@ -452,7 +452,7 @@ public final class TestWorkflowService implements IWorkflowService {
   @Override
   public RecordActivityTaskHeartbeatResponse RecordActivityTaskHeartbeat(
       RecordActivityTaskHeartbeatRequest heartbeatRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     ActivityId activityId = ActivityId.fromBytes(heartbeatRequest.getTaskToken());
     TestWorkflowMutableState mutableState = getMutableState(activityId.getExecutionId());
     return mutableState.heartbeatActivityTask(activityId.getId(), heartbeatRequest.getDetails());
@@ -462,7 +462,7 @@ public final class TestWorkflowService implements IWorkflowService {
   public RecordActivityTaskHeartbeatResponse RecordActivityTaskHeartbeatByID(
       RecordActivityTaskHeartbeatByIDRequest heartbeatRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, DomainNotActiveError,
-          LimitExceededError, ServiceBusyError, TException {
+          LimitExceededError, ServiceBusyError, BaseError {
     ExecutionId execution =
         new ExecutionId(
             heartbeatRequest.getDomain(),
@@ -475,7 +475,7 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void RespondActivityTaskCompleted(RespondActivityTaskCompletedRequest completeRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     ActivityId activityId = ActivityId.fromBytes(completeRequest.getTaskToken());
     TestWorkflowMutableState mutableState = getMutableState(activityId.getExecutionId());
     mutableState.completeActivityTask(activityId.getId(), completeRequest);
@@ -484,7 +484,7 @@ public final class TestWorkflowService implements IWorkflowService {
   @Override
   public void RespondActivityTaskCompletedByID(
       RespondActivityTaskCompletedByIDRequest completeRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     ActivityId activityId =
         new ActivityId(
             completeRequest.getDomain(),
@@ -497,7 +497,7 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void RespondActivityTaskFailed(RespondActivityTaskFailedRequest failRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     ActivityId activityId = ActivityId.fromBytes(failRequest.getTaskToken());
     TestWorkflowMutableState mutableState = getMutableState(activityId.getExecutionId());
     mutableState.failActivityTask(activityId.getId(), failRequest);
@@ -505,7 +505,7 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void RespondActivityTaskFailedByID(RespondActivityTaskFailedByIDRequest failRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     ActivityId activityId =
         new ActivityId(
             failRequest.getDomain(),
@@ -518,7 +518,7 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void RespondActivityTaskCanceled(RespondActivityTaskCanceledRequest canceledRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     ActivityId activityId = ActivityId.fromBytes(canceledRequest.getTaskToken());
     TestWorkflowMutableState mutableState = getMutableState(activityId.getExecutionId());
     mutableState.cancelActivityTask(activityId.getId(), canceledRequest);
@@ -527,7 +527,7 @@ public final class TestWorkflowService implements IWorkflowService {
   @Override
   public void RespondActivityTaskCanceledByID(
       RespondActivityTaskCanceledByIDRequest canceledRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     ActivityId activityId =
         new ActivityId(
             canceledRequest.getDomain(),
@@ -540,7 +540,7 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void RequestCancelWorkflowExecution(RequestCancelWorkflowExecutionRequest cancelRequest)
-      throws TException {
+      throws BaseError {
     ExecutionId executionId =
         new ExecutionId(cancelRequest.getDomain(), cancelRequest.getWorkflowExecution());
     TestWorkflowMutableState mutableState = getMutableState(executionId);
@@ -549,7 +549,7 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void SignalWorkflowExecution(SignalWorkflowExecutionRequest signalRequest)
-      throws TException {
+      throws BaseError {
     ExecutionId executionId =
         new ExecutionId(signalRequest.getDomain(), signalRequest.getWorkflowExecution());
     TestWorkflowMutableState mutableState = getMutableState(executionId);
@@ -561,7 +561,7 @@ public final class TestWorkflowService implements IWorkflowService {
       SignalWithStartWorkflowExecutionRequest r)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, WorkflowExecutionAlreadyStartedError,
-          TException {
+          BaseError {
     ExecutionId executionId = new ExecutionId(r.getDomain(), r.getWorkflowId(), null);
     TestWorkflowMutableState mutableState = getMutableState(executionId, false);
     SignalWorkflowExecutionRequest signalRequest =
@@ -601,7 +601,7 @@ public final class TestWorkflowService implements IWorkflowService {
       SignalWithStartWorkflowExecutionAsyncRequest signalWithStartRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, TException {
+          ClientVersionNotSupportedError, BaseError {
     SignalWithStartWorkflowExecution(signalWithStartRequest.getRequest());
     return new SignalWithStartWorkflowExecutionAsyncResponse();
   }
@@ -611,7 +611,7 @@ public final class TestWorkflowService implements IWorkflowService {
   public ResetWorkflowExecutionResponse ResetWorkflowExecution(
       ResetWorkflowExecutionRequest resetRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-          DomainNotActiveError, LimitExceededError, ClientVersionNotSupportedError, TException {
+          DomainNotActiveError, LimitExceededError, ClientVersionNotSupportedError, BaseError {
     return null;
   }
 
@@ -637,7 +637,7 @@ public final class TestWorkflowService implements IWorkflowService {
   @Override
   public void TerminateWorkflowExecution(TerminateWorkflowExecutionRequest terminateRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-          TException {
+          BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -667,7 +667,7 @@ public final class TestWorkflowService implements IWorkflowService {
             .setIdentity(identity)
             .setRetryPolicy(previousRunStartRequest.getRetryPolicy())
             .setCronSchedule(previousRunStartRequest.getCronSchedule());
-    if (a.isSetInput()) {
+    if (a.getInput() != null) {
       startRequest.setInput(a.getInput());
     }
     lock.lock();
@@ -693,11 +693,11 @@ public final class TestWorkflowService implements IWorkflowService {
   public ListOpenWorkflowExecutionsResponse ListOpenWorkflowExecutions(
       ListOpenWorkflowExecutionsRequest listRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-          TException {
+          BaseError {
     Optional<String> workflowIdFilter;
     WorkflowExecutionFilter executionFilter = listRequest.getExecutionFilter();
     if (executionFilter != null
-        && executionFilter.isSetWorkflowId()
+        && executionFilter.getWorkflowId() != null
         && !executionFilter.getWorkflowId().isEmpty()) {
       workflowIdFilter = Optional.of(executionFilter.getWorkflowId());
     } else {
@@ -711,11 +711,11 @@ public final class TestWorkflowService implements IWorkflowService {
   public ListClosedWorkflowExecutionsResponse ListClosedWorkflowExecutions(
       ListClosedWorkflowExecutionsRequest listRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-          TException {
+          BaseError {
     Optional<String> workflowIdFilter;
     WorkflowExecutionFilter executionFilter = listRequest.getExecutionFilter();
     if (executionFilter != null
-        && executionFilter.isSetWorkflowId()
+        && executionFilter.getWorkflowId() != null
         && !executionFilter.getWorkflowId().isEmpty()) {
       workflowIdFilter = Optional.of(executionFilter.getWorkflowId());
     } else {
@@ -730,7 +730,7 @@ public final class TestWorkflowService implements IWorkflowService {
   public ListWorkflowExecutionsResponse ListWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, TException {
+          ClientVersionNotSupportedError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -738,7 +738,7 @@ public final class TestWorkflowService implements IWorkflowService {
   public ListArchivedWorkflowExecutionsResponse ListArchivedWorkflowExecutions(
       ListArchivedWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, TException {
+          ClientVersionNotSupportedError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -746,7 +746,7 @@ public final class TestWorkflowService implements IWorkflowService {
   public ListWorkflowExecutionsResponse ScanWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, TException {
+          ClientVersionNotSupportedError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -754,19 +754,19 @@ public final class TestWorkflowService implements IWorkflowService {
   public CountWorkflowExecutionsResponse CountWorkflowExecutions(
       CountWorkflowExecutionsRequest countRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, TException {
+          ClientVersionNotSupportedError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public GetSearchAttributesResponse GetSearchAttributes()
-      throws InternalServiceError, ServiceBusyError, ClientVersionNotSupportedError, TException {
+      throws InternalServiceError, ServiceBusyError, ClientVersionNotSupportedError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RespondQueryTaskCompleted(RespondQueryTaskCompletedRequest completeRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     QueryId queryId = QueryId.fromBytes(completeRequest.getTaskToken());
     TestWorkflowMutableState mutableState = getMutableState(queryId.getExecutionId());
     mutableState.completeQuery(queryId, completeRequest);
@@ -775,14 +775,14 @@ public final class TestWorkflowService implements IWorkflowService {
   @Override
   public ResetStickyTaskListResponse ResetStickyTaskList(ResetStickyTaskListRequest resetRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, LimitExceededError,
-          ServiceBusyError, DomainNotActiveError, TException {
+          ServiceBusyError, DomainNotActiveError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public QueryWorkflowResponse QueryWorkflow(QueryWorkflowRequest queryRequest)
       throws BadRequestError, InternalServiceError, EntityNotExistsError, QueryFailedError,
-          TException {
+          BaseError {
     ExecutionId executionId =
         new ExecutionId(queryRequest.getDomain(), queryRequest.getExecution());
     TestWorkflowMutableState mutableState = getMutableState(executionId);
@@ -792,18 +792,18 @@ public final class TestWorkflowService implements IWorkflowService {
   @Override
   public DescribeWorkflowExecutionResponse DescribeWorkflowExecution(
       DescribeWorkflowExecutionRequest describeRequest)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public DescribeTaskListResponse DescribeTaskList(DescribeTaskListRequest request)
-      throws BadRequestError, InternalServiceError, EntityNotExistsError, TException {
+      throws BadRequestError, InternalServiceError, EntityNotExistsError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
-  public ClusterInfo GetClusterInfo() throws InternalServiceError, ServiceBusyError, TException {
+  public ClusterInfo GetClusterInfo() throws InternalServiceError, ServiceBusyError, BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -811,66 +811,64 @@ public final class TestWorkflowService implements IWorkflowService {
   public ListTaskListPartitionsResponse ListTaskListPartitions(
       ListTaskListPartitionsRequest request)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          TException {
+          BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RefreshWorkflowTasks(RefreshWorkflowTasksRequest request)
       throws BadRequestError, DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
-          TException {
+          BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RegisterDomain(
-      RegisterDomainRequest registerRequest, AsyncMethodCallback resultHandler) throws TException {
+      RegisterDomainRequest registerRequest, AsyncMethodCallback resultHandler) throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void DescribeDomain(
-      DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler) throws TException {
+      DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler) throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void ListDomains(ListDomainsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void UpdateDomain(UpdateDomainRequest updateRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void DeprecateDomain(
-      DeprecateDomainRequest deprecateRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      DeprecateDomainRequest deprecateRequest, AsyncMethodCallback resultHandler) throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RestartWorkflowExecution(
       RestartWorkflowExecutionRequest restartRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void GetTaskListsByDomain(
-      GetTaskListsByDomainRequest request, AsyncMethodCallback resultHandler)
-      throws org.apache.thrift.TException {
+      GetTaskListsByDomainRequest request, AsyncMethodCallback resultHandler) throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void StartWorkflowExecution(
       StartWorkflowExecutionRequest startRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     StartWorkflowExecutionWithTimeout(startRequest, resultHandler, null);
   }
 
@@ -879,13 +877,13 @@ public final class TestWorkflowService implements IWorkflowService {
       StartWorkflowExecutionRequest startRequest,
       AsyncMethodCallback resultHandler,
       Long timeoutInMillis)
-      throws TException {
+      throws BaseError {
     forkJoinPool.execute(
         () -> {
           try {
             StartWorkflowExecutionResponse result = StartWorkflowExecution(startRequest);
             resultHandler.onComplete(result);
-          } catch (TException e) {
+          } catch (BaseError e) {
             resultHandler.onError(e);
           }
         });
@@ -894,7 +892,7 @@ public final class TestWorkflowService implements IWorkflowService {
   @Override
   public void StartWorkflowExecutionAsync(
       StartWorkflowExecutionAsyncRequest startRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     StartWorkflowExecutionAsyncWithTimeout(startRequest, resultHandler, null);
   }
 
@@ -903,7 +901,7 @@ public final class TestWorkflowService implements IWorkflowService {
       StartWorkflowExecutionAsyncRequest startAsyncRequest,
       AsyncMethodCallback resultHandler,
       Long timeoutInMillis)
-      throws TException {
+      throws BaseError {
     // Treat it like a synchronous call but ignore the result
     StartWorkflowExecutionWithTimeout(
         startAsyncRequest.getRequest(),
@@ -926,13 +924,13 @@ public final class TestWorkflowService implements IWorkflowService {
   @Override
   public void GetWorkflowExecutionHistory(
       GetWorkflowExecutionHistoryRequest getRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     forkJoinPool.execute(
         () -> {
           try {
             GetWorkflowExecutionHistoryResponse result = GetWorkflowExecutionHistory(getRequest);
             resultHandler.onComplete(result);
-          } catch (TException e) {
+          } catch (BaseError e) {
             resultHandler.onError(e);
           }
         });
@@ -944,7 +942,7 @@ public final class TestWorkflowService implements IWorkflowService {
       GetWorkflowExecutionHistoryRequest getRequest,
       AsyncMethodCallback resultHandler,
       Long timeoutInMillis)
-      throws TException {
+      throws BaseError {
     GetWorkflowExecutionHistory(getRequest, resultHandler);
   }
 
@@ -957,97 +955,97 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void PollForDecisionTask(
-      PollForDecisionTaskRequest pollRequest, AsyncMethodCallback resultHandler) throws TException {
+      PollForDecisionTaskRequest pollRequest, AsyncMethodCallback resultHandler) throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RespondDecisionTaskCompleted(
       RespondDecisionTaskCompletedRequest completeRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RespondDecisionTaskFailed(
       RespondDecisionTaskFailedRequest failedRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void PollForActivityTask(
-      PollForActivityTaskRequest pollRequest, AsyncMethodCallback resultHandler) throws TException {
+      PollForActivityTaskRequest pollRequest, AsyncMethodCallback resultHandler) throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RecordActivityTaskHeartbeat(
       RecordActivityTaskHeartbeatRequest heartbeatRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RecordActivityTaskHeartbeatByID(
       RecordActivityTaskHeartbeatByIDRequest heartbeatRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RespondActivityTaskCompleted(
       RespondActivityTaskCompletedRequest completeRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RespondActivityTaskCompletedByID(
       RespondActivityTaskCompletedByIDRequest completeRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RespondActivityTaskFailed(
       RespondActivityTaskFailedRequest failRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RespondActivityTaskFailedByID(
       RespondActivityTaskFailedByIDRequest failRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RespondActivityTaskCanceled(
       RespondActivityTaskCanceledRequest canceledRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RespondActivityTaskCanceledByID(
       RespondActivityTaskCanceledByIDRequest canceledRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RequestCancelWorkflowExecution(
       RequestCancelWorkflowExecutionRequest cancelRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void SignalWorkflowExecution(
       SignalWorkflowExecutionRequest signalRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     SignalWorkflowExecutionWithTimeout(signalRequest, resultHandler, null);
   }
 
@@ -1056,13 +1054,13 @@ public final class TestWorkflowService implements IWorkflowService {
       SignalWorkflowExecutionRequest signalRequest,
       AsyncMethodCallback resultHandler,
       Long timeoutInMillis)
-      throws TException {
+      throws BaseError {
     forkJoinPool.execute(
         () -> {
           try {
             SignalWorkflowExecution(signalRequest);
             resultHandler.onComplete(null);
-          } catch (TException e) {
+          } catch (BaseError e) {
             resultHandler.onError(e);
           }
         });
@@ -1072,7 +1070,7 @@ public final class TestWorkflowService implements IWorkflowService {
   public void SignalWithStartWorkflowExecution(
       SignalWithStartWorkflowExecutionRequest signalWithStartRequest,
       AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -1080,116 +1078,115 @@ public final class TestWorkflowService implements IWorkflowService {
   public void SignalWithStartWorkflowExecutionAsync(
       SignalWithStartWorkflowExecutionAsyncRequest signalWithStartRequest,
       AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void ResetWorkflowExecution(
       ResetWorkflowExecutionRequest resetRequest, AsyncMethodCallback resultHandler)
-      throws TException {}
+      throws BaseError {}
 
   @Override
   public void TerminateWorkflowExecution(
       TerminateWorkflowExecutionRequest terminateRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void ListOpenWorkflowExecutions(
       ListOpenWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void ListClosedWorkflowExecutions(
       ListClosedWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void ListWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void ListArchivedWorkflowExecutions(
       ListArchivedWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void ScanWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void CountWorkflowExecutions(
       CountWorkflowExecutionsRequest countRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
-  public void GetSearchAttributes(AsyncMethodCallback resultHandler) throws TException {
+  public void GetSearchAttributes(AsyncMethodCallback resultHandler) throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RespondQueryTaskCompleted(
       RespondQueryTaskCompletedRequest completeRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void ResetStickyTaskList(
-      ResetStickyTaskListRequest resetRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      ResetStickyTaskListRequest resetRequest, AsyncMethodCallback resultHandler) throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void QueryWorkflow(QueryWorkflowRequest queryRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void DescribeWorkflowExecution(
       DescribeWorkflowExecutionRequest describeRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void DescribeTaskList(DescribeTaskListRequest request, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
-  public void GetClusterInfo(AsyncMethodCallback resultHandler) throws TException {
+  public void GetClusterInfo(AsyncMethodCallback resultHandler) throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void ListTaskListPartitions(
-      ListTaskListPartitionsRequest request, AsyncMethodCallback resultHandler) throws TException {
+      ListTaskListPartitionsRequest request, AsyncMethodCallback resultHandler) throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void RefreshWorkflowTasks(
-      RefreshWorkflowTasksRequest request, AsyncMethodCallback resultHandler) throws TException {
+      RefreshWorkflowTasksRequest request, AsyncMethodCallback resultHandler) throws BaseError {
     throw new UnsupportedOperationException("not implemented");
   }
 

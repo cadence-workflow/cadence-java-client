@@ -27,72 +27,7 @@ import com.cronutils.model.time.ExecutionTime;
 import com.cronutils.parser.CronParser;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
-import com.uber.cadence.ActivityTaskScheduledEventAttributes;
-import com.uber.cadence.BadRequestError;
-import com.uber.cadence.CancelTimerDecisionAttributes;
-import com.uber.cadence.CancelTimerFailedEventAttributes;
-import com.uber.cadence.CancelWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.ChildWorkflowExecutionCanceledEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionCompletedEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionFailedEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionStartedEventAttributes;
-import com.uber.cadence.ChildWorkflowExecutionTimedOutEventAttributes;
-import com.uber.cadence.CompleteWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.ContinueAsNewWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.Decision;
-import com.uber.cadence.DecisionTaskFailedCause;
-import com.uber.cadence.EntityNotExistsError;
-import com.uber.cadence.EventType;
-import com.uber.cadence.FailWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.HistoryEvent;
-import com.uber.cadence.InternalServiceError;
-import com.uber.cadence.MarkerRecordedEventAttributes;
-import com.uber.cadence.PollForActivityTaskRequest;
-import com.uber.cadence.PollForActivityTaskResponse;
-import com.uber.cadence.PollForDecisionTaskRequest;
-import com.uber.cadence.PollForDecisionTaskResponse;
-import com.uber.cadence.QueryConsistencyLevel;
-import com.uber.cadence.QueryFailedError;
-import com.uber.cadence.QueryRejectCondition;
-import com.uber.cadence.QueryRejected;
-import com.uber.cadence.QueryResultType;
-import com.uber.cadence.QueryTaskCompletedType;
-import com.uber.cadence.QueryWorkflowRequest;
-import com.uber.cadence.QueryWorkflowResponse;
-import com.uber.cadence.RecordActivityTaskHeartbeatResponse;
-import com.uber.cadence.RecordMarkerDecisionAttributes;
-import com.uber.cadence.RequestCancelActivityTaskDecisionAttributes;
-import com.uber.cadence.RequestCancelActivityTaskFailedEventAttributes;
-import com.uber.cadence.RequestCancelExternalWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.RequestCancelWorkflowExecutionRequest;
-import com.uber.cadence.RespondActivityTaskCanceledByIDRequest;
-import com.uber.cadence.RespondActivityTaskCanceledRequest;
-import com.uber.cadence.RespondActivityTaskCompletedByIDRequest;
-import com.uber.cadence.RespondActivityTaskCompletedRequest;
-import com.uber.cadence.RespondActivityTaskFailedByIDRequest;
-import com.uber.cadence.RespondActivityTaskFailedRequest;
-import com.uber.cadence.RespondDecisionTaskCompletedRequest;
-import com.uber.cadence.RespondDecisionTaskFailedRequest;
-import com.uber.cadence.RespondQueryTaskCompletedRequest;
-import com.uber.cadence.ScheduleActivityTaskDecisionAttributes;
-import com.uber.cadence.SignalExternalWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.SignalExternalWorkflowExecutionFailedCause;
-import com.uber.cadence.SignalWorkflowExecutionRequest;
-import com.uber.cadence.StartChildWorkflowExecutionDecisionAttributes;
-import com.uber.cadence.StartChildWorkflowExecutionFailedEventAttributes;
-import com.uber.cadence.StartTimerDecisionAttributes;
-import com.uber.cadence.StartWorkflowExecutionRequest;
-import com.uber.cadence.StickyExecutionAttributes;
-import com.uber.cadence.TimeoutType;
-import com.uber.cadence.UpsertWorkflowSearchAttributesDecisionAttributes;
-import com.uber.cadence.UpsertWorkflowSearchAttributesEventAttributes;
-import com.uber.cadence.WorkflowExecution;
-import com.uber.cadence.WorkflowExecutionAlreadyCompletedError;
-import com.uber.cadence.WorkflowExecutionCloseStatus;
-import com.uber.cadence.WorkflowExecutionContinuedAsNewEventAttributes;
-import com.uber.cadence.WorkflowExecutionSignaledEventAttributes;
-import com.uber.cadence.WorkflowQuery;
-import com.uber.cadence.WorkflowQueryResult;
+import com.uber.cadence.*;
 import com.uber.cadence.internal.common.WorkflowExecutionUtils;
 import com.uber.cadence.internal.testservice.StateMachines.Action;
 import com.uber.cadence.internal.testservice.StateMachines.ActivityTaskData;
@@ -128,7 +63,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.LongSupplier;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -331,7 +265,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
     List<Decision> decisions = request.getDecisions();
     completeDecisionUpdate(
         ctx -> {
-          if (request.getQueryResultsSize() > 0) {
+          if (request.getQueryResults() != null && request.getQueryResults().size() > 0) {
             request
                 .getQueryResults()
                 .forEach(
@@ -403,8 +337,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
     if (queryResult.getResultType() == QueryResultType.ANSWERED) {
       future.complete(new QueryWorkflowResponse().setQueryResult(queryResult.getAnswer()));
     } else {
-      future.completeExceptionally(
-          new QueryFailedError().setMessage(queryResult.getErrorMessage()));
+      future.completeExceptionally(new QueryFailedError(queryResult.getErrorMessage()));
     }
   }
 
@@ -487,7 +420,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
               RequestCancelWorkflowExecutionRequest request =
                   new RequestCancelWorkflowExecutionRequest();
               WorkflowExecution workflowExecution = new WorkflowExecution();
-              workflowExecution.setWorkflowId(attr.workflowId);
+              workflowExecution.setWorkflowId(attr.getWorkflowId());
               request.setWorkflowExecution(workflowExecution);
               request.setDomain(ctx.getDomain());
               try {
@@ -501,7 +434,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
   private void processRecordMarker(
       RequestContext ctx, RecordMarkerDecisionAttributes attr, long decisionTaskCompletedId)
       throws BadRequestError {
-    if (!attr.isSetMarkerName()) {
+    if (attr.getMarkerName() == null) {
       throw new BadRequestError("marker name is required");
     }
 
@@ -1484,7 +1417,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
   }
 
   @Override
-  public QueryWorkflowResponse query(QueryWorkflowRequest queryRequest) throws TException {
+  public QueryWorkflowResponse query(QueryWorkflowRequest queryRequest) throws BaseError {
     QueryId queryId = new QueryId(executionId);
 
     Optional<WorkflowExecutionCloseStatus> optCloseStatus = getCloseStatus();
@@ -1530,8 +1463,8 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
       return new QueryWorkflowResponse();
     } catch (ExecutionException e) {
       Throwable cause = e.getCause();
-      if (cause instanceof TException) {
-        throw (TException) cause;
+      if (cause instanceof BaseError) {
+        throw (BaseError) cause;
       }
       throw new InternalServiceError(Throwables.getStackTraceAsString(cause));
     }
@@ -1556,7 +1489,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
           new TaskListId(startRequest.getDomain(), startRequest.getTaskList().getName());
       store.sendQueryTask(executionId, taskListId, task);
     } else {
-      QueryFailedError error = new QueryFailedError().setMessage(completeRequest.getErrorMessage());
+      QueryFailedError error = new QueryFailedError(completeRequest.getErrorMessage());
       result.completeExceptionally(error);
     }
   }

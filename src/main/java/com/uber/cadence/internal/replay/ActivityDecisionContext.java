@@ -28,7 +28,6 @@ import com.uber.cadence.ScheduleActivityTaskDecisionAttributes;
 import com.uber.cadence.TaskList;
 import com.uber.cadence.TimeoutType;
 import com.uber.cadence.internal.common.RetryParameters;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
@@ -205,9 +204,9 @@ final class ActivityDecisionContext {
     if (headers == null || headers.isEmpty()) {
       return null;
     }
-    Map<String, ByteBuffer> fields = new HashMap<>();
+    Map<String, byte[]> fields = new HashMap<>();
     for (Map.Entry<String, byte[]> item : headers.entrySet()) {
-      fields.put(item.getKey(), ByteBuffer.wrap(item.getValue()));
+      fields.put(item.getKey(), item.getValue());
     }
     Header headerThrift = new Header();
     headerThrift.setFields(fields);

@@ -1,0 +1,10 @@
+package com.uber.cadence;
+
+public enum CrossClusterTaskFailedCause {
+  DOMAIN_NOT_ACTIVE,
+  DOMAIN_NOT_EXISTS,
+  WORKFLOW_ALREADY_RUNNING,
+  WORKFLOW_NOT_EXISTS,
+  WORKFLOW_ALREADY_COMPLETED,
+  UNCATEGORIZED,
+}

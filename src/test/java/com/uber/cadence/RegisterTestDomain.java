@@ -5,7 +5,6 @@ import static com.uber.cadence.testUtils.TestEnvironment.DOMAIN2;
 
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.testUtils.TestEnvironment;
-import org.apache.thrift.TException;
 
 /** Waits for local service to become available and registers UnitTest domain. */
 public class RegisterTestDomain {
@@ -32,7 +31,7 @@ public class RegisterTestDomain {
         break;
       } catch (DomainAlreadyExistsError e) {
         break;
-      } catch (TException e) {
+      } catch (BaseError e) {
         String message = e.getMessage();
         if (message != null
             && !message.contains("Failed to connect to the host")

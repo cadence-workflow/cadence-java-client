@@ -1409,9 +1409,9 @@ public class WorkflowTest {
     GetWorkflowExecutionHistoryResponse historyResp =
         WorkflowExecutionUtils.getHistoryPage(
             new byte[] {}, workflowClient.getService(), DOMAIN, executionF);
-    HistoryEvent startEvent = historyResp.history.getEvents().get(0);
-    Memo memoFromEvent = startEvent.workflowExecutionStartedEventAttributes.getMemo();
-    byte[] memoBytes = memoFromEvent.getFields().get(testMemoKey).array();
+    HistoryEvent startEvent = historyResp.getHistory().getEvents().get(0);
+    Memo memoFromEvent = startEvent.getWorkflowExecutionStartedEventAttributes().getMemo();
+    byte[] memoBytes = memoFromEvent.getFields().get(testMemoKey);
     String memoRetrieved =
         JsonDataConverter.getInstance().fromData(memoBytes, String.class, String.class);
     assertEquals(testMemoValue, memoRetrieved);
@@ -1449,33 +1449,29 @@ public class WorkflowTest {
     GetWorkflowExecutionHistoryResponse historyResp =
         WorkflowExecutionUtils.getHistoryPage(
             new byte[] {}, workflowClient.getService(), DOMAIN, executionF);
-    HistoryEvent startEvent = historyResp.history.getEvents().get(0);
+    HistoryEvent startEvent = historyResp.getHistory().getEvents().get(0);
     SearchAttributes searchAttrFromEvent =
-        startEvent.workflowExecutionStartedEventAttributes.getSearchAttributes();
+        startEvent.getWorkflowExecutionStartedEventAttributes().getSearchAttributes();
 
-    byte[] searchAttrStringBytes =
-        searchAttrFromEvent.getIndexedFields().get(testKeyString).array();
+    byte[] searchAttrStringBytes = searchAttrFromEvent.getIndexedFields().get(testKeyString);
     String retrievedString =
         JsonDataConverter.getInstance().fromData(searchAttrStringBytes, String.class, String.class);
     assertEquals(testValueString, retrievedString);
-    byte[] searchAttrIntegerBytes =
-        searchAttrFromEvent.getIndexedFields().get(testKeyInteger).array();
+    byte[] searchAttrIntegerBytes = searchAttrFromEvent.getIndexedFields().get(testKeyInteger);
     Integer retrievedInteger =
         JsonDataConverter.getInstance()
             .fromData(searchAttrIntegerBytes, Integer.class, Integer.class);
     assertEquals(testValueInteger, retrievedInteger);
-    byte[] searchAttrDateTimeBytes =
-        searchAttrFromEvent.getIndexedFields().get(testKeyDateTime).array();
+    byte[] searchAttrDateTimeBytes = searchAttrFromEvent.getIndexedFields().get(testKeyDateTime);
     LocalDateTime retrievedDateTime =
         JsonDataConverter.getInstance()
             .fromData(searchAttrDateTimeBytes, LocalDateTime.class, LocalDateTime.class);
     assertEquals(testValueDateTime, retrievedDateTime);
-    byte[] searchAttrBoolBytes = searchAttrFromEvent.getIndexedFields().get(testKeyBool).array();
+    byte[] searchAttrBoolBytes = searchAttrFromEvent.getIndexedFields().get(testKeyBool);
     Boolean retrievedBool =
         JsonDataConverter.getInstance().fromData(searchAttrBoolBytes, Boolean.class, Boolean.class);
     assertEquals(testValueBool, retrievedBool);
-    byte[] searchAttrDoubleBytes =
-        searchAttrFromEvent.getIndexedFields().get(testKeyDouble).array();
+    byte[] searchAttrDoubleBytes = searchAttrFromEvent.getIndexedFields().get(testKeyDouble);
     Double retrievedDouble =
         JsonDataConverter.getInstance().fromData(searchAttrDoubleBytes, Double.class, Double.class);
     assertEquals(testValueDouble, retrievedDouble);

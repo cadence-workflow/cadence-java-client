@@ -116,7 +116,7 @@ public class RequestMapper {
   private static final String DomainUpdateFailoverTimeoutField = "failover_timeout";
 
   public static CountWorkflowExecutionsRequest countWorkflowExecutionsRequest(
-      com.uber.cadence.entities.CountWorkflowExecutionsRequest t) {
+      com.uber.cadence.CountWorkflowExecutionsRequest t) {
     if (t == null) {
       return null;
     }
@@ -129,7 +129,7 @@ public class RequestMapper {
   }
 
   public static DescribeTaskListRequest describeTaskListRequest(
-      com.uber.cadence.entities.DescribeTaskListRequest t) {
+      com.uber.cadence.DescribeTaskListRequest t) {
     if (t == null) {
       return null;
     }
@@ -142,7 +142,7 @@ public class RequestMapper {
   }
 
   public static ListArchivedWorkflowExecutionsRequest listArchivedWorkflowExecutionsRequest(
-      com.uber.cadence.entities.ListArchivedWorkflowExecutionsRequest t) {
+      com.uber.cadence.ListArchivedWorkflowExecutionsRequest t) {
     if (t == null) {
       return null;
     }
@@ -160,7 +160,7 @@ public class RequestMapper {
   }
 
   public static RequestCancelWorkflowExecutionRequest requestCancelWorkflowExecutionRequest(
-      com.uber.cadence.entities.RequestCancelWorkflowExecutionRequest t) {
+      com.uber.cadence.RequestCancelWorkflowExecutionRequest t) {
     if (t == null) {
       return null;
     }
@@ -182,7 +182,7 @@ public class RequestMapper {
   }
 
   public static ResetStickyTaskListRequest resetStickyTaskListRequest(
-      com.uber.cadence.entities.ResetStickyTaskListRequest t) {
+      com.uber.cadence.ResetStickyTaskListRequest t) {
     if (t == null) {
       return null;
     }
@@ -193,7 +193,7 @@ public class RequestMapper {
   }
 
   public static ResetWorkflowExecutionRequest resetWorkflowExecutionRequest(
-      com.uber.cadence.entities.ResetWorkflowExecutionRequest t) {
+      com.uber.cadence.ResetWorkflowExecutionRequest t) {
     if (t == null) {
       return null;
     }
@@ -208,7 +208,7 @@ public class RequestMapper {
   }
 
   public static RespondActivityTaskCanceledByIDRequest respondActivityTaskCanceledByIdRequest(
-      com.uber.cadence.entities.RespondActivityTaskCanceledByIDRequest t) {
+      com.uber.cadence.RespondActivityTaskCanceledByIDRequest t) {
     if (t == null) {
       return null;
     }
@@ -225,7 +225,7 @@ public class RequestMapper {
   }
 
   public static RespondActivityTaskCanceledRequest respondActivityTaskCanceledRequest(
-      com.uber.cadence.entities.RespondActivityTaskCanceledRequest t) {
+      com.uber.cadence.RespondActivityTaskCanceledRequest t) {
     if (t == null) {
       return null;
     }
@@ -241,7 +241,7 @@ public class RequestMapper {
   }
 
   public static RespondActivityTaskCompletedByIDRequest respondActivityTaskCompletedByIdRequest(
-      com.uber.cadence.entities.RespondActivityTaskCompletedByIDRequest t) {
+      com.uber.cadence.RespondActivityTaskCompletedByIDRequest t) {
     if (t == null) {
       return null;
     }
@@ -258,7 +258,7 @@ public class RequestMapper {
   }
 
   public static RespondActivityTaskCompletedRequest respondActivityTaskCompletedRequest(
-      com.uber.cadence.entities.RespondActivityTaskCompletedRequest t) {
+      com.uber.cadence.RespondActivityTaskCompletedRequest t) {
     if (t == null) {
       return null;
     }
@@ -274,7 +274,7 @@ public class RequestMapper {
   }
 
   public static RespondActivityTaskFailedByIDRequest respondActivityTaskFailedByIdRequest(
-      com.uber.cadence.entities.RespondActivityTaskFailedByIDRequest t) {
+      com.uber.cadence.RespondActivityTaskFailedByIDRequest t) {
     if (t == null) {
       return null;
     }
@@ -291,7 +291,7 @@ public class RequestMapper {
   }
 
   public static RespondActivityTaskFailedRequest respondActivityTaskFailedRequest(
-      com.uber.cadence.entities.RespondActivityTaskFailedRequest t) {
+      com.uber.cadence.RespondActivityTaskFailedRequest t) {
     if (t == null) {
       return null;
     }
@@ -308,7 +308,7 @@ public class RequestMapper {
   }
 
   public static RespondDecisionTaskCompletedRequest respondDecisionTaskCompletedRequest(
-      com.uber.cadence.entities.RespondDecisionTaskCompletedRequest t) {
+      com.uber.cadence.RespondDecisionTaskCompletedRequest t) {
     if (t == null) {
       return null;
     }
@@ -335,7 +335,7 @@ public class RequestMapper {
   }
 
   public static RespondDecisionTaskFailedRequest respondDecisionTaskFailedRequest(
-      com.uber.cadence.entities.RespondDecisionTaskFailedRequest t) {
+      com.uber.cadence.RespondDecisionTaskFailedRequest t) {
     if (t == null) {
       return null;
     }
@@ -356,7 +356,7 @@ public class RequestMapper {
   }
 
   public static RespondQueryTaskCompletedRequest respondQueryTaskCompletedRequest(
-      com.uber.cadence.entities.RespondQueryTaskCompletedRequest t) {
+      com.uber.cadence.RespondQueryTaskCompletedRequest t) {
     if (t == null) {
       return null;
     }
@@ -378,7 +378,7 @@ public class RequestMapper {
   }
 
   public static ScanWorkflowExecutionsRequest scanWorkflowExecutionsRequest(
-      com.uber.cadence.entities.ListWorkflowExecutionsRequest t) {
+      com.uber.cadence.ListWorkflowExecutionsRequest t) {
     if (t == null) {
       return null;
     }
@@ -396,7 +396,7 @@ public class RequestMapper {
   }
 
   public static DescribeWorkflowExecutionRequest describeWorkflowExecutionRequest(
-      com.uber.cadence.entities.DescribeWorkflowExecutionRequest t) {
+      com.uber.cadence.DescribeWorkflowExecutionRequest t) {
     if (t == null) {
       return null;
     }
@@ -407,7 +407,7 @@ public class RequestMapper {
   }
 
   public static GetWorkflowExecutionHistoryRequest getWorkflowExecutionHistoryRequest(
-      com.uber.cadence.entities.GetWorkflowExecutionHistoryRequest t) {
+      com.uber.cadence.GetWorkflowExecutionHistoryRequest t) {
     if (t == null) {
       return null;
     }
@@ -426,7 +426,7 @@ public class RequestMapper {
   }
 
   public static SignalWithStartWorkflowExecutionRequest signalWithStartWorkflowExecutionRequest(
-      com.uber.cadence.entities.SignalWithStartWorkflowExecutionRequest t) {
+      com.uber.cadence.SignalWithStartWorkflowExecutionRequest t) {
     if (t == null) {
       return null;
     }
@@ -475,7 +475,7 @@ public class RequestMapper {
 
   public static SignalWithStartWorkflowExecutionAsyncRequest
       signalWithStartWorkflowExecutionAsyncRequest(
-          com.uber.cadence.entities.SignalWithStartWorkflowExecutionAsyncRequest t) {
+          com.uber.cadence.SignalWithStartWorkflowExecutionAsyncRequest t) {
     if (t == null) {
       return null;
     }
@@ -488,7 +488,7 @@ public class RequestMapper {
   }
 
   public static SignalWorkflowExecutionRequest signalWorkflowExecutionRequest(
-      com.uber.cadence.entities.SignalWorkflowExecutionRequest t) {
+      com.uber.cadence.SignalWorkflowExecutionRequest t) {
     if (t == null) {
       return null;
     }
@@ -509,7 +509,7 @@ public class RequestMapper {
   }
 
   public static StartWorkflowExecutionRequest startWorkflowExecutionRequest(
-      com.uber.cadence.entities.StartWorkflowExecutionRequest t) {
+      com.uber.cadence.StartWorkflowExecutionRequest t) {
     if (t == null) {
       return null;
     }
@@ -543,7 +543,7 @@ public class RequestMapper {
   }
 
   public static StartWorkflowExecutionAsyncRequest startWorkflowExecutionAsyncRequest(
-      com.uber.cadence.entities.StartWorkflowExecutionAsyncRequest t) {
+      com.uber.cadence.StartWorkflowExecutionAsyncRequest t) {
     if (t == null) {
       return null;
     }
@@ -556,7 +556,7 @@ public class RequestMapper {
   }
 
   public static TerminateWorkflowExecutionRequest terminateWorkflowExecutionRequest(
-      com.uber.cadence.entities.TerminateWorkflowExecutionRequest t) {
+      com.uber.cadence.TerminateWorkflowExecutionRequest t) {
     if (t == null) {
       return null;
     }
@@ -576,7 +576,7 @@ public class RequestMapper {
   }
 
   public static DeprecateDomainRequest deprecateDomainRequest(
-      com.uber.cadence.entities.DeprecateDomainRequest t) {
+      com.uber.cadence.DeprecateDomainRequest t) {
     if (t == null) {
       return null;
     }
@@ -587,7 +587,7 @@ public class RequestMapper {
   }
 
   public static DescribeDomainRequest describeDomainRequest(
-      com.uber.cadence.entities.DescribeDomainRequest t) {
+      com.uber.cadence.DescribeDomainRequest t) {
     if (t == null) {
       return null;
     }
@@ -600,8 +600,7 @@ public class RequestMapper {
     throw new IllegalArgumentException("neither one of field is set for DescribeDomainRequest");
   }
 
-  public static ListDomainsRequest listDomainsRequest(
-      com.uber.cadence.entities.ListDomainsRequest t) {
+  public static ListDomainsRequest listDomainsRequest(com.uber.cadence.ListDomainsRequest t) {
     if (t == null) {
       return null;
     }
@@ -614,7 +613,7 @@ public class RequestMapper {
   }
 
   public static ListTaskListPartitionsRequest listTaskListPartitionsRequest(
-      com.uber.cadence.entities.ListTaskListPartitionsRequest t) {
+      com.uber.cadence.ListTaskListPartitionsRequest t) {
     if (t == null) {
       return null;
     }
@@ -625,7 +624,7 @@ public class RequestMapper {
   }
 
   public static ListWorkflowExecutionsRequest listWorkflowExecutionsRequest(
-      com.uber.cadence.entities.ListWorkflowExecutionsRequest t) {
+      com.uber.cadence.ListWorkflowExecutionsRequest t) {
     if (t == null) {
       return null;
     }
@@ -643,7 +642,7 @@ public class RequestMapper {
   }
 
   public static PollForActivityTaskRequest pollForActivityTaskRequest(
-      com.uber.cadence.entities.PollForActivityTaskRequest t) {
+      com.uber.cadence.PollForActivityTaskRequest t) {
     if (t == null) {
       return null;
     }
@@ -659,7 +658,7 @@ public class RequestMapper {
   }
 
   public static PollForDecisionTaskRequest pollForDecisionTaskRequest(
-      com.uber.cadence.entities.PollForDecisionTaskRequest t) {
+      com.uber.cadence.PollForDecisionTaskRequest t) {
     if (t == null) {
       return null;
     }
@@ -676,8 +675,7 @@ public class RequestMapper {
     return builder.build();
   }
 
-  public static QueryWorkflowRequest queryWorkflowRequest(
-      com.uber.cadence.entities.QueryWorkflowRequest t) {
+  public static QueryWorkflowRequest queryWorkflowRequest(com.uber.cadence.QueryWorkflowRequest t) {
     if (t == null) {
       return null;
     }
@@ -691,7 +689,7 @@ public class RequestMapper {
   }
 
   public static RecordActivityTaskHeartbeatByIDRequest recordActivityTaskHeartbeatByIdRequest(
-      com.uber.cadence.entities.RecordActivityTaskHeartbeatByIDRequest t) {
+      com.uber.cadence.RecordActivityTaskHeartbeatByIDRequest t) {
     if (t == null) {
       return null;
     }
@@ -708,7 +706,7 @@ public class RequestMapper {
   }
 
   public static RecordActivityTaskHeartbeatRequest recordActivityTaskHeartbeatRequest(
-      com.uber.cadence.entities.RecordActivityTaskHeartbeatRequest t) {
+      com.uber.cadence.RecordActivityTaskHeartbeatRequest t) {
     if (t == null) {
       return null;
     }
@@ -724,7 +722,7 @@ public class RequestMapper {
   }
 
   public static RegisterDomainRequest registerDomainRequest(
-      com.uber.cadence.entities.RegisterDomainRequest t) {
+      com.uber.cadence.RegisterDomainRequest t) {
     if (t == null) {
       return null;
     }
@@ -749,7 +747,7 @@ public class RequestMapper {
   }
 
   public static RestartWorkflowExecutionRequest restartWorkflowExecutionRequest(
-      com.uber.cadence.entities.RestartWorkflowExecutionRequest t) {
+      com.uber.cadence.RestartWorkflowExecutionRequest t) {
     if (t == null) {
       return null;
     }
@@ -761,8 +759,7 @@ public class RequestMapper {
         .build();
   }
 
-  public static UpdateDomainRequest updateDomainRequest(
-      com.uber.cadence.entities.UpdateDomainRequest t) {
+  public static UpdateDomainRequest updateDomainRequest(com.uber.cadence.UpdateDomainRequest t) {
     if (t == null) {
       return null;
     }
@@ -772,7 +769,7 @@ public class RequestMapper {
             .setSecurityToken(t.getSecurityToken());
 
     List<String> fields = new ArrayList<>();
-    com.uber.cadence.entities.UpdateDomainInfo updatedInfo = t.getUpdatedInfo();
+    com.uber.cadence.UpdateDomainInfo updatedInfo = t.getUpdatedInfo();
     if (updatedInfo != null) {
       if (updatedInfo.getDescription() != null) {
         request.setDescription(updatedInfo.getDescription());
@@ -787,7 +784,7 @@ public class RequestMapper {
         fields.add(DomainUpdateDataField);
       }
     }
-    com.uber.cadence.entities.DomainConfiguration configuration = t.getConfiguration();
+    com.uber.cadence.DomainConfiguration configuration = t.getConfiguration();
     if (configuration != null) {
       if (configuration.getWorkflowExecutionRetentionPeriodInDays() > 0) {
         request.setWorkflowExecutionRetentionPeriod(
@@ -817,7 +814,7 @@ public class RequestMapper {
         fields.add(DomainUpdateVisibilityArchivalURIField);
       }
     }
-    com.uber.cadence.entities.DomainReplicationConfiguration replicationConfiguration =
+    com.uber.cadence.DomainReplicationConfiguration replicationConfiguration =
         t.getReplicationConfiguration();
     if (replicationConfiguration != null) {
       if (replicationConfiguration.getActiveClusterName() != null) {
@@ -845,7 +842,7 @@ public class RequestMapper {
   }
 
   public static ListClosedWorkflowExecutionsRequest listClosedWorkflowExecutionsRequest(
-      com.uber.cadence.entities.ListClosedWorkflowExecutionsRequest t) {
+      com.uber.cadence.ListClosedWorkflowExecutionsRequest t) {
     if (t == null) {
       return null;
     }
@@ -872,7 +869,7 @@ public class RequestMapper {
   }
 
   public static ListOpenWorkflowExecutionsRequest listOpenWorkflowExecutionsRequest(
-      com.uber.cadence.entities.ListOpenWorkflowExecutionsRequest t) {
+      com.uber.cadence.ListOpenWorkflowExecutionsRequest t) {
     if (t == null) {
       return null;
     }
@@ -896,7 +893,7 @@ public class RequestMapper {
   }
 
   public static RespondActivityTaskFailedByIDRequest respondActivityTaskFailedByIDRequest(
-      com.uber.cadence.entities.RespondActivityTaskFailedByIDRequest failRequest) {
+      com.uber.cadence.RespondActivityTaskFailedByIDRequest failRequest) {
     if (failRequest == null) {
       return null;
     }
@@ -912,7 +909,7 @@ public class RequestMapper {
   }
 
   public static RespondActivityTaskCompletedByIDRequest respondActivityTaskCompletedByIDRequest(
-      com.uber.cadence.entities.RespondActivityTaskCompletedByIDRequest completeRequest) {
+      com.uber.cadence.RespondActivityTaskCompletedByIDRequest completeRequest) {
     if (completeRequest == null) {
       return null;
     }
@@ -929,7 +926,7 @@ public class RequestMapper {
   }
 
   public static RecordActivityTaskHeartbeatByIDRequest recordActivityTaskHeartbeatByIDRequest(
-      com.uber.cadence.entities.RecordActivityTaskHeartbeatByIDRequest heartbeatRequest) {
+      com.uber.cadence.RecordActivityTaskHeartbeatByIDRequest heartbeatRequest) {
     if (heartbeatRequest == null) {
       return null;
     }
@@ -946,7 +943,7 @@ public class RequestMapper {
   }
 
   public static RespondActivityTaskCanceledByIDRequest respondActivityTaskCanceledByIDRequest(
-      com.uber.cadence.entities.RespondActivityTaskCanceledByIDRequest canceledRequest) {
+      com.uber.cadence.RespondActivityTaskCanceledByIDRequest canceledRequest) {
     if (canceledRequest == null) {
       return null;
     }
@@ -963,7 +960,7 @@ public class RequestMapper {
   }
 
   public static GetTaskListsByDomainRequest getTaskListsByDomainRequest(
-      com.uber.cadence.entities.GetTaskListsByDomainRequest domainRequest) {
+      com.uber.cadence.GetTaskListsByDomainRequest domainRequest) {
     if (domainRequest == null) {
       return null;
     }
@@ -973,7 +970,7 @@ public class RequestMapper {
   }
 
   public static RefreshWorkflowTasksRequest refreshWorkflowTasksRequest(
-      com.uber.cadence.entities.RefreshWorkflowTasksRequest request) {
+      com.uber.cadence.RefreshWorkflowTasksRequest request) {
     if (request == null) {
       return null;
     }

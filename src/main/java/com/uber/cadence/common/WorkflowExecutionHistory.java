@@ -32,7 +32,6 @@ import com.uber.cadence.EventType;
 import com.uber.cadence.HistoryEvent;
 import com.uber.cadence.WorkflowExecution;
 import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
 import java.util.Base64;
 import java.util.List;
 
@@ -47,7 +46,7 @@ public final class WorkflowExecutionHistory {
 
   public static WorkflowExecutionHistory fromJson(String serialized) {
     GsonBuilder gsonBuilder = new GsonBuilder();
-    gsonBuilder.registerTypeAdapter(ByteBuffer.class, new ByteBufferJsonDeserializer());
+    gsonBuilder.registerTypeAdapter(byte[].class, new ByteArrayJsonDeserializer());
     Gson gson = gsonBuilder.create();
     Type eventsType = new TypeToken<List<HistoryEvent>>() {}.getType();
     List<HistoryEvent> events = gson.fromJson(serialized, eventsType);
@@ -85,21 +84,21 @@ public final class WorkflowExecutionHistory {
     return events;
   }
 
-  private static final class ByteBufferJsonDeserializer
-      implements JsonDeserializer<ByteBuffer>, JsonSerializer<ByteBuffer> {
+  private static final class ByteArrayJsonDeserializer
+      implements JsonDeserializer<byte[]>, JsonSerializer<byte[]> {
 
     @Override
-    public JsonElement serialize(ByteBuffer value, Type type, JsonSerializationContext ctx) {
-      if (value.arrayOffset() > 0) {
-        throw new IllegalArgumentException("non zero value array offset: " + value.arrayOffset());
+    public JsonElement serialize(byte[] value, Type type, JsonSerializationContext ctx) {
+      if (value.length > 0) {
+        throw new IllegalArgumentException("non zero value array offset: " + value.length);
       }
-      return new JsonPrimitive(Base64.getEncoder().encodeToString(value.array()));
+      return new JsonPrimitive(Base64.getEncoder().encodeToString(value));
     }
 
     @Override
-    public ByteBuffer deserialize(JsonElement e, Type type, JsonDeserializationContext ctx)
+    public byte[] deserialize(JsonElement e, Type type, JsonDeserializationContext ctx)
         throws JsonParseException {
-      return ByteBuffer.wrap(Base64.getDecoder().decode(e.getAsString()));
+      return Base64.getDecoder().decode(e.getAsString());
     }
   }
 }

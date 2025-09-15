@@ -25,7 +25,7 @@ public interface AsyncMethodCallback<T> {
 
   /**
    * Called when there is an unexpected expection. Exception is wrapped in {@link
-   * com.uber.cadence.entities.BaseError}.
+   * com.uber.cadence.BaseError}.
    *
    * @param exception
    */

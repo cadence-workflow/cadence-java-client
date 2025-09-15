@@ -158,7 +158,7 @@ public class ExecuteActivityParametersTest {
     parameters.setActivityType(activityType);
     parameters.setInput(new byte[] {10, 20});
     String expectedString =
-        "ExecuteActivityParameters{activityId='toStringTest', activityType=ActivityType(), heartbeatTimeoutSeconds=0, input=[10, 20], scheduleToCloseTimeoutSeconds=0, scheduleToStartTimeoutSeconds=0, startToCloseTimeoutSeconds=0, taskList='null', retryParameters=null, context='null}";
+        "ExecuteActivityParameters{activityId='toStringTest', activityType=ActivityType(name=null), heartbeatTimeoutSeconds=0, input=[10, 20], scheduleToCloseTimeoutSeconds=0, scheduleToStartTimeoutSeconds=0, startToCloseTimeoutSeconds=0, taskList='null', retryParameters=null, context='null}";
 
     assertEquals(expectedString, parameters.toString());
   }
