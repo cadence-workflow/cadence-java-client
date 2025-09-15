@@ -22,6 +22,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.uber.cadence.PollForDecisionTaskResponse;
+import com.uber.cadence.TaskListKind;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.converter.JsonDataConverter;
@@ -134,7 +135,7 @@ public final class WorkerFactory {
                     workflowClient.getService(),
                     workflowClient.getOptions().getDomain(),
                     getStickyTaskListName(),
-                    TaskListKind.TASK_LIST_KIND_STICKY,
+                    TaskListKind.STICKY,
                     stickyScope,
                     workflowClient.getOptions().getIdentity())
                 .get(),
