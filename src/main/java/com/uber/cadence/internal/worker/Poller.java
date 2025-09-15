@@ -17,7 +17,7 @@
 
 package com.uber.cadence.internal.worker;
 
-import com.uber.cadence.BaseError;
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.internal.common.BackoffThrottler;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.metrics.MetricsType;
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public final class Poller<T> implements SuspendableWorker {
 
   public interface PollTask<TT> {
-    TT poll() throws BaseError;
+    TT poll() throws CadenceError;
   }
 
   interface ThrowingRunnable {

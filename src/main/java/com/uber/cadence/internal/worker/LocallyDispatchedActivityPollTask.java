@@ -17,7 +17,7 @@
 
 package com.uber.cadence.internal.worker;
 
-import com.uber.cadence.BaseError;
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.worker.LocallyDispatchedActivityWorker.Task;
@@ -38,7 +38,7 @@ final class LocallyDispatchedActivityPollTask extends ActivityPollTaskBase
   }
 
   @Override
-  protected PollForActivityTaskResponse pollTask() throws BaseError {
+  protected PollForActivityTaskResponse pollTask() throws CadenceError {
     Task task;
     try {
       task = pendingTasks.take();

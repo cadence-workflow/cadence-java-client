@@ -123,7 +123,7 @@ interface TestWorkflowMutableState {
       throws EntityNotExistsError, InternalServiceError, WorkflowExecutionAlreadyCompletedError,
           BadRequestError;
 
-  QueryWorkflowResponse query(QueryWorkflowRequest queryRequest) throws BaseError;
+  QueryWorkflowResponse query(QueryWorkflowRequest queryRequest) throws CadenceError;
 
   void completeQuery(QueryId queryId, RespondQueryTaskCompletedRequest completeRequest)
       throws EntityNotExistsError;

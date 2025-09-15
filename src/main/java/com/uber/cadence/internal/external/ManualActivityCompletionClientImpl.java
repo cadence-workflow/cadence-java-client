@@ -91,7 +91,7 @@ class ManualActivityCompletionClientImpl extends ManualActivityCompletionClient 
         throw new ActivityNotExistsException(e);
       } catch (WorkflowExecutionAlreadyCompletedError e) {
         throw new ActivityNotExistsException(e);
-      } catch (BaseError e) {
+      } catch (CadenceError e) {
         throw new ActivityCompletionFailureException(e);
       }
     } else {
@@ -113,7 +113,7 @@ class ManualActivityCompletionClientImpl extends ManualActivityCompletionClient 
         throw new ActivityNotExistsException(e);
       } catch (WorkflowExecutionAlreadyCompletedError e) {
         throw new ActivityNotExistsException(e);
-      } catch (BaseError e) {
+      } catch (CadenceError e) {
         throw new ActivityCompletionFailureException(activityId, e);
       }
     }
@@ -137,7 +137,7 @@ class ManualActivityCompletionClientImpl extends ManualActivityCompletionClient 
         throw new ActivityNotExistsException(e);
       } catch (WorkflowExecutionAlreadyCompletedError e) {
         throw new ActivityNotExistsException(e);
-      } catch (BaseError e) {
+      } catch (CadenceError e) {
         throw new ActivityCompletionFailureException(e);
       }
     } else {
@@ -155,7 +155,7 @@ class ManualActivityCompletionClientImpl extends ManualActivityCompletionClient 
         throw new ActivityNotExistsException(e);
       } catch (WorkflowExecutionAlreadyCompletedError e) {
         throw new ActivityNotExistsException(e);
-      } catch (BaseError e) {
+      } catch (CadenceError e) {
         throw new ActivityCompletionFailureException(activityId, e);
       }
     }
@@ -177,7 +177,7 @@ class ManualActivityCompletionClientImpl extends ManualActivityCompletionClient 
         throw new ActivityNotExistsException(e);
       } catch (WorkflowExecutionAlreadyCompletedError e) {
         throw new ActivityNotExistsException(e);
-      } catch (BaseError e) {
+      } catch (CadenceError e) {
         throw new ActivityCompletionFailureException(e);
       }
     } else {
@@ -195,7 +195,7 @@ class ManualActivityCompletionClientImpl extends ManualActivityCompletionClient 
       try {
         service.RespondActivityTaskCanceled(request);
         metricsScope.counter(MetricsType.ACTIVITY_TASK_CANCELED_COUNTER).inc(1);
-      } catch (BaseError e) {
+      } catch (CadenceError e) {
         // There is nothing that can be done at this point.
         // so let's just ignore.
         log.info("reportCancellation", e);
@@ -210,7 +210,7 @@ class ManualActivityCompletionClientImpl extends ManualActivityCompletionClient 
       try {
         service.RespondActivityTaskCanceledByID(request);
         metricsScope.counter(MetricsType.ACTIVITY_TASK_CANCELED_BY_ID_COUNTER).inc(1);
-      } catch (BaseError e) {
+      } catch (CadenceError e) {
         // There is nothing that can be done at this point.
         // so let's just ignore.
         log.info("reportCancellation", e);

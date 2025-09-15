@@ -221,7 +221,7 @@ public class ActivityWorker extends SuspendableWorkerBase {
 
     private void sendReply(
         PollForActivityTaskResponse task, ActivityTaskHandler.Result response, Scope metricsScope)
-        throws BaseError {
+        throws CadenceError {
       RespondActivityTaskCompletedRequest taskCompleted = response.getTaskCompleted();
       if (taskCompleted != null) {
         taskCompleted.setTaskToken(task.getTaskToken());

@@ -1417,7 +1417,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
   }
 
   @Override
-  public QueryWorkflowResponse query(QueryWorkflowRequest queryRequest) throws BaseError {
+  public QueryWorkflowResponse query(QueryWorkflowRequest queryRequest) throws CadenceError {
     QueryId queryId = new QueryId(executionId);
 
     Optional<WorkflowExecutionCloseStatus> optCloseStatus = getCloseStatus();
@@ -1463,8 +1463,8 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
       return new QueryWorkflowResponse();
     } catch (ExecutionException e) {
       Throwable cause = e.getCause();
-      if (cause instanceof BaseError) {
-        throw (BaseError) cause;
+      if (cause instanceof CadenceError) {
+        throw (CadenceError) cause;
       }
       throw new InternalServiceError(Throwables.getStackTraceAsString(cause));
     }

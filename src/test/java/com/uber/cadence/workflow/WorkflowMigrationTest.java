@@ -186,7 +186,7 @@ public class WorkflowMigrationTest {
   }
 
   private GetWorkflowExecutionHistoryResponse getWorkflowHistory(
-      WorkflowClient wc, String workflowID) throws BaseError {
+      WorkflowClient wc, String workflowID) throws CadenceError {
     return wc.getService()
         .GetWorkflowExecutionHistory(
             new GetWorkflowExecutionHistoryRequest()

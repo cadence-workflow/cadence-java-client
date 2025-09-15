@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @AllArgsConstructor
-public class ClientVersionNotSupportedError extends BaseError {
+public class ClientVersionNotSupportedError extends CadenceError {
   private String featureVersion;
   private String clientImpl;
   private String supportedVersions;

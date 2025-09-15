@@ -236,7 +236,7 @@ public final class WorkflowWorker extends SuspendableWorkerBase
         IWorkflowService service,
         PollForDecisionTaskResponse task,
         DecisionTaskHandler.Result response)
-        throws BaseError {
+        throws CadenceError {
       RespondDecisionTaskCompletedRequest taskCompleted = response.getTaskCompleted();
       if (taskCompleted != null) {
         taskCompleted.setIdentity(options.getIdentity());

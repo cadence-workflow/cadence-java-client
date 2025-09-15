@@ -17,7 +17,7 @@
 
 package com.uber.cadence.internal.worker;
 
-import com.uber.cadence.BaseError;
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
@@ -33,7 +33,7 @@ abstract class ActivityPollTaskBase implements Poller.PollTask<PollForActivityTa
     this.options = options;
   }
 
-  public PollForActivityTaskResponse poll() throws BaseError {
+  public PollForActivityTaskResponse poll() throws CadenceError {
 
     PollForActivityTaskResponse result = pollTask();
     if (result == null || result.getTaskToken() == null) {
@@ -58,5 +58,5 @@ abstract class ActivityPollTaskBase implements Poller.PollTask<PollForActivityTa
     return result;
   }
 
-  protected abstract PollForActivityTaskResponse pollTask() throws BaseError;
+  protected abstract PollForActivityTaskResponse pollTask() throws CadenceError;
 }

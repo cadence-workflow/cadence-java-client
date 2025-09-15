@@ -45,7 +45,7 @@ final class ActivityPollTask extends ActivityPollTaskBase {
   }
 
   @Override
-  protected PollForActivityTaskResponse pollTask() throws BaseError {
+  protected PollForActivityTaskResponse pollTask() throws CadenceError {
     options.getMetricsScope().counter(MetricsType.ACTIVITY_POLL_COUNTER).inc(1);
     Stopwatch sw = options.getMetricsScope().timer(MetricsType.ACTIVITY_POLL_LATENCY).start();
     PollForActivityTaskRequest pollRequest = new PollForActivityTaskRequest();
@@ -79,7 +79,7 @@ final class ActivityPollTask extends ActivityPollTaskBase {
           .counter(MetricsType.ACTIVITY_POLL_TRANSIENT_FAILED_COUNTER)
           .inc(1);
       throw e;
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       options.getMetricsScope().counter(MetricsType.ACTIVITY_POLL_FAILED_COUNTER).inc(1);
       throw e;
     }

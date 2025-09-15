@@ -22,7 +22,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.uber.cadence.*;
 import com.uber.cadence.BadRequestError;
-import com.uber.cadence.BaseError;
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.CancellationAlreadyRequestedError;
 import com.uber.cadence.ClientVersionNotSupportedError;
 import com.uber.cadence.DomainAlreadyExistsError;
@@ -88,7 +88,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       StartWorkflowExecutionRequest startRequest,
       AsyncMethodCallback<StartWorkflowExecutionResponse> resultHandler,
       Long timeoutInMillis)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -103,7 +103,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       StartWorkflowExecutionAsyncRequest startAsyncRequest,
       AsyncMethodCallback<StartWorkflowExecutionAsyncResponse> resultHandler,
       Long timeoutInMillis)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -116,7 +116,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
 
   @Override
   public GetWorkflowExecutionHistoryResponse GetWorkflowExecutionHistoryWithTimeout(
-      GetWorkflowExecutionHistoryRequest getRequest, Long timeoutInMillis) throws BaseError {
+      GetWorkflowExecutionHistoryRequest getRequest, Long timeoutInMillis) throws CadenceError {
     try {
       return ResponseMapper.getWorkflowExecutionHistoryResponse(
           grpcServiceStubs
@@ -134,7 +134,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       GetWorkflowExecutionHistoryRequest getRequest,
       AsyncMethodCallback<GetWorkflowExecutionHistoryResponse> resultHandler,
       Long timeoutInMillis)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -150,7 +150,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       SignalWorkflowExecutionRequest signalRequest,
       AsyncMethodCallback<Void> resultHandler,
       Long timeoutInMillis)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -163,7 +163,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RegisterDomain(RegisterDomainRequest registerRequest)
       throws BadRequestError, DomainAlreadyExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       grpcServiceStubs
           .domainBlockingStub()
@@ -176,7 +176,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public DescribeDomainResponse DescribeDomain(DescribeDomainRequest describeRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.describeDomainResponse(
           grpcServiceStubs
@@ -190,7 +190,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public ListDomainsResponse ListDomains(ListDomainsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.listDomainsResponse(
           grpcServiceStubs
@@ -204,7 +204,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public UpdateDomainResponse UpdateDomain(UpdateDomainRequest updateRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.updateDomainResponse(
           grpcServiceStubs
@@ -218,7 +218,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void DeprecateDomain(DeprecateDomainRequest deprecateRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       grpcServiceStubs
           .domainBlockingStub()
@@ -232,7 +232,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public RestartWorkflowExecutionResponse RestartWorkflowExecution(
       RestartWorkflowExecutionRequest restartRequest)
       throws BadRequestError, ServiceBusyError, DomainNotActiveError, LimitExceededError,
-          EntityNotExistsError, ClientVersionNotSupportedError, BaseError {
+          EntityNotExistsError, ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.restartWorkflowExecutionResponse(
           grpcServiceStubs
@@ -249,7 +249,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       StartWorkflowExecutionRequest startRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.startWorkflowExecutionResponse(
           grpcServiceStubs
@@ -265,7 +265,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       StartWorkflowExecutionAsyncRequest startRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.startWorkflowExecutionAsyncResponse(
           grpcServiceStubs
@@ -281,7 +281,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public GetWorkflowExecutionHistoryResponse GetWorkflowExecutionHistory(
       GetWorkflowExecutionHistoryRequest getRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.getWorkflowExecutionHistoryResponse(
           grpcServiceStubs
@@ -296,7 +296,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public PollForDecisionTaskResponse PollForDecisionTask(PollForDecisionTaskRequest pollRequest)
       throws BadRequestError, ServiceBusyError, LimitExceededError, EntityNotExistsError,
-          DomainNotActiveError, ClientVersionNotSupportedError, BaseError {
+          DomainNotActiveError, ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.pollForDecisionTaskResponse(
           grpcServiceStubs
@@ -312,7 +312,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       RespondDecisionTaskCompletedRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     try {
       return ResponseMapper.respondDecisionTaskCompletedResponse(
           grpcServiceStubs
@@ -328,7 +328,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RespondDecisionTaskFailed(RespondDecisionTaskFailedRequest failedRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     try {
       grpcServiceStubs
           .workerBlockingStub()
@@ -341,7 +341,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public PollForActivityTaskResponse PollForActivityTask(PollForActivityTaskRequest pollRequest)
       throws BadRequestError, ServiceBusyError, LimitExceededError, EntityNotExistsError,
-          DomainNotActiveError, ClientVersionNotSupportedError, BaseError {
+          DomainNotActiveError, ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.pollForActivityTaskResponse(
           grpcServiceStubs
@@ -357,7 +357,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       RecordActivityTaskHeartbeatRequest heartbeatRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     try {
       return ResponseMapper.recordActivityTaskHeartbeatResponse(
           grpcServiceStubs
@@ -374,7 +374,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       RecordActivityTaskHeartbeatByIDRequest heartbeatRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     try {
       return ResponseMapper.recordActivityTaskHeartbeatResponse(
           grpcServiceStubs
@@ -390,7 +390,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RespondActivityTaskCompleted(RespondActivityTaskCompletedRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     try {
       grpcServiceStubs
           .workerBlockingStub()
@@ -406,7 +406,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       RespondActivityTaskCompletedByIDRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     try {
       grpcServiceStubs
           .workerBlockingStub()
@@ -421,7 +421,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RespondActivityTaskFailed(RespondActivityTaskFailedRequest failRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     try {
       grpcServiceStubs
           .workerBlockingStub()
@@ -435,7 +435,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RespondActivityTaskFailedByID(RespondActivityTaskFailedByIDRequest failRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     try {
       grpcServiceStubs
           .workerBlockingStub()
@@ -450,7 +450,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RespondActivityTaskCanceled(RespondActivityTaskCanceledRequest canceledRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     try {
       grpcServiceStubs
           .workerBlockingStub()
@@ -466,7 +466,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       RespondActivityTaskCanceledByIDRequest canceledRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     try {
       grpcServiceStubs
           .workerBlockingStub()
@@ -481,7 +481,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RequestCancelWorkflowExecution(RequestCancelWorkflowExecutionRequest cancelRequest)
       throws BadRequestError, EntityNotExistsError, CancellationAlreadyRequestedError,
           ServiceBusyError, DomainNotActiveError, LimitExceededError,
-          ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError, BaseError {
+          ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError, CadenceError {
     try {
       grpcServiceStubs
           .workflowBlockingStub()
@@ -496,7 +496,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void SignalWorkflowExecution(SignalWorkflowExecutionRequest signalRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           LimitExceededError, ClientVersionNotSupportedError,
-          WorkflowExecutionAlreadyCompletedError, BaseError {
+          WorkflowExecutionAlreadyCompletedError, CadenceError {
     try {
       grpcServiceStubs
           .workflowBlockingStub()
@@ -511,7 +511,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       SignalWithStartWorkflowExecutionRequest signalWithStartRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           LimitExceededError, WorkflowExecutionAlreadyStartedError, ClientVersionNotSupportedError,
-          BaseError {
+          CadenceError {
     try {
       return ResponseMapper.signalWithStartWorkflowExecutionResponse(
           grpcServiceStubs
@@ -528,7 +528,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       SignalWithStartWorkflowExecutionAsyncRequest signalWithStartRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.signalWithStartWorkflowExecutionAsyncResponse(
           grpcServiceStubs
@@ -545,7 +545,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public ResetWorkflowExecutionResponse ResetWorkflowExecution(
       ResetWorkflowExecutionRequest resetRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          LimitExceededError, ClientVersionNotSupportedError, BaseError {
+          LimitExceededError, ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.resetWorkflowExecutionResponse(
           grpcServiceStubs
@@ -560,7 +560,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void TerminateWorkflowExecution(TerminateWorkflowExecutionRequest terminateRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           LimitExceededError, ClientVersionNotSupportedError,
-          WorkflowExecutionAlreadyCompletedError, BaseError {
+          WorkflowExecutionAlreadyCompletedError, CadenceError {
     try {
       grpcServiceStubs
           .workflowBlockingStub()
@@ -575,7 +575,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public ListOpenWorkflowExecutionsResponse ListOpenWorkflowExecutions(
       ListOpenWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, LimitExceededError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.listOpenWorkflowExecutionsResponse(
           grpcServiceStubs
@@ -591,7 +591,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public ListClosedWorkflowExecutionsResponse ListClosedWorkflowExecutions(
       ListClosedWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.listClosedWorkflowExecutionsResponse(
           grpcServiceStubs
@@ -607,7 +607,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public ListWorkflowExecutionsResponse ListWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.listWorkflowExecutionsResponse(
           grpcServiceStubs
@@ -622,7 +622,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public ListArchivedWorkflowExecutionsResponse ListArchivedWorkflowExecutions(
       ListArchivedWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.listArchivedWorkflowExecutionsResponse(
           grpcServiceStubs
@@ -638,7 +638,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public ListWorkflowExecutionsResponse ScanWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.scanWorkflowExecutionsResponse(
           grpcServiceStubs
@@ -653,7 +653,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public CountWorkflowExecutionsResponse CountWorkflowExecutions(
       CountWorkflowExecutionsRequest countRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.countWorkflowExecutionsResponse(
           grpcServiceStubs
@@ -666,7 +666,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
 
   @Override
   public GetSearchAttributesResponse GetSearchAttributes()
-      throws ServiceBusyError, ClientVersionNotSupportedError, BaseError {
+      throws ServiceBusyError, ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.getSearchAttributesResponse(
           grpcServiceStubs
@@ -681,7 +681,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RespondQueryTaskCompleted(RespondQueryTaskCompletedRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          DomainNotActiveError, ClientVersionNotSupportedError, BaseError {
+          DomainNotActiveError, ClientVersionNotSupportedError, CadenceError {
     try {
       grpcServiceStubs
           .workerBlockingStub()
@@ -696,7 +696,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public ResetStickyTaskListResponse ResetStickyTaskList(ResetStickyTaskListRequest resetRequest)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
           DomainNotActiveError, ClientVersionNotSupportedError,
-          WorkflowExecutionAlreadyCompletedError, BaseError {
+          WorkflowExecutionAlreadyCompletedError, CadenceError {
     try {
       return ResponseMapper.resetStickyTaskListResponse(
           grpcServiceStubs
@@ -710,7 +710,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public QueryWorkflowResponse QueryWorkflow(QueryWorkflowRequest queryRequest)
       throws BadRequestError, EntityNotExistsError, QueryFailedError, LimitExceededError,
-          ServiceBusyError, ClientVersionNotSupportedError, BaseError {
+          ServiceBusyError, ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.queryWorkflowResponse(
           grpcServiceStubs
@@ -725,7 +725,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public DescribeWorkflowExecutionResponse DescribeWorkflowExecution(
       DescribeWorkflowExecutionRequest describeRequest)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.describeWorkflowExecutionResponse(
           grpcServiceStubs
@@ -740,7 +740,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public DescribeTaskListResponse DescribeTaskList(DescribeTaskListRequest request)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.describeTaskListResponse(
           grpcServiceStubs
@@ -752,7 +752,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   }
 
   @Override
-  public ClusterInfo GetClusterInfo() throws InternalServiceError, ServiceBusyError, BaseError {
+  public ClusterInfo GetClusterInfo() throws InternalServiceError, ServiceBusyError, CadenceError {
     try {
       return ResponseMapper.clusterInfoResponse(
           grpcServiceStubs
@@ -766,7 +766,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public GetTaskListsByDomainResponse GetTaskListsByDomain(GetTaskListsByDomainRequest request)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     try {
       return ResponseMapper.getTaskListsByDomainResponse(
           grpcServiceStubs
@@ -781,7 +781,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public ListTaskListPartitionsResponse ListTaskListPartitions(
       ListTaskListPartitionsRequest request)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          BaseError {
+          CadenceError {
     try {
       return ResponseMapper.listTaskListPartitionsResponse(
           grpcServiceStubs
@@ -795,7 +795,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RefreshWorkflowTasks(RefreshWorkflowTasksRequest request)
       throws BadRequestError, DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
-          BaseError {
+          CadenceError {
     try {
       grpcServiceStubs
           .workflowBlockingStub()
@@ -808,7 +808,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RegisterDomain(
       RegisterDomainRequest registerRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .domainFutureStub()
@@ -821,7 +821,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void DescribeDomain(
       DescribeDomainRequest describeRequest,
       AsyncMethodCallback<DescribeDomainResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .domainFutureStub()
@@ -833,7 +833,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void ListDomains(
       ListDomainsRequest listRequest, AsyncMethodCallback<ListDomainsResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .domainFutureStub()
@@ -845,7 +845,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void UpdateDomain(
       UpdateDomainRequest updateRequest, AsyncMethodCallback<UpdateDomainResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .domainFutureStub()
@@ -857,7 +857,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void DeprecateDomain(
       DeprecateDomainRequest deprecateRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .domainFutureStub()
@@ -870,7 +870,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RestartWorkflowExecution(
       RestartWorkflowExecutionRequest restartRequest,
       AsyncMethodCallback<RestartWorkflowExecutionResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -884,7 +884,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void StartWorkflowExecution(
       StartWorkflowExecutionRequest startRequest,
       AsyncMethodCallback<StartWorkflowExecutionResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -897,7 +897,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void StartWorkflowExecutionAsync(
       StartWorkflowExecutionAsyncRequest startRequest,
       AsyncMethodCallback<StartWorkflowExecutionAsyncResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -911,7 +911,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void GetWorkflowExecutionHistory(
       GetWorkflowExecutionHistoryRequest getRequest,
       AsyncMethodCallback<GetWorkflowExecutionHistoryResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -925,7 +925,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void PollForDecisionTask(
       PollForDecisionTaskRequest pollRequest,
       AsyncMethodCallback<PollForDecisionTaskResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -938,7 +938,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RespondDecisionTaskCompleted(
       RespondDecisionTaskCompletedRequest completeRequest,
       AsyncMethodCallback<RespondDecisionTaskCompletedResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -951,7 +951,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RespondDecisionTaskFailed(
       RespondDecisionTaskFailedRequest failedRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -965,7 +965,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void PollForActivityTask(
       PollForActivityTaskRequest pollRequest,
       AsyncMethodCallback<PollForActivityTaskResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -978,7 +978,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RecordActivityTaskHeartbeat(
       RecordActivityTaskHeartbeatRequest heartbeatRequest,
       AsyncMethodCallback<RecordActivityTaskHeartbeatResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -992,7 +992,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RecordActivityTaskHeartbeatByID(
       RecordActivityTaskHeartbeatByIDRequest heartbeatRequest,
       AsyncMethodCallback<RecordActivityTaskHeartbeatResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -1005,7 +1005,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RespondActivityTaskCompleted(
       RespondActivityTaskCompletedRequest completeRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -1019,7 +1019,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RespondActivityTaskCompletedByID(
       RespondActivityTaskCompletedByIDRequest completeRequest,
       AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -1032,7 +1032,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RespondActivityTaskFailed(
       RespondActivityTaskFailedRequest failRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -1044,7 +1044,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RespondActivityTaskFailedByID(
       RespondActivityTaskFailedByIDRequest failRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -1057,7 +1057,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RespondActivityTaskCanceled(
       RespondActivityTaskCanceledRequest canceledRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -1071,7 +1071,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void RespondActivityTaskCanceledByID(
       RespondActivityTaskCanceledByIDRequest canceledRequest,
       AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -1084,7 +1084,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RequestCancelWorkflowExecution(
       RequestCancelWorkflowExecutionRequest cancelRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1097,7 +1097,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void SignalWorkflowExecution(
       SignalWorkflowExecutionRequest signalRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1110,7 +1110,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void SignalWithStartWorkflowExecution(
       SignalWithStartWorkflowExecutionRequest signalWithStartRequest,
       AsyncMethodCallback<StartWorkflowExecutionResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1124,7 +1124,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void SignalWithStartWorkflowExecutionAsync(
       SignalWithStartWorkflowExecutionAsyncRequest signalWithStartRequest,
       AsyncMethodCallback<SignalWithStartWorkflowExecutionAsyncResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1139,7 +1139,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void ResetWorkflowExecution(
       ResetWorkflowExecutionRequest resetRequest,
       AsyncMethodCallback<ResetWorkflowExecutionResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1151,7 +1151,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void TerminateWorkflowExecution(
       TerminateWorkflowExecutionRequest terminateRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1165,7 +1165,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void ListOpenWorkflowExecutions(
       ListOpenWorkflowExecutionsRequest listRequest,
       AsyncMethodCallback<ListOpenWorkflowExecutionsResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .visibilityFutureStub()
@@ -1179,7 +1179,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void ListClosedWorkflowExecutions(
       ListClosedWorkflowExecutionsRequest listRequest,
       AsyncMethodCallback<ListClosedWorkflowExecutionsResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .visibilityFutureStub()
@@ -1193,7 +1193,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void ListWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest,
       AsyncMethodCallback<ListWorkflowExecutionsResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .visibilityFutureStub()
@@ -1206,7 +1206,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void ListArchivedWorkflowExecutions(
       ListArchivedWorkflowExecutionsRequest listRequest,
       AsyncMethodCallback<ListArchivedWorkflowExecutionsResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .visibilityFutureStub()
@@ -1220,7 +1220,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void ScanWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest,
       AsyncMethodCallback<ListWorkflowExecutionsResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .visibilityFutureStub()
@@ -1233,7 +1233,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void CountWorkflowExecutions(
       CountWorkflowExecutionsRequest countRequest,
       AsyncMethodCallback<CountWorkflowExecutionsResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .visibilityFutureStub()
@@ -1244,7 +1244,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
 
   @Override
   public void GetSearchAttributes(AsyncMethodCallback<GetSearchAttributesResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .visibilityFutureStub()
@@ -1257,7 +1257,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RespondQueryTaskCompleted(
       RespondQueryTaskCompletedRequest completeRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -1271,7 +1271,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void ResetStickyTaskList(
       ResetStickyTaskListRequest resetRequest,
       AsyncMethodCallback<ResetStickyTaskListResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workerFutureStub()
@@ -1283,7 +1283,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void QueryWorkflow(
       QueryWorkflowRequest queryRequest, AsyncMethodCallback<QueryWorkflowResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1296,7 +1296,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void DescribeWorkflowExecution(
       DescribeWorkflowExecutionRequest describeRequest,
       AsyncMethodCallback<DescribeWorkflowExecutionResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1309,7 +1309,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void DescribeTaskList(
       DescribeTaskListRequest request, AsyncMethodCallback<DescribeTaskListResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1319,7 +1319,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   }
 
   @Override
-  public void GetClusterInfo(AsyncMethodCallback<ClusterInfo> resultHandler) throws BaseError {
+  public void GetClusterInfo(AsyncMethodCallback<ClusterInfo> resultHandler) throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1332,7 +1332,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void GetTaskListsByDomain(
       GetTaskListsByDomainRequest request,
       AsyncMethodCallback<GetTaskListsByDomainResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1345,7 +1345,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   public void ListTaskListPartitions(
       ListTaskListPartitionsRequest request,
       AsyncMethodCallback<ListTaskListPartitionsResponse> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1357,7 +1357,7 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   @Override
   public void RefreshWorkflowTasks(
       RefreshWorkflowTasksRequest request, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError {
+      throws CadenceError {
     Futures.addCallback(
         grpcServiceStubs
             .workflowFutureStub()
@@ -1366,13 +1366,13 @@ public class WorkflowServiceGrpc implements IWorkflowService {
         executor);
   }
 
-  private BaseError toServiceClientException(Throwable t) {
-    if (t instanceof BaseError) {
-      return (BaseError) t;
+  private CadenceError toServiceClientException(Throwable t) {
+    if (t instanceof CadenceError) {
+      return (CadenceError) t;
     } else if (t instanceof StatusRuntimeException) {
       return ErrorMapper.Error((StatusRuntimeException) t);
     } else {
-      return new BaseError(t);
+      return new CadenceError(t);
     }
   }
 

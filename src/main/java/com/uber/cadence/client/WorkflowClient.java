@@ -17,7 +17,7 @@
 
 package com.uber.cadence.client;
 
-import com.uber.cadence.BaseError;
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.RefreshWorkflowTasksRequest;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.activity.Activity;
@@ -260,7 +260,7 @@ public interface WorkflowClient {
    * @param refreshWorkflowTasksRequest that contains WorkflowID and RunID of the started workflow.
    */
   void refreshWorkflowTasks(RefreshWorkflowTasksRequest refreshWorkflowTasksRequest)
-      throws BaseError;
+      throws CadenceError;
 
   /**
    * Executes zero argument workflow with void return type

@@ -17,7 +17,7 @@ package com.uber.cadence.internal.worker;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import com.uber.cadence.BaseError;
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowClientOptions;
 import com.uber.cadence.serviceclient.ClientOptions;
@@ -58,7 +58,7 @@ public class LocallyDispatchedActivityPollTaskTest {
     try {
       pollTask.pollTask();
       fail("Expected RuntimeException due to interruption");
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       fail("Unexpected BaseError");
     } catch (RuntimeException e) {
       assertTrue(e.getMessage().contains("locally dispatch activity poll task interrupted"));

@@ -123,7 +123,7 @@ public class CleanWorkerShutdownTest {
   }
 
   @Test
-  public void testShutdown() throws ExecutionException, InterruptedException, BaseError {
+  public void testShutdown() throws ExecutionException, InterruptedException, CadenceError {
     String taskList =
         "CleanWorkerShutdownTest-" + testName.getMethodName() + "-" + UUID.randomUUID().toString();
     WorkflowClient workflowClient;
@@ -177,7 +177,7 @@ public class CleanWorkerShutdownTest {
   }
 
   @Test
-  public void testShutdownNow() throws ExecutionException, InterruptedException, BaseError {
+  public void testShutdownNow() throws ExecutionException, InterruptedException, CadenceError {
     String taskList =
         "CleanWorkerShutdownTest-" + testName.getMethodName() + "-" + UUID.randomUUID().toString();
     WorkflowClient workflowClient;
@@ -258,7 +258,7 @@ public class CleanWorkerShutdownTest {
    */
   @Test
   public void testShutdownHeartbeatingActivity()
-      throws ExecutionException, InterruptedException, BaseError {
+      throws ExecutionException, InterruptedException, CadenceError {
     String taskList =
         "CleanWorkerShutdownTest-" + testName.getMethodName() + "-" + UUID.randomUUID().toString();
     WorkflowClient workflowClient;

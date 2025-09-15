@@ -126,7 +126,7 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
       sendHeartbeatRequest(details);
       hasOutstandingHeartbeat = false;
       nextHeartbeatDelay = heartbeatIntervalMillis;
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       // Not rethrowing to not fail activity implementation on intermittent connection or Cadence
       // errors.
       log.warn("Heartbeat failed.", e);
@@ -156,7 +156,7 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
             TimeUnit.MILLISECONDS);
   }
 
-  private void sendHeartbeatRequest(Object details) throws BaseError {
+  private void sendHeartbeatRequest(Object details) throws CadenceError {
     RecordActivityTaskHeartbeatRequest r = new RecordActivityTaskHeartbeatRequest();
     r.setTaskToken(task.getTaskToken());
     byte[] serialized = dataConverter.toData(details);

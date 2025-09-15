@@ -71,7 +71,7 @@ public class ActivityPollTaskTest {
   }
 
   @Test
-  public void testPollTaskSuccess() throws BaseError {
+  public void testPollTaskSuccess() throws CadenceError {
     PollForActivityTaskResponse response =
         new PollForActivityTaskResponse().setTaskToken("testToken".getBytes());
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
@@ -96,7 +96,7 @@ public class ActivityPollTaskTest {
   }
 
   @Test(expected = InternalServiceError.class)
-  public void testPollTaskInternalServiceError() throws BaseError {
+  public void testPollTaskInternalServiceError() throws CadenceError {
     // Set up mockService to throw an InternalServiceError exception
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
         .thenThrow(new InternalServiceError());
@@ -122,7 +122,7 @@ public class ActivityPollTaskTest {
   }
 
   @Test(expected = ServiceBusyError.class)
-  public void testPollTaskServiceBusyError() throws BaseError {
+  public void testPollTaskServiceBusyError() throws CadenceError {
     // Set up mockService to throw a ServiceBusyError exception
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
         .thenThrow(new ServiceBusyError());
@@ -147,11 +147,11 @@ public class ActivityPollTaskTest {
     }
   }
 
-  @Test(expected = BaseError.class)
-  public void testPollTaskGeneralTException() throws BaseError {
+  @Test(expected = CadenceError.class)
+  public void testPollTaskGeneralTException() throws CadenceError {
     // Set up mockService to throw a BaseError
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
-        .thenThrow(new BaseError());
+        .thenThrow(new CadenceError());
 
     // Mock the metricsScope and counter to ensure proper behavior
     Scope metricsScope = options.getMetricsScope();
@@ -168,7 +168,7 @@ public class ActivityPollTaskTest {
   }
 
   @Test
-  public void testPollTaskNoTask() throws BaseError {
+  public void testPollTaskNoTask() throws CadenceError {
     // Set up mockService to return an empty PollForActivityTaskResponse
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
         .thenReturn(new PollForActivityTaskResponse());

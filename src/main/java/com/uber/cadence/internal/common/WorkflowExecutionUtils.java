@@ -203,7 +203,7 @@ public class WorkflowExecutionUtils {
           continue;
         }
         throw e;
-      } catch (BaseError e) {
+      } catch (CadenceError e) {
         throw CheckedExceptionWrapper.wrap(e);
       }
 
@@ -339,7 +339,7 @@ public class WorkflowExecutionUtils {
                   }
                 },
                 unit.toMillis(timeout));
-          } catch (BaseError e) {
+          } catch (CadenceError e) {
             result.completeExceptionally(e);
           }
           return result;
@@ -408,7 +408,7 @@ public class WorkflowExecutionUtils {
     GetWorkflowExecutionHistoryResponse history;
     try {
       history = service.GetWorkflowExecutionHistory(getHistoryRequest);
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       throw new Error(e);
     }
     if (history == null) {

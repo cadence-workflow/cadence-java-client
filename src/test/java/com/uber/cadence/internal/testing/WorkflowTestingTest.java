@@ -532,7 +532,7 @@ public class WorkflowTestingTest {
   }
 
   @Test
-  public void testTimerCancellation() throws BaseError {
+  public void testTimerCancellation() throws CadenceError {
     Worker worker = testEnvironment.newWorker(TASK_LIST);
     worker.registerWorkflowImplementationTypes(TestTimerCancellationWorkflow.class);
     worker.registerActivitiesImplementations(new ActivityImpl());

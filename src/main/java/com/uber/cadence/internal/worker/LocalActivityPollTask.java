@@ -17,7 +17,7 @@
 
 package com.uber.cadence.internal.worker;
 
-import com.uber.cadence.BaseError;
+import com.uber.cadence.CadenceError;
 import java.time.Duration;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -32,7 +32,7 @@ final class LocalActivityPollTask
       new ArrayBlockingQueue<>(QUEUE_SIZE);
 
   @Override
-  public LocalActivityWorker.Task poll() throws BaseError {
+  public LocalActivityWorker.Task poll() throws CadenceError {
     try {
       return pendingTasks.take();
     } catch (InterruptedException e) {

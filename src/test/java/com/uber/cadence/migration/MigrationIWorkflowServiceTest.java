@@ -45,7 +45,7 @@ public class MigrationIWorkflowServiceTest {
 
   // No previous workflow found - launch a workflow in new cluster
   @Test
-  public void testStartWorkflowExecution_startNewWorkflow() throws BaseError {
+  public void testStartWorkflowExecution_startNewWorkflow() throws CadenceError {
 
     StartWorkflowExecutionRequest startRequest =
         new StartWorkflowExecutionRequest()
@@ -87,7 +87,7 @@ public class MigrationIWorkflowServiceTest {
 
   // Previous running workflow found: expected to launch a wf in the old cluster
   @Test
-  public void testStartWorkflowExecution_startOldWorkflow() throws BaseError {
+  public void testStartWorkflowExecution_startOldWorkflow() throws CadenceError {
 
     StartWorkflowExecutionRequest startRequest =
         new StartWorkflowExecutionRequest()
@@ -120,7 +120,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testStartWorkflow_noWorkflowID() throws BaseError {
+  public void testStartWorkflow_noWorkflowID() throws CadenceError {
     StartWorkflowExecutionRequest startRequest =
         new StartWorkflowExecutionRequest()
             .setWorkflowType(new WorkflowType().setName("sampleWorkflow"))
@@ -137,7 +137,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testStartWorkflow_errorInDescribeWorkflowExecution() throws BaseError {
+  public void testStartWorkflow_errorInDescribeWorkflowExecution() throws CadenceError {
 
     StartWorkflowExecutionRequest startRequest =
         new StartWorkflowExecutionRequest()
@@ -157,7 +157,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListWorkflows_InitialRequest() throws BaseError {
+  public void testListWorkflows_InitialRequest() throws CadenceError {
 
     String domainNew = "test";
     int one = 1;
@@ -185,7 +185,7 @@ public class MigrationIWorkflowServiceTest {
 
   // calling old cluster when new cluster returns empty response
   @Test
-  public void testListWorkflow_OldClusterCall() throws BaseError {
+  public void testListWorkflow_OldClusterCall() throws CadenceError {
 
     String domainNew = "test";
     int one = 1;
@@ -222,7 +222,7 @@ public class MigrationIWorkflowServiceTest {
   // if fetching from new cluster result size is less than pageSize, fetch additional records from
   // Old Cluster
   @Test
-  public void testListWorkflow_fetchFromBothCluster() throws BaseError {
+  public void testListWorkflow_fetchFromBothCluster() throws CadenceError {
     String domainNew = "test";
     int one = 1;
     int two = 2;
@@ -258,7 +258,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListWorkflows_emptyRequestTests() throws BaseError {
+  public void testListWorkflows_emptyRequestTests() throws CadenceError {
 
     // Test when request is null
     try {
@@ -277,7 +277,7 @@ public class MigrationIWorkflowServiceTest {
 
   // Test when error returned from internal client, return same error
   @Test
-  public void testListWorkflow_error() throws BaseError {
+  public void testListWorkflow_error() throws CadenceError {
     String domainNew = "test";
 
     when(serviceNew.ListWorkflowExecutions(any())).thenReturn(null);
@@ -289,7 +289,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListWorkflow_FromClusterOnly() throws BaseError {
+  public void testListWorkflow_FromClusterOnly() throws CadenceError {
 
     String domain = "test";
 
@@ -311,7 +311,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListWorkflows_ResponseWithToken() throws BaseError {
+  public void testListWorkflows_ResponseWithToken() throws CadenceError {
 
     String domainNew = "test";
 
@@ -349,7 +349,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testScanWorkflow_InitialRequest() throws BaseError {
+  public void testScanWorkflow_InitialRequest() throws CadenceError {
 
     String domainNew = "test";
 
@@ -379,7 +379,7 @@ public class MigrationIWorkflowServiceTest {
   // Test scanWorkflow when new cluster returns an empty response and it falls back to the old
   // cluster.
   @Test
-  public void testScanWorkflow_OldClusterCall() throws BaseError {
+  public void testScanWorkflow_OldClusterCall() throws CadenceError {
 
     String domainNew = "test";
 
@@ -421,7 +421,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testScanWorkflow_FetchFromBothClusters() throws BaseError {
+  public void testScanWorkflow_FetchFromBothClusters() throws CadenceError {
 
     String domainNew = "test";
 
@@ -463,7 +463,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testScanWorkflow_EmptyRequestTests() throws BaseError {
+  public void testScanWorkflow_EmptyRequestTests() throws CadenceError {
 
     // Test when the request is null.
     try {
@@ -482,7 +482,7 @@ public class MigrationIWorkflowServiceTest {
 
   // Test when an error is returned from the internal client, and the response is null.
   @Test
-  public void testScanWorkflow_Error() throws BaseError {
+  public void testScanWorkflow_Error() throws CadenceError {
 
     String domainNew = "test";
 
@@ -496,7 +496,7 @@ public class MigrationIWorkflowServiceTest {
 
   // Test scanWorkflow when fetching only from the 'from' cluster.
   @Test
-  public void testScanWorkflow_FromClusterOnly() throws BaseError {
+  public void testScanWorkflow_FromClusterOnly() throws CadenceError {
 
     String domain = "test";
 
@@ -520,7 +520,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testScanWorkflows_ResponseWithToken() throws BaseError {
+  public void testScanWorkflows_ResponseWithToken() throws CadenceError {
 
     String domainNew = "test";
 
@@ -563,7 +563,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testCountWorkflow_bothClusterSuccess() throws BaseError {
+  public void testCountWorkflow_bothClusterSuccess() throws CadenceError {
 
     String domain = "test";
     String query = "";
@@ -586,7 +586,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testCountWorkflow_errorInOneCluster() throws BaseError {
+  public void testCountWorkflow_errorInOneCluster() throws CadenceError {
 
     String domain = "test";
     String query = "";
@@ -607,7 +607,7 @@ public class MigrationIWorkflowServiceTest {
 
   // query in the new cluster
   @Test
-  public void testQueryWorkflow_queryWorkflowInNew() throws BaseError {
+  public void testQueryWorkflow_queryWorkflowInNew() throws CadenceError {
 
     String domain = "test";
     String wfID = "123";
@@ -644,7 +644,7 @@ public class MigrationIWorkflowServiceTest {
 
   // query found in the old cluster
   @Test
-  public void testQueryWorkflow_queryWorkflowInOld() throws BaseError {
+  public void testQueryWorkflow_queryWorkflowInOld() throws CadenceError {
 
     String domain = "test";
     String wfID = "123";
@@ -680,7 +680,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testQueryWorkflow_noWorkflowID() throws BaseError {
+  public void testQueryWorkflow_noWorkflowID() throws CadenceError {
 
     String domain = "test";
     QueryWorkflowRequest request = new QueryWorkflowRequest().setDomain(domain);
@@ -694,7 +694,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testQueryWorkflow_errorInDescribeWorkflowExecution() throws BaseError {
+  public void testQueryWorkflow_errorInDescribeWorkflowExecution() throws CadenceError {
 
     String domain = "test";
     String wfID = "123";
@@ -717,7 +717,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListOpenWorkflows_InitialRequest() throws BaseError {
+  public void testListOpenWorkflows_InitialRequest() throws CadenceError {
 
     String domain = "test";
 
@@ -750,7 +750,7 @@ public class MigrationIWorkflowServiceTest {
 
   // calling old cluster when new cluster returns empty response
   @Test
-  public void testListOpenWorkflow_OldClusterCall() throws BaseError {
+  public void testListOpenWorkflow_OldClusterCall() throws CadenceError {
 
     String domain = "test";
 
@@ -792,7 +792,7 @@ public class MigrationIWorkflowServiceTest {
   // if fetching from new cluster result size is less than pageSize, fetch additional records from
   // Old Cluster
   @Test
-  public void testListOpenWorkflow_fetchFromBothCluster() throws BaseError {
+  public void testListOpenWorkflow_fetchFromBothCluster() throws CadenceError {
 
     String domain = "test";
 
@@ -828,7 +828,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListOpenWorkflows_emptyRequestTests() throws BaseError {
+  public void testListOpenWorkflows_emptyRequestTests() throws CadenceError {
 
     // Test when request is null
     try {
@@ -848,7 +848,7 @@ public class MigrationIWorkflowServiceTest {
 
   // Test when error returned from internal client, return same error
   @Test
-  public void testListOpenWorkflow_error() throws BaseError {
+  public void testListOpenWorkflow_error() throws CadenceError {
     String domain = "test";
 
     when(serviceNew.ListOpenWorkflowExecutions(any())).thenReturn(null);
@@ -860,7 +860,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListOpenWorkflow_FromClusterOnly() throws BaseError {
+  public void testListOpenWorkflow_FromClusterOnly() throws CadenceError {
 
     String domain = "test";
 
@@ -882,7 +882,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListOpenWorkflows_ResponseWithToken() throws BaseError {
+  public void testListOpenWorkflows_ResponseWithToken() throws CadenceError {
 
     String domain = "test";
 
@@ -922,7 +922,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListClosedWorkflows_InitialRequest() throws BaseError {
+  public void testListClosedWorkflows_InitialRequest() throws CadenceError {
 
     String domain = "test";
 
@@ -955,7 +955,7 @@ public class MigrationIWorkflowServiceTest {
 
   // calling old cluster when new cluster returns empty response
   @Test
-  public void testListClosedWorkflow_OldClusterCall() throws BaseError {
+  public void testListClosedWorkflow_OldClusterCall() throws CadenceError {
 
     String domain = "test";
 
@@ -997,7 +997,7 @@ public class MigrationIWorkflowServiceTest {
   // if fetching from new cluster result size is less than pageSize, fetch additional records from
   // Old Cluster
   @Test
-  public void testListClosedWorkflow_fetchFromBothCluster() throws BaseError {
+  public void testListClosedWorkflow_fetchFromBothCluster() throws CadenceError {
 
     String domain = "test";
 
@@ -1035,7 +1035,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListClosedWorkflows_emptyRequestTests() throws BaseError {
+  public void testListClosedWorkflows_emptyRequestTests() throws CadenceError {
 
     // Test when request is null
     try {
@@ -1055,7 +1055,7 @@ public class MigrationIWorkflowServiceTest {
 
   // Test when error returned from internal client, return same error
   @Test
-  public void testListClosedWorkflow_error() throws BaseError {
+  public void testListClosedWorkflow_error() throws CadenceError {
     String domain = "test";
 
     when(serviceNew.ListClosedWorkflowExecutions(any())).thenReturn(null);
@@ -1067,7 +1067,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListClosedWorkflow_FromClusterOnly() throws BaseError {
+  public void testListClosedWorkflow_FromClusterOnly() throws CadenceError {
 
     String domain = "test";
 
@@ -1089,7 +1089,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testListClosedWorkflows_ResponseWithToken() throws BaseError {
+  public void testListClosedWorkflows_ResponseWithToken() throws CadenceError {
 
     String domain = "test";
 
@@ -1129,7 +1129,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testSignalWithStartWorkflowExecution_NewService() throws BaseError {
+  public void testSignalWithStartWorkflowExecution_NewService() throws CadenceError {
     SignalWithStartWorkflowExecutionRequest request =
         new SignalWithStartWorkflowExecutionRequest()
             .setWorkflowId("newSignalWorkflow")
@@ -1148,7 +1148,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testSignalWithStartWorkflowExecution_OldService() throws BaseError {
+  public void testSignalWithStartWorkflowExecution_OldService() throws CadenceError {
     SignalWithStartWorkflowExecutionRequest signal =
         new SignalWithStartWorkflowExecutionRequest()
             .setWorkflowId("testSignal")
@@ -1177,7 +1177,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testSignalWorkflowExecution_SignalNewService() throws BaseError {
+  public void testSignalWorkflowExecution_SignalNewService() throws CadenceError {
     SignalWorkflowExecutionRequest request =
         new SignalWorkflowExecutionRequest()
             .setWorkflowExecution(new WorkflowExecution().setWorkflowId("newSignal"))
@@ -1193,7 +1193,7 @@ public class MigrationIWorkflowServiceTest {
   }
 
   @Test
-  public void testSignalWorkflowExecution_SignalInOldService() throws BaseError {
+  public void testSignalWorkflowExecution_SignalInOldService() throws CadenceError {
     SignalWorkflowExecutionRequest request =
         new SignalWorkflowExecutionRequest()
             .setWorkflowExecution(new WorkflowExecution().setWorkflowId("oldSignal"))

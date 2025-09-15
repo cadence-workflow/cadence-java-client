@@ -21,7 +21,7 @@ import com.google.protobuf.Any;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.rpc.Status;
 import com.uber.cadence.AccessDeniedError;
-import com.uber.cadence.BaseError;
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.CancellationAlreadyRequestedError;
 import com.uber.cadence.ClientVersionNotSupportedError;
 import com.uber.cadence.DomainAlreadyExistsError;
@@ -38,11 +38,11 @@ import io.grpc.StatusRuntimeException;
 import io.grpc.protobuf.StatusProto;
 
 public class ErrorMapper {
-  public static BaseError Error(StatusRuntimeException e) {
+  public static CadenceError Error(StatusRuntimeException e) {
 
     Status status = StatusProto.fromThrowable(e);
     if (status == null) {
-      return new BaseError("empty status", e);
+      return new CadenceError("empty status", e);
     }
 
     Any detail = Any.getDefaultInstance();
@@ -100,10 +100,10 @@ public class ErrorMapper {
           }
         case UNKNOWN:
         default:
-          return new BaseError(e);
+          return new CadenceError(e);
       }
     } catch (InvalidProtocolBufferException ex) {
-      return new BaseError(ex);
+      return new CadenceError(ex);
     }
   }
 }

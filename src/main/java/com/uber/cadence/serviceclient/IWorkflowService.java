@@ -32,13 +32,13 @@ public interface IWorkflowService extends Iface, AsyncIface {
    * @param startRequest
    * @param resultHandler
    * @param timeoutInMillis
-   * @throws BaseError
+   * @throws CadenceError
    */
   void StartWorkflowExecutionWithTimeout(
       StartWorkflowExecutionRequest startRequest,
       AsyncMethodCallback<StartWorkflowExecutionResponse> resultHandler,
       Long timeoutInMillis)
-      throws BaseError;
+      throws CadenceError;
 
   /**
    * StartWorkflowExecutionAsyncWithTimeout start workflow same as StartWorkflowExecutionAsync but
@@ -47,13 +47,13 @@ public interface IWorkflowService extends Iface, AsyncIface {
    * @param startAsyncRequest
    * @param resultHandler
    * @param timeoutInMillis
-   * @throws BaseError
+   * @throws CadenceError
    */
   void StartWorkflowExecutionAsyncWithTimeout(
       StartWorkflowExecutionAsyncRequest startAsyncRequest,
       AsyncMethodCallback<StartWorkflowExecutionAsyncResponse> resultHandler,
       Long timeoutInMillis)
-      throws BaseError;
+      throws CadenceError;
 
   /**
    * GetWorkflowExecutionHistoryWithTimeout get workflow history same as GetWorkflowExecutionHistory
@@ -62,10 +62,10 @@ public interface IWorkflowService extends Iface, AsyncIface {
    * @param getRequest
    * @param timeoutInMillis
    * @return GetWorkflowExecutionHistoryResponse
-   * @throws BaseError
+   * @throws CadenceError
    */
   GetWorkflowExecutionHistoryResponse GetWorkflowExecutionHistoryWithTimeout(
-      GetWorkflowExecutionHistoryRequest getRequest, Long timeoutInMillis) throws BaseError;
+      GetWorkflowExecutionHistoryRequest getRequest, Long timeoutInMillis) throws CadenceError;
 
   /**
    * GetWorkflowExecutionHistoryWithTimeout get workflow history asynchronously same as
@@ -74,13 +74,13 @@ public interface IWorkflowService extends Iface, AsyncIface {
    * @param getRequest
    * @param resultHandler
    * @param timeoutInMillis
-   * @throws BaseError
+   * @throws CadenceError
    */
   void GetWorkflowExecutionHistoryWithTimeout(
       GetWorkflowExecutionHistoryRequest getRequest,
       AsyncMethodCallback<GetWorkflowExecutionHistoryResponse> resultHandler,
       Long timeoutInMillis)
-      throws BaseError;
+      throws CadenceError;
 
   /**
    * SignalWorkflowExecutionWithTimeout signal workflow same as SignalWorkflowExecution but with
@@ -89,13 +89,13 @@ public interface IWorkflowService extends Iface, AsyncIface {
    * @param signalRequest
    * @param resultHandler
    * @param timeoutInMillis
-   * @throws BaseError
+   * @throws CadenceError
    */
   void SignalWorkflowExecutionWithTimeout(
       SignalWorkflowExecutionRequest signalRequest,
       AsyncMethodCallback<Void> resultHandler,
       Long timeoutInMillis)
-      throws BaseError;
+      throws CadenceError;
 
   /**
    * Checks if we have a valid connection to the Cadence cluster, and potentially resets the peer
@@ -116,7 +116,7 @@ interface Iface {
    */
   void RegisterDomain(RegisterDomainRequest registerRequest)
       throws BadRequestError, DomainAlreadyExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * DescribeDomain returns the information and configuration for a registered domain.
@@ -125,7 +125,7 @@ interface Iface {
    */
   DescribeDomainResponse DescribeDomain(DescribeDomainRequest describeRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * ListDomains returns the information and configuration for all domains.
@@ -134,7 +134,7 @@ interface Iface {
    */
   ListDomainsResponse ListDomains(ListDomainsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * UpdateDomain is used to update the information and configuration for a registered domain.
@@ -143,7 +143,7 @@ interface Iface {
    */
   UpdateDomainResponse UpdateDomain(UpdateDomainRequest updateRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * DeprecateDomain us used to update status of a registered domain to DEPRECATED. Once the domain
@@ -154,7 +154,7 @@ interface Iface {
    */
   void DeprecateDomain(DeprecateDomainRequest deprecateRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * RestartWorkflowExecution restarts a previous workflow If the workflow is currently running it
@@ -165,7 +165,7 @@ interface Iface {
   RestartWorkflowExecutionResponse RestartWorkflowExecution(
       RestartWorkflowExecutionRequest restartRequest)
       throws BadRequestError, ServiceBusyError, DomainNotActiveError, LimitExceededError,
-          EntityNotExistsError, ClientVersionNotSupportedError, BaseError;
+          EntityNotExistsError, ClientVersionNotSupportedError, CadenceError;
 
   /**
    * StartWorkflowExecution starts a new long running workflow instance. It will create the instance
@@ -178,7 +178,7 @@ interface Iface {
   StartWorkflowExecutionResponse StartWorkflowExecution(StartWorkflowExecutionRequest startRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * StartWorkflowExecutionAsync starts a new long running workflow instance asynchronously. It will
@@ -191,7 +191,7 @@ interface Iface {
       StartWorkflowExecutionAsyncRequest startRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * Returns the history of specified workflow execution. It fails with 'EntityNotExistError' if
@@ -202,7 +202,7 @@ interface Iface {
   GetWorkflowExecutionHistoryResponse GetWorkflowExecutionHistory(
       GetWorkflowExecutionHistoryRequest getRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * PollForDecisionTask is called by application worker to process DecisionTask from a specific
@@ -215,7 +215,7 @@ interface Iface {
    */
   PollForDecisionTaskResponse PollForDecisionTask(PollForDecisionTaskRequest pollRequest)
       throws BadRequestError, ServiceBusyError, LimitExceededError, EntityNotExistsError,
-          DomainNotActiveError, ClientVersionNotSupportedError, BaseError;
+          DomainNotActiveError, ClientVersionNotSupportedError, CadenceError;
 
   /**
    * RespondDecisionTaskCompleted is called by application worker to complete a DecisionTask handed
@@ -232,7 +232,7 @@ interface Iface {
       RespondDecisionTaskCompletedRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError;
+          CadenceError;
 
   /**
    * RespondDecisionTaskFailed is called by application worker to indicate failure. This results in
@@ -246,7 +246,7 @@ interface Iface {
   void RespondDecisionTaskFailed(RespondDecisionTaskFailedRequest failedRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError;
+          CadenceError;
 
   /**
    * PollForActivityTask is called by application worker to process ActivityTask from a specific
@@ -261,7 +261,7 @@ interface Iface {
    */
   PollForActivityTaskResponse PollForActivityTask(PollForActivityTaskRequest pollRequest)
       throws BadRequestError, ServiceBusyError, LimitExceededError, EntityNotExistsError,
-          DomainNotActiveError, ClientVersionNotSupportedError, BaseError;
+          DomainNotActiveError, ClientVersionNotSupportedError, CadenceError;
 
   /**
    * RecordActivityTaskHeartbeat is called by application worker while it is processing an
@@ -277,7 +277,7 @@ interface Iface {
       RecordActivityTaskHeartbeatRequest heartbeatRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError;
+          CadenceError;
 
   /**
    * RecordActivityTaskHeartbeatByID is called by application worker while it is processing an
@@ -293,7 +293,7 @@ interface Iface {
       RecordActivityTaskHeartbeatByIDRequest heartbeatRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError;
+          CadenceError;
 
   /**
    * RespondActivityTaskCompleted is called by application worker when it is done processing an
@@ -308,7 +308,7 @@ interface Iface {
   void RespondActivityTaskCompleted(RespondActivityTaskCompletedRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError;
+          CadenceError;
 
   /**
    * RespondActivityTaskCompletedByID is called by application worker when it is done processing an
@@ -323,7 +323,7 @@ interface Iface {
   void RespondActivityTaskCompletedByID(RespondActivityTaskCompletedByIDRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError;
+          CadenceError;
 
   /**
    * RespondActivityTaskFailed is called by application worker when it is done processing an
@@ -338,7 +338,7 @@ interface Iface {
   void RespondActivityTaskFailed(RespondActivityTaskFailedRequest failRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError;
+          CadenceError;
 
   /**
    * RespondActivityTaskFailedByID is called by application worker when it is done processing an
@@ -353,7 +353,7 @@ interface Iface {
   void RespondActivityTaskFailedByID(RespondActivityTaskFailedByIDRequest failRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError;
+          CadenceError;
 
   /**
    * RespondActivityTaskCanceled is called by application worker when it is successfully canceled an
@@ -368,7 +368,7 @@ interface Iface {
   void RespondActivityTaskCanceled(RespondActivityTaskCanceledRequest canceledRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError;
+          CadenceError;
 
   /**
    * RespondActivityTaskCanceledByID is called by application worker when it is successfully
@@ -383,7 +383,7 @@ interface Iface {
   void RespondActivityTaskCanceledByID(RespondActivityTaskCanceledByIDRequest canceledRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError;
+          CadenceError;
 
   /**
    * RequestCancelWorkflowExecution is called by application worker when it wants to request
@@ -397,7 +397,7 @@ interface Iface {
   void RequestCancelWorkflowExecution(RequestCancelWorkflowExecutionRequest cancelRequest)
       throws BadRequestError, EntityNotExistsError, CancellationAlreadyRequestedError,
           ServiceBusyError, DomainNotActiveError, LimitExceededError,
-          ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError, BaseError;
+          ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError, CadenceError;
 
   /**
    * SignalWorkflowExecution is used to send a signal event to running workflow execution. This
@@ -409,7 +409,7 @@ interface Iface {
   void SignalWorkflowExecution(SignalWorkflowExecutionRequest signalRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           LimitExceededError, ClientVersionNotSupportedError,
-          WorkflowExecutionAlreadyCompletedError, BaseError;
+          WorkflowExecutionAlreadyCompletedError, CadenceError;
 
   /**
    * SignalWithStartWorkflowExecution is used to ensure sending signal to a workflow. If the
@@ -424,7 +424,7 @@ interface Iface {
       SignalWithStartWorkflowExecutionRequest signalWithStartRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           LimitExceededError, WorkflowExecutionAlreadyStartedError, ClientVersionNotSupportedError,
-          BaseError;
+          CadenceError;
 
   /**
    * SignalWithStartWorkflowExecutionAsync is used to ensure sending signal to a workflow
@@ -437,7 +437,7 @@ interface Iface {
       SignalWithStartWorkflowExecutionAsyncRequest signalWithStartRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * ResetWorkflowExecution reset an existing workflow execution to DecisionTaskCompleted
@@ -447,7 +447,7 @@ interface Iface {
    */
   ResetWorkflowExecutionResponse ResetWorkflowExecution(ResetWorkflowExecutionRequest resetRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          LimitExceededError, ClientVersionNotSupportedError, BaseError;
+          LimitExceededError, ClientVersionNotSupportedError, CadenceError;
 
   /**
    * TerminateWorkflowExecution terminates an existing workflow execution by recording
@@ -459,7 +459,7 @@ interface Iface {
   void TerminateWorkflowExecution(TerminateWorkflowExecutionRequest terminateRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           LimitExceededError, ClientVersionNotSupportedError,
-          WorkflowExecutionAlreadyCompletedError, BaseError;
+          WorkflowExecutionAlreadyCompletedError, CadenceError;
 
   /**
    * ListOpenWorkflowExecutions is a visibility API to list the open executions in a specific
@@ -470,7 +470,7 @@ interface Iface {
   ListOpenWorkflowExecutionsResponse ListOpenWorkflowExecutions(
       ListOpenWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, LimitExceededError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * ListClosedWorkflowExecutions is a visibility API to list the closed executions in a specific
@@ -481,7 +481,7 @@ interface Iface {
   ListClosedWorkflowExecutionsResponse ListClosedWorkflowExecutions(
       ListClosedWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * ListWorkflowExecutions is a visibility API to list workflow executions in a specific domain.
@@ -490,7 +490,7 @@ interface Iface {
    */
   ListWorkflowExecutionsResponse ListWorkflowExecutions(ListWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * ListArchivedWorkflowExecutions is a visibility API to list archived workflow executions in a
@@ -501,7 +501,7 @@ interface Iface {
   ListArchivedWorkflowExecutionsResponse ListArchivedWorkflowExecutions(
       ListArchivedWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * ScanWorkflowExecutions is a visibility API to list large amount of workflow executions in a
@@ -511,7 +511,7 @@ interface Iface {
    */
   ListWorkflowExecutionsResponse ScanWorkflowExecutions(ListWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * CountWorkflowExecutions is a visibility API to count of workflow executions in a specific
@@ -522,13 +522,13 @@ interface Iface {
   CountWorkflowExecutionsResponse CountWorkflowExecutions(
       CountWorkflowExecutionsRequest countRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * GetSearchAttributes is a visibility API to get all legal keys that could be used in list APIs
    */
   GetSearchAttributesResponse GetSearchAttributes()
-      throws ServiceBusyError, ClientVersionNotSupportedError, BaseError;
+      throws ServiceBusyError, ClientVersionNotSupportedError, CadenceError;
 
   /**
    * RespondQueryTaskCompleted is called by application worker to complete a QueryTask (which is a
@@ -540,7 +540,7 @@ interface Iface {
    */
   void RespondQueryTaskCompleted(RespondQueryTaskCompletedRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          DomainNotActiveError, ClientVersionNotSupportedError, BaseError;
+          DomainNotActiveError, ClientVersionNotSupportedError, CadenceError;
 
   /**
    * Reset the sticky tasklist related information in mutable state of a given workflow. Things
@@ -552,7 +552,7 @@ interface Iface {
   ResetStickyTaskListResponse ResetStickyTaskList(ResetStickyTaskListRequest resetRequest)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
           DomainNotActiveError, ClientVersionNotSupportedError,
-          WorkflowExecutionAlreadyCompletedError, BaseError;
+          WorkflowExecutionAlreadyCompletedError, CadenceError;
 
   /**
    * QueryWorkflow returns query result for a specified workflow execution
@@ -561,7 +561,7 @@ interface Iface {
    */
   QueryWorkflowResponse QueryWorkflow(QueryWorkflowRequest queryRequest)
       throws BadRequestError, EntityNotExistsError, QueryFailedError, LimitExceededError,
-          ServiceBusyError, ClientVersionNotSupportedError, BaseError;
+          ServiceBusyError, ClientVersionNotSupportedError, CadenceError;
 
   /**
    * DescribeWorkflowExecution returns information about the specified workflow execution.
@@ -571,7 +571,7 @@ interface Iface {
   DescribeWorkflowExecutionResponse DescribeWorkflowExecution(
       DescribeWorkflowExecutionRequest describeRequest)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * DescribeTaskList returns information about the target tasklist, right now this API returns the
@@ -581,10 +581,10 @@ interface Iface {
    */
   DescribeTaskListResponse DescribeTaskList(DescribeTaskListRequest request)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /** GetClusterInfo returns information about cadence cluster */
-  ClusterInfo GetClusterInfo() throws InternalServiceError, ServiceBusyError, BaseError;
+  ClusterInfo GetClusterInfo() throws InternalServiceError, ServiceBusyError, CadenceError;
 
   /**
    * GetTaskListsByDomain returns the list of all the task lists for a domainName.
@@ -593,7 +593,7 @@ interface Iface {
    */
   GetTaskListsByDomainResponse GetTaskListsByDomain(GetTaskListsByDomainRequest request)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError;
+          ClientVersionNotSupportedError, CadenceError;
 
   /**
    * ReapplyEvents applies stale events to the current workflow and current run
@@ -601,7 +601,7 @@ interface Iface {
    * @param request
    */
   ListTaskListPartitionsResponse ListTaskListPartitions(ListTaskListPartitionsRequest request)
-      throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError, BaseError;
+      throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError, CadenceError;
 
   /**
    * RefreshWorkflowTasks refreshes all tasks of a workflow
@@ -610,202 +610,202 @@ interface Iface {
    */
   void RefreshWorkflowTasks(RefreshWorkflowTasksRequest request)
       throws BadRequestError, DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
-          BaseError;
+          CadenceError;
 }
 
 interface AsyncIface {
 
   void RegisterDomain(
       RegisterDomainRequest registerRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void DescribeDomain(
       DescribeDomainRequest describeRequest,
       AsyncMethodCallback<DescribeDomainResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void ListDomains(
       ListDomainsRequest listRequest, AsyncMethodCallback<ListDomainsResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void UpdateDomain(
       UpdateDomainRequest updateRequest, AsyncMethodCallback<UpdateDomainResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void DeprecateDomain(
       DeprecateDomainRequest deprecateRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RestartWorkflowExecution(
       RestartWorkflowExecutionRequest restartRequest,
       AsyncMethodCallback<RestartWorkflowExecutionResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void StartWorkflowExecution(
       StartWorkflowExecutionRequest startRequest,
       AsyncMethodCallback<StartWorkflowExecutionResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void StartWorkflowExecutionAsync(
       StartWorkflowExecutionAsyncRequest startRequest,
       AsyncMethodCallback<StartWorkflowExecutionAsyncResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void GetWorkflowExecutionHistory(
       GetWorkflowExecutionHistoryRequest getRequest,
       AsyncMethodCallback<GetWorkflowExecutionHistoryResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void PollForDecisionTask(
       PollForDecisionTaskRequest pollRequest,
       AsyncMethodCallback<PollForDecisionTaskResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RespondDecisionTaskCompleted(
       RespondDecisionTaskCompletedRequest completeRequest,
       AsyncMethodCallback<RespondDecisionTaskCompletedResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RespondDecisionTaskFailed(
       RespondDecisionTaskFailedRequest failedRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void PollForActivityTask(
       PollForActivityTaskRequest pollRequest,
       AsyncMethodCallback<PollForActivityTaskResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RecordActivityTaskHeartbeat(
       RecordActivityTaskHeartbeatRequest heartbeatRequest,
       AsyncMethodCallback<RecordActivityTaskHeartbeatResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RecordActivityTaskHeartbeatByID(
       RecordActivityTaskHeartbeatByIDRequest heartbeatRequest,
       AsyncMethodCallback<RecordActivityTaskHeartbeatResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RespondActivityTaskCompleted(
       RespondActivityTaskCompletedRequest completeRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RespondActivityTaskCompletedByID(
       RespondActivityTaskCompletedByIDRequest completeRequest,
       AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RespondActivityTaskFailed(
       RespondActivityTaskFailedRequest failRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RespondActivityTaskFailedByID(
       RespondActivityTaskFailedByIDRequest failRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RespondActivityTaskCanceled(
       RespondActivityTaskCanceledRequest canceledRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RespondActivityTaskCanceledByID(
       RespondActivityTaskCanceledByIDRequest canceledRequest,
       AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RequestCancelWorkflowExecution(
       RequestCancelWorkflowExecutionRequest cancelRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void SignalWorkflowExecution(
       SignalWorkflowExecutionRequest signalRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void SignalWithStartWorkflowExecution(
       SignalWithStartWorkflowExecutionRequest signalWithStartRequest,
       AsyncMethodCallback<StartWorkflowExecutionResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void SignalWithStartWorkflowExecutionAsync(
       SignalWithStartWorkflowExecutionAsyncRequest signalWithStartRequest,
       AsyncMethodCallback<SignalWithStartWorkflowExecutionAsyncResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void ResetWorkflowExecution(
       ResetWorkflowExecutionRequest resetRequest,
       AsyncMethodCallback<ResetWorkflowExecutionResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void TerminateWorkflowExecution(
       TerminateWorkflowExecutionRequest terminateRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void ListOpenWorkflowExecutions(
       ListOpenWorkflowExecutionsRequest listRequest,
       AsyncMethodCallback<ListOpenWorkflowExecutionsResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void ListClosedWorkflowExecutions(
       ListClosedWorkflowExecutionsRequest listRequest,
       AsyncMethodCallback<ListClosedWorkflowExecutionsResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void ListWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest,
       AsyncMethodCallback<ListWorkflowExecutionsResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void ListArchivedWorkflowExecutions(
       ListArchivedWorkflowExecutionsRequest listRequest,
       AsyncMethodCallback<ListArchivedWorkflowExecutionsResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void ScanWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest,
       AsyncMethodCallback<ListWorkflowExecutionsResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void CountWorkflowExecutions(
       CountWorkflowExecutionsRequest countRequest,
       AsyncMethodCallback<CountWorkflowExecutionsResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void GetSearchAttributes(AsyncMethodCallback<GetSearchAttributesResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RespondQueryTaskCompleted(
       RespondQueryTaskCompletedRequest completeRequest, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void ResetStickyTaskList(
       ResetStickyTaskListRequest resetRequest,
       AsyncMethodCallback<ResetStickyTaskListResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void QueryWorkflow(
       QueryWorkflowRequest queryRequest, AsyncMethodCallback<QueryWorkflowResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void DescribeWorkflowExecution(
       DescribeWorkflowExecutionRequest describeRequest,
       AsyncMethodCallback<DescribeWorkflowExecutionResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void DescribeTaskList(
       DescribeTaskListRequest request, AsyncMethodCallback<DescribeTaskListResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
-  void GetClusterInfo(AsyncMethodCallback<ClusterInfo> resultHandler) throws BaseError;
+  void GetClusterInfo(AsyncMethodCallback<ClusterInfo> resultHandler) throws CadenceError;
 
   void GetTaskListsByDomain(
       GetTaskListsByDomainRequest request,
       AsyncMethodCallback<GetTaskListsByDomainResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void ListTaskListPartitions(
       ListTaskListPartitionsRequest request,
       AsyncMethodCallback<ListTaskListPartitionsResponse> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 
   void RefreshWorkflowTasks(
       RefreshWorkflowTasksRequest request, AsyncMethodCallback<Void> resultHandler)
-      throws BaseError;
+      throws CadenceError;
 }

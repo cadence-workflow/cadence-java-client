@@ -30,14 +30,14 @@ public class IWorkflowServiceBase implements IWorkflowService {
   @Override
   public void RegisterDomain(RegisterDomainRequest registerRequest)
       throws BadRequestError, DomainAlreadyExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public DescribeDomainResponse DescribeDomain(DescribeDomainRequest describeRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -52,21 +52,21 @@ public class IWorkflowServiceBase implements IWorkflowService {
   @Override
   public ListDomainsResponse ListDomains(ListDomainsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public UpdateDomainResponse UpdateDomain(UpdateDomainRequest updateRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void DeprecateDomain(DeprecateDomainRequest deprecateRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -74,7 +74,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public RestartWorkflowExecutionResponse RestartWorkflowExecution(
       RestartWorkflowExecutionRequest restartRequest)
       throws BadRequestError, ServiceBusyError, DomainNotActiveError, LimitExceededError,
-          EntityNotExistsError, ClientVersionNotSupportedError, BaseError {
+          EntityNotExistsError, ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -83,7 +83,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       StartWorkflowExecutionRequest startRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -92,7 +92,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       StartWorkflowExecutionAsyncRequest startRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -100,14 +100,14 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public GetWorkflowExecutionHistoryResponse GetWorkflowExecutionHistory(
       GetWorkflowExecutionHistoryRequest getRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public PollForDecisionTaskResponse PollForDecisionTask(PollForDecisionTaskRequest pollRequest)
       throws BadRequestError, ServiceBusyError, LimitExceededError, EntityNotExistsError,
-          DomainNotActiveError, ClientVersionNotSupportedError, BaseError {
+          DomainNotActiveError, ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -116,7 +116,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       RespondDecisionTaskCompletedRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -124,14 +124,14 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public void RespondDecisionTaskFailed(RespondDecisionTaskFailedRequest failedRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public PollForActivityTaskResponse PollForActivityTask(PollForActivityTaskRequest pollRequest)
       throws BadRequestError, ServiceBusyError, LimitExceededError, EntityNotExistsError,
-          DomainNotActiveError, ClientVersionNotSupportedError, BaseError {
+          DomainNotActiveError, ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -140,7 +140,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       RecordActivityTaskHeartbeatRequest heartbeatRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -149,7 +149,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       RecordActivityTaskHeartbeatByIDRequest heartbeatRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -157,7 +157,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public void RespondActivityTaskCompleted(RespondActivityTaskCompletedRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -166,7 +166,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       RespondActivityTaskCompletedByIDRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -174,7 +174,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public void RespondActivityTaskFailed(RespondActivityTaskFailedRequest failRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -182,7 +182,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public void RespondActivityTaskFailedByID(RespondActivityTaskFailedByIDRequest failRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -190,7 +190,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public void RespondActivityTaskCanceled(RespondActivityTaskCanceledRequest canceledRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -199,7 +199,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       RespondActivityTaskCanceledByIDRequest canceledRequest)
       throws BadRequestError, EntityNotExistsError, DomainNotActiveError, LimitExceededError,
           ServiceBusyError, ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -207,7 +207,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public void RequestCancelWorkflowExecution(RequestCancelWorkflowExecutionRequest cancelRequest)
       throws BadRequestError, EntityNotExistsError, CancellationAlreadyRequestedError,
           ServiceBusyError, DomainNotActiveError, LimitExceededError,
-          ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError, BaseError {
+          ClientVersionNotSupportedError, WorkflowExecutionAlreadyCompletedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -215,7 +215,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public void SignalWorkflowExecution(SignalWorkflowExecutionRequest signalRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           LimitExceededError, ClientVersionNotSupportedError,
-          WorkflowExecutionAlreadyCompletedError, BaseError {
+          WorkflowExecutionAlreadyCompletedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -224,7 +224,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       SignalWithStartWorkflowExecutionRequest signalWithStartRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           LimitExceededError, WorkflowExecutionAlreadyStartedError, ClientVersionNotSupportedError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -233,7 +233,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       SignalWithStartWorkflowExecutionAsyncRequest signalWithStartRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -241,7 +241,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public ResetWorkflowExecutionResponse ResetWorkflowExecution(
       ResetWorkflowExecutionRequest resetRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          LimitExceededError, ClientVersionNotSupportedError, BaseError {
+          LimitExceededError, ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -249,7 +249,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public void TerminateWorkflowExecution(TerminateWorkflowExecutionRequest terminateRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           LimitExceededError, ClientVersionNotSupportedError,
-          WorkflowExecutionAlreadyCompletedError, BaseError {
+          WorkflowExecutionAlreadyCompletedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -257,7 +257,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public ListOpenWorkflowExecutionsResponse ListOpenWorkflowExecutions(
       ListOpenWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, LimitExceededError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -265,7 +265,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public ListClosedWorkflowExecutionsResponse ListClosedWorkflowExecutions(
       ListClosedWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -273,7 +273,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public ListWorkflowExecutionsResponse ListWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -281,7 +281,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public ListArchivedWorkflowExecutionsResponse ListArchivedWorkflowExecutions(
       ListArchivedWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -289,7 +289,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public ListWorkflowExecutionsResponse ScanWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -297,20 +297,20 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public CountWorkflowExecutionsResponse CountWorkflowExecutions(
       CountWorkflowExecutionsRequest countRequest)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public GetSearchAttributesResponse GetSearchAttributes()
-      throws ServiceBusyError, ClientVersionNotSupportedError, BaseError {
+      throws ServiceBusyError, ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RespondQueryTaskCompleted(RespondQueryTaskCompletedRequest completeRequest)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          DomainNotActiveError, ClientVersionNotSupportedError, BaseError {
+          DomainNotActiveError, ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -318,14 +318,14 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public ResetStickyTaskListResponse ResetStickyTaskList(ResetStickyTaskListRequest resetRequest)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
           DomainNotActiveError, ClientVersionNotSupportedError,
-          WorkflowExecutionAlreadyCompletedError, BaseError {
+          WorkflowExecutionAlreadyCompletedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public QueryWorkflowResponse QueryWorkflow(QueryWorkflowRequest queryRequest)
       throws BadRequestError, EntityNotExistsError, QueryFailedError, LimitExceededError,
-          ServiceBusyError, ClientVersionNotSupportedError, BaseError {
+          ServiceBusyError, ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -333,26 +333,26 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public DescribeWorkflowExecutionResponse DescribeWorkflowExecution(
       DescribeWorkflowExecutionRequest describeRequest)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public DescribeTaskListResponse DescribeTaskList(DescribeTaskListRequest request)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
-  public ClusterInfo GetClusterInfo() throws InternalServiceError, ServiceBusyError, BaseError {
+  public ClusterInfo GetClusterInfo() throws InternalServiceError, ServiceBusyError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public GetTaskListsByDomainResponse GetTaskListsByDomain(GetTaskListsByDomainRequest request)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -360,26 +360,26 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public ListTaskListPartitionsResponse ListTaskListPartitions(
       ListTaskListPartitionsRequest request)
       throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RefreshWorkflowTasks(RefreshWorkflowTasksRequest request)
       throws BadRequestError, DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
-          BaseError {
+          CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RegisterDomain(
-      RegisterDomainRequest registerRequest, AsyncMethodCallback resultHandler) throws BaseError {
+      RegisterDomainRequest registerRequest, AsyncMethodCallback resultHandler) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void DescribeDomain(
-      DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler) throws BaseError {
+      DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -392,143 +392,143 @@ public class IWorkflowServiceBase implements IWorkflowService {
 
   @Override
   public void ListDomains(ListDomainsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void UpdateDomain(UpdateDomainRequest updateRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void DeprecateDomain(
-      DeprecateDomainRequest deprecateRequest, AsyncMethodCallback resultHandler) throws BaseError {
+      DeprecateDomainRequest deprecateRequest, AsyncMethodCallback resultHandler) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RestartWorkflowExecution(
       RestartWorkflowExecutionRequest restartRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void StartWorkflowExecution(
       StartWorkflowExecutionRequest startRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void StartWorkflowExecutionAsync(
       StartWorkflowExecutionAsyncRequest startRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void GetWorkflowExecutionHistory(
       GetWorkflowExecutionHistoryRequest getRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void PollForDecisionTask(
-      PollForDecisionTaskRequest pollRequest, AsyncMethodCallback resultHandler) throws BaseError {
+      PollForDecisionTaskRequest pollRequest, AsyncMethodCallback resultHandler) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RespondDecisionTaskCompleted(
       RespondDecisionTaskCompletedRequest completeRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RespondDecisionTaskFailed(
       RespondDecisionTaskFailedRequest failedRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void PollForActivityTask(
-      PollForActivityTaskRequest pollRequest, AsyncMethodCallback resultHandler) throws BaseError {
+      PollForActivityTaskRequest pollRequest, AsyncMethodCallback resultHandler) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RecordActivityTaskHeartbeat(
       RecordActivityTaskHeartbeatRequest heartbeatRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RecordActivityTaskHeartbeatByID(
       RecordActivityTaskHeartbeatByIDRequest heartbeatRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RespondActivityTaskCompleted(
       RespondActivityTaskCompletedRequest completeRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RespondActivityTaskCompletedByID(
       RespondActivityTaskCompletedByIDRequest completeRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RespondActivityTaskFailed(
       RespondActivityTaskFailedRequest failRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RespondActivityTaskFailedByID(
       RespondActivityTaskFailedByIDRequest failRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RespondActivityTaskCanceled(
       RespondActivityTaskCanceledRequest canceledRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RespondActivityTaskCanceledByID(
       RespondActivityTaskCanceledByIDRequest canceledRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RequestCancelWorkflowExecution(
       RequestCancelWorkflowExecutionRequest cancelRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void SignalWorkflowExecution(
       SignalWorkflowExecutionRequest signalRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -536,7 +536,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public void SignalWithStartWorkflowExecution(
       SignalWithStartWorkflowExecutionRequest signalWithStartRequest,
       AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -544,123 +544,123 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public void SignalWithStartWorkflowExecutionAsync(
       SignalWithStartWorkflowExecutionAsyncRequest signalWithStartRequest,
       AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void ResetWorkflowExecution(
       ResetWorkflowExecutionRequest resetRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void TerminateWorkflowExecution(
       TerminateWorkflowExecutionRequest terminateRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void ListOpenWorkflowExecutions(
       ListOpenWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void ListClosedWorkflowExecutions(
       ListClosedWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void ListWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void ListArchivedWorkflowExecutions(
       ListArchivedWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void ScanWorkflowExecutions(
       ListWorkflowExecutionsRequest listRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void CountWorkflowExecutions(
       CountWorkflowExecutionsRequest countRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
-  public void GetSearchAttributes(AsyncMethodCallback resultHandler) throws BaseError {
+  public void GetSearchAttributes(AsyncMethodCallback resultHandler) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RespondQueryTaskCompleted(
       RespondQueryTaskCompletedRequest completeRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void ResetStickyTaskList(
-      ResetStickyTaskListRequest resetRequest, AsyncMethodCallback resultHandler) throws BaseError {
+      ResetStickyTaskListRequest resetRequest, AsyncMethodCallback resultHandler) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void QueryWorkflow(QueryWorkflowRequest queryRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void DescribeWorkflowExecution(
       DescribeWorkflowExecutionRequest describeRequest, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void DescribeTaskList(DescribeTaskListRequest request, AsyncMethodCallback resultHandler)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
-  public void GetClusterInfo(AsyncMethodCallback resultHandler) throws BaseError {
+  public void GetClusterInfo(AsyncMethodCallback resultHandler) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void GetTaskListsByDomain(
-      GetTaskListsByDomainRequest request, AsyncMethodCallback resultHandler) throws BaseError {
+      GetTaskListsByDomainRequest request, AsyncMethodCallback resultHandler) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void ListTaskListPartitions(
-      ListTaskListPartitionsRequest request, AsyncMethodCallback resultHandler) throws BaseError {
+      ListTaskListPartitionsRequest request, AsyncMethodCallback resultHandler) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public void RefreshWorkflowTasks(
-      RefreshWorkflowTasksRequest request, AsyncMethodCallback resultHandler) throws BaseError {
+      RefreshWorkflowTasksRequest request, AsyncMethodCallback resultHandler) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -674,7 +674,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       StartWorkflowExecutionRequest startRequest,
       AsyncMethodCallback resultHandler,
       Long timeoutInMillis)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -683,13 +683,13 @@ public class IWorkflowServiceBase implements IWorkflowService {
       StartWorkflowExecutionAsyncRequest startAsyncRequest,
       AsyncMethodCallback resultHandler,
       Long timeoutInMillis)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
   public GetWorkflowExecutionHistoryResponse GetWorkflowExecutionHistoryWithTimeout(
-      GetWorkflowExecutionHistoryRequest getRequest, Long timeoutInMillis) throws BaseError {
+      GetWorkflowExecutionHistoryRequest getRequest, Long timeoutInMillis) throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -698,7 +698,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       GetWorkflowExecutionHistoryRequest getRequest,
       AsyncMethodCallback resultHandler,
       Long timeoutInMillis)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 
@@ -707,7 +707,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
       SignalWorkflowExecutionRequest signalRequest,
       AsyncMethodCallback resultHandler,
       Long timeoutInMillis)
-      throws BaseError {
+      throws CadenceError {
     throw new UnsupportedOperationException("unimplemented");
   }
 

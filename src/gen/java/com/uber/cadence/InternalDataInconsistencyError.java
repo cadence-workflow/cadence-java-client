@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class InternalDataInconsistencyError extends BaseError {
+public class InternalDataInconsistencyError extends CadenceError {
 
   public InternalDataInconsistencyError() {
     super();

@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @AllArgsConstructor
-public class EntityNotExistsError extends BaseError {
+public class EntityNotExistsError extends CadenceError {
   private String currentCluster;
   private String activeCluster;
 

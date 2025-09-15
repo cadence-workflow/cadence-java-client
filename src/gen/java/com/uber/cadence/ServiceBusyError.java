@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @AllArgsConstructor
-public class ServiceBusyError extends BaseError {
+public class ServiceBusyError extends CadenceError {
   private String reason;
 
   public ServiceBusyError() {

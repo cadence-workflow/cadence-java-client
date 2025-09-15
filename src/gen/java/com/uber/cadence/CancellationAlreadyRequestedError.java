@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class CancellationAlreadyRequestedError extends BaseError {
+public class CancellationAlreadyRequestedError extends CadenceError {
 
   public CancellationAlreadyRequestedError() {
     super();

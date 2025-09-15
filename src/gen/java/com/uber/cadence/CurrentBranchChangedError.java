@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @AllArgsConstructor
-public class CurrentBranchChangedError extends BaseError {
+public class CurrentBranchChangedError extends CadenceError {
   private byte[] currentBranchToken;
 
   public CurrentBranchChangedError() {

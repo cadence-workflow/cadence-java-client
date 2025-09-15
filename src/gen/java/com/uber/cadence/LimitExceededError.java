@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class LimitExceededError extends BaseError {
+public class LimitExceededError extends CadenceError {
 
   public LimitExceededError() {
     super();

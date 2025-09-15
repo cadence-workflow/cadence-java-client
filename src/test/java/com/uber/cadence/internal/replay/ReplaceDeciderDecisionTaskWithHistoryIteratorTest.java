@@ -113,7 +113,7 @@ public class ReplaceDeciderDecisionTaskWithHistoryIteratorTest {
 
   @Test
   public void testGetHistoryWithSinglePageOfEvents()
-      throws BaseError, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+      throws CadenceError, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     // Arrange
     List<HistoryEvent> events = Arrays.asList(createMockHistoryEvent(2), createMockHistoryEvent(3));
     History mockHistory = new History().setEvents(events);
@@ -141,7 +141,7 @@ public class ReplaceDeciderDecisionTaskWithHistoryIteratorTest {
 
   @Test
   public void testGetHistoryWithMultiplePages()
-      throws BaseError, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+      throws CadenceError, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     // First page events
     List<HistoryEvent> firstPageEvents =
         Arrays.asList(createMockHistoryEvent(1), createMockHistoryEvent(2));
@@ -191,14 +191,14 @@ public class ReplaceDeciderDecisionTaskWithHistoryIteratorTest {
 
   @Test(expected = Error.class)
   public void testGetHistoryFailure()
-      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, BaseError {
+      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, CadenceError {
     when(mockService.GetWorkflowExecutionHistory(
             new GetWorkflowExecutionHistoryRequest()
                 .setDomain(DOMAIN)
                 .setNextPageToken(START_PAGE_TOKEN.getBytes())
                 .setExecution(WORKFLOW_EXECUTION)
                 .setMaximumPageSize(MAXIMUM_PAGE_SIZE)))
-        .thenThrow(new BaseError());
+        .thenThrow(new CadenceError());
 
     // Act & Assert
     Method wrapperMethod = iterator.getClass().getMethod("getHistory");
@@ -212,7 +212,7 @@ public class ReplaceDeciderDecisionTaskWithHistoryIteratorTest {
 
   @Test(expected = Error.class)
   public void testEmptyHistory()
-      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, BaseError {
+      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, CadenceError {
     when(mockService.GetWorkflowExecutionHistory(
             new GetWorkflowExecutionHistoryRequest()
                 .setDomain(DOMAIN)

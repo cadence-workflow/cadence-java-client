@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class BadRequestError extends BaseError {
+public class BadRequestError extends CadenceError {
 
   public BadRequestError() {
     super();

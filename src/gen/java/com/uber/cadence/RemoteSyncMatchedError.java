@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class RemoteSyncMatchedError extends BaseError {
+public class RemoteSyncMatchedError extends CadenceError {
 
   public RemoteSyncMatchedError() {
     super();

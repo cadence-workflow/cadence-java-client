@@ -59,7 +59,7 @@ final class WorkflowPollTask implements Poller.PollTask<PollForDecisionTaskRespo
   }
 
   @Override
-  public PollForDecisionTaskResponse poll() throws BaseError {
+  public PollForDecisionTaskResponse poll() throws CadenceError {
     metricScope.counter(MetricsType.DECISION_POLL_COUNTER).inc(1);
     Stopwatch sw = metricScope.timer(MetricsType.DECISION_POLL_LATENCY).start();
 
@@ -89,7 +89,7 @@ final class WorkflowPollTask implements Poller.PollTask<PollForDecisionTaskRespo
           .counter(MetricsType.DECISION_POLL_TRANSIENT_FAILED_COUNTER)
           .inc(1);
       throw e;
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       metricScope.counter(MetricsType.DECISION_POLL_FAILED_COUNTER).inc(1);
       throw e;
     }

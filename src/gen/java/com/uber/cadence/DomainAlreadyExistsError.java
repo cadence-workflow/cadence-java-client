@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class DomainAlreadyExistsError extends BaseError {
+public class DomainAlreadyExistsError extends CadenceError {
 
   public DomainAlreadyExistsError() {
     super();

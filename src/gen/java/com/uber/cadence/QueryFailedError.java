@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class QueryFailedError extends BaseError {
+public class QueryFailedError extends CadenceError {
 
   public QueryFailedError() {
     super();

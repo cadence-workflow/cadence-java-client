@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class WorkflowExecutionAlreadyCompletedError extends BaseError {
+public class WorkflowExecutionAlreadyCompletedError extends CadenceError {
 
   public WorkflowExecutionAlreadyCompletedError() {
     super();

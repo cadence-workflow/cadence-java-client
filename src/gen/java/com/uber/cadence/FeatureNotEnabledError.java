@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @AllArgsConstructor
-public class FeatureNotEnabledError extends BaseError {
+public class FeatureNotEnabledError extends CadenceError {
   private String featureFlag;
 
   public FeatureNotEnabledError() {

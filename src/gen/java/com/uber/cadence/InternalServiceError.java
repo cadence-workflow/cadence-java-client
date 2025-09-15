@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class InternalServiceError extends BaseError {
+public class InternalServiceError extends CadenceError {
 
   public InternalServiceError() {
     super();

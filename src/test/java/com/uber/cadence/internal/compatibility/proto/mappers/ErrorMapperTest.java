@@ -65,7 +65,7 @@ public class ErrorMapperTest {
             LimitExceededError.getDefaultInstance(),
             com.uber.cadence.LimitExceededError.class
           },
-          {Status.UNKNOWN, null, com.uber.cadence.BaseError.class},
+          {Status.UNKNOWN, null, com.uber.cadence.CadenceError.class},
           {
             Status.NOT_FOUND,
             WorkflowExecutionAlreadyCompletedError.getDefaultInstance(),
@@ -132,7 +132,7 @@ public class ErrorMapperTest {
     }
 
     StatusRuntimeException ex = StatusProto.toStatusRuntimeException(builder.build());
-    com.uber.cadence.BaseError result = ErrorMapper.Error(ex);
+    com.uber.cadence.CadenceError result = ErrorMapper.Error(ex);
     assertEquals(expectedException, result.getClass());
   }
 }

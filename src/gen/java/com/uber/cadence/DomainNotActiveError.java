@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @AllArgsConstructor
-public class DomainNotActiveError extends BaseError {
+public class DomainNotActiveError extends CadenceError {
   private String domainName;
   private String currentCluster;
   private String activeCluster;

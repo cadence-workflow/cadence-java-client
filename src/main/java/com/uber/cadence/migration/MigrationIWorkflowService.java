@@ -53,7 +53,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
 
   @Override
   public StartWorkflowExecutionResponse StartWorkflowExecution(
-      StartWorkflowExecutionRequest startRequest) throws BaseError {
+      StartWorkflowExecutionRequest startRequest) throws CadenceError {
 
     if (shouldStartInNew(startRequest.getWorkflowId()))
       return serviceNew.StartWorkflowExecution(startRequest);
@@ -66,7 +66,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
       StartWorkflowExecutionAsyncRequest startRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
 
     if (shouldStartInNew(startRequest.getRequest().getWorkflowId())) {
       return serviceNew.StartWorkflowExecutionAsync(startRequest);
@@ -84,7 +84,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
    */
   @Override
   public StartWorkflowExecutionResponse SignalWithStartWorkflowExecution(
-      SignalWithStartWorkflowExecutionRequest signalWithStartRequest) throws BaseError {
+      SignalWithStartWorkflowExecutionRequest signalWithStartRequest) throws CadenceError {
     if (shouldStartInNew(signalWithStartRequest.getWorkflowId()))
       return serviceNew.SignalWithStartWorkflowExecution(signalWithStartRequest);
     return serviceOld.SignalWithStartWorkflowExecution(signalWithStartRequest);
@@ -95,7 +95,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
       SignalWithStartWorkflowExecutionAsyncRequest signalWithStartRequest)
       throws BadRequestError, WorkflowExecutionAlreadyStartedError, ServiceBusyError,
           DomainNotActiveError, LimitExceededError, EntityNotExistsError,
-          ClientVersionNotSupportedError, BaseError {
+          ClientVersionNotSupportedError, CadenceError {
     if (shouldStartInNew(signalWithStartRequest.getRequest().getWorkflowId())) {
       return serviceNew.SignalWithStartWorkflowExecutionAsync(signalWithStartRequest);
     }
@@ -110,7 +110,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
    */
   @Override
   public void SignalWorkflowExecution(SignalWorkflowExecutionRequest signalRequest)
-      throws BaseError {
+      throws CadenceError {
     if (shouldStartInNew(signalRequest.getWorkflowExecution().getWorkflowId()))
       serviceNew.SignalWorkflowExecution(signalRequest);
     else serviceOld.SignalWorkflowExecution(signalRequest);
@@ -120,7 +120,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
   public RestartWorkflowExecutionResponse RestartWorkflowExecution(
       RestartWorkflowExecutionRequest restartRequest)
       throws BadRequestError, ServiceBusyError, DomainNotActiveError, LimitExceededError,
-          EntityNotExistsError, ClientVersionNotSupportedError, BaseError {
+          EntityNotExistsError, ClientVersionNotSupportedError, CadenceError {
     if (shouldStartInNew(restartRequest.getWorkflowExecution().getWorkflowId())) {
       return serviceNew.RestartWorkflowExecution(restartRequest);
     }
@@ -130,7 +130,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
 
   @Override
   public GetWorkflowExecutionHistoryResponse GetWorkflowExecutionHistory(
-      GetWorkflowExecutionHistoryRequest getRequest) throws BaseError {
+      GetWorkflowExecutionHistoryRequest getRequest) throws CadenceError {
     if (shouldStartInNew(getRequest.getExecution().getWorkflowId()))
       return serviceNew.GetWorkflowExecutionHistory(getRequest);
     return serviceOld.GetWorkflowExecutionHistory(getRequest);
@@ -140,7 +140,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
       ListWorkflowExecutionsRequest listWorkflowExecutionsRequest,
       int pageSizeOverride,
       String searchType)
-      throws BaseError {
+      throws CadenceError {
 
     if (pageSizeOverride != 0) {
       listWorkflowExecutionsRequest.setPageSize(pageSizeOverride);
@@ -158,7 +158,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
       ListWorkflowExecutionsRequest listWorkflowExecutionsRequest,
       ListWorkflowExecutionsResponse response,
       String searchType)
-      throws BaseError {
+      throws CadenceError {
     int responsePageSize = response.getExecutions().size();
     int neededPageSize = listWorkflowExecutionsRequest.getPageSize() - responsePageSize;
 
@@ -195,13 +195,13 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
    * @return The ListWorkflowExecutionsResponse containing a list of WorkflowExecutionInfo
    *     representing the workflow executions that match the query criteria. The response also
    *     includes a nextPageToken to support pagination.
-   * @throws BaseError if there's any communication error with the underlying workflow service.
+   * @throws CadenceError if there's any communication error with the underlying workflow service.
    * @throws BadRequestError if the provided ListWorkflowExecutionsRequest is invalid (null or lacks
    *     a domain).
    */
   @Override
   public ListWorkflowExecutionsResponse ListWorkflowExecutions(
-      ListWorkflowExecutionsRequest listRequest) throws BaseError {
+      ListWorkflowExecutionsRequest listRequest) throws CadenceError {
 
     if (listRequest == null) {
       throw new BadRequestError("List request is null");
@@ -252,12 +252,12 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
    *
    * @param listRequest The ListWorkflowExecutionsRequest containing query parameters.
    * @return The ListWorkflowExecutionsResponse with WorkflowExecutionInfo and nextPageToken.
-   * @throws BaseError if there's any communication error with the workflow service.
+   * @throws CadenceError if there's any communication error with the workflow service.
    * @throws BadRequestError if the provided ListWorkflowExecutionsRequest is invalid.
    */
   @Override
   public ListWorkflowExecutionsResponse ScanWorkflowExecutions(
-      ListWorkflowExecutionsRequest listRequest) throws BaseError {
+      ListWorkflowExecutionsRequest listRequest) throws CadenceError {
     ListWorkflowExecutionsResponse response;
     if (listRequest == null) {
       throw new BadRequestError("List request is null");
@@ -301,7 +301,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
 
   @Override
   public ListOpenWorkflowExecutionsResponse ListOpenWorkflowExecutions(
-      ListOpenWorkflowExecutionsRequest listRequest) throws BaseError {
+      ListOpenWorkflowExecutionsRequest listRequest) throws CadenceError {
     ListOpenWorkflowExecutionsResponse response;
     if (listRequest == null) {
       throw new BadRequestError("List request is null");
@@ -360,7 +360,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
 
   @Override
   public ListClosedWorkflowExecutionsResponse ListClosedWorkflowExecutions(
-      ListClosedWorkflowExecutionsRequest listRequest) throws BaseError {
+      ListClosedWorkflowExecutionsRequest listRequest) throws CadenceError {
     ListClosedWorkflowExecutionsResponse response;
     if (listRequest == null) {
       throw new BadRequestError("List request is null");
@@ -419,7 +419,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
   }
 
   @Override
-  public QueryWorkflowResponse QueryWorkflow(QueryWorkflowRequest queryRequest) throws BaseError {
+  public QueryWorkflowResponse QueryWorkflow(QueryWorkflowRequest queryRequest) throws CadenceError {
 
     try {
       if (shouldStartInNew(queryRequest.getExecution().getWorkflowId()))
@@ -433,7 +433,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
 
   @Override
   public CountWorkflowExecutionsResponse CountWorkflowExecutions(
-      CountWorkflowExecutionsRequest countRequest) throws BaseError {
+      CountWorkflowExecutionsRequest countRequest) throws CadenceError {
 
     CountWorkflowExecutionsResponse countResponseNew =
         serviceNew.CountWorkflowExecutions(countRequest);
@@ -448,7 +448,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
 
   @Override
   public void TerminateWorkflowExecution(TerminateWorkflowExecutionRequest terminateRequest)
-      throws BaseError {
+      throws CadenceError {
     try {
       serviceNew.TerminateWorkflowExecution(terminateRequest);
     } catch (EntityNotExistsError e) {
@@ -456,7 +456,7 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
     }
   }
 
-  private Boolean shouldStartInNew(String workflowID) throws BaseError {
+  private Boolean shouldStartInNew(String workflowID) throws CadenceError {
     try {
       return describeWorkflowExecution(serviceNew, domainNew, workflowID)
           .thenCombine(
@@ -471,11 +471,11 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
               )
           .get();
     } catch (CompletionException e) {
-      throw e.getCause() instanceof BaseError
-          ? (BaseError) e.getCause()
-          : new BaseError("unknown error: " + e.getMessage());
+      throw e.getCause() instanceof CadenceError
+          ? (CadenceError) e.getCause()
+          : new CadenceError("unknown error: " + e.getMessage());
     } catch (Exception e) {
-      throw new BaseError("Unknown error: " + e.getMessage());
+      throw new CadenceError("Unknown error: " + e.getMessage());
     }
   }
 

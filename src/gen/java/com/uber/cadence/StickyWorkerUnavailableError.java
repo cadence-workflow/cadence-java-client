@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class StickyWorkerUnavailableError extends BaseError {
+public class StickyWorkerUnavailableError extends CadenceError {
 
   public StickyWorkerUnavailableError() {
     super();

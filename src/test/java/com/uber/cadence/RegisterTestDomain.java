@@ -31,7 +31,7 @@ public class RegisterTestDomain {
         break;
       } catch (DomainAlreadyExistsError e) {
         break;
-      } catch (BaseError e) {
+      } catch (CadenceError e) {
         String message = e.getMessage();
         if (message != null
             && !message.contains("Failed to connect to the host")

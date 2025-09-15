@@ -106,7 +106,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
               RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, () -> service.StartWorkflowExecution(request));
     } catch (WorkflowExecutionAlreadyStartedError e) {
       throw e;
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
     }
     WorkflowExecution execution = new WorkflowExecution();
@@ -152,7 +152,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
                   }
                 },
                 timeoutInMillis);
-          } catch (BaseError e) {
+          } catch (CadenceError e) {
             result.completeExceptionally(e);
           }
           return result;
@@ -185,7 +185,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
           RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, () -> service.StartWorkflowExecutionAsync(request));
     } catch (WorkflowExecutionAlreadyStartedError e) {
       throw e;
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
     }
   }
@@ -215,7 +215,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
                   }
                 },
                 timeoutInMillis);
-          } catch (BaseError e) {
+          } catch (CadenceError e) {
             result.completeExceptionally(e);
           }
           return result;
@@ -322,7 +322,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
 
     try {
       RpcRetryer.retry(() -> service.SignalWorkflowExecution(request));
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
     }
   }
@@ -355,7 +355,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
                     result.completeExceptionally(exception);
                   }
                 });
-          } catch (BaseError e) {
+          } catch (CadenceError e) {
             result.completeExceptionally(e);
           }
           return result;
@@ -425,7 +425,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
           RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS,
           () -> service.SignalWithStartWorkflowExecutionAsync(request));
       return new WorkflowExecution().setWorkflowId(request.getRequest().getWorkflowId());
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
     }
   }
@@ -441,7 +441,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
       return new WorkflowExecution()
           .setRunId(result.getRunId())
           .setWorkflowId(request.getWorkflowId());
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
     }
   }
@@ -498,7 +498,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     request.setWorkflowExecution(execution);
     try {
       RpcRetryer.retry(() -> service.RequestCancelWorkflowExecution(request));
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
     }
   }
@@ -521,7 +521,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
           RpcRetryer.retryWithResult(
               RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, () -> service.QueryWorkflow(request));
       return response;
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
     }
   }
@@ -541,7 +541,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     //        request.setChildPolicy(terminateParameters.getChildPolicy());
     try {
       RpcRetryer.retry(() -> service.TerminateWorkflowExecution(request));
-    } catch (BaseError e) {
+    } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
     }
   }

@@ -690,7 +690,7 @@ class ReplayDecider implements Decider {
             nextPageToken = r.getNextPageToken();
             metricsScope.counter(MetricsType.WORKFLOW_GET_HISTORY_SUCCEED_COUNTER).inc(1);
             sw.stop();
-          } catch (BaseError e) {
+          } catch (CadenceError e) {
             metricsScope.counter(MetricsType.WORKFLOW_GET_HISTORY_FAILED_COUNTER).inc(1);
             throw new Error(e);
           }

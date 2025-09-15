@@ -85,7 +85,7 @@ public class WorkflowPollTaskTest {
   }
 
   @Test
-  public void testPollSuccess() throws BaseError {
+  public void testPollSuccess() throws CadenceError {
     // Mock a successful response with all necessary fields
     WorkflowType workflowType = new WorkflowType().setName("testWorkflowType");
 
@@ -141,7 +141,7 @@ public class WorkflowPollTaskTest {
   }
 
   @Test(expected = InternalServiceError.class)
-  public void testPollInternalServiceError() throws BaseError {
+  public void testPollInternalServiceError() throws CadenceError {
     when(mockService.PollForDecisionTask(any(PollForDecisionTaskRequest.class)))
         .thenThrow(new InternalServiceError());
 
@@ -160,7 +160,7 @@ public class WorkflowPollTaskTest {
   }
 
   @Test(expected = ServiceBusyError.class)
-  public void testPollServiceBusyError() throws BaseError {
+  public void testPollServiceBusyError() throws CadenceError {
     when(mockService.PollForDecisionTask(any(PollForDecisionTaskRequest.class)))
         .thenThrow(new ServiceBusyError());
 
@@ -178,10 +178,10 @@ public class WorkflowPollTaskTest {
     }
   }
 
-  @Test(expected = BaseError.class)
-  public void testPollGeneralTException() throws BaseError {
+  @Test(expected = CadenceError.class)
+  public void testPollGeneralTException() throws CadenceError {
     when(mockService.PollForDecisionTask(any(PollForDecisionTaskRequest.class)))
-        .thenThrow(new BaseError());
+        .thenThrow(new CadenceError());
 
     Counter failedCounter = mock(Counter.class);
     when(mockMetricScope.counter(MetricsType.DECISION_POLL_FAILED_COUNTER))
@@ -195,7 +195,7 @@ public class WorkflowPollTaskTest {
   }
 
   @Test
-  public void testPollNoTask() throws BaseError {
+  public void testPollNoTask() throws CadenceError {
     when(mockService.PollForDecisionTask(any(PollForDecisionTaskRequest.class)))
         .thenReturn(new PollForDecisionTaskResponse());
 

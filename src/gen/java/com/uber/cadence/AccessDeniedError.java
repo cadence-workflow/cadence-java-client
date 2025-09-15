@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class AccessDeniedError extends BaseError {
+public class AccessDeniedError extends CadenceError {
 
   public AccessDeniedError() {
     super();

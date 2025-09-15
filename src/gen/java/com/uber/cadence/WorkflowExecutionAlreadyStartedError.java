@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @AllArgsConstructor
-public class WorkflowExecutionAlreadyStartedError extends BaseError {
+public class WorkflowExecutionAlreadyStartedError extends CadenceError {
   private String startRequestId;
   private String runId;
 

@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @AllArgsConstructor
-public class RetryTaskV2Error extends BaseError {
+public class RetryTaskV2Error extends CadenceError {
   private String domainId;
   private String workflowId;
   private String runId;

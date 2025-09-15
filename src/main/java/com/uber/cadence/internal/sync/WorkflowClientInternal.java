@@ -19,7 +19,7 @@ package com.uber.cadence.internal.sync;
 
 import com.google.common.base.Strings;
 import com.google.common.reflect.TypeToken;
-import com.uber.cadence.BaseError;
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.RefreshWorkflowTasksRequest;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.client.ActivityCompletionClient;
@@ -220,7 +220,7 @@ public final class WorkflowClientInternal implements WorkflowClient {
 
   @Override
   public void refreshWorkflowTasks(RefreshWorkflowTasksRequest refreshWorkflowTasksRequest)
-      throws BaseError {
+      throws CadenceError {
     workflowService.RefreshWorkflowTasks(refreshWorkflowTasksRequest);
   }
 
