@@ -48,7 +48,11 @@ import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.w
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowQueryMap;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowType;
 
-import com.uber.cadence.api.v1.*;
+import com.uber.cadence.*;
+import com.uber.cadence.api.v1.GetClusterInfoResponse;
+import com.uber.cadence.api.v1.RecordActivityTaskHeartbeatByIDResponse;
+import com.uber.cadence.api.v1.ScanWorkflowExecutionsResponse;
+import com.uber.cadence.api.v1.SignalWithStartWorkflowExecutionResponse;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -77,7 +81,7 @@ public class ResponseMapper {
     }
     com.uber.cadence.DescribeTaskListResponse describeTaskListResponse =
         new com.uber.cadence.DescribeTaskListResponse();
-    describeTaskListResponse.setPollers(pollerInfoArray(t.getPollersList()));
+    describeTaskListResponse.setPollers(pollerInfoArray(t.getPollers()));
     describeTaskListResponse.setTaskListStatus(taskListStatus(t.getTaskListStatus()));
     return describeTaskListResponse;
   }

@@ -597,7 +597,7 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
     @Override
     public void DiagnoseWorkflowExecution(
         DiagnoseWorkflowExecutionRequest diagnoseRequest, AsyncMethodCallback resultHandler)
-        throws TException {
+        throws CadenceError {
       impl.DiagnoseWorkflowExecution(diagnoseRequest, resultHandler);
     }
 
@@ -935,7 +935,7 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
     public DiagnoseWorkflowExecutionResponse DiagnoseWorkflowExecution(
         DiagnoseWorkflowExecutionRequest diagnoseRequest)
         throws DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
-            ClientVersionNotSupportedError, TException {
+            ClientVersionNotSupportedError, CadenceError {
       return impl.DiagnoseWorkflowExecution(diagnoseRequest);
     }
 

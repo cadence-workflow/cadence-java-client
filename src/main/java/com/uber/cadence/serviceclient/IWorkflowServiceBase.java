@@ -45,7 +45,7 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public DiagnoseWorkflowExecutionResponse DiagnoseWorkflowExecution(
       DiagnoseWorkflowExecutionRequest diagnoseRequest)
       throws DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
-          ClientVersionNotSupportedError, TException {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
   }
 

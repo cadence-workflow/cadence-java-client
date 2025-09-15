@@ -17,6 +17,7 @@
 
 package com.uber.cadence.internal.testservice;
 
+import com.uber.cadence.BadRequestError;
 import com.uber.cadence.CadenceError;
 import com.uber.cadence.ClientVersionNotSupportedError;
 import com.uber.cadence.ClusterInfo;
@@ -211,7 +212,7 @@ public final class TestWorkflowService implements IWorkflowService {
   public DiagnoseWorkflowExecutionResponse DiagnoseWorkflowExecution(
       DiagnoseWorkflowExecutionRequest diagnoseRequest)
       throws DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
-          ClientVersionNotSupportedError, TException {
+          ClientVersionNotSupportedError, CadenceError {
     throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
   }
 
@@ -848,7 +849,7 @@ public final class TestWorkflowService implements IWorkflowService {
   @Override
   public void DiagnoseWorkflowExecution(
       DiagnoseWorkflowExecutionRequest diagnoseRequest, AsyncMethodCallback resultHandler)
-      throws TException {
+      throws CadenceError {
     throw new UnsupportedOperationException("DiagnoseWorkflowExecution is not implemented");
   }
 

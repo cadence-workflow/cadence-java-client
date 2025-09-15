@@ -127,6 +127,11 @@ interface Iface {
       throws BadRequestError, EntityNotExistsError, ServiceBusyError,
           ClientVersionNotSupportedError, CadenceError;
 
+  DiagnoseWorkflowExecutionResponse DiagnoseWorkflowExecution(
+      DiagnoseWorkflowExecutionRequest diagnoseRequest)
+      throws DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
+          ClientVersionNotSupportedError, CadenceError;
+
   /**
    * ListDomains returns the information and configuration for all domains.
    *
@@ -623,6 +628,10 @@ interface AsyncIface {
   void DescribeDomain(
       DescribeDomainRequest describeRequest,
       AsyncMethodCallback<DescribeDomainResponse> resultHandler)
+      throws CadenceError;
+
+  void DiagnoseWorkflowExecution(
+      DiagnoseWorkflowExecutionRequest diagnoseRequest, AsyncMethodCallback resultHandler)
       throws CadenceError;
 
   void ListDomains(
