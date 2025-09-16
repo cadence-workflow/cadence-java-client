@@ -851,7 +851,10 @@ public class ClientObjects {
           .setQuery("query");
 
   public static final DescribeWorkflowExecutionRequest DESCRIBE_WORKFLOW_EXECUTION_REQUEST =
-      new DescribeWorkflowExecutionRequest().setDomain("domain").setExecution(WORKFLOW_EXECUTION);
+      new DescribeWorkflowExecutionRequest()
+          .setDomain("domain")
+          .setExecution(WORKFLOW_EXECUTION)
+          .setQueryConsistencyLevel(QueryConsistencyLevel.STRONG);
 
   public static final GetWorkflowExecutionHistoryRequest GET_WORKFLOW_EXECUTION_HISTORY_REQUEST =
       new GetWorkflowExecutionHistoryRequest()
@@ -861,7 +864,8 @@ public class ClientObjects {
           .setWaitForNewEvent(true)
           .setHistoryEventFilterType(HistoryEventFilterType.CLOSE_EVENT)
           .setSkipArchival(true)
-          .setNextPageToken(utf8("nextPageToken"));
+          .setNextPageToken(utf8("nextPageToken"))
+          .setQueryConsistencyLevel(QueryConsistencyLevel.STRONG);
 
   public static final StartWorkflowExecutionRequest START_WORKFLOW_EXECUTION =
       new StartWorkflowExecutionRequest()

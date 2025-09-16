@@ -403,6 +403,7 @@ public class RequestMapper {
     return DescribeWorkflowExecutionRequest.newBuilder()
         .setDomain(t.getDomain())
         .setWorkflowExecution(workflowExecution(t.getExecution()))
+        .setQueryConsistencyLevel(queryConsistencyLevel(t.getQueryConsistencyLevel()))
         .build();
   }
 
@@ -418,7 +419,8 @@ public class RequestMapper {
             .setPageSize(t.getMaximumPageSize())
             .setWaitForNewEvent(t.isWaitForNewEvent())
             .setHistoryEventFilterType(eventFilterType(t.getHistoryEventFilterType()))
-            .setSkipArchival(t.isSkipArchival());
+            .setSkipArchival(t.isSkipArchival())
+            .setQueryConsistencyLevel(queryConsistencyLevel(t.getQueryConsistencyLevel()));
     if (t.getNextPageToken() != null) {
       builder.setNextPageToken(arrayToByteString(t.getNextPageToken()));
     }

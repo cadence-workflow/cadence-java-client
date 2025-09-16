@@ -606,7 +606,8 @@ interface Iface {
    * @param request
    */
   ListTaskListPartitionsResponse ListTaskListPartitions(ListTaskListPartitionsRequest request)
-      throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError, CadenceError;
+      throws BadRequestError, EntityNotExistsError, LimitExceededError, ServiceBusyError,
+          CadenceError;
 
   /**
    * RefreshWorkflowTasks refreshes all tasks of a workflow

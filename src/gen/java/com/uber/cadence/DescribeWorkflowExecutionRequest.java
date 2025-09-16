@@ -9,4 +9,5 @@ import lombok.experimental.Accessors;
 public class DescribeWorkflowExecutionRequest {
   private String domain;
   private WorkflowExecution execution;
+  private QueryConsistencyLevel queryConsistencyLevel;
 }

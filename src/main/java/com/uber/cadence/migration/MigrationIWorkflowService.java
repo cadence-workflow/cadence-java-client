@@ -419,7 +419,8 @@ public class MigrationIWorkflowService extends IWorkflowServiceBase {
   }
 
   @Override
-  public QueryWorkflowResponse QueryWorkflow(QueryWorkflowRequest queryRequest) throws CadenceError {
+  public QueryWorkflowResponse QueryWorkflow(QueryWorkflowRequest queryRequest)
+      throws CadenceError {
 
     try {
       if (shouldStartInNew(queryRequest.getExecution().getWorkflowId()))

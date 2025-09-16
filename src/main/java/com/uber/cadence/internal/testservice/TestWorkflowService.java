@@ -834,13 +834,15 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void RegisterDomain(
-      RegisterDomainRequest registerRequest, AsyncMethodCallback resultHandler) throws CadenceError {
+      RegisterDomainRequest registerRequest, AsyncMethodCallback resultHandler)
+      throws CadenceError {
     throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
   public void DescribeDomain(
-      DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler) throws CadenceError {
+      DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler)
+      throws CadenceError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -865,7 +867,8 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void DeprecateDomain(
-      DeprecateDomainRequest deprecateRequest, AsyncMethodCallback resultHandler) throws CadenceError {
+      DeprecateDomainRequest deprecateRequest, AsyncMethodCallback resultHandler)
+      throws CadenceError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -972,7 +975,8 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void PollForDecisionTask(
-      PollForDecisionTaskRequest pollRequest, AsyncMethodCallback resultHandler) throws CadenceError {
+      PollForDecisionTaskRequest pollRequest, AsyncMethodCallback resultHandler)
+      throws CadenceError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -992,7 +996,8 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void PollForActivityTask(
-      PollForActivityTaskRequest pollRequest, AsyncMethodCallback resultHandler) throws CadenceError {
+      PollForActivityTaskRequest pollRequest, AsyncMethodCallback resultHandler)
+      throws CadenceError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -1167,7 +1172,8 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void ResetStickyTaskList(
-      ResetStickyTaskListRequest resetRequest, AsyncMethodCallback resultHandler) throws CadenceError {
+      ResetStickyTaskListRequest resetRequest, AsyncMethodCallback resultHandler)
+      throws CadenceError {
     throw new UnsupportedOperationException("not implemented");
   }
 
@@ -1197,7 +1203,8 @@ public final class TestWorkflowService implements IWorkflowService {
 
   @Override
   public void ListTaskListPartitions(
-      ListTaskListPartitionsRequest request, AsyncMethodCallback resultHandler) throws CadenceError {
+      ListTaskListPartitionsRequest request, AsyncMethodCallback resultHandler)
+      throws CadenceError {
     throw new UnsupportedOperationException("not implemented");
   }
 
