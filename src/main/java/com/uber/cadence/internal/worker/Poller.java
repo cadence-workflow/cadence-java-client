@@ -17,6 +17,7 @@
 
 package com.uber.cadence.internal.worker;
 
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.internal.common.BackoffThrottler;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.metrics.MetricsType;
@@ -30,7 +31,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public final class Poller<T> implements SuspendableWorker {
 
   public interface PollTask<TT> {
-    TT poll() throws TException;
+    TT poll() throws CadenceError;
   }
 
   interface ThrowingRunnable {

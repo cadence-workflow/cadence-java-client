@@ -17,12 +17,12 @@
 
 package com.uber.cadence.internal.worker;
 
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.worker.LocallyDispatchedActivityWorker.Task;
 import java.util.concurrent.SynchronousQueue;
 import java.util.function.Function;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ final class LocallyDispatchedActivityPollTask extends ActivityPollTaskBase
   }
 
   @Override
-  protected PollForActivityTaskResponse pollTask() throws TException {
+  protected PollForActivityTaskResponse pollTask() throws CadenceError {
     Task task;
     try {
       task = pendingTasks.take();
@@ -61,22 +61,23 @@ final class LocallyDispatchedActivityPollTask extends ActivityPollTaskBase
         .getMetricsScope()
         .counter(MetricsType.LOCALLY_DISPATCHED_ACTIVITY_POLL_SUCCEED_COUNTER)
         .inc(1);
-    PollForActivityTaskResponse result = new PollForActivityTaskResponse();
-    result.activityId = task.activityId;
-    result.activityType = task.activityType;
-    result.header = task.header;
-    result.input = task.input;
-    result.workflowExecution = task.workflowExecution;
-    result.scheduledTimestampOfThisAttempt = task.scheduledTimestampOfThisAttempt;
-    result.scheduledTimestamp = task.scheduledTimestamp;
-    result.scheduleToCloseTimeoutSeconds = task.scheduleToCloseTimeoutSeconds;
-    result.startedTimestamp = task.startedTimestamp;
-    result.startToCloseTimeoutSeconds = task.startToCloseTimeoutSeconds;
-    result.heartbeatTimeoutSeconds = task.heartbeatTimeoutSeconds;
-    result.taskToken = task.taskToken;
-    result.workflowType = task.workflowType;
-    result.workflowDomain = task.workflowDomain;
-    result.attempt = 0;
+    PollForActivityTaskResponse result =
+        new PollForActivityTaskResponse()
+            .setActivityId(task.activityId)
+            .setActivityType(task.activityType)
+            .setHeader(task.header)
+            .setInput(task.input.array())
+            .setWorkflowExecution(task.workflowExecution)
+            .setScheduledTimestampOfThisAttempt(task.scheduledTimestampOfThisAttempt)
+            .setScheduledTimestamp(task.scheduledTimestamp)
+            .setScheduleToCloseTimeoutSeconds(task.scheduleToCloseTimeoutSeconds)
+            .setStartedTimestamp(task.startedTimestamp)
+            .setStartToCloseTimeoutSeconds(task.startToCloseTimeoutSeconds)
+            .setHeartbeatTimeoutSeconds(task.heartbeatTimeoutSeconds)
+            .setTaskToken(task.taskToken.array())
+            .setWorkflowType(task.workflowType)
+            .setWorkflowDomain(task.workflowDomain)
+            .setAttempt(0);
     return result;
   }
 

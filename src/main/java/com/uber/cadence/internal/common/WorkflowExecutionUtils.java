@@ -26,27 +26,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.uber.cadence.ActivityType;
-import com.uber.cadence.Decision;
-import com.uber.cadence.DecisionType;
-import com.uber.cadence.EntityNotExistsError;
-import com.uber.cadence.EventType;
-import com.uber.cadence.GetWorkflowExecutionHistoryRequest;
-import com.uber.cadence.GetWorkflowExecutionHistoryResponse;
-import com.uber.cadence.History;
-import com.uber.cadence.HistoryEvent;
-import com.uber.cadence.HistoryEventFilterType;
-import com.uber.cadence.TaskList;
-import com.uber.cadence.WorkflowExecution;
-import com.uber.cadence.WorkflowExecutionCloseStatus;
-import com.uber.cadence.WorkflowExecutionFailedEventAttributes;
-import com.uber.cadence.WorkflowExecutionTerminatedEventAttributes;
-import com.uber.cadence.WorkflowExecutionTimedOutEventAttributes;
-import com.uber.cadence.WorkflowType;
+import com.uber.cadence.*;
 import com.uber.cadence.client.WorkflowTerminatedException;
 import com.uber.cadence.client.WorkflowTimedOutException;
 import com.uber.cadence.common.RetryOptions;
 import com.uber.cadence.common.WorkflowExecutionHistory;
+import com.uber.cadence.serviceclient.AsyncMethodCallback;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.io.File;
 import java.io.IOException;
@@ -63,8 +48,6 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.apache.thrift.TException;
-import org.apache.thrift.async.AsyncMethodCallback;
 
 /**
  * Convenience methods to be used by unit tests and during development.
@@ -200,9 +183,9 @@ public class WorkflowExecutionUtils {
                 retryOptions,
                 () -> service.GetWorkflowExecutionHistoryWithTimeout(r, unit.toMillis(timeout)));
       } catch (EntityNotExistsError e) {
-        if (e.activeCluster != null
-            && e.currentCluster != null
-            && !e.activeCluster.equals(e.currentCluster)) {
+        if (e.getActiveCluster() != null
+            && e.getCurrentCluster() != null
+            && !e.getActiveCluster().equals(e.getCurrentCluster())) {
           // Current cluster is passive cluster. Execution might not exist because of replication
           // lag. If we are still within timeout, wait for a little bit and retry.
           if (timeout != 0
@@ -220,7 +203,7 @@ public class WorkflowExecutionUtils {
           continue;
         }
         throw e;
-      } catch (TException e) {
+      } catch (CadenceError e) {
         throw CheckedExceptionWrapper.wrap(e);
       }
 
@@ -356,7 +339,7 @@ public class WorkflowExecutionUtils {
                   }
                 },
                 unit.toMillis(timeout));
-          } catch (TException e) {
+          } catch (CadenceError e) {
             result.completeExceptionally(e);
           }
           return result;
@@ -425,7 +408,7 @@ public class WorkflowExecutionUtils {
     GetWorkflowExecutionHistoryResponse history;
     try {
       history = service.GetWorkflowExecutionHistory(getHistoryRequest);
-    } catch (TException e) {
+    } catch (CadenceError e) {
       throw new Error(e);
     }
     if (history == null) {

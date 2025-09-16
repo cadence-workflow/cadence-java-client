@@ -555,7 +555,7 @@ class WorkflowStubImpl implements WorkflowStub {
       throw e;
     }
 
-    if (result.queryRejected == null) {
+    if (result.getQueryRejected() == null) {
       return dataConverter.fromData(result.getQueryResult(), resultClass, resultType);
     } else {
       throw new WorkflowQueryRejectedException(

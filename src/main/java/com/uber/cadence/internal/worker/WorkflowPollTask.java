@@ -20,12 +20,7 @@ package com.uber.cadence.internal.worker;
 import static com.uber.cadence.internal.metrics.MetricsTagValue.INTERNAL_SERVICE_ERROR;
 import static com.uber.cadence.internal.metrics.MetricsTagValue.SERVICE_BUSY;
 
-import com.uber.cadence.InternalServiceError;
-import com.uber.cadence.PollForDecisionTaskRequest;
-import com.uber.cadence.PollForDecisionTaskResponse;
-import com.uber.cadence.ServiceBusyError;
-import com.uber.cadence.TaskList;
-import com.uber.cadence.TaskListKind;
+import com.uber.cadence.*;
 import com.uber.cadence.common.BinaryChecksum;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
@@ -35,7 +30,6 @@ import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.util.Duration;
 import com.uber.m3.util.ImmutableMap;
 import java.util.Objects;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +59,7 @@ final class WorkflowPollTask implements Poller.PollTask<PollForDecisionTaskRespo
   }
 
   @Override
-  public PollForDecisionTaskResponse poll() throws TException {
+  public PollForDecisionTaskResponse poll() throws CadenceError {
     metricScope.counter(MetricsType.DECISION_POLL_COUNTER).inc(1);
     Stopwatch sw = metricScope.timer(MetricsType.DECISION_POLL_LATENCY).start();
 
@@ -95,7 +89,7 @@ final class WorkflowPollTask implements Poller.PollTask<PollForDecisionTaskRespo
           .counter(MetricsType.DECISION_POLL_TRANSIENT_FAILED_COUNTER)
           .inc(1);
       throw e;
-    } catch (TException e) {
+    } catch (CadenceError e) {
       metricScope.counter(MetricsType.DECISION_POLL_FAILED_COUNTER).inc(1);
       throw e;
     }

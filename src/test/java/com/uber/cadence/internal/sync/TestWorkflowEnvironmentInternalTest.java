@@ -23,10 +23,10 @@ import static org.mockito.Mockito.*;
 
 import com.uber.cadence.*;
 import com.uber.cadence.internal.testservice.TestWorkflowService;
+import com.uber.cadence.serviceclient.AsyncMethodCallback;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import org.apache.thrift.async.AsyncMethodCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

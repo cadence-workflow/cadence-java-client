@@ -1,0 +1,13 @@
+package {{.PackageName}};
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+import java.util.*;
+
+@Data
+@Accessors(chain = true)
+public class {{.ClassName}} {
+  {{- range .Fields}}
+  private {{.Type}} {{.Name}};
+  {{- end}}
+}

@@ -17,12 +17,12 @@
 
 package com.uber.cadence.internal.worker;
 
+import com.uber.cadence.CadenceError;
 import java.time.Duration;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
-import org.apache.thrift.TException;
 
 final class LocalActivityPollTask
     implements Poller.PollTask<LocalActivityWorker.Task>,
@@ -32,7 +32,7 @@ final class LocalActivityPollTask
       new ArrayBlockingQueue<>(QUEUE_SIZE);
 
   @Override
-  public LocalActivityWorker.Task poll() throws TException {
+  public LocalActivityWorker.Task poll() throws CadenceError {
     try {
       return pendingTasks.take();
     } catch (InterruptedException e) {

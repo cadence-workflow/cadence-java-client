@@ -101,7 +101,8 @@ public class MigrationInterceptor extends WorkflowInterceptorBase {
                 new StartWorkflowExecutionRequest()
                     .setDomain(domainNew)
                     .setWorkflowId(workflowInfo.getWorkflowId())
-                    .setTaskList(new TaskList().setName(startedEventAttributes.taskList.getName()))
+                    .setTaskList(
+                        new TaskList().setName(startedEventAttributes.getTaskList().getName()))
                     .setInput(input.getInput())
                     .setWorkflowType(new WorkflowType().setName(input.getWorkflowType().getName()))
                     .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.TerminateIfRunning)
@@ -174,7 +175,8 @@ public class MigrationInterceptor extends WorkflowInterceptorBase {
                 new StartWorkflowExecutionRequest()
                     .setDomain(domainNew)
                     .setWorkflowId(workflowInfo.getWorkflowId())
-                    .setTaskList(new TaskList().setName(startedEventAttributes.taskList.getName()))
+                    .setTaskList(
+                        new TaskList().setName(startedEventAttributes.getTaskList().getName()))
                     .setInput(workflowInfo.getDataConverter().toData(args))
                     .setWorkflowType(
                         new WorkflowType()
@@ -203,12 +205,12 @@ public class MigrationInterceptor extends WorkflowInterceptorBase {
   }
 
   private boolean isChildWorkflow(WorkflowExecutionStartedEventAttributes startedEventAttributes) {
-    return startedEventAttributes.isSetParentWorkflowExecution()
-        && !startedEventAttributes.getParentWorkflowExecution().isSetWorkflowId();
+    return startedEventAttributes.getParentWorkflowExecution() != null
+        && startedEventAttributes.getParentWorkflowExecution().getWorkflowId() != null;
   }
 
   private boolean isCronSchedule(WorkflowExecutionStartedEventAttributes startedEventAttributes) {
-    return !Strings.isNullOrEmpty(startedEventAttributes.cronSchedule);
+    return !Strings.isNullOrEmpty(startedEventAttributes.getCronSchedule());
   }
 
   private void cancelCurrentWorkflow() {

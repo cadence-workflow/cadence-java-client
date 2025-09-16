@@ -110,7 +110,7 @@ public class TestEnvironmentWorkflowTest {
           testEnv.getWorkflowService().ListClosedWorkflowExecutions(listRequest);
       Assert.assertEquals(2, listResponse.getExecutions().size());
       for (WorkflowExecutionInfo e : listResponse.getExecutions()) {
-        assertTrue(e.isIsCron());
+        assertTrue(e.isCron());
         assertEquals(WorkflowExecutionCloseStatus.CONTINUED_AS_NEW, e.getCloseStatus());
       }
     } catch (Exception e) {

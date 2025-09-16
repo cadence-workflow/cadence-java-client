@@ -25,11 +25,9 @@ import com.uber.cadence.activity.ActivityMethod;
 import com.uber.cadence.activity.ActivityOptions;
 import com.uber.cadence.client.*;
 import com.uber.cadence.common.RetryOptions;
-import com.uber.cadence.internal.compatibility.Thrift2ProtoAdapter;
-import com.uber.cadence.internal.compatibility.proto.serviceclient.IGrpcServiceStubs;
 import com.uber.cadence.serviceclient.ClientOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
-import com.uber.cadence.serviceclient.WorkflowServiceTChannel;
+import com.uber.cadence.serviceclient.WorkflowServiceGrpc;
 import com.uber.cadence.testUtils.TestEnvironment;
 import com.uber.cadence.worker.Worker;
 import com.uber.cadence.worker.WorkerFactory;
@@ -145,22 +143,12 @@ public class StartWorkflowTest {
   private static final String TASK_LIST = "test-tasklist";
 
   @Test
-  public void testStartWorkflowTchannel() {
-    Assume.assumeTrue(useDockerService);
-    MockTracer mockTracer = new MockTracer();
-    IWorkflowService service =
-        new WorkflowServiceTChannel(ClientOptions.newBuilder().setTracer(mockTracer).build());
-    testStartWorkflowHelper(service, mockTracer, true);
-  }
-
-  @Test
   public void testStartWorkflowGRPC() {
     Assume.assumeTrue(useDockerService);
     MockTracer mockTracer = new MockTracer();
     IWorkflowService service =
-        new Thrift2ProtoAdapter(
-            IGrpcServiceStubs.newInstance(
-                ClientOptions.newBuilder().setTracer(mockTracer).setPort(7833).build()));
+        new WorkflowServiceGrpc(
+            ClientOptions.newBuilder().setTracer(mockTracer).setPort(7833).build());
     testStartWorkflowHelper(service, mockTracer, true);
   }
 
@@ -169,9 +157,8 @@ public class StartWorkflowTest {
     Assume.assumeTrue(useDockerService);
     MockTracer mockTracer = new MockTracer();
     IWorkflowService service =
-        new Thrift2ProtoAdapter(
-            IGrpcServiceStubs.newInstance(
-                ClientOptions.newBuilder().setTracer(mockTracer).setPort(7833).build()));
+        new WorkflowServiceGrpc(
+            ClientOptions.newBuilder().setTracer(mockTracer).setPort(7833).build());
     try {
       service.RegisterDomain(new RegisterDomainRequest().setName(DOMAIN));
     } catch (DomainAlreadyExistsError e) {
@@ -244,31 +231,13 @@ public class StartWorkflowTest {
   }
 
   @Test
-  public void testSignalWithStartWorkflowTchannel() {
-    Assume.assumeTrue(useDockerService);
-    MockTracer mockTracer = new MockTracer();
-    IWorkflowService service =
-        new WorkflowServiceTChannel(ClientOptions.newBuilder().setTracer(mockTracer).build());
-    testSignalWithStartWorkflowHelper(service, mockTracer, true);
-  }
-
-  @Test
   public void testSignalWithStartWorkflowGRPC() {
     Assume.assumeTrue(useDockerService);
     MockTracer mockTracer = new MockTracer();
     IWorkflowService service =
-        new Thrift2ProtoAdapter(
-            IGrpcServiceStubs.newInstance(
-                ClientOptions.newBuilder().setTracer(mockTracer).setPort(7833).build()));
+        new WorkflowServiceGrpc(
+            ClientOptions.newBuilder().setTracer(mockTracer).setPort(7833).build());
     testSignalWithStartWorkflowHelper(service, mockTracer, true);
-  }
-
-  @Test
-  public void testStartWorkflowTchannelNoPropagation() {
-    Assume.assumeTrue(useDockerService);
-    MockTracer mockTracer = new MockTracer();
-    IWorkflowService service = new WorkflowServiceTChannel(ClientOptions.newBuilder().build());
-    testStartWorkflowHelper(service, mockTracer, false);
   }
 
   @Test
@@ -276,17 +245,8 @@ public class StartWorkflowTest {
     Assume.assumeTrue(useDockerService);
     MockTracer mockTracer = new MockTracer();
     IWorkflowService service =
-        new Thrift2ProtoAdapter(
-            IGrpcServiceStubs.newInstance(ClientOptions.newBuilder().setPort(7833).build()));
+        new WorkflowServiceGrpc(ClientOptions.newBuilder().setPort(7833).build());
     testStartWorkflowHelper(service, mockTracer, false);
-  }
-
-  @Test
-  public void testSignalStartWorkflowTchannelNoPropagation() {
-    Assume.assumeTrue(useDockerService);
-    MockTracer mockTracer = new MockTracer();
-    IWorkflowService service = new WorkflowServiceTChannel(ClientOptions.newBuilder().build());
-    testSignalWithStartWorkflowHelper(service, mockTracer, false);
   }
 
   @Test
@@ -294,8 +254,7 @@ public class StartWorkflowTest {
     Assume.assumeTrue(useDockerService);
     MockTracer mockTracer = new MockTracer();
     IWorkflowService service =
-        new Thrift2ProtoAdapter(
-            IGrpcServiceStubs.newInstance(ClientOptions.newBuilder().setPort(7833).build()));
+        new WorkflowServiceGrpc(ClientOptions.newBuilder().setPort(7833).build());
     testSignalWithStartWorkflowHelper(service, mockTracer, false);
   }
 

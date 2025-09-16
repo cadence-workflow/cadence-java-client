@@ -16,12 +16,12 @@
 package com.uber.cadence.internal.shadowing;
 
 import com.uber.cadence.activity.ActivityMethod;
-import com.uber.cadence.shadower.shadowerConstants;
+import com.uber.cadence.shadower.Constants;
 import com.uber.cadence.worker.WorkflowImplementationOptions;
 import com.uber.cadence.workflow.Functions;
 
 public interface ReplayWorkflowActivity {
-  @ActivityMethod(name = shadowerConstants.ReplayWorkflowActivityName)
+  @ActivityMethod(name = Constants.ReplayWorkflowActivityName)
   ReplayWorkflowActivityResult replay(ReplayWorkflowActivityParams params) throws Exception;
 
   ReplayWorkflowActivityResult replayOneExecution(String domain, WorkflowExecution execution);

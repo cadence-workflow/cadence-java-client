@@ -17,12 +17,7 @@
 
 package com.uber.cadence.internal.sync;
 
-import com.uber.cadence.BadRequestError;
-import com.uber.cadence.EntityNotExistsError;
-import com.uber.cadence.RecordActivityTaskHeartbeatRequest;
-import com.uber.cadence.RecordActivityTaskHeartbeatResponse;
-import com.uber.cadence.WorkflowExecution;
-import com.uber.cadence.WorkflowExecutionAlreadyCompletedError;
+import com.uber.cadence.*;
 import com.uber.cadence.activity.ActivityTask;
 import com.uber.cadence.client.ActivityCancelledException;
 import com.uber.cadence.client.ActivityCompletionException;
@@ -38,7 +33,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +126,7 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
       sendHeartbeatRequest(details);
       hasOutstandingHeartbeat = false;
       nextHeartbeatDelay = heartbeatIntervalMillis;
-    } catch (TException e) {
+    } catch (CadenceError e) {
       // Not rethrowing to not fail activity implementation on intermittent connection or Cadence
       // errors.
       log.warn("Heartbeat failed.", e);
@@ -162,7 +156,7 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
             TimeUnit.MILLISECONDS);
   }
 
-  private void sendHeartbeatRequest(Object details) throws TException {
+  private void sendHeartbeatRequest(Object details) throws CadenceError {
     RecordActivityTaskHeartbeatRequest r = new RecordActivityTaskHeartbeatRequest();
     r.setTaskToken(task.getTaskToken());
     byte[] serialized = dataConverter.toData(details);

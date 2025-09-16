@@ -14,10 +14,9 @@
  */
 package com.uber.cadence.testUtils;
 
-import com.uber.cadence.internal.compatibility.Thrift2ProtoAdapter;
-import com.uber.cadence.internal.compatibility.proto.serviceclient.IGrpcServiceStubs;
 import com.uber.cadence.serviceclient.ClientOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
+import com.uber.cadence.serviceclient.WorkflowServiceGrpc;
 
 public final class TestEnvironment {
   public static final String DOMAIN = "UnitTest";
@@ -42,7 +41,6 @@ public final class TestEnvironment {
   }
 
   public static IWorkflowService getDockerService() {
-    return new Thrift2ProtoAdapter(
-        IGrpcServiceStubs.newInstance(ClientOptions.newBuilder().setPort(7833).build()));
+    return new WorkflowServiceGrpc(ClientOptions.newBuilder().setPort(7833).build());
   }
 }

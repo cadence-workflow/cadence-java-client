@@ -88,7 +88,7 @@ class TestWorkflowStoreImpl implements TestWorkflowStore {
         }
         event.setEventId(history.size() + 1L);
         // It can be set in StateMachines.startActivityTask
-        if (!event.isSetTimestamp()) {
+        if (event.getTimestamp() == 0) {
           event.setTimestamp(timeInNanos);
         }
         history.add(event);
@@ -421,11 +421,14 @@ class TestWorkflowStoreImpl implements TestWorkflowStore {
                   .setExecution(executionId.getExecution())
                   .setHistoryLength(history.size())
                   .setStartTime(history.get(0).getTimestamp())
-                  .setIsCron(
-                      history
-                          .get(0)
-                          .getWorkflowExecutionStartedEventAttributes()
-                          .isSetCronSchedule())
+                  .setCron(
+                      history.get(0).getWorkflowExecutionStartedEventAttributes().getCronSchedule()
+                              != null
+                          && !history
+                              .get(0)
+                              .getWorkflowExecutionStartedEventAttributes()
+                              .getCronSchedule()
+                              .isEmpty())
                   .setType(
                       history
                           .get(0)
@@ -447,11 +450,14 @@ class TestWorkflowStoreImpl implements TestWorkflowStore {
                   .setExecution(executionId.getExecution())
                   .setHistoryLength(history.size())
                   .setStartTime(history.get(0).getTimestamp())
-                  .setIsCron(
-                      history
-                          .get(0)
-                          .getWorkflowExecutionStartedEventAttributes()
-                          .isSetCronSchedule())
+                  .setCron(
+                      history.get(0).getWorkflowExecutionStartedEventAttributes().getCronSchedule()
+                              != null
+                          && !history
+                              .get(0)
+                              .getWorkflowExecutionStartedEventAttributes()
+                              .getCronSchedule()
+                              .isEmpty())
                   .setType(
                       history.get(0).getWorkflowExecutionStartedEventAttributes().getWorkflowType())
                   .setCloseStatus(

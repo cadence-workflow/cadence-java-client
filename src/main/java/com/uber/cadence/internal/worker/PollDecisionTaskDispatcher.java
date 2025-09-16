@@ -65,7 +65,7 @@ public final class PollDecisionTaskDispatcher
       subscribers.get(taskListName).accept(t);
     } else {
       RespondDecisionTaskFailedRequest request = new RespondDecisionTaskFailedRequest();
-      request.setTaskToken(t.taskToken);
+      request.setTaskToken(t.getTaskToken());
       request.setCause(DecisionTaskFailedCause.RESET_STICKY_TASKLIST);
       String message =
           String.format(
