@@ -520,8 +520,7 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
 
     @Override
     public GetSearchAttributesResponse GetSearchAttributes()
-        throws InternalServiceError, ServiceBusyError, ClientVersionNotSupportedError,
-            CadenceError {
+        throws InternalServiceError, ServiceBusyError, ClientVersionNotSupportedError, CadenceError {
       return impl.GetSearchAttributes();
     }
 
@@ -560,8 +559,7 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
     }
 
     @Override
-    public ClusterInfo GetClusterInfo()
-        throws InternalServiceError, ServiceBusyError, CadenceError {
+    public ClusterInfo GetClusterInfo() throws InternalServiceError, ServiceBusyError, CadenceError {
       return impl.GetClusterInfo();
     }
 
@@ -582,15 +580,13 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
 
     @Override
     public void RegisterDomain(
-        RegisterDomainRequest registerRequest, AsyncMethodCallback resultHandler)
-        throws CadenceError {
+        RegisterDomainRequest registerRequest, AsyncMethodCallback resultHandler) throws CadenceError {
       impl.RegisterDomain(registerRequest, resultHandler);
     }
 
     @Override
     public void DescribeDomain(
-        DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler)
-        throws CadenceError {
+        DescribeDomainRequest describeRequest, AsyncMethodCallback resultHandler) throws CadenceError {
       impl.DescribeDomain(describeRequest, resultHandler);
     }
 
@@ -629,8 +625,7 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
 
     @Override
     public void GetTaskListsByDomain(
-        GetTaskListsByDomainRequest request, AsyncMethodCallback resultHandler)
-        throws CadenceError {
+        GetTaskListsByDomainRequest request, AsyncMethodCallback resultHandler) throws CadenceError {
       impl.GetTaskListsByDomain(request, resultHandler);
     }
 
@@ -907,15 +902,13 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
 
     @Override
     public void ListTaskListPartitions(
-        ListTaskListPartitionsRequest request, AsyncMethodCallback resultHandler)
-        throws CadenceError {
+        ListTaskListPartitionsRequest request, AsyncMethodCallback resultHandler) throws CadenceError {
       impl.ListTaskListPartitions(request, resultHandler);
     }
 
     @Override
     public void RefreshWorkflowTasks(
-        RefreshWorkflowTasksRequest request, AsyncMethodCallback resultHandler)
-        throws CadenceError {
+        RefreshWorkflowTasksRequest request, AsyncMethodCallback resultHandler) throws CadenceError {
       impl.RefreshWorkflowTasks(request, resultHandler);
     }
 

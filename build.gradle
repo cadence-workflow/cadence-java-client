@@ -137,7 +137,7 @@ sourceSets {
         }
         java {
             srcDir 'src/main'
-            srcDir 'src/entities'
+            srcDir 'src/gen/java'
         }
     }
 }
