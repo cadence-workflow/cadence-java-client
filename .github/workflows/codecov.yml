@@ -12,6 +12,8 @@ jobs:
         run: docker compose -f docker/github_actions/docker-compose.yml run unit-test-test-service
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
+        with:
+          files: ./build/reports/jacoco/test/jacocoTestReport.xml
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           slug: cadence-workflow/cadence-java-client
