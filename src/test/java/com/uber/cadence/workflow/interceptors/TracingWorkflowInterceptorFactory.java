@@ -208,6 +208,13 @@ public class TracingWorkflowInterceptorFactory
     }
 
     @Override
+    public int getVersion(
+        String changeID, int minSupported, int maxSupported, GetVersionOptions options) {
+      trace.add("getVersion with options");
+      return next.getVersion(changeID, minSupported, maxSupported, options);
+    }
+
+    @Override
     public void continueAsNew(
         Optional<String> workflowType, Optional<ContinueAsNewOptions> options, Object[] args) {
       trace.add("continueAsNew");
