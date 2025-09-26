@@ -1,0 +1,73 @@
+package com.uber.cadence;
+
+import java.util.*;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+@Data
+@Accessors(chain = true)
+public class HistoryEvent {
+  private long eventId;
+  private long timestamp;
+  private EventType eventType;
+  private long version;
+  private long taskId;
+  private WorkflowExecutionStartedEventAttributes workflowExecutionStartedEventAttributes;
+  private WorkflowExecutionCompletedEventAttributes workflowExecutionCompletedEventAttributes;
+  private WorkflowExecutionFailedEventAttributes workflowExecutionFailedEventAttributes;
+  private WorkflowExecutionTimedOutEventAttributes workflowExecutionTimedOutEventAttributes;
+  private DecisionTaskScheduledEventAttributes decisionTaskScheduledEventAttributes;
+  private DecisionTaskStartedEventAttributes decisionTaskStartedEventAttributes;
+  private DecisionTaskCompletedEventAttributes decisionTaskCompletedEventAttributes;
+  private DecisionTaskTimedOutEventAttributes decisionTaskTimedOutEventAttributes;
+  private DecisionTaskFailedEventAttributes decisionTaskFailedEventAttributes;
+  private ActivityTaskScheduledEventAttributes activityTaskScheduledEventAttributes;
+  private ActivityTaskStartedEventAttributes activityTaskStartedEventAttributes;
+  private ActivityTaskCompletedEventAttributes activityTaskCompletedEventAttributes;
+  private ActivityTaskFailedEventAttributes activityTaskFailedEventAttributes;
+  private ActivityTaskTimedOutEventAttributes activityTaskTimedOutEventAttributes;
+  private TimerStartedEventAttributes timerStartedEventAttributes;
+  private TimerFiredEventAttributes timerFiredEventAttributes;
+  private ActivityTaskCancelRequestedEventAttributes activityTaskCancelRequestedEventAttributes;
+  private RequestCancelActivityTaskFailedEventAttributes
+      requestCancelActivityTaskFailedEventAttributes;
+  private ActivityTaskCanceledEventAttributes activityTaskCanceledEventAttributes;
+  private TimerCanceledEventAttributes timerCanceledEventAttributes;
+  private CancelTimerFailedEventAttributes cancelTimerFailedEventAttributes;
+  private MarkerRecordedEventAttributes markerRecordedEventAttributes;
+  private WorkflowExecutionSignaledEventAttributes workflowExecutionSignaledEventAttributes;
+  private WorkflowExecutionTerminatedEventAttributes workflowExecutionTerminatedEventAttributes;
+  private WorkflowExecutionCancelRequestedEventAttributes
+      workflowExecutionCancelRequestedEventAttributes;
+  private WorkflowExecutionCanceledEventAttributes workflowExecutionCanceledEventAttributes;
+  private RequestCancelExternalWorkflowExecutionInitiatedEventAttributes
+      requestCancelExternalWorkflowExecutionInitiatedEventAttributes;
+  private RequestCancelExternalWorkflowExecutionFailedEventAttributes
+      requestCancelExternalWorkflowExecutionFailedEventAttributes;
+  private ExternalWorkflowExecutionCancelRequestedEventAttributes
+      externalWorkflowExecutionCancelRequestedEventAttributes;
+  private WorkflowExecutionContinuedAsNewEventAttributes
+      workflowExecutionContinuedAsNewEventAttributes;
+  private StartChildWorkflowExecutionInitiatedEventAttributes
+      startChildWorkflowExecutionInitiatedEventAttributes;
+  private StartChildWorkflowExecutionFailedEventAttributes
+      startChildWorkflowExecutionFailedEventAttributes;
+  private ChildWorkflowExecutionStartedEventAttributes childWorkflowExecutionStartedEventAttributes;
+  private ChildWorkflowExecutionCompletedEventAttributes
+      childWorkflowExecutionCompletedEventAttributes;
+  private ChildWorkflowExecutionFailedEventAttributes childWorkflowExecutionFailedEventAttributes;
+  private ChildWorkflowExecutionCanceledEventAttributes
+      childWorkflowExecutionCanceledEventAttributes;
+  private ChildWorkflowExecutionTimedOutEventAttributes
+      childWorkflowExecutionTimedOutEventAttributes;
+  private ChildWorkflowExecutionTerminatedEventAttributes
+      childWorkflowExecutionTerminatedEventAttributes;
+  private SignalExternalWorkflowExecutionInitiatedEventAttributes
+      signalExternalWorkflowExecutionInitiatedEventAttributes;
+  private SignalExternalWorkflowExecutionFailedEventAttributes
+      signalExternalWorkflowExecutionFailedEventAttributes;
+  private ExternalWorkflowExecutionSignaledEventAttributes
+      externalWorkflowExecutionSignaledEventAttributes;
+  private UpsertWorkflowSearchAttributesEventAttributes
+      upsertWorkflowSearchAttributesEventAttributes;
+}
