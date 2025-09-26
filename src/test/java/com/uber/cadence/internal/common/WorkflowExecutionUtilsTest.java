@@ -21,13 +21,12 @@ import com.google.common.collect.ImmutableMap;
 import com.uber.cadence.*;
 import com.uber.cadence.client.WorkflowTerminatedException;
 import com.uber.cadence.client.WorkflowTimedOutException;
-import com.uber.cadence.internal.compatibility.ThriftObjects;
+import com.uber.cadence.internal.compatibility.ClientObjects;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,8 +41,7 @@ public class WorkflowExecutionUtilsTest {
           + "    ActivityType = activityName;\n"
           + "    Domain = domain;\n"
           + "    Header = {\n"
-          + "      Fields = { key1=value1, key2=value2 };\n"
-          + "      FieldsSize = 2\n"
+          + "      Fields = { key1=value1, key2=value2 }\n"
           + "    };\n"
           + "    HeartbeatTimeoutSeconds = 4;\n"
           + "    Input = input;\n"
@@ -408,7 +406,7 @@ public class WorkflowExecutionUtilsTest {
   @Test
   public void testGetHistoryPage_ExceptionWhileRetrievingExecutionHistory() throws Exception {
     final String errMessage = "thrift comm exception";
-    when(mockService.GetWorkflowExecutionHistory(any())).thenThrow(new TException(errMessage));
+    when(mockService.GetWorkflowExecutionHistory(any())).thenThrow(new CadenceError(errMessage));
 
     Error exception =
         assertThrows(
@@ -433,8 +431,8 @@ public class WorkflowExecutionUtilsTest {
         new Header()
             .setFields(
                 ImmutableMap.of(
-                    "key1", ThriftObjects.utf8("value1"),
-                    "key2", ThriftObjects.utf8("value2")));
+                    "key1", ClientObjects.utf8("value1"),
+                    "key2", ClientObjects.utf8("value2")));
 
     final Decision decisionScheduleActivity =
         new Decision()
@@ -444,7 +442,7 @@ public class WorkflowExecutionUtilsTest {
                     .setActivityId("activityId")
                     .setActivityType(activityType)
                     .setTaskList(taskList)
-                    .setInput(ThriftObjects.utf8("input"))
+                    .setInput(ClientObjects.utf8("input"))
                     .setScheduleToCloseTimeoutSeconds(1)
                     .setScheduleToStartTimeoutSeconds(2)
                     .setStartToCloseTimeoutSeconds(3)
@@ -460,7 +458,7 @@ public class WorkflowExecutionUtilsTest {
                 new FailWorkflowExecutionDecisionAttributes()
                     .setReason("failure reason")
                     .setDetails(
-                        ThriftObjects.utf8(
+                        ClientObjects.utf8(
                             "{\"error\":\"panic\", \"stackTrace\":\"fn()\\nmain()\"}")));
 
     ArrayList<Decision> decisions =

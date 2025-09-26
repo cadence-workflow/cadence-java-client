@@ -29,11 +29,12 @@ import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowClientOptions;
+import com.uber.cadence.converter.JsonDataConverter;
 import com.uber.cadence.serviceclient.IWorkflowService;
+import com.uber.cadence.shadower.Constants;
 import com.uber.cadence.shadower.ExitCondition;
 import com.uber.cadence.shadower.Mode;
 import com.uber.cadence.shadower.WorkflowParams;
-import com.uber.cadence.shadower.shadowerConstants;
 import com.uber.m3.tally.NoopScope;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -87,14 +88,14 @@ public class ShadowingWorkerTest {
             .setWorkflowQuery(shadowingOptions.getWorkflowQuery());
     StartWorkflowExecutionRequest expectedRequest =
         new StartWorkflowExecutionRequest()
-            .setDomain(shadowerConstants.LocalDomainName)
-            .setWorkflowId(shadowingOptions.getDomain() + shadowerConstants.WorkflowIDSuffix)
-            .setTaskList(new TaskList().setName(shadowerConstants.TaskList))
-            .setWorkflowType(new WorkflowType().setName(shadowerConstants.WorkflowName))
+            .setDomain(Constants.LocalDomainName)
+            .setWorkflowId(shadowingOptions.getDomain() + Constants.WorkflowIDSuffix)
+            .setTaskList(new TaskList().setName(Constants.TaskList))
+            .setWorkflowType(new WorkflowType().setName(Constants.WorkflowName))
             .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.AllowDuplicate)
             .setExecutionStartToCloseTimeoutSeconds(864000)
             .setTaskStartToCloseTimeoutSeconds(60)
-            .setInput(serializer.serialize(params));
+            .setInput(JsonDataConverter.getInstance().toData(params));
     when(mockService.StartWorkflowExecution(any())).thenReturn(null);
 
     shadowingWorker.startShadowingWorkflow();

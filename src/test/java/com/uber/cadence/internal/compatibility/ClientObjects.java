@@ -17,25 +17,22 @@ package com.uber.cadence.internal.compatibility;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.uber.cadence.*;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class ThriftObjects {
-  public static final WorkflowType WORKFLOW_TYPE =
-      new com.uber.cadence.WorkflowType().setName("workflowType");
+public class ClientObjects {
+
+  public static final WorkflowType WORKFLOW_TYPE = new WorkflowType().setName("workflowType");
   public static final ActivityType ACTIVITY_TYPE = new ActivityType().setName("activityName");
   public static final TaskList TASK_LIST =
-      new com.uber.cadence.TaskList()
-          .setName("taskList")
-          .setKind(com.uber.cadence.TaskListKind.NORMAL);
+      new TaskList().setName("taskList").setKind(TaskListKind.NORMAL);
   public static final TaskListMetadata TASK_LIST_METADATA =
       new TaskListMetadata().setMaxTasksPerSecond(10);
   public static final RetryPolicy RETRY_POLICY =
-      new com.uber.cadence.RetryPolicy()
+      new RetryPolicy()
           .setInitialIntervalInSeconds(11)
           .setBackoffCoefficient(0.5)
           .setMaximumIntervalInSeconds(12)
@@ -59,16 +56,16 @@ public final class ThriftObjects {
           .setWorkerTaskList(TASK_LIST)
           .setScheduleToStartTimeoutSeconds(1);
   public static final WorkflowQuery WORKFLOW_QUERY =
-      new WorkflowQuery().setQueryType("queryType").setQueryArgs(utf8("queryArgs"));
+      new WorkflowQuery()
+          .setQueryType("queryType")
+          .setQueryArgs("queryArgs".getBytes(StandardCharsets.UTF_8));
   public static final WorkflowQueryResult WORKFLOW_QUERY_RESULT =
       new WorkflowQueryResult()
           .setResultType(QueryResultType.ANSWERED)
-          .setAnswer(utf8("answer"))
+          .setAnswer("answer".getBytes(StandardCharsets.UTF_8))
           .setErrorMessage("error");
   public static final Header HEADER = new Header().setFields(ImmutableMap.of("key", utf8("value")));
   public static final Memo MEMO = new Memo().setFields(ImmutableMap.of("memo", utf8("memoValue")));
-  public static final AutoConfigHint AUTO_CONFIG_HINT =
-      new AutoConfigHint().setEnableAutoConfig(true).setPollerWaitTimeInMs(100);
   public static final SearchAttributes SEARCH_ATTRIBUTES =
       new SearchAttributes().setIndexedFields(ImmutableMap.of("search", utf8("attributes")));
   public static final Map<String, String> DATA = ImmutableMap.of("dataKey", "dataValue");
@@ -115,7 +112,7 @@ public final class ThriftObjects {
           .setSearchAttributes(SEARCH_ATTRIBUTES)
           .setAutoResetPoints(RESET_POINTS)
           .setTaskList(TASK_LIST.getName())
-          .setIsCron(true);
+          .setCron(true);
   public static final PendingActivityInfo PENDING_ACTIVITY_INFO =
       new PendingActivityInfo()
           .setActivityID("activityId")
@@ -182,7 +179,16 @@ public final class ThriftObjects {
           .setHistoryArchivalURI("historyArchivalUri")
           .setVisibilityArchivalStatus(ArchivalStatus.DISABLED)
           .setVisibilityArchivalURI("visibilityArchivalUri")
-          .setEmitMetric(true);
+          .setEmitMetric(true)
+          .setAsyncWorkflowConfiguration(new AsyncWorkflowConfiguration().setEnabled(true))
+          .setIsolationgroups(
+              new IsolationGroupConfiguration()
+                  .setIsolationGroups(
+                      ImmutableList.of(
+                          new IsolationGroupPartition()
+                              .setName("partitionName")
+                              .setState(IsolationGroupState.HEALTHY))));
+
   public static final StartTimeFilter START_TIME_FILTER =
       new StartTimeFilter().setEarliestTime(2).setLatestTime(3);
   public static final WorkflowExecutionFilter WORKFLOW_EXECUTION_FILTER =
@@ -427,7 +433,7 @@ public final class ThriftObjects {
               .setScheduleToStartTimeoutSeconds(2)
               .setStartToCloseTimeoutSeconds(3)
               .setHeartbeatTimeoutSeconds(4)
-              .setDecisionTaskCompletedEventId(5)
+              .setDecisionTaskCompletedEventId((5))
               .setRetryPolicy(RETRY_POLICY)
               .setHeader(HEADER);
 
@@ -541,9 +547,7 @@ public final class ThriftObjects {
               .setHeader(HEADER)
               .setMemo(MEMO)
               .setSearchAttributes(SEARCH_ATTRIBUTES)
-              .setDelayStartSeconds(4)
-              .setJitterStartSeconds(5)
-              .setFirstRunAtTimestamp(123456789L);
+              .setDelayStartSeconds(4);
 
   public static final StartChildWorkflowExecutionFailedEventAttributes
       START_CHILD_WORKFLOW_EXECUTION_FAILED_EVENT_ATTRIBUTES =
@@ -779,7 +783,7 @@ public final class ThriftObjects {
               .setDetails(utf8("details"))
               .setIdentity("identity");
   public static final RespondActivityTaskCanceledRequest RESPOND_ACTIVITY_TASK_CANCELED_REQUEST =
-      new com.uber.cadence.RespondActivityTaskCanceledRequest()
+      new RespondActivityTaskCanceledRequest()
           .setTaskToken(utf8("taskToken"))
           .setDetails(utf8("details"))
           .setIdentity("identity");
@@ -863,8 +867,8 @@ public final class ThriftObjects {
           .setNextPageToken(utf8("nextPageToken"))
           .setQueryConsistencyLevel(QueryConsistencyLevel.STRONG);
 
-  public static final com.uber.cadence.StartWorkflowExecutionRequest START_WORKFLOW_EXECUTION =
-      new com.uber.cadence.StartWorkflowExecutionRequest()
+  public static final StartWorkflowExecutionRequest START_WORKFLOW_EXECUTION =
+      new StartWorkflowExecutionRequest()
           .setDomain("domain")
           .setWorkflowId(WORKFLOW_ID)
           .setWorkflowType(WORKFLOW_TYPE)
@@ -874,7 +878,7 @@ public final class ThriftObjects {
           .setTaskStartToCloseTimeoutSeconds(2)
           .setIdentity("identity")
           .setRequestId("requestId")
-          .setWorkflowIdReusePolicy(com.uber.cadence.WorkflowIdReusePolicy.AllowDuplicate)
+          .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.AllowDuplicate)
           .setRetryPolicy(RETRY_POLICY)
           .setCronSchedule("cronSchedule")
           .setMemo(MEMO)
@@ -882,31 +886,30 @@ public final class ThriftObjects {
           .setHeader(HEADER)
           .setJitterStartSeconds(0)
           .setDelayStartSeconds(3)
-          .setFirstRunAtTimestamp(123456789L);
-  public static final com.uber.cadence.SignalWithStartWorkflowExecutionRequest
-      SIGNAL_WITH_START_WORKFLOW_EXECUTION =
-          new SignalWithStartWorkflowExecutionRequest()
-              .setDomain("domain")
-              .setWorkflowId(WORKFLOW_ID)
-              .setWorkflowType(WORKFLOW_TYPE)
-              .setTaskList(TASK_LIST)
-              .setInput("input".getBytes(StandardCharsets.UTF_8))
-              .setExecutionStartToCloseTimeoutSeconds(1)
-              .setTaskStartToCloseTimeoutSeconds(2)
-              .setIdentity("identity")
-              .setRequestId("requestId")
-              .setWorkflowIdReusePolicy(com.uber.cadence.WorkflowIdReusePolicy.AllowDuplicate)
-              .setSignalName("signalName")
-              .setSignalInput("signalInput".getBytes(StandardCharsets.UTF_8))
-              .setControl("control".getBytes(StandardCharsets.UTF_8))
-              .setRetryPolicy(RETRY_POLICY)
-              .setCronSchedule("cronSchedule")
-              .setMemo(MEMO)
-              .setSearchAttributes(SEARCH_ATTRIBUTES)
-              .setHeader(HEADER)
-              .setDelayStartSeconds(3)
-              .setJitterStartSeconds(0)
-              .setFirstRunAtTimestamp(123456789L);
+          .setFirstRunAtTimestamp(123456789);
+  public static final SignalWithStartWorkflowExecutionRequest SIGNAL_WITH_START_WORKFLOW_EXECUTION =
+      new SignalWithStartWorkflowExecutionRequest()
+          .setDomain("domain")
+          .setWorkflowId(WORKFLOW_ID)
+          .setWorkflowType(WORKFLOW_TYPE)
+          .setTaskList(TASK_LIST)
+          .setInput("input".getBytes(StandardCharsets.UTF_8))
+          .setExecutionStartToCloseTimeoutSeconds(1)
+          .setTaskStartToCloseTimeoutSeconds(2)
+          .setIdentity("identity")
+          .setRequestId("requestId")
+          .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.AllowDuplicate)
+          .setSignalName("signalName")
+          .setSignalInput("signalInput".getBytes(StandardCharsets.UTF_8))
+          .setControl("control".getBytes(StandardCharsets.UTF_8))
+          .setRetryPolicy(RETRY_POLICY)
+          .setCronSchedule("cronSchedule")
+          .setMemo(MEMO)
+          .setSearchAttributes(SEARCH_ATTRIBUTES)
+          .setHeader(HEADER)
+          .setDelayStartSeconds(3)
+          .setJitterStartSeconds(0)
+          .setFirstRunAtTimestamp(123456789);
 
   public static final StartWorkflowExecutionAsyncRequest START_WORKFLOW_EXECUTION_ASYNC_REQUEST =
       new StartWorkflowExecutionAsyncRequest().setRequest(START_WORKFLOW_EXECUTION);
@@ -1004,7 +1007,7 @@ public final class ThriftObjects {
           .setActiveClusterName("activeCluster")
           .setData(DATA)
           .setSecurityToken("securityToken")
-          .setIsGlobalDomain(true)
+          .setGlobalDomain(true)
           .setHistoryArchivalStatus(ArchivalStatus.ENABLED)
           .setHistoryArchivalURI("historyArchivalUri")
           .setVisibilityArchivalStatus(ArchivalStatus.DISABLED)
@@ -1113,8 +1116,7 @@ public final class ThriftObjects {
           .setHeartbeatDetails(utf8("heartbeatDetails"))
           .setWorkflowType(WORKFLOW_TYPE)
           .setWorkflowDomain("domain")
-          .setHeader(HEADER)
-          .setAutoConfigHint(AUTO_CONFIG_HINT);
+          .setHeader(HEADER);
   public static final PollForDecisionTaskResponse POLL_FOR_DECISION_TASK_RESPONSE =
       new PollForDecisionTaskResponse()
           .setTaskToken(utf8("taskToken"))
@@ -1131,8 +1133,7 @@ public final class ThriftObjects {
           .setScheduledTimestamp(5)
           .setStartedTimestamp(6)
           .setQueries(ImmutableMap.of("query", WORKFLOW_QUERY))
-          .setNextEventId(7)
-          .setAutoConfigHint(AUTO_CONFIG_HINT);
+          .setNextEventId(7);
 
   public static final QueryWorkflowResponse QUERY_WORKFLOW_RESPONSE =
       new QueryWorkflowResponse()
@@ -1158,7 +1159,7 @@ public final class ThriftObjects {
           .setConfiguration(DOMAIN_CONFIGURATION)
           .setReplicationConfiguration(DOMAIN_REPLICATION_CONFIGURATION)
           .setFailoverVersion(1)
-          .setIsGlobalDomain(true);
+          .setGlobalDomain(true);
   public static final ListDomainsResponse LIST_DOMAINS_RESPONSE =
       new ListDomainsResponse()
           .setDomains(ImmutableList.of(DESCRIBE_DOMAIN_RESPONSE))
@@ -1172,12 +1173,12 @@ public final class ThriftObjects {
           .setConfiguration(DOMAIN_CONFIGURATION)
           .setReplicationConfiguration(DOMAIN_REPLICATION_CONFIGURATION)
           .setFailoverVersion(1)
-          .setIsGlobalDomain(true);
+          .setGlobalDomain(true);
 
-  private ThriftObjects() {}
+  private ClientObjects() {}
 
-  public static ByteBuffer utf8(String value) {
-    return ByteBuffer.wrap(utf8Bytes(value));
+  public static byte[] utf8(String value) {
+    return utf8Bytes(value);
   }
 
   public static byte[] utf8Bytes(String value) {

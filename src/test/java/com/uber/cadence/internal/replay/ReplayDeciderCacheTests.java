@@ -201,7 +201,7 @@ public class ReplayDeciderCacheTests {
 
     assertEquals(3, replayDeciderCache.size());
 
-    replayDeciderCache.evictAnyNotInProcessing(decisionTask3.workflowExecution.runId);
+    replayDeciderCache.evictAnyNotInProcessing(decisionTask3.getWorkflowExecution().getRunId());
 
     // Assert
     assertEquals(2, replayDeciderCache.size());
@@ -226,7 +226,7 @@ public class ReplayDeciderCacheTests {
 
     assertEquals(1, replayDeciderCache.size());
 
-    replayDeciderCache.evictAnyNotInProcessing(decisionTask1.workflowExecution.runId);
+    replayDeciderCache.evictAnyNotInProcessing(decisionTask1.getWorkflowExecution().getRunId());
 
     // Assert
     assertEquals(1, replayDeciderCache.size());

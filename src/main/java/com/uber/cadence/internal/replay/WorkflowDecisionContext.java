@@ -43,7 +43,6 @@ import com.uber.cadence.workflow.ChildWorkflowTerminatedException;
 import com.uber.cadence.workflow.ChildWorkflowTimedOutException;
 import com.uber.cadence.workflow.SignalExternalWorkflowException;
 import com.uber.cadence.workflow.StartChildWorkflowFailedException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -177,9 +176,9 @@ final class WorkflowDecisionContext {
     if (headers == null || headers.isEmpty()) {
       return null;
     }
-    Map<String, ByteBuffer> fields = new HashMap<>();
+    Map<String, byte[]> fields = new HashMap<>();
     for (Map.Entry<String, byte[]> item : headers.entrySet()) {
-      fields.put(item.getKey(), ByteBuffer.wrap(item.getValue()));
+      fields.put(item.getKey(), item.getValue());
     }
     Header headerThrift = new Header();
     headerThrift.setFields(fields);
@@ -230,7 +229,7 @@ final class WorkflowDecisionContext {
         new RequestCancelExternalWorkflowExecutionDecisionAttributes();
     String workflowId = execution.getWorkflowId();
     attributes.setWorkflowId(workflowId);
-    if (execution.isSetRunId()) {
+    if (execution.getRunId() != null) {
       attributes.setRunId(execution.getRunId());
     }
     decisions.requestCancelExternalWorkflowExecution(attributes);

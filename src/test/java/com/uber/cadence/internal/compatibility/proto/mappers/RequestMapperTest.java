@@ -15,7 +15,7 @@
  *  permissions and limitations under the License.
  */
 
-package com.uber.cadence.internal.compatibility.proto;
+package com.uber.cadence.internal.compatibility.proto.mappers;
 
 import static com.uber.cadence.internal.compatibility.MapperTestUtil.assertMissingFields;
 import static com.uber.cadence.internal.compatibility.MapperTestUtil.assertNoMissingFields;
@@ -24,20 +24,17 @@ import static org.junit.Assert.assertNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.protobuf.Message;
+import com.uber.cadence.internal.compatibility.ClientObjects;
 import com.uber.cadence.internal.compatibility.ProtoObjects;
-import com.uber.cadence.internal.compatibility.ThriftObjects;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Function;
-import org.apache.thrift.TBase;
-import org.apache.thrift.TFieldIdEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class RequestMapperTest<
-    F extends Enum<F> & TFieldIdEnum, T extends TBase<T, F>, P extends Message> {
+public class RequestMapperTest<T, P extends Message> {
 
   @Parameterized.Parameter(0)
   public String testName;
@@ -81,173 +78,190 @@ public class RequestMapperTest<
   public static Iterable<Object[]> cases() {
     return Arrays.asList(
         testCase(
-            ThriftObjects.COUNT_WORKFLOW_EXECUTIONS_REQUEST,
+            ClientObjects.COUNT_WORKFLOW_EXECUTIONS_REQUEST,
             ProtoObjects.COUNT_WORKFLOW_EXECUTIONS_REQUEST,
             RequestMapper::countWorkflowExecutionsRequest),
         testCase(
-            ThriftObjects.DESCRIBE_TASK_LIST_REQUEST,
+            ClientObjects.DESCRIBE_TASK_LIST_REQUEST,
             ProtoObjects.DESCRIBE_TASK_LIST_REQUEST,
             RequestMapper::describeTaskListRequest),
         testCase(
-            ThriftObjects.LIST_ARCHIVED_WORKFLOW_EXECUTIONS_REQUEST,
+            ClientObjects.LIST_ARCHIVED_WORKFLOW_EXECUTIONS_REQUEST,
             ProtoObjects.LIST_ARCHIVED_WORKFLOW_EXECUTIONS_REQUEST,
             RequestMapper::listArchivedWorkflowExecutionsRequest),
         testCase(
-            ThriftObjects.REQUEST_CANCEL_WORKFLOW_EXECUTION_REQUEST,
+            ClientObjects.REQUEST_CANCEL_WORKFLOW_EXECUTION_REQUEST,
             ProtoObjects.REQUEST_CANCEL_WORKFLOW_EXECUTION_REQUEST,
             RequestMapper::requestCancelWorkflowExecutionRequest,
             "firstExecutionRunID", // optional field
             "cause"), // optional field
         testCase(
-            ThriftObjects.REQUEST_CANCEL_WORKFLOW_EXECUTION_REQUEST_FULL,
+            ClientObjects.REQUEST_CANCEL_WORKFLOW_EXECUTION_REQUEST_FULL,
             ProtoObjects.REQUEST_CANCEL_WORKFLOW_EXECUTION_REQUEST_FULL,
             RequestMapper::requestCancelWorkflowExecutionRequest),
         testCase(
-            ThriftObjects.RESET_STICKY_TASK_LIST_REQUEST,
+            ClientObjects.RESET_STICKY_TASK_LIST_REQUEST,
             ProtoObjects.RESET_STICKY_TASK_LIST_REQUEST,
             RequestMapper::resetStickyTaskListRequest),
         testCase(
-            ThriftObjects.RESET_WORKFLOW_EXECUTION_REQUEST,
+            ClientObjects.RESET_WORKFLOW_EXECUTION_REQUEST,
             ProtoObjects.RESET_WORKFLOW_EXECUTION_REQUEST,
             RequestMapper::resetWorkflowExecutionRequest),
         testCase(
-            ThriftObjects.RESPOND_ACTIVITY_TASK_CANCELED_BY_ID_REQUEST,
+            ClientObjects.RESPOND_ACTIVITY_TASK_CANCELED_BY_ID_REQUEST,
             ProtoObjects.RESPOND_ACTIVITY_TASK_CANCELED_BY_ID_REQUEST,
             RequestMapper::respondActivityTaskCanceledByIdRequest),
         testCase(
-            ThriftObjects.RESPOND_ACTIVITY_TASK_CANCELED_REQUEST,
+            ClientObjects.RESPOND_ACTIVITY_TASK_CANCELED_REQUEST,
             ProtoObjects.RESPOND_ACTIVITY_TASK_CANCELED_REQUEST,
             RequestMapper::respondActivityTaskCanceledRequest),
         testCase(
-            ThriftObjects.RESPOND_ACTIVITY_TASK_COMPLETED_BY_ID_REQUEST,
+            ClientObjects.RESPOND_ACTIVITY_TASK_COMPLETED_BY_ID_REQUEST,
             ProtoObjects.RESPOND_ACTIVITY_TASK_COMPLETED_BY_ID_REQUEST,
             RequestMapper::respondActivityTaskCompletedByIdRequest),
         testCase(
-            ThriftObjects.RESPOND_ACTIVITY_TASK_COMPLETED_REQUEST,
+            ClientObjects.RESPOND_ACTIVITY_TASK_COMPLETED_REQUEST,
             ProtoObjects.RESPOND_ACTIVITY_TASK_COMPLETED_REQUEST,
             RequestMapper::respondActivityTaskCompletedRequest),
         testCase(
-            ThriftObjects.RESPOND_ACTIVITY_TASK_FAILED_BY_ID_REQUEST,
+            ClientObjects.RESPOND_ACTIVITY_TASK_FAILED_BY_ID_REQUEST,
             ProtoObjects.RESPOND_ACTIVITY_TASK_FAILED_BY_ID_REQUEST,
             RequestMapper::respondActivityTaskFailedByIdRequest),
         testCase(
-            ThriftObjects.RESPOND_ACTIVITY_TASK_FAILED_REQUEST,
+            ClientObjects.RESPOND_ACTIVITY_TASK_FAILED_REQUEST,
             ProtoObjects.RESPOND_ACTIVITY_TASK_FAILED_REQUEST,
             RequestMapper::respondActivityTaskFailedRequest),
         testCase(
-            ThriftObjects.RESPOND_DECISION_TASK_COMPLETED_REQUEST,
+            ClientObjects.RESPOND_DECISION_TASK_COMPLETED_REQUEST,
             ProtoObjects.RESPOND_DECISION_TASK_COMPLETED_REQUEST,
-            RequestMapper::respondDecisionTaskCompletedRequest),
+            RequestMapper::respondDecisionTaskCompletedRequest,
+            "scheduleActivityTaskDecisionAttributes", // all other types are missing as expected
+            "requestCancelActivityTaskDecisionAttributes",
+            "startTimerDecisionAttributes",
+            "failWorkflowExecutionDecisionAttributes",
+            "cancelTimerDecisionAttributes",
+            "cancelWorkflowExecutionDecisionAttributes",
+            "requestCancelExternalWorkflowExecutionDecisionAttributes",
+            "recordMarkerDecisionAttributes",
+            "continueAsNewWorkflowExecutionDecisionAttributes",
+            "startChildWorkflowExecutionDecisionAttributes",
+            "signalExternalWorkflowExecutionDecisionAttributes",
+            "upsertWorkflowSearchAttributesDecisionAttributes"),
         testCase(
-            ThriftObjects.RESPOND_DECISION_TASK_FAILED_REQUEST,
+            ClientObjects.RESPOND_DECISION_TASK_FAILED_REQUEST,
             ProtoObjects.RESPOND_DECISION_TASK_FAILED_REQUEST,
             RequestMapper::respondDecisionTaskFailedRequest),
         testCase(
-            ThriftObjects.RESPOND_QUERY_TASK_COMPLETED_REQUEST,
+            ClientObjects.RESPOND_QUERY_TASK_COMPLETED_REQUEST,
             ProtoObjects.RESPOND_QUERY_TASK_COMPLETED_REQUEST,
             RequestMapper::respondQueryTaskCompletedRequest),
         testCase(
-            ThriftObjects.LIST_WORKFLOW_EXECUTIONS_REQUEST,
+            ClientObjects.LIST_WORKFLOW_EXECUTIONS_REQUEST,
             ProtoObjects.SCAN_WORKFLOW_EXECUTIONS_REQUEST,
             RequestMapper::scanWorkflowExecutionsRequest),
         testCase(
-            ThriftObjects.DESCRIBE_WORKFLOW_EXECUTION_REQUEST,
+            ClientObjects.DESCRIBE_WORKFLOW_EXECUTION_REQUEST,
             ProtoObjects.DESCRIBE_WORKFLOW_EXECUTION_REQUEST,
             RequestMapper::describeWorkflowExecutionRequest),
         testCase(
-            ThriftObjects.GET_WORKFLOW_EXECUTION_HISTORY_REQUEST,
+            ClientObjects.GET_WORKFLOW_EXECUTION_HISTORY_REQUEST,
             ProtoObjects.GET_WORKFLOW_EXECUTION_HISTORY_REQUEST,
             RequestMapper::getWorkflowExecutionHistoryRequest),
         testCase(
-            ThriftObjects.START_WORKFLOW_EXECUTION,
+            ClientObjects.START_WORKFLOW_EXECUTION,
             ProtoObjects.START_WORKFLOW_EXECUTION,
             RequestMapper::startWorkflowExecutionRequest),
         testCase(
-            ThriftObjects.SIGNAL_WITH_START_WORKFLOW_EXECUTION,
+            ClientObjects.SIGNAL_WITH_START_WORKFLOW_EXECUTION,
             ProtoObjects.SIGNAL_WITH_START_WORKFLOW_EXECUTION,
             RequestMapper::signalWithStartWorkflowExecutionRequest),
         testCase(
-            ThriftObjects.START_WORKFLOW_EXECUTION_ASYNC_REQUEST,
+            ClientObjects.START_WORKFLOW_EXECUTION_ASYNC_REQUEST,
             ProtoObjects.START_WORKFLOW_EXECUTION_ASYNC_REQUEST,
             RequestMapper::startWorkflowExecutionAsyncRequest),
         testCase(
-            ThriftObjects.SIGNAL_WITH_START_WORKFLOW_EXECUTION_ASYNC_REQUEST,
+            ClientObjects.SIGNAL_WITH_START_WORKFLOW_EXECUTION_ASYNC_REQUEST,
             ProtoObjects.SIGNAL_WITH_START_WORKFLOW_EXECUTION_ASYNC_REQUEST,
             RequestMapper::signalWithStartWorkflowExecutionAsyncRequest),
         testCase(
-            ThriftObjects.SIGNAL_WORKFLOW_EXECUTION_REQUEST,
+            ClientObjects.SIGNAL_WORKFLOW_EXECUTION_REQUEST,
             ProtoObjects.SIGNAL_WORKFLOW_EXECUTION_REQUEST,
             RequestMapper::signalWorkflowExecutionRequest),
         testCase(
-            ThriftObjects.TERMINATE_WORKFLOW_EXECUTION_REQUEST,
+            ClientObjects.TERMINATE_WORKFLOW_EXECUTION_REQUEST,
             ProtoObjects.TERMINATE_WORKFLOW_EXECUTION_REQUEST,
             RequestMapper::terminateWorkflowExecutionRequest,
             "firstExecutionRunID"), // optional field
         testCase(
-            ThriftObjects.TERMINATE_WORKFLOW_EXECUTION_REQUEST_FULL,
+            ClientObjects.TERMINATE_WORKFLOW_EXECUTION_REQUEST_FULL,
             ProtoObjects.TERMINATE_WORKFLOW_EXECUTION_REQUEST_FULL,
             RequestMapper::terminateWorkflowExecutionRequest),
         testCase(
-            ThriftObjects.DEPRECATE_DOMAIN_REQUEST,
+            ClientObjects.DEPRECATE_DOMAIN_REQUEST,
             ProtoObjects.DEPRECATE_DOMAIN_REQUEST,
             RequestMapper::deprecateDomainRequest),
         testCase(
-            ThriftObjects.DESCRIBE_DOMAIN_BY_ID_REQUEST,
+            ClientObjects.DESCRIBE_DOMAIN_BY_ID_REQUEST,
             ProtoObjects.DESCRIBE_DOMAIN_BY_ID_REQUEST,
             RequestMapper::describeDomainRequest,
             "name"), // Not needed for query by ID
         testCase(
-            ThriftObjects.DESCRIBE_DOMAIN_BY_NAME_REQUEST,
+            ClientObjects.DESCRIBE_DOMAIN_BY_NAME_REQUEST,
             ProtoObjects.DESCRIBE_DOMAIN_BY_NAME_REQUEST,
             RequestMapper::describeDomainRequest,
             "uuid"), // Not needed for query by name
         testCase(
-            ThriftObjects.LIST_DOMAINS_REQUEST,
+            ClientObjects.LIST_DOMAINS_REQUEST,
             ProtoObjects.LIST_DOMAINS_REQUEST,
             RequestMapper::listDomainsRequest),
         testCase(
-            ThriftObjects.LIST_TASK_LIST_PARTITIONS_REQUEST,
+            ClientObjects.LIST_TASK_LIST_PARTITIONS_REQUEST,
             ProtoObjects.LIST_TASK_LIST_PARTITIONS_REQUEST,
             RequestMapper::listTaskListPartitionsRequest),
         testCase(
-            ThriftObjects.POLL_FOR_ACTIVITY_TASK_REQUEST,
+            ClientObjects.POLL_FOR_ACTIVITY_TASK_REQUEST,
             ProtoObjects.POLL_FOR_ACTIVITY_TASK_REQUEST,
             RequestMapper::pollForActivityTaskRequest),
         testCase(
-            ThriftObjects.POLL_FOR_DECISION_TASK_REQUEST,
+            ClientObjects.POLL_FOR_DECISION_TASK_REQUEST,
             ProtoObjects.POLL_FOR_DECISION_TASK_REQUEST,
             RequestMapper::pollForDecisionTaskRequest),
         testCase(
-            ThriftObjects.QUERY_WORKFLOW_REQUEST,
+            ClientObjects.QUERY_WORKFLOW_REQUEST,
             ProtoObjects.QUERY_WORKFLOW_REQUEST,
             RequestMapper::queryWorkflowRequest),
         testCase(
-            ThriftObjects.RECORD_ACTIVITY_TASK_HEARTBEAT_BY_ID_REQUEST,
+            ClientObjects.RECORD_ACTIVITY_TASK_HEARTBEAT_BY_ID_REQUEST,
             ProtoObjects.RECORD_ACTIVITY_TASK_HEARTBEAT_BY_ID_REQUEST,
             RequestMapper::recordActivityTaskHeartbeatByIdRequest),
         testCase(
-            ThriftObjects.RECORD_ACTIVITY_TASK_HEARTBEAT_REQUEST,
+            ClientObjects.RECORD_ACTIVITY_TASK_HEARTBEAT_REQUEST,
             ProtoObjects.RECORD_ACTIVITY_TASK_HEARTBEAT_REQUEST,
             RequestMapper::recordActivityTaskHeartbeatRequest),
         testCase(
-            ThriftObjects.REGISTER_DOMAIN_REQUEST,
+            ClientObjects.REGISTER_DOMAIN_REQUEST,
             ProtoObjects.REGISTER_DOMAIN_REQUEST,
-            RequestMapper::registerDomainRequest,
-            "emitMetric"), // Thrift has this field but proto doens't have it
+            RequestMapper
+                ::registerDomainRequest), // Thrift has this field but proto doens't have it
         testCase(
-            ThriftObjects.UPDATE_DOMAIN_REQUEST,
+            ClientObjects.UPDATE_DOMAIN_REQUEST,
+            // Data and replicationConfiguration are copied incorrectly due to a bug :(
             ProtoObjects.UPDATE_DOMAIN_REQUEST,
-            RequestMapper::updateDomainRequest),
+            RequestMapper::updateDomainRequest,
+            // TODO new fields that are not yet supported
+            "queueConfig",
+            "predefinedQueueName",
+            "queueType"),
         testCase(
-            ThriftObjects.LIST_CLOSED_WORKFLOW_EXECUTIONS_REQUEST,
+            ClientObjects.LIST_CLOSED_WORKFLOW_EXECUTIONS_REQUEST,
             ProtoObjects.LIST_CLOSED_WORKFLOW_EXECUTIONS_REQUEST,
             RequestMapper::listClosedWorkflowExecutionsRequest),
         testCase(
-            ThriftObjects.LIST_OPEN_WORKFLOW_EXECUTIONS_REQUEST,
+            ClientObjects.LIST_OPEN_WORKFLOW_EXECUTIONS_REQUEST,
             ProtoObjects.LIST_OPEN_WORKFLOW_EXECUTIONS_REQUEST,
             RequestMapper::listOpenWorkflowExecutionsRequest),
         testCase(
-            ThriftObjects.LIST_WORKFLOW_EXECUTIONS_REQUEST,
+            ClientObjects.LIST_WORKFLOW_EXECUTIONS_REQUEST,
             ProtoObjects.LIST_WORKFLOW_EXECUTIONS_REQUEST,
             RequestMapper::listWorkflowExecutionsRequest));
   }

@@ -17,13 +17,13 @@
 
 package com.uber.cadence.internal.worker;
 
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.util.Duration;
 import com.uber.m3.util.ImmutableMap;
-import org.apache.thrift.TException;
 
 abstract class ActivityPollTaskBase implements Poller.PollTask<PollForActivityTaskResponse> {
 
@@ -33,7 +33,7 @@ abstract class ActivityPollTaskBase implements Poller.PollTask<PollForActivityTa
     this.options = options;
   }
 
-  public PollForActivityTaskResponse poll() throws TException {
+  public PollForActivityTaskResponse poll() throws CadenceError {
 
     PollForActivityTaskResponse result = pollTask();
     if (result == null || result.getTaskToken() == null) {
@@ -58,5 +58,5 @@ abstract class ActivityPollTaskBase implements Poller.PollTask<PollForActivityTa
     return result;
   }
 
-  protected abstract PollForActivityTaskResponse pollTask() throws TException;
+  protected abstract PollForActivityTaskResponse pollTask() throws CadenceError;
 }

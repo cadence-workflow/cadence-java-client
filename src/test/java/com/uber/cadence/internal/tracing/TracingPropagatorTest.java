@@ -26,7 +26,6 @@ import com.uber.cadence.PollForActivityTaskResponse;
 import io.opentracing.Span;
 import io.opentracing.mock.MockSpan;
 import io.opentracing.mock.MockTracer;
-import java.nio.ByteBuffer;
 import java.util.List;
 import org.junit.Test;
 
@@ -39,12 +38,7 @@ public class TracingPropagatorTest {
   public void testSpanForExecuteActivity_allowReusingHeaders() {
     Header header =
         new Header()
-            .setFields(
-                ImmutableMap.of(
-                    "traceid",
-                    ByteBuffer.wrap("100".getBytes()),
-                    "spanid",
-                    ByteBuffer.wrap("200".getBytes())));
+            .setFields(ImmutableMap.of("traceid", "100".getBytes(), "spanid", "200".getBytes()));
 
     Span span =
         propagator.spanForExecuteActivity(

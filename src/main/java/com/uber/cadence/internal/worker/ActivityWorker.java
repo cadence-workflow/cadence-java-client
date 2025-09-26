@@ -17,12 +17,7 @@
 
 package com.uber.cadence.internal.worker;
 
-import com.uber.cadence.Header;
-import com.uber.cadence.PollForActivityTaskResponse;
-import com.uber.cadence.RespondActivityTaskCanceledRequest;
-import com.uber.cadence.RespondActivityTaskCompletedRequest;
-import com.uber.cadence.RespondActivityTaskFailedRequest;
-import com.uber.cadence.WorkflowExecution;
+import com.uber.cadence.*;
 import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.internal.common.RpcRetryer;
 import com.uber.cadence.internal.logging.LoggerTag;
@@ -44,7 +39,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
-import org.apache.thrift.TException;
 import org.slf4j.MDC;
 
 public class ActivityWorker extends SuspendableWorkerBase {
@@ -196,7 +190,7 @@ public class ActivityWorker extends SuspendableWorkerBase {
           .getFields()
           .forEach(
               (k, v) -> {
-                headerData.put(k, org.apache.thrift.TBaseHelper.byteBufferToByteArray(v));
+                headerData.put(k, v);
               });
 
       for (ContextPropagator propagator : options.getContextPropagators()) {
@@ -227,7 +221,7 @@ public class ActivityWorker extends SuspendableWorkerBase {
 
     private void sendReply(
         PollForActivityTaskResponse task, ActivityTaskHandler.Result response, Scope metricsScope)
-        throws TException {
+        throws CadenceError {
       RespondActivityTaskCompletedRequest taskCompleted = response.getTaskCompleted();
       if (taskCompleted != null) {
         taskCompleted.setTaskToken(task.getTaskToken());
