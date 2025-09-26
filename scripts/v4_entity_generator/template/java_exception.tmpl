@@ -1,0 +1,31 @@
+package {{.PackageName}};
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import java.util.*;
+
+@Getter
+@Setter
+@Accessors(chain = true)
+public class {{.ClassName}} extends {{.BaseExceptionClassName}} {
+  {{- range .Fields}}
+  private {{.Type}} {{.Name}};
+  {{- end}}
+
+  public {{.ClassName}}() {
+    super();
+  }
+
+  public {{.ClassName}}(String message) {
+    super(message);
+  }
+
+  public {{.ClassName}}(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public {{.ClassName}}(Throwable cause) {
+    super(cause);
+  }
+}
