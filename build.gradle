@@ -130,12 +130,6 @@ task updateDlsSubmodule(type: Exec) {
     commandLine 'git', 'submodule', 'update'
 }
 
-compileThrift {
-    dependsOn updateDlsSubmodule
-    verbose true
-    sourceItems "${projectDir}/src/main/idls/thrift/cadence.thrift","${projectDir}/src/main/idls/thrift/shared.thrift","${projectDir}/src/main/idls/thrift/shadower.thrift"
-}
-
 sourceSets {
     main {
         proto {
