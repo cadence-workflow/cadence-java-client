@@ -19,6 +19,7 @@ const (
 type Field struct {
 	Name string
 	Type string
+	Initializer string
 }
 
 type TemplateEntity struct {
@@ -119,9 +120,22 @@ func (g *Generator) generateStruct(v *ast.Struct, outputDir string, packageName 
 			return fmt.Errorf("failed to map field type: %w", err)
 		}
 
+		initializer := ""
+		switch field.Type.(type) {
+		case ast.SetType:
+			initializer = " = new HashSet<>();"
+		case ast.ListType:
+			initializer = " = new ArrayList<>();"
+		case ast.MapType:
+			initializer = " = new HashMap<>();"
+		}
+
+		fmt.Println(field.Name, initializer, typeStr)
+
 		fields = append(fields, Field{
 			Name: field.Name,
 			Type: typeStr,
+			Initializer: initializer,
 		})
 	}
 

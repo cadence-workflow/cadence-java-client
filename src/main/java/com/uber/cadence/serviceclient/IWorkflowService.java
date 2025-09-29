@@ -20,7 +20,7 @@ package com.uber.cadence.serviceclient;
 import com.uber.cadence.*;
 import java.util.concurrent.CompletableFuture;
 
-public interface IWorkflowService extends Iface, AsyncIface {
+public interface IWorkflowService {
   void close();
 
   ClientOptions getOptions();
@@ -102,9 +102,8 @@ public interface IWorkflowService extends Iface, AsyncIface {
    * list
    */
   CompletableFuture<Boolean> isHealthy();
-}
 
-interface Iface {
+  // sync methods
 
   /**
    * RegisterDomain creates a new domain which can be used as a container for all resources. Domain
@@ -617,9 +616,8 @@ interface Iface {
   void RefreshWorkflowTasks(RefreshWorkflowTasksRequest request)
       throws BadRequestError, DomainNotActiveError, ServiceBusyError, EntityNotExistsError,
           CadenceError;
-}
 
-interface AsyncIface {
+  // Async methods
 
   void RegisterDomain(
       RegisterDomainRequest registerRequest, AsyncMethodCallback<Void> resultHandler)

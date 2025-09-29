@@ -1,6 +1,5 @@
 buildscript {
     dependencies {
-        classpath "gradle.plugin.org.jruyi.gradle:thrift-gradle-plugin:0.4.1"
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.11'
     }
 }
@@ -34,7 +33,6 @@ repositories {
 apply plugin: 'com.google.protobuf'
 apply plugin: 'idea' // IntelliJ plugin to see files generated from protos
 apply plugin: 'maven'
-apply plugin: 'org.jruyi.thrift'
 apply plugin: 'maven-publish'
 apply plugin: 'com.github.sherter.google-java-format'
 
@@ -77,7 +75,6 @@ dependencies {
 
     compile group: 'com.uber.tchannel', name: 'tchannel-core', version: '0.8.30'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
-    compile group: 'org.apache.thrift', name: 'libthrift', version: '0.9.3'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.10'
     compile group: 'com.uber.m3', name: 'tally-core', version: '0.11.1'
     compile group: 'com.google.guava', name: 'guava', version: '31.1-jre'

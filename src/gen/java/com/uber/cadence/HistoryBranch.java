@@ -9,5 +9,5 @@ import lombok.experimental.Accessors;
 public class HistoryBranch {
   private String treeID;
   private String branchID;
-  private List<HistoryBranchRange> ancestors;
+  private List<HistoryBranchRange> ancestors = new ArrayList<>();;
 }

@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class GetWorkflowExecutionHistoryResponse {
   private History history;
-  private List<DataBlob> rawHistory;
+  private List<DataBlob> rawHistory = new ArrayList<>();;
   private byte[] nextPageToken;
   private boolean archived;
 }

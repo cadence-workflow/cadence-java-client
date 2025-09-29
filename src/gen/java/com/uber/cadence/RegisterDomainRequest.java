@@ -12,9 +12,9 @@ public class RegisterDomainRequest {
   private String ownerEmail;
   private int workflowExecutionRetentionPeriodInDays;
   private boolean emitMetric;
-  private List<ClusterReplicationConfiguration> clusters;
+  private List<ClusterReplicationConfiguration> clusters = new ArrayList<>();;
   private String activeClusterName;
-  private Map<String, String> data;
+  private Map<String, String> data = new HashMap<>();;
   private String securityToken;
   private boolean isGlobalDomain;
   private ArchivalStatus historyArchivalStatus;

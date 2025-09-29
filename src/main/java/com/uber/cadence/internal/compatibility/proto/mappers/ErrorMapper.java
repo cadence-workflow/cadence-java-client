@@ -32,6 +32,7 @@ import com.uber.cadence.InternalDataInconsistencyError;
 import com.uber.cadence.InternalServiceError;
 import com.uber.cadence.LimitExceededError;
 import com.uber.cadence.ServiceBusyError;
+import com.uber.cadence.TimeoutError;
 import com.uber.cadence.WorkflowExecutionAlreadyCompletedError;
 import com.uber.cadence.WorkflowExecutionAlreadyStartedError;
 import io.grpc.StatusRuntimeException;
@@ -103,6 +104,8 @@ public class ErrorMapper {
           } else {
             return new ServiceBusyError().setReason(e.getMessage());
           }
+        case DEADLINE_EXCEEDED:
+          return new TimeoutError(e);
         case UNKNOWN:
         default:
           return new CadenceError(e);

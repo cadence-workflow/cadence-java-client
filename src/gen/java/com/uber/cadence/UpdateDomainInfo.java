@@ -9,5 +9,5 @@ import lombok.experimental.Accessors;
 public class UpdateDomainInfo {
   private String description;
   private String ownerEmail;
-  private Map<String, String> data;
+  private Map<String, String> data = new HashMap<>();;
 }

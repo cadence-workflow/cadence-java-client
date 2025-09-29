@@ -241,8 +241,7 @@ public class RequestMapperTest<T, P extends Message> {
         testCase(
             ClientObjects.REGISTER_DOMAIN_REQUEST,
             ProtoObjects.REGISTER_DOMAIN_REQUEST,
-            RequestMapper
-                ::registerDomainRequest), // Thrift has this field but proto doens't have it
+            RequestMapper::registerDomainRequest),
         testCase(
             ClientObjects.UPDATE_DOMAIN_REQUEST,
             // Data and replicationConfiguration are copied incorrectly due to a bug :(

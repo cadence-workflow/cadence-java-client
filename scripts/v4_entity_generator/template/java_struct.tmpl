@@ -11,6 +11,6 @@ import {{.}};
 @Accessors(chain = true)
 public class {{.ClassName}} {
   {{- range .Fields}}
-  private {{.Type}} {{.Name}};
+  private {{.Type}} {{.Name}}{{.Initializer}};
   {{- end}}
 }

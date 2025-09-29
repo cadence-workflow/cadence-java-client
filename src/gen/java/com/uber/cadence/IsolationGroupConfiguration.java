@@ -7,5 +7,5 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class IsolationGroupConfiguration {
-  private List<IsolationGroupPartition> isolationGroups;
+  private List<IsolationGroupPartition> isolationGroups = new ArrayList<>();;
 }

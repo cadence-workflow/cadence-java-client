@@ -24,6 +24,7 @@ import com.uber.cadence.PollForDecisionTaskResponse;
 import com.uber.cadence.internal.common.WorkflowExecutionUtils;
 import com.uber.cadence.internal.worker.DecisionTaskWithHistoryIterator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -255,7 +256,9 @@ class HistoryHelper {
   @Override
   public String toString() {
     return WorkflowExecutionUtils.prettyPrintHistory(
-        decisionTaskWithHistoryIterator.getDecisionTask().getHistory().getEvents().iterator(),
+        decisionTaskWithHistoryIterator.getDecisionTask().getHistory().getEvents() != null
+            ? decisionTaskWithHistoryIterator.getDecisionTask().getHistory().getEvents().iterator()
+            : Collections.emptyIterator(),
         true);
   }
 

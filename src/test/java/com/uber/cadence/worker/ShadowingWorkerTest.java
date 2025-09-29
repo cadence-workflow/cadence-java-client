@@ -39,8 +39,6 @@ import com.uber.m3.tally.NoopScope;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.UUID;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
@@ -75,7 +73,6 @@ public class ShadowingWorkerTest {
     ShadowingWorker shadowingWorker =
         new ShadowingWorker(
             mockClient, taskList, WorkerOptions.defaultInstance(), shadowingOptions);
-    TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
 
     WorkflowParams params =
         new WorkflowParams()
