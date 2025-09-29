@@ -270,4 +270,21 @@ public class JsonDataConverterTest {
 
     assertEquals("root exception", causeFromConverted.getSuppressed()[0].getMessage());
   }
+
+  @Test
+  public void testExceptionNotFound() {
+    String convertedString =
+        "{\n"
+            + "  \"detailMessage\": \"application exception\",\n"
+            + "  \"stackTrace\": \"com.uber.cadence.converter.JsonDataConverterTest.testExceptionNotFound(JsonDataConverterTest.java:282)\\nsun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\\nsun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)\\nsun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\\njava.lang.reflect.Method.invoke(Method.java:498)\\norg.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)\\norg.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)\\norg.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)\\norg.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)\\norg.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)\\norg.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)\\norg.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)\\norg.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)\\norg.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)\\norg.junit.runners.ParentRunner$4.run(ParentRunner.java:331)\\norg.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)\\norg.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)\\norg.junit.runners.ParentRunner.access$100(ParentRunner.java:66)\\norg.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)\\norg.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)\\norg.junit.runners.ParentRunner.run(ParentRunner.java:413)\\norg.eclipse.jdt.internal.junit4.runner.JUnit4TestReference.run(JUnit4TestReference.java:93)\\norg.eclipse.jdt.internal.junit.runner.TestExecution.run(TestExecution.java:40)\\norg.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:520)\\norg.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:748)\\norg.eclipse.jdt.internal.junit.runner.RemoteTestRunner.run(RemoteTestRunner.java:443)\\norg.eclipse.jdt.internal.junit.runner.RemoteTestRunner.main(RemoteTestRunner.java:211)\\n\",\n"
+            + "  \"suppressedExceptions\": [],\n"
+            + "  \"class\": \"com.uber.cadence.converter.ExceptionNotFound\"\n"
+            + "}";
+    RuntimeException fromConverted =
+        converter.fromData(
+            convertedString.getBytes(StandardCharsets.UTF_8),
+            RuntimeException.class,
+            RuntimeException.class);
+    assertNull(fromConverted);
+  }
 }

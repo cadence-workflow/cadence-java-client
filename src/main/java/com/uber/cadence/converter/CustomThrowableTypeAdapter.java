@@ -137,7 +137,7 @@ class CustomThrowableTypeAdapter<T extends Throwable> extends TypeAdapter<T> {
       try {
         classType = Class.forName(className);
       } catch (ClassNotFoundException e) {
-        throw new IOException("Cannot deserialize " + className + " exception", e);
+        return null;
       }
       if (!Throwable.class.isAssignableFrom(classType)) {
         throw new IOException("Expected type that extends Throwable: " + className);
