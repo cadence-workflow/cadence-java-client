@@ -3,8 +3,5 @@
 # commits to that branch and one of them can break the build
 FROM adoptopenjdk/openjdk11:jdk-11.0.10_9-alpine
 
-# Cleanup packages and remove cache
-RUN apk del build-dependencies wget && rm -rf /var/cache/apk/*
-
 RUN mkdir /cadence-java-client
 WORKDIR /cadence-java-client
