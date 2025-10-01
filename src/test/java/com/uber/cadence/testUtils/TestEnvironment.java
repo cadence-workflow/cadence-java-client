@@ -28,7 +28,7 @@ public final class TestEnvironment {
   private static final boolean DEBUGGER_TIMEOUTS = false;
 
   private static final boolean USE_DOCKER_SERVICE =
-      Boolean.parseBoolean(System.getenv("USE_DOCKER_SERVICE"));
+      true || Boolean.parseBoolean(System.getenv("USE_DOCKER_SERVICE"));
 
   private TestEnvironment() {}
 
