@@ -8,5 +8,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class VersionHistory {
   private byte[] branchToken;
-  private List<VersionHistoryItem> items;
+  private List<VersionHistoryItem> items = new ArrayList<>();;
 }

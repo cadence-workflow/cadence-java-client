@@ -56,7 +56,7 @@ public class StartWorkflowExecutionParametersTest {
   public void testToString() {
     String expectedString =
         "StartWorkflowExecutionParameters{workflowId='workflow123', "
-            + "workflowType=WorkflowType(name:sampleWorkflow), taskList='taskList1', "
+            + "workflowType=WorkflowType(name=sampleWorkflow), taskList='taskList1', "
             + "input=[1, 2, 3], executionStartToCloseTimeoutSeconds=60, "
             + "taskStartToCloseTimeoutSeconds=30, workflowIdReusePolicy=null, "
             + "retryParameters=RetryParameters{initialIntervalInSeconds=0, "

@@ -12,17 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package com.uber.cadence.internal.compatibility.proto;
+package com.uber.cadence.internal.compatibility.proto.mappers;
 
-import static com.uber.cadence.internal.compatibility.MapperTestUtil.assertMissingFields;
 import static com.uber.cadence.internal.compatibility.MapperTestUtil.assertNoMissingFields;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.uber.cadence.Decision;
 import com.uber.cadence.DecisionType;
+import com.uber.cadence.internal.compatibility.ClientObjects;
 import com.uber.cadence.internal.compatibility.ProtoObjects;
-import com.uber.cadence.internal.compatibility.ThriftObjects;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
@@ -35,36 +34,36 @@ public class DecisionMapperTest {
   private static final Map<Decision, com.uber.cadence.api.v1.Decision> DECISIONS =
       ImmutableMap.<Decision, com.uber.cadence.api.v1.Decision>builder()
           .put(
-              ThriftObjects.DECISION_SCHEDULE_ACTIVITY_TASK,
+              ClientObjects.DECISION_SCHEDULE_ACTIVITY_TASK,
               ProtoObjects.DECISION_SCHEDULE_ACTIVITY_TASK)
           .put(
-              ThriftObjects.DECISION_REQUEST_CANCEL_ACTIVITY_TASK,
+              ClientObjects.DECISION_REQUEST_CANCEL_ACTIVITY_TASK,
               ProtoObjects.DECISION_REQUEST_CANCEL_ACTIVITY_TASK)
-          .put(ThriftObjects.DECISION_START_TIMER, ProtoObjects.DECISION_START_TIMER)
+          .put(ClientObjects.DECISION_START_TIMER, ProtoObjects.DECISION_START_TIMER)
           .put(
-              ThriftObjects.DECISION_COMPLETE_WORKFLOW_EXECUTION,
+              ClientObjects.DECISION_COMPLETE_WORKFLOW_EXECUTION,
               ProtoObjects.DECISION_COMPLETE_WORKFLOW_EXECUTION)
           .put(
-              ThriftObjects.DECISION_FAIL_WORKFLOW_EXECUTION,
+              ClientObjects.DECISION_FAIL_WORKFLOW_EXECUTION,
               ProtoObjects.DECISION_FAIL_WORKFLOW_EXECUTION)
-          .put(ThriftObjects.DECISION_CANCEL_TIMER, ProtoObjects.DECISION_CANCEL_TIMER)
-          .put(ThriftObjects.DECISION_CANCEL_WORKFLOW, ProtoObjects.DECISION_CANCEL_WORKFLOW)
+          .put(ClientObjects.DECISION_CANCEL_TIMER, ProtoObjects.DECISION_CANCEL_TIMER)
+          .put(ClientObjects.DECISION_CANCEL_WORKFLOW, ProtoObjects.DECISION_CANCEL_WORKFLOW)
           .put(
-              ThriftObjects.DECISION_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION,
+              ClientObjects.DECISION_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION,
               ProtoObjects.DECISION_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION)
           .put(
-              ThriftObjects.DECISION_CONTINUE_AS_NEW_WORKFLOW_EXECUTION,
+              ClientObjects.DECISION_CONTINUE_AS_NEW_WORKFLOW_EXECUTION,
               ProtoObjects.DECISION_CONTINUE_AS_NEW_WORKFLOW_EXECUTION)
           .put(
-              ThriftObjects.DECISION_START_CHILD_WORKFLOW_EXECUTION,
+              ClientObjects.DECISION_START_CHILD_WORKFLOW_EXECUTION,
               ProtoObjects.DECISION_START_CHILD_WORKFLOW_EXECUTION)
           .put(
-              ThriftObjects.DECISION_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION,
+              ClientObjects.DECISION_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION,
               ProtoObjects.DECISION_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION)
           .put(
-              ThriftObjects.DECISION_UPSERT_WORKFLOW_SEARCH_ATTRIBUTES,
+              ClientObjects.DECISION_UPSERT_WORKFLOW_SEARCH_ATTRIBUTES,
               ProtoObjects.DECISION_UPSERT_WORKFLOW_SEARCH_ATTRIBUTES)
-          .put(ThriftObjects.DECISION_RECORD_MARKER, ProtoObjects.DECISION_RECORD_MARKER)
+          .put(ClientObjects.DECISION_RECORD_MARKER, ProtoObjects.DECISION_RECORD_MARKER)
           .build();
 
   @Test
@@ -95,46 +94,46 @@ public class DecisionMapperTest {
     // If IDL changes add a new field to decision attributes, this should fail
     for (Map.Entry<Decision, com.uber.cadence.api.v1.Decision> entry : DECISIONS.entrySet()) {
       Decision decision = entry.getKey();
-      switch (decision.decisionType) {
+      switch (decision.getDecisionType()) {
         case ScheduleActivityTask:
-          assertNoMissingFields(decision.scheduleActivityTaskDecisionAttributes);
+          assertNoMissingFields(decision.getScheduleActivityTaskDecisionAttributes());
           break;
         case RequestCancelActivityTask:
-          assertNoMissingFields(decision.requestCancelActivityTaskDecisionAttributes);
+          assertNoMissingFields(decision.getRequestCancelActivityTaskDecisionAttributes());
           break;
         case StartTimer:
-          assertNoMissingFields(decision.startTimerDecisionAttributes);
+          assertNoMissingFields(decision.getStartTimerDecisionAttributes());
           break;
         case CompleteWorkflowExecution:
-          assertNoMissingFields(decision.completeWorkflowExecutionDecisionAttributes);
+          assertNoMissingFields(decision.getCompleteWorkflowExecutionDecisionAttributes());
           break;
         case FailWorkflowExecution:
-          assertNoMissingFields(decision.failWorkflowExecutionDecisionAttributes);
+          assertNoMissingFields(decision.getFailWorkflowExecutionDecisionAttributes());
           break;
         case CancelTimer:
-          assertNoMissingFields(decision.cancelTimerDecisionAttributes);
+          assertNoMissingFields(decision.getCancelTimerDecisionAttributes());
           break;
         case CancelWorkflowExecution:
-          assertNoMissingFields(decision.cancelWorkflowExecutionDecisionAttributes);
+          assertNoMissingFields(decision.getCancelWorkflowExecutionDecisionAttributes());
           break;
         case RequestCancelExternalWorkflowExecution:
-          assertNoMissingFields(decision.requestCancelExternalWorkflowExecutionDecisionAttributes);
+          assertNoMissingFields(
+              decision.getRequestCancelExternalWorkflowExecutionDecisionAttributes());
           break;
         case RecordMarker:
-          assertNoMissingFields(decision.recordMarkerDecisionAttributes);
+          assertNoMissingFields(decision.getRecordMarkerDecisionAttributes());
           break;
         case ContinueAsNewWorkflowExecution:
-          assertMissingFields(
-              decision.continueAsNewWorkflowExecutionDecisionAttributes, "jitterStartSeconds");
+          assertNoMissingFields(decision.getContinueAsNewWorkflowExecutionDecisionAttributes());
           break;
         case StartChildWorkflowExecution:
-          assertNoMissingFields(decision.startChildWorkflowExecutionDecisionAttributes);
+          assertNoMissingFields(decision.getStartChildWorkflowExecutionDecisionAttributes());
           break;
         case SignalExternalWorkflowExecution:
-          assertNoMissingFields(decision.signalExternalWorkflowExecutionDecisionAttributes);
+          assertNoMissingFields(decision.getSignalExternalWorkflowExecutionDecisionAttributes());
           break;
         case UpsertWorkflowSearchAttributes:
-          assertNoMissingFields(decision.upsertWorkflowSearchAttributesDecisionAttributes);
+          assertNoMissingFields(decision.getUpsertWorkflowSearchAttributesDecisionAttributes());
           break;
       }
     }

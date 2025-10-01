@@ -24,22 +24,6 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: 'gradle'
-      - name: Install necessary tooling
-        env:
-          APACHE_THRIFT_VERSION: 0.9.3
-        run: |
-          apt-get update && apt-get install -y wget gcc make build-essential git
-
-          wget https://archive.apache.org/dist/thrift/${APACHE_THRIFT_VERSION}/thrift-${APACHE_THRIFT_VERSION}.tar.gz && \
-          tar -xvf thrift-${APACHE_THRIFT_VERSION}.tar.gz && \
-          rm thrift-${APACHE_THRIFT_VERSION}.tar.gz && \
-          cd thrift-${APACHE_THRIFT_VERSION}/ && \
-          ./configure --enable-libs=no --enable-tests=no --enable-tutorial=no --with-cpp=no --with-c_glib=no --with-java=yes --with-ruby=no --with-erlang=no --with-go=no --with-nodejs=no --with-python=no && \
-          make && \
-          make install && \
-          cd .. && \
-          rm -rf thrift-${APACHE_THRIFT_VERSION}
-
       - name: Determine release version
         id: vars
         run: |

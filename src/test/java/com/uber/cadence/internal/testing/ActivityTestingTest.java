@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.uber.cadence.CadenceError;
 import com.uber.cadence.RecordActivityTaskHeartbeatResponse;
 import com.uber.cadence.activity.Activity;
 import com.uber.cadence.activity.ActivityMethod;
@@ -35,7 +36,6 @@ import io.netty.util.internal.ConcurrentSet;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -180,7 +180,7 @@ public class ActivityTestingTest {
   }
 
   @Test
-  public void testHeartbeatCancellation() throws InterruptedException, TException {
+  public void testHeartbeatCancellation() throws InterruptedException, CadenceError {
     testEnvironment.registerActivitiesImplementations(new HeartbeatCancellationActivityImpl());
     IWorkflowService workflowService = mock(IWorkflowService.class);
     RecordActivityTaskHeartbeatResponse resp = new RecordActivityTaskHeartbeatResponse();
@@ -211,7 +211,7 @@ public class ActivityTestingTest {
   }
 
   @Test
-  public void testCancellationOnNextHeartbeat() throws InterruptedException, TException {
+  public void testCancellationOnNextHeartbeat() throws InterruptedException, CadenceError {
     testEnvironment.registerActivitiesImplementations(
         new CancellationOnNextHeartbeatActivityImpl());
     IWorkflowService workflowService = mock(IWorkflowService.class);
@@ -237,12 +237,12 @@ public class ActivityTestingTest {
   }
 
   @Test
-  public void testHeartbeatIntermittentError() throws TException, InterruptedException {
+  public void testHeartbeatIntermittentError() throws CadenceError, InterruptedException {
     testEnvironment.registerActivitiesImplementations(new SimpleHeartbeatActivityImpl());
     IWorkflowService workflowService = mock(IWorkflowService.class);
     when(workflowService.RecordActivityTaskHeartbeat(any()))
-        .thenThrow(new TException("intermittent error"))
-        .thenThrow(new TException("intermittent error"))
+        .thenThrow(new CadenceError("intermittent error"))
+        .thenThrow(new CadenceError("intermittent error"))
         .thenReturn(new RecordActivityTaskHeartbeatResponse());
     testEnvironment.setWorkflowService(workflowService);
     AtomicInteger count = new AtomicInteger();

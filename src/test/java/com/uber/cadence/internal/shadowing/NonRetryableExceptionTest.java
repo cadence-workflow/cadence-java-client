@@ -15,7 +15,7 @@
  */
 package com.uber.cadence.internal.shadowing;
 
-import static com.uber.cadence.shadower.shadowerConstants.ErrNonRetryableType;
+import static com.uber.cadence.shadower.Constants.ErrNonRetryableType;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;

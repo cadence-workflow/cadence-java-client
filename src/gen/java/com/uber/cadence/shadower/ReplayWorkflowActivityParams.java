@@ -9,5 +9,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ReplayWorkflowActivityParams {
   private String domain;
-  private List<WorkflowExecution> executions;
+  private List<WorkflowExecution> executions = new ArrayList<>();;
 }

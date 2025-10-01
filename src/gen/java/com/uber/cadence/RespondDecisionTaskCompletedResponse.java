@@ -8,5 +8,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class RespondDecisionTaskCompletedResponse {
   private PollForDecisionTaskResponse decisionTask;
-  private Map<String, ActivityLocalDispatchInfo> activitiesToDispatchLocally;
+  private Map<String, ActivityLocalDispatchInfo> activitiesToDispatchLocally = new HashMap<>();;
 }

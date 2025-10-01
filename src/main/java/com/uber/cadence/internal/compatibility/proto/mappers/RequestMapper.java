@@ -13,52 +13,49 @@
  *  express or implied. See the License for the specific language governing
  *  permissions and limitations under the License.
  */
-package com.uber.cadence.internal.compatibility.proto;
+package com.uber.cadence.internal.compatibility.proto.mappers;
 
-import static com.uber.cadence.internal.compatibility.proto.DecisionMapper.decisionArray;
-import static com.uber.cadence.internal.compatibility.proto.EnumMapper.archivalStatus;
-import static com.uber.cadence.internal.compatibility.proto.EnumMapper.decisionTaskFailedCause;
-import static com.uber.cadence.internal.compatibility.proto.EnumMapper.eventFilterType;
-import static com.uber.cadence.internal.compatibility.proto.EnumMapper.queryConsistencyLevel;
-import static com.uber.cadence.internal.compatibility.proto.EnumMapper.queryRejectCondition;
-import static com.uber.cadence.internal.compatibility.proto.EnumMapper.queryTaskCompletedType;
-import static com.uber.cadence.internal.compatibility.proto.EnumMapper.taskListType;
-import static com.uber.cadence.internal.compatibility.proto.EnumMapper.workflowIdReusePolicy;
-import static com.uber.cadence.internal.compatibility.proto.Helpers.arrayToByteString;
-import static com.uber.cadence.internal.compatibility.proto.Helpers.daysToDuration;
-import static com.uber.cadence.internal.compatibility.proto.Helpers.newFieldMask;
-import static com.uber.cadence.internal.compatibility.proto.Helpers.nullToEmpty;
-import static com.uber.cadence.internal.compatibility.proto.Helpers.secondsToDuration;
-import static com.uber.cadence.internal.compatibility.proto.Helpers.unixNanoToTime;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.badBinaries;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.clusterReplicationConfigurationArray;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.failure;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.header;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.memo;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.payload;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.retryPolicy;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.searchAttributes;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.startTimeFilter;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.statusFilter;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.stickyExecutionAttributes;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.taskList;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.taskListMetadata;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.workerVersionInfo;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.workflowExecution;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.workflowExecutionFilter;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.workflowQuery;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.workflowQueryResultMap;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.workflowType;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.workflowTypeFilter;
+import static com.uber.cadence.internal.compatibility.proto.mappers.DecisionMapper.decisionArray;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.archivalStatus;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.decisionTaskFailedCause;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.eventFilterType;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.queryConsistencyLevel;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.queryRejectCondition;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.queryTaskCompletedType;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.taskListType;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.workflowIdReusePolicy;
+import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.arrayToByteString;
+import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.daysToDuration;
+import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.newFieldMask;
+import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.nullToEmpty;
+import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.secondsToDuration;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.badBinaries;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.clusterReplicationConfigurationArray;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.failure;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.header;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.memo;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.payload;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.retryPolicy;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.searchAttributes;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.startTimeFilter;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.statusFilter;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.stickyExecutionAttributes;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.taskList;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.taskListMetadata;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workerVersionInfo;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowExecution;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowExecutionFilter;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowQuery;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowQueryResultMap;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowType;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowTypeFilter;
 
-import com.uber.cadence.DomainConfiguration;
-import com.uber.cadence.DomainReplicationConfiguration;
-import com.uber.cadence.UpdateDomainInfo;
 import com.uber.cadence.api.v1.CountWorkflowExecutionsRequest;
 import com.uber.cadence.api.v1.DeprecateDomainRequest;
 import com.uber.cadence.api.v1.DescribeDomainRequest;
 import com.uber.cadence.api.v1.DescribeTaskListRequest;
 import com.uber.cadence.api.v1.DescribeWorkflowExecutionRequest;
+import com.uber.cadence.api.v1.GetTaskListsByDomainRequest;
 import com.uber.cadence.api.v1.GetWorkflowExecutionHistoryRequest;
 import com.uber.cadence.api.v1.ListArchivedWorkflowExecutionsRequest;
 import com.uber.cadence.api.v1.ListClosedWorkflowExecutionsRequest;
@@ -71,6 +68,7 @@ import com.uber.cadence.api.v1.PollForDecisionTaskRequest;
 import com.uber.cadence.api.v1.QueryWorkflowRequest;
 import com.uber.cadence.api.v1.RecordActivityTaskHeartbeatByIDRequest;
 import com.uber.cadence.api.v1.RecordActivityTaskHeartbeatRequest;
+import com.uber.cadence.api.v1.RefreshWorkflowTasksRequest;
 import com.uber.cadence.api.v1.RegisterDomainRequest;
 import com.uber.cadence.api.v1.RequestCancelWorkflowExecutionRequest;
 import com.uber.cadence.api.v1.ResetStickyTaskListRequest;
@@ -84,6 +82,7 @@ import com.uber.cadence.api.v1.RespondActivityTaskFailedRequest;
 import com.uber.cadence.api.v1.RespondDecisionTaskCompletedRequest;
 import com.uber.cadence.api.v1.RespondDecisionTaskFailedRequest;
 import com.uber.cadence.api.v1.RespondQueryTaskCompletedRequest;
+import com.uber.cadence.api.v1.RestartWorkflowExecutionRequest;
 import com.uber.cadence.api.v1.ScanWorkflowExecutionsRequest;
 import com.uber.cadence.api.v1.SignalWithStartWorkflowExecutionAsyncRequest;
 import com.uber.cadence.api.v1.SignalWithStartWorkflowExecutionRequest;
@@ -170,14 +169,14 @@ public class RequestMapper {
             .setDomain(t.getDomain())
             .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
             .setRequestId(t.getRequestId());
-    if (t.getCause() != null) {
-      builder.setCause(t.getCause());
+    if (t.getIdentity() != null) {
+      builder.setIdentity(t.getIdentity());
     }
     if (t.getFirstExecutionRunID() != null) {
       builder.setFirstExecutionRunId(t.getFirstExecutionRunID());
     }
-    if (t.getIdentity() != null) {
-      builder.setIdentity(t.getIdentity());
+    if (t.getCause() != null) {
+      builder.setCause(t.getCause());
     }
     return builder.build();
   }
@@ -201,7 +200,7 @@ public class RequestMapper {
     return ResetWorkflowExecutionRequest.newBuilder()
         .setDomain(t.getDomain())
         .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
-        .setReason(t.getReason())
+        .setReason(t.getReason() != null ? t.getReason() : "")
         .setDecisionFinishEventId(t.getDecisionFinishEventId())
         .setRequestId(t.getRequestId())
         .setSkipSignalReapply(t.isSkipSignalReapply())
@@ -419,7 +418,7 @@ public class RequestMapper {
             .setWorkflowExecution(workflowExecution(t.getExecution()))
             .setPageSize(t.getMaximumPageSize())
             .setWaitForNewEvent(t.isWaitForNewEvent())
-            .setHistoryEventFilterType(eventFilterType(t.HistoryEventFilterType))
+            .setHistoryEventFilterType(eventFilterType(t.getHistoryEventFilterType()))
             .setSkipArchival(t.isSkipArchival())
             .setQueryConsistencyLevel(queryConsistencyLevel(t.getQueryConsistencyLevel()));
     if (t.getNextPageToken() != null) {
@@ -447,10 +446,7 @@ public class RequestMapper {
             .setMemo(memo(t.getMemo()))
             .setSearchAttributes(searchAttributes(t.getSearchAttributes()))
             .setHeader(header(t.getHeader()))
-            .setJitterStart(secondsToDuration(t.getJitterStartSeconds()));
-    if (t.isSetFirstRunAtTimestamp()) {
-      builder.setFirstRunAt(unixNanoToTime(t.getFirstRunAtTimestamp()));
-    }
+            .setFirstRunAt(Helpers.unixNanoToTime(t.getFirstRunAtTimestamp()));
     if (t.getRetryPolicy() != null) {
       builder.setRetryPolicy(retryPolicy(t.getRetryPolicy()));
     }
@@ -464,6 +460,7 @@ public class RequestMapper {
     if (t.getDelayStartSeconds() > 0) {
       builder.setDelayStart(secondsToDuration(t.getDelayStartSeconds()));
     }
+    builder.setJitterStart(secondsToDuration(t.getJitterStartSeconds()));
 
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
@@ -535,10 +532,8 @@ public class RequestMapper {
             .setSearchAttributes(searchAttributes(t.getSearchAttributes()))
             .setHeader(header(t.getHeader()))
             .setDelayStart(secondsToDuration(t.getDelayStartSeconds()))
-            .setJitterStart(secondsToDuration(t.getJitterStartSeconds()));
-    if (t.isSetFirstRunAtTimestamp()) {
-      request.setFirstRunAt(unixNanoToTime(t.getFirstRunAtTimestamp()));
-    }
+            .setJitterStart(secondsToDuration(t.getJitterStartSeconds()))
+            .setFirstRunAt(Helpers.unixNanoToTime(t.getFirstRunAtTimestamp()));
     if (t.getRetryPolicy() != null) {
       request.setRetryPolicy(retryPolicy(t.getRetryPolicy()));
     }
@@ -573,7 +568,7 @@ public class RequestMapper {
         TerminateWorkflowExecutionRequest.newBuilder()
             .setDomain(t.getDomain())
             .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
-            .setReason(t.getReason())
+            .setReason(t.getReason() != null ? t.getReason() : "")
             .setDetails(payload(t.getDetails()));
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
@@ -600,11 +595,11 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    if (t.uuid != null) {
-      return DescribeDomainRequest.newBuilder().setId(t.uuid).build();
+    if (t.getUuid() != null) {
+      return DescribeDomainRequest.newBuilder().setId(t.getUuid()).build();
     }
-    if (t.name != null) {
-      return DescribeDomainRequest.newBuilder().setName(t.name).build();
+    if (t.getName() != null) {
+      return DescribeDomainRequest.newBuilder().setName(t.getName()).build();
     }
     throw new IllegalArgumentException("neither one of field is set for DescribeDomainRequest");
   }
@@ -613,7 +608,8 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    ListDomainsRequest.Builder request = ListDomainsRequest.newBuilder().setPageSize(t.pageSize);
+    ListDomainsRequest.Builder request =
+        ListDomainsRequest.newBuilder().setPageSize(t.getPageSize());
     if (t.getNextPageToken() != null) {
       request.setNextPageToken(arrayToByteString(t.getNextPageToken()));
     }
@@ -745,13 +741,26 @@ public class RequestMapper {
             .setActiveClusterName(Helpers.nullToEmpty(t.getActiveClusterName()))
             .putAllData(Helpers.nullToEmpty(t.getData()))
             .setSecurityToken(Helpers.nullToEmpty(t.getSecurityToken()))
-            .setIsGlobalDomain(nullToEmpty(t.isIsGlobalDomain()))
+            .setIsGlobalDomain(nullToEmpty(t.isGlobalDomain()))
             .setHistoryArchivalStatus(archivalStatus(t.getHistoryArchivalStatus()))
             .setHistoryArchivalUri(Helpers.nullToEmpty(t.getHistoryArchivalURI()))
             .setVisibilityArchivalStatus(archivalStatus(t.getVisibilityArchivalStatus()))
             .setVisibilityArchivalUri(Helpers.nullToEmpty(t.getVisibilityArchivalURI()))
             .build();
     return request;
+  }
+
+  public static RestartWorkflowExecutionRequest restartWorkflowExecutionRequest(
+      com.uber.cadence.RestartWorkflowExecutionRequest t) {
+    if (t == null) {
+      return null;
+    }
+    return RestartWorkflowExecutionRequest.newBuilder()
+        .setDomain(t.getDomain())
+        .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
+        .setReason(t.getReason() != null ? t.getReason() : "")
+        .setIdentity(t.getIdentity() != null ? t.getIdentity() : "")
+        .build();
   }
 
   public static UpdateDomainRequest updateDomainRequest(com.uber.cadence.UpdateDomainRequest t) {
@@ -764,7 +773,7 @@ public class RequestMapper {
             .setSecurityToken(t.getSecurityToken());
 
     List<String> fields = new ArrayList<>();
-    UpdateDomainInfo updatedInfo = t.getUpdatedInfo();
+    com.uber.cadence.UpdateDomainInfo updatedInfo = t.getUpdatedInfo();
     if (updatedInfo != null) {
       if (updatedInfo.getDescription() != null) {
         request.setDescription(updatedInfo.getDescription());
@@ -779,7 +788,7 @@ public class RequestMapper {
         fields.add(DomainUpdateDataField);
       }
     }
-    DomainConfiguration configuration = t.getConfiguration();
+    com.uber.cadence.DomainConfiguration configuration = t.getConfiguration();
     if (configuration != null) {
       if (configuration.getWorkflowExecutionRetentionPeriodInDays() > 0) {
         request.setWorkflowExecutionRetentionPeriod(
@@ -809,7 +818,8 @@ public class RequestMapper {
         fields.add(DomainUpdateVisibilityArchivalURIField);
       }
     }
-    DomainReplicationConfiguration replicationConfiguration = t.getReplicationConfiguration();
+    com.uber.cadence.DomainReplicationConfiguration replicationConfiguration =
+        t.getReplicationConfiguration();
     if (replicationConfiguration != null) {
       if (replicationConfiguration.getActiveClusterName() != null) {
         request.setActiveClusterName(replicationConfiguration.getActiveClusterName());
@@ -884,5 +894,93 @@ public class RequestMapper {
       request.setStartTimeFilter(startTimeFilter(t.getStartTimeFilter()));
     }
     return request.build();
+  }
+
+  public static RespondActivityTaskFailedByIDRequest respondActivityTaskFailedByIDRequest(
+      com.uber.cadence.RespondActivityTaskFailedByIDRequest failRequest) {
+    if (failRequest == null) {
+      return null;
+    }
+    RespondActivityTaskFailedByIDRequest.Builder request =
+        RespondActivityTaskFailedByIDRequest.newBuilder()
+            .setDomain(failRequest.getDomain())
+            .setWorkflowExecution(
+                TypeMapper.workflowRunPair(failRequest.getWorkflowID(), failRequest.getRunID()))
+            .setActivityId(failRequest.getActivityID())
+            .setFailure(failure(failRequest.getReason(), failRequest.getDetails()))
+            .setIdentity(failRequest.getIdentity() != null ? failRequest.getIdentity() : "");
+    return request.build();
+  }
+
+  public static RespondActivityTaskCompletedByIDRequest respondActivityTaskCompletedByIDRequest(
+      com.uber.cadence.RespondActivityTaskCompletedByIDRequest completeRequest) {
+    if (completeRequest == null) {
+      return null;
+    }
+    RespondActivityTaskCompletedByIDRequest.Builder request =
+        RespondActivityTaskCompletedByIDRequest.newBuilder()
+            .setDomain(completeRequest.getDomain())
+            .setWorkflowExecution(
+                TypeMapper.workflowRunPair(
+                    completeRequest.getWorkflowID(), completeRequest.getRunID()))
+            .setActivityId(completeRequest.getActivityID())
+            .setResult(payload(completeRequest.getResult()))
+            .setIdentity(
+                completeRequest.getIdentity() != null ? completeRequest.getIdentity() : "");
+    return request.build();
+  }
+
+  public static RecordActivityTaskHeartbeatByIDRequest recordActivityTaskHeartbeatByIDRequest(
+      com.uber.cadence.RecordActivityTaskHeartbeatByIDRequest heartbeatRequest) {
+    if (heartbeatRequest == null) {
+      return null;
+    }
+    RecordActivityTaskHeartbeatByIDRequest.Builder request =
+        RecordActivityTaskHeartbeatByIDRequest.newBuilder()
+            .setDomain(heartbeatRequest.getDomain())
+            .setWorkflowExecution(
+                TypeMapper.workflowRunPair(
+                    heartbeatRequest.getWorkflowID(), heartbeatRequest.getRunID()))
+            .setActivityId(heartbeatRequest.getActivityID())
+            .setDetails(payload(heartbeatRequest.getDetails()))
+            .setIdentity(
+                heartbeatRequest.getIdentity() != null ? heartbeatRequest.getIdentity() : "");
+    return request.build();
+  }
+
+  public static RespondActivityTaskCanceledByIDRequest respondActivityTaskCanceledByIDRequest(
+      com.uber.cadence.RespondActivityTaskCanceledByIDRequest canceledRequest) {
+    if (canceledRequest == null) {
+      return null;
+    }
+    RespondActivityTaskCanceledByIDRequest.Builder request =
+        RespondActivityTaskCanceledByIDRequest.newBuilder()
+            .setDomain(canceledRequest.getDomain())
+            .setWorkflowExecution(
+                TypeMapper.workflowRunPair(
+                    canceledRequest.getWorkflowID(), canceledRequest.getRunID()))
+            .setActivityId(canceledRequest.getActivityID())
+            .setDetails(payload(canceledRequest.getDetails()))
+            .setIdentity(
+                canceledRequest.getIdentity() != null ? canceledRequest.getIdentity() : "");
+    return request.build();
+  }
+
+  public static GetTaskListsByDomainRequest getTaskListsByDomainRequest(
+      com.uber.cadence.GetTaskListsByDomainRequest domainRequest) {
+    if (domainRequest == null) {
+      return null;
+    }
+    GetTaskListsByDomainRequest.Builder request =
+        GetTaskListsByDomainRequest.newBuilder().setDomain(domainRequest.getDomainName());
+    return request.build();
+  }
+
+  public static RefreshWorkflowTasksRequest refreshWorkflowTasksRequest(
+      com.uber.cadence.RefreshWorkflowTasksRequest request) {
+    if (request == null) {
+      return null;
+    }
+    return RefreshWorkflowTasksRequest.newBuilder().setDomain(request.getDomain()).build();
   }
 }

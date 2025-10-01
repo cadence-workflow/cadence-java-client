@@ -7,6 +7,6 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class GetCrossClusterTasksResponse {
-  private Map<Integer, List<CrossClusterTaskRequest>> tasksByShard;
-  private Map<Integer, GetTaskFailedCause> failedCauseByShard;
+  private Map<Integer, List<CrossClusterTaskRequest>> tasksByShard = new HashMap<>();;
+  private Map<Integer, GetTaskFailedCause> failedCauseByShard = new HashMap<>();;
 }

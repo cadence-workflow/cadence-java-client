@@ -22,7 +22,6 @@ import static com.uber.cadence.internal.common.InternalUtils.createStickyTaskLis
 
 import com.uber.cadence.*;
 import com.uber.cadence.internal.testservice.TestWorkflowService;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -43,26 +42,24 @@ public class TestServiceUtils {
       int taskStartToCloseTimeoutSeconds,
       TestWorkflowService service)
       throws Exception {
-    StartWorkflowExecutionRequest request = new StartWorkflowExecutionRequest();
-    request.domain = domain;
-    request.workflowId = UUID.randomUUID().toString();
-    request.taskList = createNormalTaskList(tasklistName);
-    request.setExecutionStartToCloseTimeoutSeconds(executionStartToCloseTimeoutSeconds);
-    request.setTaskStartToCloseTimeoutSeconds(taskStartToCloseTimeoutSeconds);
-    WorkflowType type = new WorkflowType();
-    type.name = workflowType;
-    request.workflowType = type;
+    StartWorkflowExecutionRequest request =
+        new StartWorkflowExecutionRequest()
+            .setDomain(domain)
+            .setWorkflowId(UUID.randomUUID().toString())
+            .setTaskList(createNormalTaskList(tasklistName))
+            .setExecutionStartToCloseTimeoutSeconds(executionStartToCloseTimeoutSeconds)
+            .setTaskStartToCloseTimeoutSeconds(taskStartToCloseTimeoutSeconds)
+            .setWorkflowType(new WorkflowType().setName(workflowType));
     service.StartWorkflowExecution(request);
   }
 
   public static void respondDecisionTaskCompletedWithSticky(
-      ByteBuffer taskToken, String stickyTasklistName, TestWorkflowService service)
-      throws Exception {
+      byte[] taskToken, String stickyTasklistName, TestWorkflowService service) throws Exception {
     respondDecisionTaskCompletedWithSticky(taskToken, stickyTasklistName, 100, service);
   }
 
   public static void respondDecisionTaskCompletedWithSticky(
-      ByteBuffer taskToken,
+      byte[] taskToken,
       String stickyTasklistName,
       int startToCloseTimeout,
       TestWorkflowService service)
@@ -78,7 +75,7 @@ public class TestServiceUtils {
   }
 
   public static void respondDecisionTaskFailedWithSticky(
-      ByteBuffer taskToken, TestWorkflowService service) throws Exception {
+      byte[] taskToken, TestWorkflowService service) throws Exception {
     RespondDecisionTaskFailedRequest request = new RespondDecisionTaskFailedRequest();
     request.setTaskToken(taskToken);
     service.RespondDecisionTaskFailed(request);
