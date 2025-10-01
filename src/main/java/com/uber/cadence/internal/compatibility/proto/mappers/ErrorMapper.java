@@ -60,6 +60,13 @@ public class ErrorMapper {
         case NOT_FOUND:
           if (detail.is(com.uber.cadence.api.v1.WorkflowExecutionAlreadyCompletedError.class)) {
             return new WorkflowExecutionAlreadyCompletedError(e);
+          } else if (detail.is(com.uber.cadence.api.v1.EntityNotExistsError.class)
+              && status
+                  .getMessage()
+                  .contains(
+                      "Workflow execution already completed.")) {
+            // old server returns EntityNotExistsError with message Workflow is alredy completed
+            return new WorkflowExecutionAlreadyCompletedError(e);
           } else {
             return new EntityNotExistsError(e);
           }

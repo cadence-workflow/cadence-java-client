@@ -200,7 +200,7 @@ public class RequestMapper {
     return ResetWorkflowExecutionRequest.newBuilder()
         .setDomain(t.getDomain())
         .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
-        .setReason(t.getReason())
+        .setReason(t.getReason() != null ? t.getReason() : "")
         .setDecisionFinishEventId(t.getDecisionFinishEventId())
         .setRequestId(t.getRequestId())
         .setSkipSignalReapply(t.isSkipSignalReapply())
@@ -568,7 +568,7 @@ public class RequestMapper {
         TerminateWorkflowExecutionRequest.newBuilder()
             .setDomain(t.getDomain())
             .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
-            .setReason(t.getReason())
+            .setReason(t.getReason() != null ? t.getReason() : "")
             .setDetails(payload(t.getDetails()));
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
@@ -758,8 +758,8 @@ public class RequestMapper {
     return RestartWorkflowExecutionRequest.newBuilder()
         .setDomain(t.getDomain())
         .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
-        .setReason(t.getReason())
-        .setIdentity(t.getIdentity())
+        .setReason(t.getReason() != null ? t.getReason() : "")
+        .setIdentity(t.getIdentity() != null ? t.getIdentity() : "")
         .build();
   }
 
@@ -908,7 +908,7 @@ public class RequestMapper {
                 TypeMapper.workflowRunPair(failRequest.getWorkflowID(), failRequest.getRunID()))
             .setActivityId(failRequest.getActivityID())
             .setFailure(failure(failRequest.getReason(), failRequest.getDetails()))
-            .setIdentity(failRequest.getIdentity());
+            .setIdentity(failRequest.getIdentity() != null ? failRequest.getIdentity() : "");
     return request.build();
   }
 
@@ -925,7 +925,7 @@ public class RequestMapper {
                     completeRequest.getWorkflowID(), completeRequest.getRunID()))
             .setActivityId(completeRequest.getActivityID())
             .setResult(payload(completeRequest.getResult()))
-            .setIdentity(completeRequest.getIdentity());
+            .setIdentity(completeRequest.getIdentity() != null ? completeRequest.getIdentity() : "");
     return request.build();
   }
 
@@ -942,7 +942,7 @@ public class RequestMapper {
                     heartbeatRequest.getWorkflowID(), heartbeatRequest.getRunID()))
             .setActivityId(heartbeatRequest.getActivityID())
             .setDetails(payload(heartbeatRequest.getDetails()))
-            .setIdentity(heartbeatRequest.getIdentity());
+            .setIdentity(heartbeatRequest.getIdentity() != null ? heartbeatRequest.getIdentity() : "");
     return request.build();
   }
 
@@ -959,7 +959,7 @@ public class RequestMapper {
                     canceledRequest.getWorkflowID(), canceledRequest.getRunID()))
             .setActivityId(canceledRequest.getActivityID())
             .setDetails(payload(canceledRequest.getDetails()))
-            .setIdentity(canceledRequest.getIdentity());
+            .setIdentity(canceledRequest.getIdentity() != null ? canceledRequest.getIdentity() : "");
     return request.build();
   }
 
