@@ -925,7 +925,8 @@ public class RequestMapper {
                     completeRequest.getWorkflowID(), completeRequest.getRunID()))
             .setActivityId(completeRequest.getActivityID())
             .setResult(payload(completeRequest.getResult()))
-            .setIdentity(completeRequest.getIdentity() != null ? completeRequest.getIdentity() : "");
+            .setIdentity(
+                completeRequest.getIdentity() != null ? completeRequest.getIdentity() : "");
     return request.build();
   }
 
@@ -942,7 +943,8 @@ public class RequestMapper {
                     heartbeatRequest.getWorkflowID(), heartbeatRequest.getRunID()))
             .setActivityId(heartbeatRequest.getActivityID())
             .setDetails(payload(heartbeatRequest.getDetails()))
-            .setIdentity(heartbeatRequest.getIdentity() != null ? heartbeatRequest.getIdentity() : "");
+            .setIdentity(
+                heartbeatRequest.getIdentity() != null ? heartbeatRequest.getIdentity() : "");
     return request.build();
   }
 
@@ -959,7 +961,8 @@ public class RequestMapper {
                     canceledRequest.getWorkflowID(), canceledRequest.getRunID()))
             .setActivityId(canceledRequest.getActivityID())
             .setDetails(payload(canceledRequest.getDetails()))
-            .setIdentity(canceledRequest.getIdentity() != null ? canceledRequest.getIdentity() : "");
+            .setIdentity(
+                canceledRequest.getIdentity() != null ? canceledRequest.getIdentity() : "");
     return request.build();
   }
 
