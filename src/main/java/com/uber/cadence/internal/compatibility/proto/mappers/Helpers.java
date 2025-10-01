@@ -13,7 +13,7 @@
  *  express or implied. See the License for the specific language governing
  *  permissions and limitations under the License.
  */
-package com.uber.cadence.internal.compatibility.proto;
+package com.uber.cadence.internal.compatibility.proto.mappers;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
@@ -21,6 +21,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.DoubleValue;
 import com.google.protobuf.Duration;
 import com.google.protobuf.FieldMask;
+import com.google.protobuf.Int64Value;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Durations;
 import com.google.protobuf.util.Timestamps;
@@ -71,5 +72,28 @@ class Helpers {
       return null;
     }
     return ByteString.copyFrom(t);
+  }
+
+  static long toInt64Value(Int64Value v) {
+    return v.getValue();
+  }
+
+  static long timeToUnixNano(Timestamp t) {
+    return Timestamps.toNanos(t);
+  }
+
+  static int durationToDays(Duration d) {
+    return (int) Durations.toDays(d);
+  }
+
+  static int durationToSeconds(Duration d) {
+    return (int) Durations.toSeconds(d);
+  }
+
+  static byte[] byteStringToArray(ByteString t) {
+    if (t == null || t.size() == 0) {
+      return null;
+    }
+    return t.toByteArray();
   }
 }

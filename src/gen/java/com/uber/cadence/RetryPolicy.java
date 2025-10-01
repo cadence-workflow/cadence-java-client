@@ -11,6 +11,6 @@ public class RetryPolicy {
   private double backoffCoefficient;
   private int maximumIntervalInSeconds;
   private int maximumAttempts;
-  private List<String> nonRetriableErrorReasons;
+  private List<String> nonRetriableErrorReasons = new ArrayList<>();;
   private int expirationIntervalInSeconds;
 }

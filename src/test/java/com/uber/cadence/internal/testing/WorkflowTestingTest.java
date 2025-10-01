@@ -22,17 +22,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.uber.cadence.EventType;
-import com.uber.cadence.GetWorkflowExecutionHistoryRequest;
-import com.uber.cadence.History;
-import com.uber.cadence.HistoryEvent;
-import com.uber.cadence.ListClosedWorkflowExecutionsRequest;
-import com.uber.cadence.ListClosedWorkflowExecutionsResponse;
-import com.uber.cadence.ListOpenWorkflowExecutionsRequest;
-import com.uber.cadence.ListOpenWorkflowExecutionsResponse;
-import com.uber.cadence.TimeoutType;
-import com.uber.cadence.WorkflowExecution;
-import com.uber.cadence.WorkflowExecutionInfo;
+import com.uber.cadence.*;
 import com.uber.cadence.activity.Activity;
 import com.uber.cadence.activity.ActivityMethod;
 import com.uber.cadence.activity.ActivityOptions;
@@ -50,7 +40,6 @@ import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import org.apache.thrift.TException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -543,7 +532,7 @@ public class WorkflowTestingTest {
   }
 
   @Test
-  public void testTimerCancellation() throws TException {
+  public void testTimerCancellation() throws CadenceError {
     Worker worker = testEnvironment.newWorker(TASK_LIST);
     worker.registerWorkflowImplementationTypes(TestTimerCancellationWorkflow.class);
     worker.registerActivitiesImplementations(new ActivityImpl());

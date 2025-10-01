@@ -12,6 +12,6 @@ public class TaskListStatus {
   private long ackLevel;
   private double ratePerSecond;
   private TaskIDBlock taskIDBlock;
-  private Map<String, IsolationGroupMetrics> isolationGroupMetrics;
+  private Map<String, IsolationGroupMetrics> isolationGroupMetrics = new HashMap<>();;
   private double newTasksPerSecond;
 }

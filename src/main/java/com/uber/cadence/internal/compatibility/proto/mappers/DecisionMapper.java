@@ -13,25 +13,25 @@
  *  express or implied. See the License for the specific language governing
  *  permissions and limitations under the License.
  */
-package com.uber.cadence.internal.compatibility.proto;
+package com.uber.cadence.internal.compatibility.proto.mappers;
 
-import static com.uber.cadence.internal.compatibility.proto.EnumMapper.continueAsNewInitiator;
-import static com.uber.cadence.internal.compatibility.proto.EnumMapper.parentClosePolicy;
-import static com.uber.cadence.internal.compatibility.proto.EnumMapper.workflowIdReusePolicy;
-import static com.uber.cadence.internal.compatibility.proto.Helpers.arrayToByteString;
-import static com.uber.cadence.internal.compatibility.proto.Helpers.longToInt;
-import static com.uber.cadence.internal.compatibility.proto.Helpers.secondsToDuration;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.activityType;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.failure;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.header;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.memo;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.payload;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.retryPolicy;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.searchAttributes;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.taskList;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.workflowExecution;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.workflowRunPair;
-import static com.uber.cadence.internal.compatibility.proto.TypeMapper.workflowType;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.continueAsNewInitiator;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.parentClosePolicy;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.workflowIdReusePolicy;
+import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.arrayToByteString;
+import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.longToInt;
+import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.secondsToDuration;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.activityType;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.failure;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.header;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.memo;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.payload;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.retryPolicy;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.searchAttributes;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.taskList;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowExecution;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowRunPair;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowType;
 
 import com.uber.cadence.api.v1.CancelTimerDecisionAttributes;
 import com.uber.cadence.api.v1.CancelWorkflowExecutionDecisionAttributes;
@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 class DecisionMapper {
-
   static List<Decision> decisionArray(List<com.uber.cadence.Decision> t) {
     if (t == null) {
       return null;

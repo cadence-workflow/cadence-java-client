@@ -20,7 +20,7 @@ public class PollForDecisionTaskResponse {
   private TaskList WorkflowExecutionTaskList;
   private long scheduledTimestamp;
   private long startedTimestamp;
-  private Map<String, WorkflowQuery> queries;
+  private Map<String, WorkflowQuery> queries = new HashMap<>();;
   private long nextEventId;
   private long totalHistoryBytes;
   private AutoConfigHint autoConfigHint;

@@ -7,5 +7,5 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class DescribeQueueResponse {
-  private List<String> processingQueueStates;
+  private List<String> processingQueueStates = new ArrayList<>();;
 }

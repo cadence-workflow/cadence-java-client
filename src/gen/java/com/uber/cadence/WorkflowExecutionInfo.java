@@ -24,5 +24,5 @@ public class WorkflowExecutionInfo {
   private String taskList;
   private boolean isCron;
   private long updateTime;
-  private Map<String, String> partitionConfig;
+  private Map<String, String> partitionConfig = new HashMap<>();;
 }

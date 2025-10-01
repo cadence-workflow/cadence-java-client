@@ -17,6 +17,7 @@
 
 package com.uber.cadence.internal.sync;
 
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,6 +26,7 @@ import com.uber.cadence.SearchAttributes;
 import com.uber.cadence.converter.JsonDataConverter;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.replay.DecisionContext;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -48,7 +50,13 @@ public class SyncDecisionContextTest {
     SearchAttributes serializedAttr = InternalUtils.convertMapToSearchAttributes(attr);
 
     context.upsertSearchAttributes(attr);
-    verify(mockDecisionContext, times(1)).upsertSearchAttributes(serializedAttr);
+    verify(mockDecisionContext, times(1))
+        .upsertSearchAttributes(
+            argThat(
+                s ->
+                    Arrays.equals(
+                        s.getIndexedFields().get("CustomKeywordField"),
+                        serializedAttr.getIndexedFields().get("CustomKeywordField"))));
   }
 
   @Test(expected = IllegalArgumentException.class)

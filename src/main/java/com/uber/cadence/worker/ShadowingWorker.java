@@ -23,6 +23,8 @@ import com.uber.cadence.WorkflowExecutionAlreadyStartedError;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.client.WorkflowClient;
+import com.uber.cadence.converter.DataConverter;
+import com.uber.cadence.converter.JsonDataConverter;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.common.RpcRetryer;
 import com.uber.cadence.internal.metrics.MetricsTag;
@@ -34,8 +36,8 @@ import com.uber.cadence.internal.sync.SyncActivityWorker;
 import com.uber.cadence.internal.worker.SingleWorkerOptions;
 import com.uber.cadence.internal.worker.Suspendable;
 import com.uber.cadence.serviceclient.IWorkflowService;
+import com.uber.cadence.shadower.Constants;
 import com.uber.cadence.shadower.WorkflowParams;
-import com.uber.cadence.shadower.shadowerConstants;
 import com.uber.cadence.testing.TestEnvironmentOptions;
 import com.uber.cadence.workflow.Functions;
 import com.uber.m3.tally.Scope;
@@ -44,8 +46,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.thrift.TSerializer;
-import org.apache.thrift.protocol.TSimpleJSONProtocol;
 
 public final class ShadowingWorker implements Suspendable {
 
@@ -117,7 +117,7 @@ public final class ShadowingWorker implements Suspendable {
             .build();
     activityWorker =
         new SyncActivityWorker(
-            client.getService(), shadowerConstants.LocalDomainName, this.taskList, activityOptions);
+            client.getService(), Constants.LocalDomainName, this.taskList, activityOptions);
     activityWorker.setActivitiesImplementation(scanActivity, replayActivity);
   }
 
@@ -183,7 +183,7 @@ public final class ShadowingWorker implements Suspendable {
   }
 
   protected void startShadowingWorkflow() throws Exception {
-    TSerializer serializer = new TSerializer(new TSimpleJSONProtocol.Factory());
+    DataConverter dataConverter = JsonDataConverter.getInstance();
     WorkflowParams params =
         new WorkflowParams()
             .setDomain(shadowingOptions.getDomain())
@@ -195,11 +195,11 @@ public final class ShadowingWorker implements Suspendable {
             .setWorkflowQuery(shadowingOptions.getWorkflowQuery());
     StartWorkflowExecutionRequest request =
         new StartWorkflowExecutionRequest()
-            .setDomain(shadowerConstants.LocalDomainName)
-            .setWorkflowId(shadowingOptions.getDomain() + shadowerConstants.WorkflowIDSuffix)
-            .setTaskList(new TaskList().setName(shadowerConstants.TaskList))
-            .setInput(serializer.serialize(params))
-            .setWorkflowType(new WorkflowType().setName(shadowerConstants.WorkflowName))
+            .setDomain(Constants.LocalDomainName)
+            .setWorkflowId(shadowingOptions.getDomain() + Constants.WorkflowIDSuffix)
+            .setTaskList(new TaskList().setName(Constants.TaskList))
+            .setInput(dataConverter.toData(params))
+            .setWorkflowType(new WorkflowType().setName(Constants.WorkflowName))
             .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.AllowDuplicate)
             .setRequestId(UUID.randomUUID().toString())
             .setExecutionStartToCloseTimeoutSeconds(864000)
