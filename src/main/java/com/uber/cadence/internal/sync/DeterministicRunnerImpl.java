@@ -36,6 +36,7 @@ import com.uber.cadence.internal.replay.SignalExternalWorkflowParameters;
 import com.uber.cadence.internal.replay.StartChildWorkflowExecutionParameters;
 import com.uber.cadence.workflow.Functions.Func;
 import com.uber.cadence.workflow.Functions.Func1;
+import com.uber.cadence.workflow.GetVersionOptions;
 import com.uber.cadence.workflow.Promise;
 import com.uber.m3.tally.Scope;
 import java.time.Duration;
@@ -692,6 +693,16 @@ class DeterministicRunnerImpl implements DeterministicRunner {
     @Override
     public int getVersion(
         String changeID, DataConverter converter, int minSupported, int maxSupported) {
+      throw new UnsupportedOperationException("not implemented");
+    }
+
+    @Override
+    public int getVersion(
+        String changeID,
+        DataConverter converter,
+        int minSupported,
+        int maxSupported,
+        GetVersionOptions options) {
       throw new UnsupportedOperationException("not implemented");
     }
 
