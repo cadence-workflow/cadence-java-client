@@ -15,29 +15,10 @@
 package com.uber.cadence.client;
 
 import com.uber.cadence.CadenceError;
-import java.util.Objects;
 
 public final class ApplicationFailureException extends CadenceError {
 
   public ApplicationFailureException(String message) {
     super(message);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null || getClass() != obj.getClass()) {
-      return false;
-    }
-    ApplicationFailureException that = (ApplicationFailureException) obj;
-    return Objects.equals(getMessage(), that.getMessage())
-        && Objects.equals(getCause(), that.getCause());
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(getMessage(), getCause());
   }
 }

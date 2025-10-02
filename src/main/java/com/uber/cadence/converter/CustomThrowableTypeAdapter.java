@@ -138,7 +138,7 @@ class CustomThrowableTypeAdapter<T extends Throwable> extends TypeAdapter<T> {
       try {
         classType = Class.forName(className);
       } catch (ClassNotFoundException e) {
-        return (T) new ApplicationFailureException("Class not found: " + className);
+        classType = ApplicationFailureException.class;
       }
       if (!Throwable.class.isAssignableFrom(classType)) {
         throw new IOException("Expected type that extends Throwable: " + className);

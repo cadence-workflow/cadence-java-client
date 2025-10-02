@@ -287,8 +287,7 @@ public class JsonDataConverterTest {
             RuntimeException.class,
             RuntimeException.class);
     assertEquals(ApplicationFailureException.class, fromConverted.getClass());
-    assertEquals(
-        "Class not found: com.uber.cadence.converter.ExceptionNotFound",
-        fromConverted.getMessage());
+    assertEquals("application exception", fromConverted.getMessage());
+    assertNotSame(fromConverted.getStackTrace().length, 0);
   }
 }
