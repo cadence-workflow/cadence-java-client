@@ -22,6 +22,7 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.uber.cadence.client.ApplicationFailureException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -137,7 +138,7 @@ class CustomThrowableTypeAdapter<T extends Throwable> extends TypeAdapter<T> {
       try {
         classType = Class.forName(className);
       } catch (ClassNotFoundException e) {
-        return null;
+        return (T) new ApplicationFailureException("Class not found: " + className);
       }
       if (!Throwable.class.isAssignableFrom(classType)) {
         throw new IOException("Expected type that extends Throwable: " + className);

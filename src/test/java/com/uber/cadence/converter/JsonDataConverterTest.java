@@ -27,6 +27,7 @@ import com.uber.cadence.TaskList;
 import com.uber.cadence.WorkflowExecutionStartedEventAttributes;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.activity.Activity;
+import com.uber.cadence.client.ApplicationFailureException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -285,6 +286,9 @@ public class JsonDataConverterTest {
             convertedString.getBytes(StandardCharsets.UTF_8),
             RuntimeException.class,
             RuntimeException.class);
-    assertNull(fromConverted);
+    assertEquals(ApplicationFailureException.class, fromConverted.getClass());
+    assertEquals(
+        "Class not found: com.uber.cadence.converter.ExceptionNotFound",
+        fromConverted.getMessage());
   }
 }
