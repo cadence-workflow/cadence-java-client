@@ -460,6 +460,7 @@ final class SyncDecisionContext implements WorkflowInterceptor {
             .setWorkflowIdReusePolicy(options.getWorkflowIdReusePolicy())
             .setRetryParameters(retryParameters)
             .setCronSchedule(options.getCronSchedule())
+            .setCronOverlapPolicy(options.getCronOverlapPolicy())
             .setMemo(options.getMemo())
             .setSearchAttributes(options.getSearchAttributes())
             .setContext(extractContextsAndConvertToBytes(propagators))
