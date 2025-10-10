@@ -121,7 +121,8 @@ public class RequestMapper {
       return null;
     }
     CountWorkflowExecutionsRequest.Builder request =
-        CountWorkflowExecutionsRequest.newBuilder().setDomain(t.getDomain() != null ? t.getDomain() : "");
+        CountWorkflowExecutionsRequest.newBuilder()
+            .setDomain(t.getDomain() != null ? t.getDomain() : "");
     if (t.getQuery() != null) {
       request.setQuery(t.getQuery());
     }
@@ -972,7 +973,8 @@ public class RequestMapper {
       return null;
     }
     GetTaskListsByDomainRequest.Builder request =
-        GetTaskListsByDomainRequest.newBuilder().setDomain(domainRequest.getDomainName() != null ? domainRequest.getDomainName() : "");
+        GetTaskListsByDomainRequest.newBuilder()
+            .setDomain(domainRequest.getDomainName() != null ? domainRequest.getDomainName() : "");
     return request.build();
   }
 
@@ -981,6 +983,8 @@ public class RequestMapper {
     if (request == null) {
       return null;
     }
-    return RefreshWorkflowTasksRequest.newBuilder().setDomain(request.getDomain() != null ? request.getDomain() : "").build();
+    return RefreshWorkflowTasksRequest.newBuilder()
+        .setDomain(request.getDomain() != null ? request.getDomain() : "")
+        .build();
   }
 }
