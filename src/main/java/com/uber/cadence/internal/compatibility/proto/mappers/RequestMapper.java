@@ -121,7 +121,7 @@ public class RequestMapper {
       return null;
     }
     CountWorkflowExecutionsRequest.Builder request =
-        CountWorkflowExecutionsRequest.newBuilder().setDomain(t.getDomain());
+        CountWorkflowExecutionsRequest.newBuilder().setDomain(t.getDomain() != null ? t.getDomain() : "");
     if (t.getQuery() != null) {
       request.setQuery(t.getQuery());
     }
@@ -134,7 +134,7 @@ public class RequestMapper {
       return null;
     }
     return DescribeTaskListRequest.newBuilder()
-        .setDomain(t.getDomain())
+        .setDomain(t.getDomain() != null ? t.getDomain() : "")
         .setTaskList(taskList(t.getTaskList()))
         .setTaskListType(taskListType(t.getTaskListType()))
         .setIncludeTaskListStatus(t.isIncludeTaskListStatus())
@@ -148,7 +148,7 @@ public class RequestMapper {
     }
     ListArchivedWorkflowExecutionsRequest.Builder request =
         ListArchivedWorkflowExecutionsRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setPageSize(t.getPageSize());
     if (t.getNextPageToken() != null) {
       request.setNextPageToken(arrayToByteString(t.getNextPageToken()));
@@ -166,7 +166,7 @@ public class RequestMapper {
     }
     RequestCancelWorkflowExecutionRequest.Builder builder =
         RequestCancelWorkflowExecutionRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
             .setRequestId(t.getRequestId());
     if (t.getIdentity() != null) {
@@ -187,7 +187,7 @@ public class RequestMapper {
       return null;
     }
     return ResetStickyTaskListRequest.newBuilder()
-        .setDomain(t.getDomain())
+        .setDomain(t.getDomain() != null ? t.getDomain() : "")
         .setWorkflowExecution(workflowExecution(t.getExecution()))
         .build();
   }
@@ -198,7 +198,7 @@ public class RequestMapper {
       return null;
     }
     return ResetWorkflowExecutionRequest.newBuilder()
-        .setDomain(t.getDomain())
+        .setDomain(t.getDomain() != null ? t.getDomain() : "")
         .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
         .setReason(t.getReason() != null ? t.getReason() : "")
         .setDecisionFinishEventId(t.getDecisionFinishEventId())
@@ -214,7 +214,7 @@ public class RequestMapper {
     }
     RespondActivityTaskCanceledByIDRequest.Builder builder =
         RespondActivityTaskCanceledByIDRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setWorkflowExecution(TypeMapper.workflowRunPair(t.getWorkflowID(), t.getRunID()))
             .setActivityId(t.getActivityID())
             .setDetails(payload(t.getDetails()));
@@ -247,7 +247,7 @@ public class RequestMapper {
     }
     RespondActivityTaskCompletedByIDRequest.Builder builder =
         RespondActivityTaskCompletedByIDRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setWorkflowExecution(TypeMapper.workflowRunPair(t.getWorkflowID(), t.getRunID()))
             .setActivityId(t.getActivityID())
             .setResult(payload(t.getResult()));
@@ -280,7 +280,7 @@ public class RequestMapper {
     }
     RespondActivityTaskFailedByIDRequest.Builder builder =
         RespondActivityTaskFailedByIDRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setWorkflowExecution(TypeMapper.workflowRunPair(t.getWorkflowID(), t.getRunID()))
             .setActivityId(t.getActivityID())
             .setFailure(failure(t.getReason(), t.getDetails()));
@@ -384,7 +384,7 @@ public class RequestMapper {
     }
     ScanWorkflowExecutionsRequest.Builder request =
         ScanWorkflowExecutionsRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setPageSize(t.getPageSize());
     if (t.getNextPageToken() != null) {
       request.setNextPageToken(arrayToByteString(t.getNextPageToken()));
@@ -401,7 +401,7 @@ public class RequestMapper {
       return null;
     }
     return DescribeWorkflowExecutionRequest.newBuilder()
-        .setDomain(t.getDomain())
+        .setDomain(t.getDomain() != null ? t.getDomain() : "")
         .setWorkflowExecution(workflowExecution(t.getExecution()))
         .setQueryConsistencyLevel(queryConsistencyLevel(t.getQueryConsistencyLevel()))
         .build();
@@ -414,7 +414,7 @@ public class RequestMapper {
     }
     GetWorkflowExecutionHistoryRequest.Builder builder =
         GetWorkflowExecutionHistoryRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setWorkflowExecution(workflowExecution(t.getExecution()))
             .setPageSize(t.getMaximumPageSize())
             .setWaitForNewEvent(t.isWaitForNewEvent())
@@ -434,7 +434,7 @@ public class RequestMapper {
     }
     StartWorkflowExecutionRequest.Builder builder =
         StartWorkflowExecutionRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setWorkflowId(t.getWorkflowId())
             .setWorkflowType(workflowType(t.getWorkflowType()))
             .setTaskList(taskList(t.getTaskList()))
@@ -497,7 +497,7 @@ public class RequestMapper {
     }
     SignalWorkflowExecutionRequest.Builder builder =
         SignalWorkflowExecutionRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
             .setSignalName(t.getSignalName())
             .setSignalInput(payload(t.getInput()))
@@ -518,7 +518,7 @@ public class RequestMapper {
     }
     StartWorkflowExecutionRequest.Builder request =
         StartWorkflowExecutionRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setWorkflowId(t.getWorkflowId())
             .setWorkflowType(workflowType(t.getWorkflowType()))
             .setTaskList(taskList(t.getTaskList()))
@@ -566,7 +566,7 @@ public class RequestMapper {
     }
     TerminateWorkflowExecutionRequest.Builder builder =
         TerminateWorkflowExecutionRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
             .setReason(t.getReason() != null ? t.getReason() : "")
             .setDetails(payload(t.getDetails()));
@@ -622,7 +622,7 @@ public class RequestMapper {
       return null;
     }
     return ListTaskListPartitionsRequest.newBuilder()
-        .setDomain(t.getDomain())
+        .setDomain(t.getDomain() != null ? t.getDomain() : "")
         .setTaskList(taskList(t.getTaskList()))
         .build();
   }
@@ -634,7 +634,7 @@ public class RequestMapper {
     }
     ListWorkflowExecutionsRequest.Builder request =
         ListWorkflowExecutionsRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setPageSize(t.getPageSize());
     if (t.getNextPageToken() != null) {
       request.setNextPageToken(arrayToByteString(t.getNextPageToken()));
@@ -652,7 +652,7 @@ public class RequestMapper {
     }
     PollForActivityTaskRequest.Builder builder =
         PollForActivityTaskRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setTaskList(taskList(t.getTaskList()))
             .setTaskListMetadata(taskListMetadata(t.getTaskListMetadata()));
     if (t.getIdentity() != null) {
@@ -668,7 +668,7 @@ public class RequestMapper {
     }
     PollForDecisionTaskRequest.Builder builder =
         PollForDecisionTaskRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setTaskList(taskList(t.getTaskList()));
     if (t.getBinaryChecksum() != null) {
       builder.setBinaryChecksum(t.getBinaryChecksum());
@@ -684,7 +684,7 @@ public class RequestMapper {
       return null;
     }
     return QueryWorkflowRequest.newBuilder()
-        .setDomain(t.getDomain())
+        .setDomain(t.getDomain() != null ? t.getDomain() : "")
         .setWorkflowExecution(workflowExecution(t.getExecution()))
         .setQuery(workflowQuery(t.getQuery()))
         .setQueryRejectCondition(queryRejectCondition(t.getQueryRejectCondition()))
@@ -699,7 +699,7 @@ public class RequestMapper {
     }
     RecordActivityTaskHeartbeatByIDRequest.Builder builder =
         RecordActivityTaskHeartbeatByIDRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setWorkflowExecution(TypeMapper.workflowRunPair(t.getWorkflowID(), t.getRunID()))
             .setActivityId(t.getActivityID())
             .setDetails(payload(t.getDetails()));
@@ -756,7 +756,7 @@ public class RequestMapper {
       return null;
     }
     return RestartWorkflowExecutionRequest.newBuilder()
-        .setDomain(t.getDomain())
+        .setDomain(t.getDomain() != null ? t.getDomain() : "")
         .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
         .setReason(t.getReason() != null ? t.getReason() : "")
         .setIdentity(t.getIdentity() != null ? t.getIdentity() : "")
@@ -852,7 +852,7 @@ public class RequestMapper {
     }
     ListClosedWorkflowExecutionsRequest.Builder request =
         ListClosedWorkflowExecutionsRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setPageSize(t.getMaximumPageSize());
     if (t.getExecutionFilter() != null) {
       request.setExecutionFilter(workflowExecutionFilter(t.getExecutionFilter()));
@@ -879,7 +879,7 @@ public class RequestMapper {
     }
     ListOpenWorkflowExecutionsRequest.Builder request =
         ListOpenWorkflowExecutionsRequest.newBuilder()
-            .setDomain(t.getDomain())
+            .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setPageSize(t.getMaximumPageSize());
     if (t.getExecutionFilter() != null) {
       request.setExecutionFilter(workflowExecutionFilter(t.getExecutionFilter()));
@@ -903,7 +903,7 @@ public class RequestMapper {
     }
     RespondActivityTaskFailedByIDRequest.Builder request =
         RespondActivityTaskFailedByIDRequest.newBuilder()
-            .setDomain(failRequest.getDomain())
+            .setDomain(failRequest.getDomain() != null ? failRequest.getDomain() : "")
             .setWorkflowExecution(
                 TypeMapper.workflowRunPair(failRequest.getWorkflowID(), failRequest.getRunID()))
             .setActivityId(failRequest.getActivityID())
@@ -919,7 +919,7 @@ public class RequestMapper {
     }
     RespondActivityTaskCompletedByIDRequest.Builder request =
         RespondActivityTaskCompletedByIDRequest.newBuilder()
-            .setDomain(completeRequest.getDomain())
+            .setDomain(completeRequest.getDomain() != null ? completeRequest.getDomain() : "")
             .setWorkflowExecution(
                 TypeMapper.workflowRunPair(
                     completeRequest.getWorkflowID(), completeRequest.getRunID()))
@@ -937,7 +937,7 @@ public class RequestMapper {
     }
     RecordActivityTaskHeartbeatByIDRequest.Builder request =
         RecordActivityTaskHeartbeatByIDRequest.newBuilder()
-            .setDomain(heartbeatRequest.getDomain())
+            .setDomain(heartbeatRequest.getDomain() != null ? heartbeatRequest.getDomain() : "")
             .setWorkflowExecution(
                 TypeMapper.workflowRunPair(
                     heartbeatRequest.getWorkflowID(), heartbeatRequest.getRunID()))
@@ -955,7 +955,7 @@ public class RequestMapper {
     }
     RespondActivityTaskCanceledByIDRequest.Builder request =
         RespondActivityTaskCanceledByIDRequest.newBuilder()
-            .setDomain(canceledRequest.getDomain())
+            .setDomain(canceledRequest.getDomain() != null ? canceledRequest.getDomain() : "")
             .setWorkflowExecution(
                 TypeMapper.workflowRunPair(
                     canceledRequest.getWorkflowID(), canceledRequest.getRunID()))
@@ -972,7 +972,7 @@ public class RequestMapper {
       return null;
     }
     GetTaskListsByDomainRequest.Builder request =
-        GetTaskListsByDomainRequest.newBuilder().setDomain(domainRequest.getDomainName());
+        GetTaskListsByDomainRequest.newBuilder().setDomain(domainRequest.getDomainName() != null ? domainRequest.getDomainName() : "");
     return request.build();
   }
 
@@ -981,6 +981,6 @@ public class RequestMapper {
     if (request == null) {
       return null;
     }
-    return RefreshWorkflowTasksRequest.newBuilder().setDomain(request.getDomain()).build();
+    return RefreshWorkflowTasksRequest.newBuilder().setDomain(request.getDomain() != null ? request.getDomain() : "").build();
   }
 }
