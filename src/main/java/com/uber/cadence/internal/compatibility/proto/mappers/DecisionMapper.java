@@ -157,7 +157,7 @@ class DecisionMapper {
               d.getRequestCancelExternalWorkflowExecutionDecisionAttributes();
           RequestCancelExternalWorkflowExecutionDecisionAttributes.Builder builder =
               RequestCancelExternalWorkflowExecutionDecisionAttributes.newBuilder()
-                  .setDomain(attr.getDomain())
+                  .setDomain(attr.getDomain() != null ? attr.getDomain() : "")
                   .setWorkflowExecution(workflowRunPair(attr.getWorkflowId(), attr.getRunId()))
                   .setChildWorkflowOnly(attr.isChildWorkflowOnly());
           if (attr.getControl() != null) {
