@@ -128,7 +128,10 @@ class TypeMapper {
     if (Strings.isNullOrEmpty(workflowId) && Strings.isNullOrEmpty(runId)) {
       return WorkflowExecution.newBuilder().build();
     }
-    return WorkflowExecution.newBuilder().setWorkflowId(workflowId).setRunId(runId).build();
+    return WorkflowExecution.newBuilder()
+        .setWorkflowId(workflowId)
+        .setRunId(runId != null ? runId : "")
+        .build();
   }
 
   static ActivityType activityType(com.uber.cadence.ActivityType t) {
@@ -275,7 +278,7 @@ class TypeMapper {
     }
     return WorkflowExecutionFilter.newBuilder()
         .setWorkflowId(t.getWorkflowId())
-        .setRunId(t.getRunId())
+        .setRunId(t.getRunId() != null ? t.getRunId() : "")
         .build();
   }
 

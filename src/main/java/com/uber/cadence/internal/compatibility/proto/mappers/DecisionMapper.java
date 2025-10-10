@@ -157,7 +157,7 @@ class DecisionMapper {
               d.getRequestCancelExternalWorkflowExecutionDecisionAttributes();
           RequestCancelExternalWorkflowExecutionDecisionAttributes.Builder builder =
               RequestCancelExternalWorkflowExecutionDecisionAttributes.newBuilder()
-                  .setDomain(attr.getDomain())
+                  .setDomain(attr.getDomain() != null ? attr.getDomain() : "")
                   .setWorkflowExecution(workflowRunPair(attr.getWorkflowId(), attr.getRunId()))
                   .setChildWorkflowOnly(attr.isChildWorkflowOnly());
           if (attr.getControl() != null) {
@@ -202,7 +202,7 @@ class DecisionMapper {
               d.getStartChildWorkflowExecutionDecisionAttributes();
           StartChildWorkflowExecutionDecisionAttributes.Builder builder =
               StartChildWorkflowExecutionDecisionAttributes.newBuilder()
-                  .setDomain(attr.getDomain())
+                  .setDomain(attr.getDomain() != null ? attr.getDomain() : "")
                   .setWorkflowId(attr.getWorkflowId())
                   .setWorkflowType(workflowType(attr.getWorkflowType()))
                   .setTaskList(taskList(attr.getTaskList()))
@@ -234,7 +234,7 @@ class DecisionMapper {
               d.getSignalExternalWorkflowExecutionDecisionAttributes();
           SignalExternalWorkflowExecutionDecisionAttributes.Builder builder =
               SignalExternalWorkflowExecutionDecisionAttributes.newBuilder()
-                  .setDomain(attr.getDomain())
+                  .setDomain(attr.getDomain() != null ? attr.getDomain() : "")
                   .setWorkflowExecution(workflowExecution(attr.getExecution()))
                   .setSignalName(attr.getSignalName())
                   .setInput(payload(attr.getInput()))
