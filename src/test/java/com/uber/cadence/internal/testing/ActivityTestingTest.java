@@ -32,8 +32,8 @@ import com.uber.cadence.client.ActivityCancelledException;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.testing.TestActivityEnvironment;
 import com.uber.cadence.workflow.ActivityFailureException;
-import io.netty.util.internal.ConcurrentSet;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
@@ -134,7 +134,7 @@ public class ActivityTestingTest {
   @Test
   public void testHeartbeatThrottling() throws InterruptedException {
     testEnvironment.registerActivitiesImplementations(new BurstHeartbeatActivityImpl());
-    ConcurrentSet<Integer> details = new ConcurrentSet<>();
+    ConcurrentSkipListSet<Integer> details = new ConcurrentSkipListSet<>();
     testEnvironment.setActivityHeartbeatListener(Integer.class, details::add);
     InterruptibleTestActivity activity =
         testEnvironment.newActivityStub(InterruptibleTestActivity.class);

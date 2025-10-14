@@ -51,7 +51,7 @@ public class WorkflowExecution {
     this.runId = runId;
   }
 
-  public com.uber.cadence.WorkflowExecution toThrift() {
+  public com.uber.cadence.WorkflowExecution toEntity() {
     return new com.uber.cadence.WorkflowExecution().setWorkflowId(workflowId).setRunId(runId);
   }
 

@@ -73,7 +73,8 @@ dependencies {
     errorproneJavac('com.google.errorprone:javac:9+181-r4173-1')
     errorprone('com.google.errorprone:error_prone_core:2.3.4')
 
-    compile group: 'com.uber.tchannel', name: 'tchannel-core', version: '0.8.30'
+    compile group: 'io.opentracing', name: 'opentracing-api', version: '0.33.0'
+    compile group: 'io.opentracing', name: 'opentracing-util', version: '0.33.0'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.10'
     compile group: 'com.uber.m3', name: 'tally-core', version: '0.11.1'

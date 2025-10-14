@@ -122,7 +122,7 @@ final class ActivityDecisionContext {
       attributes.setRetryPolicy(retryParameters.toRetryPolicy());
     }
 
-    attributes.setHeader(toHeaderThrift(parameters.getContext()));
+    attributes.setHeader(toHeader(parameters.getContext()));
 
     long scheduledEventId = decisions.scheduleActivityTask(attributes);
     context.setCompletionHandle(callback);
@@ -200,7 +200,7 @@ final class ActivityDecisionContext {
     }
   }
 
-  private Header toHeaderThrift(Map<String, byte[]> headers) {
+  private Header toHeader(Map<String, byte[]> headers) {
     if (headers == null || headers.isEmpty()) {
       return null;
     }
@@ -208,8 +208,8 @@ final class ActivityDecisionContext {
     for (Map.Entry<String, byte[]> item : headers.entrySet()) {
       fields.put(item.getKey(), item.getValue());
     }
-    Header headerThrift = new Header();
-    headerThrift.setFields(fields);
-    return headerThrift;
+    Header headerEntity = new Header();
+    headerEntity.setFields(fields);
+    return headerEntity;
   }
 }
