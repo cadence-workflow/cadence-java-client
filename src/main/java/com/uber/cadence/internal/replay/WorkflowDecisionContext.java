@@ -146,7 +146,7 @@ final class WorkflowDecisionContext {
       attributes.setCronSchedule(parameters.getCronSchedule());
     }
 
-    attributes.setHeader(toHeaderThrift(parameters.getContext()));
+    attributes.setHeader(toHeader(parameters.getContext()));
 
     ParentClosePolicy parentClosePolicy = parameters.getParentClosePolicy();
     if (parentClosePolicy != null) {
@@ -172,7 +172,7 @@ final class WorkflowDecisionContext {
     return new ChildWorkflowCancellationHandler(initiatedEventId, attributes.getWorkflowId());
   }
 
-  private Header toHeaderThrift(Map<String, byte[]> headers) {
+  private Header toHeader(Map<String, byte[]> headers) {
     if (headers == null || headers.isEmpty()) {
       return null;
     }
@@ -180,9 +180,9 @@ final class WorkflowDecisionContext {
     for (Map.Entry<String, byte[]> item : headers.entrySet()) {
       fields.put(item.getKey(), item.getValue());
     }
-    Header headerThrift = new Header();
-    headerThrift.setFields(fields);
-    return headerThrift;
+    Header headerEntity = new Header();
+    headerEntity.setFields(fields);
+    return headerEntity;
   }
 
   boolean isChildWorkflowExecutionStartedWithRetryOptions() {

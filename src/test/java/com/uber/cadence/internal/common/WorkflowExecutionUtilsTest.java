@@ -405,7 +405,7 @@ public class WorkflowExecutionUtilsTest {
   // ===========================
   @Test
   public void testGetHistoryPage_ExceptionWhileRetrievingExecutionHistory() throws Exception {
-    final String errMessage = "thrift comm exception";
+    final String errMessage = "comm exception";
     when(mockService.GetWorkflowExecutionHistory(any())).thenThrow(new CadenceError(errMessage));
 
     Error exception =

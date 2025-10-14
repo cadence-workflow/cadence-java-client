@@ -179,7 +179,7 @@ public final class ReplayWorkflowActivityImpl implements ReplayWorkflowActivity 
               RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS,
               () ->
                   WorkflowExecutionUtils.getHistoryPage(
-                      nextPageToken, this.serviceClient, domain, execution.toThrift()));
+                      nextPageToken, this.serviceClient, domain, execution.toEntity()));
       pageToken = resp.getNextPageToken();
 
       // TODO support raw history feature once server removes default Thrift encoding

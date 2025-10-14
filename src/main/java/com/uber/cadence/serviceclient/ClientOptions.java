@@ -47,7 +47,7 @@ public class ClientOptions {
 
   private static final String DEFAULT_CLIENT_APP_NAME = "cadence-client";
 
-  /** Name of the Cadence service front end as required by TChannel. */
+  /** Name of the Cadence service front end. */
   private static final String DEFAULT_SERVICE_NAME = "cadence-frontend";
 
   private static final ClientOptions DEFAULT_INSTANCE;
@@ -59,23 +59,23 @@ public class ClientOptions {
   private final String host;
   private final int port;
   private final ManagedChannel gRPCChannel;
-  /** The tChannel timeout in milliseconds */
+  /** The timeout in milliseconds */
   private final long rpcTimeoutMillis;
-  /** The tChannel timeout for long poll calls in milliseconds */
+  /** The ttimeout for long poll calls in milliseconds */
   private final long rpcLongPollTimeoutMillis;
-  /** The tChannel timeout for query workflow call in milliseconds */
+  /** The timeout for query workflow call in milliseconds */
   private final long rpcQueryTimeoutMillis;
-  /** The tChannel timeout for list archived workflow call in milliseconds */
+  /** The timeout for list archived workflow call in milliseconds */
   private final long rpcListArchivedWorkflowTimeoutMillis;
-  /** TChannel service name that the Cadence service was started with. */
+  /** Grpc Service name that the Cadence service was started with. */
   private final String serviceName;
   /** Name of the service using the cadence-client. */
   private final String clientAppName;
   /** Client for metrics reporting. */
   private final Scope metricsScope;
-  /** Optional TChannel transport headers */
+  /** Optional transport headers */
   private final Map<String, String> transportHeaders;
-  /** Optional TChannel headers */
+  /** Optional headers */
   private final Map<String, String> headers;
   /** Optional authorization provider */
   private final IAuthorizationProvider authProvider;
@@ -320,8 +320,8 @@ public class ClientOptions {
     /**
      * Sets the client application name.
      *
-     * <p>This name will be used as the tchannel client service name. It will also be reported as a
-     * tag along with metrics emitted to m3.
+     * <p>This name will be used as the client service name. It will also be reported as a tag along
+     * with metrics emitted to m3.
      *
      * @param clientAppName String representing the client application name.
      * @return Builder for ClentOptions
@@ -354,7 +354,7 @@ public class ClientOptions {
     }
 
     /**
-     * Sets additional transport headers for tchannel client.
+     * Sets additional transport headers for client.
      *
      * @param transportHeaders Map with additional transport headers
      * @return Builder for ClentOptions

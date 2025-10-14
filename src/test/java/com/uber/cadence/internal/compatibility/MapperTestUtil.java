@@ -23,9 +23,9 @@ import java.util.regex.Pattern;
 import org.junit.Assert;
 
 /**
- * Utility that asserts all fields on a Thrift object are present other than a specified list of
- * fields. This ensures that any changes to the IDL will result in the test failing unless either
- * the test or mapper is updated.
+ * Utility that asserts all fields on a object are present other than a specified list of fields.
+ * This ensures that any changes to the IDL will result in the test failing unless either the test
+ * or mapper is updated.
  */
 public class MapperTestUtil {
   public static void assertNoMissingFields(Object message) {

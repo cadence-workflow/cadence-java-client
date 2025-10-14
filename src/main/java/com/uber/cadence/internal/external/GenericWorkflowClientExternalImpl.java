@@ -255,9 +255,9 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     if (!Strings.isNullOrEmpty(startParameters.getCronSchedule())) {
       request.setCronSchedule(startParameters.getCronSchedule());
     }
-    request.setMemo(toMemoThrift(startParameters.getMemo()));
-    request.setSearchAttributes(toSearchAttributesThrift(startParameters.getSearchAttributes()));
-    request.setHeader(toHeaderThrift(startParameters.getContext()));
+    request.setMemo(toMemo(startParameters.getMemo()));
+    request.setSearchAttributes(toSearchAttributes(startParameters.getSearchAttributes()));
+    request.setHeader(toHeader(startParameters.getContext()));
     if (startParameters.getDelayStart() != null) {
       request.setDelayStartSeconds((int) startParameters.getDelayStart().getSeconds());
     }
@@ -265,7 +265,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     return request;
   }
 
-  private Memo toMemoThrift(Map<String, byte[]> memo) {
+  private Memo toMemo(Map<String, byte[]> memo) {
     if (memo == null || memo.isEmpty()) {
       return null;
     }
@@ -274,12 +274,12 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     for (Map.Entry<String, byte[]> item : memo.entrySet()) {
       fields.put(item.getKey(), item.getValue());
     }
-    Memo memoThrift = new Memo();
-    memoThrift.setFields(fields);
-    return memoThrift;
+    Memo memoEntity = new Memo();
+    memoEntity.setFields(fields);
+    return memoEntity;
   }
 
-  private SearchAttributes toSearchAttributesThrift(Map<String, byte[]> searchAttributes) {
+  private SearchAttributes toSearchAttributes(Map<String, byte[]> searchAttributes) {
     if (searchAttributes == null || searchAttributes.isEmpty()) {
       return null;
     }
@@ -288,12 +288,12 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     for (Map.Entry<String, byte[]> item : searchAttributes.entrySet()) {
       fields.put(item.getKey(), item.getValue());
     }
-    SearchAttributes searchAttrThrift = new SearchAttributes();
-    searchAttrThrift.setIndexedFields(fields);
-    return searchAttrThrift;
+    SearchAttributes searchAttrEntity = new SearchAttributes();
+    searchAttrEntity.setIndexedFields(fields);
+    return searchAttrEntity;
   }
 
-  private Header toHeaderThrift(Map<String, byte[]> headers) {
+  private Header toHeader(Map<String, byte[]> headers) {
     if (headers == null || headers.isEmpty()) {
       return null;
     }
@@ -301,9 +301,9 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     for (Map.Entry<String, byte[]> item : headers.entrySet()) {
       fields.put(item.getKey(), item.getValue());
     }
-    Header headerThrift = new Header();
-    headerThrift.setFields(fields);
-    return headerThrift;
+    Header headerEntity = new Header();
+    headerEntity.setFields(fields);
+    return headerEntity;
   }
 
   private RetryPolicy toRetryPolicy(RetryParameters retryParameters) {
