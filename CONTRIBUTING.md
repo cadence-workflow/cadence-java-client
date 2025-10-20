@@ -2,6 +2,8 @@
 
 This doc is intended for contributors to `cadence-java-client` (hopefully that's you!)
 
+For general information about contributing to Cadence projects, please see our [shared contributing guide](https://github.com/cadence-workflow/.github/blob/main/CONTRIBUTING.md).
+
 **Note:** All contributors also need to fill out the [Uber Contributor License Agreement](http://t.uber.com/cla) before we can merge in any of your changes
 
 ## Development Environment
