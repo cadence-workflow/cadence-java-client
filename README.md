@@ -44,8 +44,16 @@ The documentation on how to use the Cadence Java client is [here](https://cadenc
 
 Javadocs for the client API are located [here](https://www.javadoc.io/doc/com.uber.cadence/cadence-client).
 
+## Community
+
+Join our community on the CNCF Slack workspace at [cloud-native.slack.com](https://communityinviter.com/apps/cloud-native/cncf) in the **#cadence-users** channel for discussions, questions, and support.
+
+[![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://communityinviter.com/apps/cloud-native/cncf)
+
 ## Contributing
 We'd love your help in making the Cadence Java client great. Please review our [contribution guidelines](CONTRIBUTING.md).
+
+If you'd like to propose a new feature, first join the [CNCF Slack workspace](https://communityinviter.com/apps/cloud-native/cncf) in the **#cadence-users** channel to start a discussion.
 
 ## License
 Apache 2.0 License, please see [LICENSE](LICENSE) for details.
