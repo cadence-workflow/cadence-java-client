@@ -25,6 +25,7 @@ import com.cronutils.model.definition.CronDefinition;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
 import com.google.common.base.Strings;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.common.CronSchedule;
 import com.uber.cadence.common.MethodRetry;
@@ -64,6 +65,7 @@ public final class WorkflowOptions {
         .setRetryOptions(RetryOptions.merge(methodRetry, o.getRetryOptions()))
         .setCronSchedule(OptionsUtils.merge(cronAnnotation, o.getCronSchedule(), String.class))
         .setMemo(o.getMemo())
+        .setCronOverlapPolicy(o.getCronOverlapPolicy())
         .setSearchAttributes(o.getSearchAttributes())
         .setContextPropagators(o.getContextPropagators())
         .setDelayStart(o.delayStart)
@@ -86,6 +88,8 @@ public final class WorkflowOptions {
 
     private String cronSchedule;
 
+    private CronOverlapPolicy cronOverlapPolicy;
+
     private Map<String, Object> memo;
 
     private Map<String, Object> searchAttributes;
@@ -107,6 +111,7 @@ public final class WorkflowOptions {
       this.taskList = o.taskList;
       this.retryOptions = o.retryOptions;
       this.cronSchedule = o.cronSchedule;
+      this.cronOverlapPolicy = o.cronOverlapPolicy;
       this.memo = o.memo;
       this.searchAttributes = o.searchAttributes;
       this.contextPropagators = o.contextPropagators;
@@ -194,6 +199,11 @@ public final class WorkflowOptions {
       return this;
     }
 
+    public Builder setCronOverlapPolicy(CronOverlapPolicy cronOverlapPolicy) {
+      this.cronOverlapPolicy = cronOverlapPolicy;
+      return this;
+    }
+
     /**
      * Specifies additional non-indexed information in result of list workflow. The type of value
      * can be any object that are serializable by {@link com.uber.cadence.converter.DataConverter}
@@ -235,7 +245,8 @@ public final class WorkflowOptions {
           memo,
           searchAttributes,
           contextPropagators,
-          delayStart);
+          delayStart,
+          cronOverlapPolicy);
     }
 
     /**
@@ -290,7 +301,8 @@ public final class WorkflowOptions {
           memo,
           searchAttributes,
           contextPropagators,
-          delayStart);
+          delayStart,
+          cronOverlapPolicy);
     }
   }
 
@@ -307,6 +319,8 @@ public final class WorkflowOptions {
   private RetryOptions retryOptions;
 
   private String cronSchedule;
+
+  private CronOverlapPolicy cronOverlapPolicy;
 
   private Map<String, Object> memo;
 
@@ -327,7 +341,8 @@ public final class WorkflowOptions {
       Map<String, Object> memo,
       Map<String, Object> searchAttributes,
       List<ContextPropagator> contextPropagators,
-      Duration delayStart) {
+      Duration delayStart,
+      CronOverlapPolicy cronOverlapPolicy) {
     this.workflowId = workflowId;
     this.workflowIdReusePolicy = workflowIdReusePolicy;
     this.executionStartToCloseTimeout = executionStartToCloseTimeout;
@@ -339,6 +354,7 @@ public final class WorkflowOptions {
     this.searchAttributes = searchAttributes;
     this.contextPropagators = contextPropagators;
     this.delayStart = delayStart;
+    this.cronOverlapPolicy = cronOverlapPolicy;
   }
 
   public String getWorkflowId() {
@@ -369,6 +385,10 @@ public final class WorkflowOptions {
     return cronSchedule;
   }
 
+  public CronOverlapPolicy getCronOverlapPolicy() {
+    return cronOverlapPolicy;
+  }
+
   public Map<String, Object> getMemo() {
     return memo;
   }
@@ -397,6 +417,7 @@ public final class WorkflowOptions {
         && Objects.equals(taskList, that.taskList)
         && Objects.equals(retryOptions, that.retryOptions)
         && Objects.equals(cronSchedule, that.cronSchedule)
+        && cronOverlapPolicy == that.cronOverlapPolicy
         && Objects.equals(memo, that.memo)
         && Objects.equals(searchAttributes, that.searchAttributes)
         && Objects.equals(contextPropagators, that.contextPropagators)
@@ -413,6 +434,7 @@ public final class WorkflowOptions {
         taskList,
         retryOptions,
         cronSchedule,
+        cronOverlapPolicy,
         memo,
         searchAttributes,
         contextPropagators,
@@ -439,6 +461,8 @@ public final class WorkflowOptions {
         + ", cronSchedule='"
         + cronSchedule
         + '\''
+        + ", cronOverlapPolicy="
+        + cronOverlapPolicy
         + ", memo='"
         + memo
         + '\''
