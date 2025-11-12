@@ -155,7 +155,6 @@ public class DecisionEventsIteratorTest {
         new HistoryHelper.DecisionEventsIterator(
             mockDecisionTaskWithHistoryIterator, REPLAY_TIME_MILLIS);
 
-
     // first decision batch
     HistoryHelper.DecisionEvents decisionEvents = iterator.next();
     assertNotNull(decisionEvents);
@@ -179,17 +178,17 @@ public class DecisionEventsIteratorTest {
     // Arrange - Non-replay scenario
     List<HistoryEvent> events =
         Arrays.asList(
-          createHistoryEvent(1, EventType.WorkflowExecutionStarted, EVENT_TIMESTAMP_NANOS),
-          createHistoryEvent(2, EventType.DecisionTaskScheduled, EVENT_TIMESTAMP_NANOS),
-          createHistoryEvent(3, EventType.DecisionTaskStarted, EVENT_TIMESTAMP_NANOS),
-          createHistoryEvent(4, EventType.DecisionTaskCompleted, EVENT_TIMESTAMP_NANOS),
-          createHistoryEvent(5, EventType.ActivityTaskScheduled, EVENT_TIMESTAMP_NANOS),
-          createHistoryEvent(6, EventType.ActivityTaskStarted, EVENT_TIMESTAMP_NANOS),
-          createHistoryEvent(7, EventType.ActivityTaskCompleted, EVENT_TIMESTAMP_NANOS),
-          createHistoryEvent(8, EventType.DecisionTaskScheduled, EVENT_TIMESTAMP_NANOS),
-          createHistoryEvent(9, EventType.DecisionTaskStarted, EVENT_TIMESTAMP_NANOS),
-          createHistoryEvent(10, EventType.DecisionTaskCompleted, EVENT_TIMESTAMP_NANOS),
-          createHistoryEvent(11, EventType.WorkflowExecutionCompleted, EVENT_TIMESTAMP_NANOS));
+            createHistoryEvent(1, EventType.WorkflowExecutionStarted, EVENT_TIMESTAMP_NANOS),
+            createHistoryEvent(2, EventType.DecisionTaskScheduled, EVENT_TIMESTAMP_NANOS),
+            createHistoryEvent(3, EventType.DecisionTaskStarted, EVENT_TIMESTAMP_NANOS),
+            createHistoryEvent(4, EventType.DecisionTaskCompleted, EVENT_TIMESTAMP_NANOS),
+            createHistoryEvent(5, EventType.ActivityTaskScheduled, EVENT_TIMESTAMP_NANOS),
+            createHistoryEvent(6, EventType.ActivityTaskStarted, EVENT_TIMESTAMP_NANOS),
+            createHistoryEvent(7, EventType.ActivityTaskCompleted, EVENT_TIMESTAMP_NANOS),
+            createHistoryEvent(8, EventType.DecisionTaskScheduled, EVENT_TIMESTAMP_NANOS),
+            createHistoryEvent(9, EventType.DecisionTaskStarted, EVENT_TIMESTAMP_NANOS),
+            createHistoryEvent(10, EventType.DecisionTaskCompleted, EVENT_TIMESTAMP_NANOS),
+            createHistoryEvent(11, EventType.WorkflowExecutionCompleted, EVENT_TIMESTAMP_NANOS));
     when(mockDecisionTaskWithHistoryIterator.getHistory()).thenReturn(events.iterator());
 
     // Act
