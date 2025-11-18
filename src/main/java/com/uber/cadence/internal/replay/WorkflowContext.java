@@ -20,6 +20,7 @@ package com.uber.cadence.internal.replay;
 import com.uber.cadence.*;
 import com.uber.cadence.context.ContextPropagator;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,24 +177,17 @@ final class WorkflowContext {
   }
 
   void mergeSearchAttributes(SearchAttributes searchAttributes) {
-    if (searchAttributes == null) {
-      return;
-    }
-    if (this.searchAttributes == null) {
-      this.searchAttributes = newSearchAttributes();
-    }
-    Map<String, ByteBuffer> current = this.searchAttributes.getIndexedFields();
-    searchAttributes
-        .getIndexedFields()
-        .forEach(
-            (k, v) -> {
-              current.put(k, v);
-            });
-  }
+    Map<String, ByteBuffer> newIndexedFields = new HashMap<>();
 
-  private SearchAttributes newSearchAttributes() {
-    SearchAttributes result = new SearchAttributes();
-    result.setIndexedFields(new HashMap<String, ByteBuffer>());
-    return result;
+    if (this.searchAttributes != null && this.searchAttributes.getIndexedFields() != null) {
+      newIndexedFields.putAll(this.searchAttributes.getIndexedFields());
+    }
+    // New attributes override existing ones
+    if (searchAttributes != null && searchAttributes.getIndexedFields() != null) {
+      newIndexedFields.putAll(searchAttributes.getIndexedFields());
+    }
+
+    this.searchAttributes =
+        new SearchAttributes().setIndexedFields(Collections.unmodifiableMap(newIndexedFields));
   }
 }

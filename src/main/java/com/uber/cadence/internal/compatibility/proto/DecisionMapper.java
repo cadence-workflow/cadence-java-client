@@ -77,7 +77,6 @@ class DecisionMapper {
               d.getScheduleActivityTaskDecisionAttributes();
           ScheduleActivityTaskDecisionAttributes.Builder builder =
               ScheduleActivityTaskDecisionAttributes.newBuilder()
-                  .setActivityId(attr.getActivityId())
                   .setActivityType(activityType(attr.getActivityType()))
                   .setTaskList(taskList(attr.getTaskList()))
                   .setInput(payload(attr.getInput()))
@@ -89,6 +88,9 @@ class DecisionMapper {
                   .setHeartbeatTimeout(secondsToDuration(attr.getHeartbeatTimeoutSeconds()))
                   .setHeader(header(attr.getHeader()))
                   .setRequestLocalDispatch(attr.isRequestLocalDispatch());
+          if (attr.getActivityId() != null) {
+            builder.setActivityId(attr.getActivityId());
+          }
           if (attr.getRetryPolicy() != null) {
             builder.setRetryPolicy(retryPolicy(attr.getRetryPolicy()));
           }
@@ -102,19 +104,27 @@ class DecisionMapper {
         {
           com.uber.cadence.RequestCancelActivityTaskDecisionAttributes attr =
               d.getRequestCancelActivityTaskDecisionAttributes();
-          decision.setRequestCancelActivityTaskDecisionAttributes(
-              RequestCancelActivityTaskDecisionAttributes.newBuilder()
-                  .setActivityId(attr.getActivityId()));
+
+          RequestCancelActivityTaskDecisionAttributes.Builder builder =
+              RequestCancelActivityTaskDecisionAttributes.newBuilder();
+          if (attr.getActivityId() != null) {
+            builder.setActivityId(attr.getActivityId());
+          }
+          decision.setRequestCancelActivityTaskDecisionAttributes(builder.build());
         }
         break;
       case StartTimer:
         {
           com.uber.cadence.StartTimerDecisionAttributes attr = d.getStartTimerDecisionAttributes();
-          decision.setStartTimerDecisionAttributes(
+          StartTimerDecisionAttributes.Builder builder =
               StartTimerDecisionAttributes.newBuilder()
-                  .setTimerId(attr.getTimerId())
                   .setStartToFireTimeout(
-                      secondsToDuration(longToInt(attr.getStartToFireTimeoutSeconds()))));
+                      secondsToDuration(longToInt(attr.getStartToFireTimeoutSeconds())));
+          if (attr.getTimerId() != null) {
+            builder.setTimerId(attr.getTimerId());
+          }
+
+          decision.setStartTimerDecisionAttributes(builder.build());
         }
         break;
       case CompleteWorkflowExecution:
@@ -139,8 +149,12 @@ class DecisionMapper {
         {
           com.uber.cadence.CancelTimerDecisionAttributes attr =
               d.getCancelTimerDecisionAttributes();
-          decision.setCancelTimerDecisionAttributes(
-              CancelTimerDecisionAttributes.newBuilder().setTimerId(attr.getTimerId()));
+          CancelTimerDecisionAttributes.Builder builder =
+              CancelTimerDecisionAttributes.newBuilder();
+          if (attr.getTimerId() != null) {
+            builder.setTimerId(attr.getTimerId());
+          }
+          decision.setCancelTimerDecisionAttributes(builder.build());
         }
         break;
       case CancelWorkflowExecution:
@@ -158,9 +172,11 @@ class DecisionMapper {
               d.getRequestCancelExternalWorkflowExecutionDecisionAttributes();
           RequestCancelExternalWorkflowExecutionDecisionAttributes.Builder builder =
               RequestCancelExternalWorkflowExecutionDecisionAttributes.newBuilder()
-                  .setDomain(attr.getDomain())
                   .setWorkflowExecution(workflowRunPair(attr.getWorkflowId(), attr.getRunId()))
                   .setChildWorkflowOnly(attr.isChildWorkflowOnly());
+          if (attr.getDomain() != null) {
+            builder.setDomain(attr.getDomain());
+          }
           if (attr.getControl() != null) {
             builder.setControl(arrayToByteString(attr.getControl()));
           }
@@ -203,8 +219,6 @@ class DecisionMapper {
               d.getStartChildWorkflowExecutionDecisionAttributes();
           StartChildWorkflowExecutionDecisionAttributes.Builder builder =
               StartChildWorkflowExecutionDecisionAttributes.newBuilder()
-                  .setDomain(attr.getDomain())
-                  .setWorkflowId(attr.getWorkflowId())
                   .setWorkflowType(workflowType(attr.getWorkflowType()))
                   .setTaskList(taskList(attr.getTaskList()))
                   .setInput(payload(attr.getInput()))
@@ -217,6 +231,12 @@ class DecisionMapper {
                   .setHeader(header(attr.getHeader()))
                   .setMemo(memo(attr.getMemo()))
                   .setSearchAttributes(searchAttributes(attr.getSearchAttributes()));
+          if (attr.getDomain() != null) {
+            builder.setDomain(attr.getDomain());
+          }
+          if (attr.getWorkflowId() != null) {
+            builder.setWorkflowId(attr.getWorkflowId());
+          }
           if (attr.getRetryPolicy() != null) {
             builder.setRetryPolicy(retryPolicy(attr.getRetryPolicy()));
           }
@@ -235,11 +255,15 @@ class DecisionMapper {
               d.getSignalExternalWorkflowExecutionDecisionAttributes();
           SignalExternalWorkflowExecutionDecisionAttributes.Builder builder =
               SignalExternalWorkflowExecutionDecisionAttributes.newBuilder()
-                  .setDomain(attr.getDomain())
                   .setWorkflowExecution(workflowExecution(attr.getExecution()))
-                  .setSignalName(attr.getSignalName())
                   .setInput(payload(attr.getInput()))
                   .setChildWorkflowOnly(attr.isChildWorkflowOnly());
+          if (attr.getDomain() != null) {
+            builder.setDomain(attr.getDomain());
+          }
+          if (attr.getSignalName() != null) {
+            builder.setSignalName(attr.getSignalName());
+          }
           if (attr.getControl() != null) {
             builder.setControl(arrayToByteString(attr.getControl()));
           }
@@ -259,11 +283,14 @@ class DecisionMapper {
         {
           com.uber.cadence.RecordMarkerDecisionAttributes attr =
               d.getRecordMarkerDecisionAttributes();
-          decision.setRecordMarkerDecisionAttributes(
+          RecordMarkerDecisionAttributes.Builder builder =
               RecordMarkerDecisionAttributes.newBuilder()
-                  .setMarkerName(attr.getMarkerName())
                   .setDetails(payload(attr.getDetails()))
-                  .setHeader(header(attr.getHeader())));
+                  .setHeader(header(attr.getHeader()));
+          if (attr.getMarkerName() != null) {
+            builder.setMarkerName(attr.getMarkerName());
+          }
+          decision.setRecordMarkerDecisionAttributes(builder.build());
         }
         break;
       default:
