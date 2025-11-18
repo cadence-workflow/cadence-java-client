@@ -25,6 +25,7 @@ import static org.junit.Assert.fail;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import com.google.common.collect.ImmutableMap;
 import com.uber.cadence.AccessDeniedError;
 import com.uber.cadence.RefreshWorkflowTasksRequest;
 import com.uber.cadence.SignalWithStartWorkflowExecutionAsyncRequest;
@@ -84,6 +85,13 @@ import org.slf4j.LoggerFactory;
 public class Thrift2ProtoAdapterTest {
   private static final Metadata.Key<String> AUTHORIZATION_HEADER_KEY =
       Metadata.Key.of("cadence-authorization", Metadata.ASCII_STRING_MARSHALLER);
+  private static final Metadata.Key<String> EXPECTED_HEADER_KEY =
+      Metadata.Key.of("rpc-service", Metadata.ASCII_STRING_MARSHALLER);
+  private static final Metadata.Key<String> REMOVED_HEADER_KEY =
+      Metadata.Key.of("rpc-caller", Metadata.ASCII_STRING_MARSHALLER);
+  private static final Metadata.Key<String> ADDED_HEADER_KEY =
+      Metadata.Key.of("from-options", Metadata.ASCII_STRING_MARSHALLER);
+  private static final String ADDED_HEADER_VALUE = "added-value";
   private static final StatusRuntimeException GRPC_ACCESS_DENIED =
       new StatusRuntimeException(Status.PERMISSION_DENIED);
 
@@ -107,11 +115,14 @@ public class Thrift2ProtoAdapterTest {
         (Logger)
             LoggerFactory.getLogger(
                 "com.uber.cadence.internal.compatibility.proto.serviceclient.GrpcServiceStubs");
+    Map<String, String> headers =
+        ImmutableMap.of(REMOVED_HEADER_KEY.name(), "", ADDED_HEADER_KEY.name(), ADDED_HEADER_VALUE);
     logger.setLevel(Level.TRACE);
     client =
         new Thrift2ProtoAdapter(
             IGrpcServiceStubs.newInstance(
                 ClientOptions.newBuilder()
+                    .setHeaders(headers)
                     .setAuthorizationProvider("foo"::getBytes)
                     .setGRPCChannel(clientChannel)
                     .build()));
@@ -119,6 +130,7 @@ public class Thrift2ProtoAdapterTest {
         new Thrift2ProtoAdapter(
             IGrpcServiceStubs.newInstance(
                 ClientOptions.newBuilder()
+                    .setHeaders(headers)
                     .setAuthorizationProvider("foo"::getBytes)
                     .setTracer(tracer)
                     .setGRPCChannel(clientChannel)
@@ -1020,7 +1032,9 @@ public class Thrift2ProtoAdapterTest {
           }
           serverBuilder.addService(
               ServerInterceptors.intercept(
-                  serviceDefinition.build(), new AuthHeaderValidatingInterceptor()));
+                  serviceDefinition.build(),
+                  new AuthHeaderValidatingInterceptor(),
+                  new HeaderValidatingInterceptor()));
         }
         return serverBuilder.build().start();
       } catch (IOException e) {
@@ -1058,7 +1072,41 @@ public class Thrift2ProtoAdapterTest {
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
         ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
       if (!headers.containsKey(AUTHORIZATION_HEADER_KEY)) {
-        call.close(Status.INVALID_ARGUMENT, new Metadata());
+        call.close(
+            Status.INVALID_ARGUMENT.withDescription(
+                "Missing auth header: " + AUTHORIZATION_HEADER_KEY.name()),
+            new Metadata());
+      }
+      return next.startCall(call, headers);
+    }
+  }
+
+  private static class HeaderValidatingInterceptor implements ServerInterceptor {
+    @Override
+    public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
+        ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
+      if (!headers.containsKey(EXPECTED_HEADER_KEY)) {
+        call.close(
+            Status.INVALID_ARGUMENT.withDescription("Missing " + EXPECTED_HEADER_KEY.name()),
+            new Metadata());
+      }
+      String addedHeaderValue = headers.get(ADDED_HEADER_KEY);
+      if (!ADDED_HEADER_VALUE.equals(addedHeaderValue)) {
+        call.close(
+            Status.INVALID_ARGUMENT.withDescription(
+                "Incorrect value for "
+                    + ADDED_HEADER_KEY.name()
+                    + "; got "
+                    + addedHeaderValue
+                    + " instead of "
+                    + ADDED_HEADER_VALUE),
+            new Metadata());
+      }
+      if (headers.containsKey(REMOVED_HEADER_KEY)) {
+        call.close(
+            Status.INVALID_ARGUMENT.withDescription(
+                "Unexpected header " + REMOVED_HEADER_KEY.name()),
+            new Metadata());
       }
       return next.startCall(call, headers);
     }
