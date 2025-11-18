@@ -1,4 +1,5 @@
 # Java framework for Cadence [![CI Checks](https://github.com/cadence-workflow/cadence-java-client/actions/workflows/ci-checks.yml/badge.svg)](https://github.com/cadence-workflow/cadence-java-client/actions/workflows/ci-checks.yml) [![Javadocs](https://www.javadoc.io/badge/com.uber.cadence/cadence-client.svg)](https://www.javadoc.io/doc/com.uber.cadence/cadence-client) [![codecov](https://codecov.io/gh/cadence-workflow/cadence-java-client/graph/badge.svg?token=eVBGf4EmXr)](https://codecov.io/gh/cadence-workflow/cadence-java-client)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcadence-workflow%2Fcadence-java-client.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcadence-workflow%2Fcadence-java-client?ref=badge_shield)
 
 
 [Cadence](https://github.com/uber/cadence) is a distributed, scalable, durable, and highly available orchestration engine we developed at Uber Engineering to execute asynchronous long-running business logic in a scalable and resilient way.
@@ -57,3 +58,6 @@ If you'd like to propose a new feature, first join the [CNCF Slack workspace](ht
 
 ## License
 Apache 2.0 License, please see [LICENSE](LICENSE) for details.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcadence-workflow%2Fcadence-java-client.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcadence-workflow%2Fcadence-java-client?ref=badge_large)
