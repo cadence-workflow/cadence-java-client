@@ -134,12 +134,19 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    return DescribeTaskListRequest.newBuilder()
-        .setDomain(t.getDomain())
-        .setTaskList(taskList(t.getTaskList()))
-        .setTaskListType(taskListType(t.getTaskListType()))
-        .setIncludeTaskListStatus(t.isIncludeTaskListStatus())
-        .build();
+    DescribeTaskListRequest.Builder builder =
+        DescribeTaskListRequest.newBuilder().setIncludeTaskListStatus(t.isIncludeTaskListStatus());
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getTaskList() != null) {
+      builder.setTaskList(taskList(t.getTaskList()));
+    }
+    if (t.getTaskListType() != null) {
+      builder.setTaskListType(taskListType(t.getTaskListType()));
+    }
+
+    return builder.build();
   }
 
   public static ListArchivedWorkflowExecutionsRequest listArchivedWorkflowExecutionsRequest(
@@ -148,9 +155,10 @@ public class RequestMapper {
       return null;
     }
     ListArchivedWorkflowExecutionsRequest.Builder request =
-        ListArchivedWorkflowExecutionsRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setPageSize(t.getPageSize());
+        ListArchivedWorkflowExecutionsRequest.newBuilder().setPageSize(t.getPageSize());
+    if (t.getDomain() != null) {
+      request.setDomain(t.getDomain());
+    }
     if (t.getNextPageToken() != null) {
       request.setNextPageToken(arrayToByteString(t.getNextPageToken()));
     }
@@ -166,10 +174,16 @@ public class RequestMapper {
       return null;
     }
     RequestCancelWorkflowExecutionRequest.Builder builder =
-        RequestCancelWorkflowExecutionRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
-            .setRequestId(t.getRequestId());
+        RequestCancelWorkflowExecutionRequest.newBuilder();
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getWorkflowExecution() != null) {
+      builder.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
+    }
+    if (t.getRequestId() != null) {
+      builder.setRequestId(t.getRequestId());
+    }
     if (t.getCause() != null) {
       builder.setCause(t.getCause());
     }
@@ -187,10 +201,14 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    return ResetStickyTaskListRequest.newBuilder()
-        .setDomain(t.getDomain())
-        .setWorkflowExecution(workflowExecution(t.getExecution()))
-        .build();
+    ResetStickyTaskListRequest.Builder builder = ResetStickyTaskListRequest.newBuilder();
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getExecution() != null) {
+      builder.setWorkflowExecution(workflowExecution(t.getExecution()));
+    }
+    return builder.build();
   }
 
   public static ResetWorkflowExecutionRequest resetWorkflowExecutionRequest(
@@ -198,14 +216,23 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    return ResetWorkflowExecutionRequest.newBuilder()
-        .setDomain(t.getDomain())
-        .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
-        .setReason(t.getReason())
-        .setDecisionFinishEventId(t.getDecisionFinishEventId())
-        .setRequestId(t.getRequestId())
-        .setSkipSignalReapply(t.isSkipSignalReapply())
-        .build();
+    ResetWorkflowExecutionRequest.Builder builder =
+        ResetWorkflowExecutionRequest.newBuilder()
+            .setDecisionFinishEventId(t.getDecisionFinishEventId())
+            .setSkipSignalReapply(t.isSkipSignalReapply());
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getWorkflowExecution() != null) {
+      builder.setWorkflowExecution(workflowExecution(t.getWorkflowExecution()));
+    }
+    if (t.getReason() != null) {
+      builder.setReason(t.getReason());
+    }
+    if (t.getRequestId() != null) {
+      builder.setRequestId(t.getRequestId());
+    }
+    return builder.build();
   }
 
   public static RespondActivityTaskCanceledByIDRequest respondActivityTaskCanceledByIdRequest(
@@ -215,10 +242,16 @@ public class RequestMapper {
     }
     RespondActivityTaskCanceledByIDRequest.Builder builder =
         RespondActivityTaskCanceledByIDRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setWorkflowExecution(TypeMapper.workflowRunPair(t.getWorkflowID(), t.getRunID()))
-            .setActivityId(t.getActivityID())
-            .setDetails(payload(t.getDetails()));
+            .setWorkflowExecution(TypeMapper.workflowRunPair(t.getWorkflowID(), t.getRunID()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getActivityID() != null) {
+      builder.setActivityId(t.getActivityID());
+    }
+    if (t.getDetails() != null) {
+      builder.setDetails(payload(t.getDetails()));
+    }
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
     }
@@ -231,7 +264,10 @@ public class RequestMapper {
       return null;
     }
     RespondActivityTaskCanceledRequest.Builder builder =
-        RespondActivityTaskCanceledRequest.newBuilder().setDetails(payload(t.getDetails()));
+        RespondActivityTaskCanceledRequest.newBuilder();
+    if (t.getDetails() != null) {
+      builder.setDetails(payload(t.getDetails()));
+    }
     if (t.getTaskToken() != null) {
       builder.setTaskToken(arrayToByteString(t.getTaskToken()));
     }
@@ -248,10 +284,16 @@ public class RequestMapper {
     }
     RespondActivityTaskCompletedByIDRequest.Builder builder =
         RespondActivityTaskCompletedByIDRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setWorkflowExecution(TypeMapper.workflowRunPair(t.getWorkflowID(), t.getRunID()))
-            .setActivityId(t.getActivityID())
-            .setResult(payload(t.getResult()));
+            .setWorkflowExecution(TypeMapper.workflowRunPair(t.getWorkflowID(), t.getRunID()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getActivityID() != null) {
+      builder.setActivityId(t.getActivityID());
+    }
+    if (t.getResult() != null) {
+      builder.setResult(payload(t.getResult()));
+    }
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
     }
@@ -264,7 +306,10 @@ public class RequestMapper {
       return null;
     }
     RespondActivityTaskCompletedRequest.Builder builder =
-        RespondActivityTaskCompletedRequest.newBuilder().setResult(payload(t.getResult()));
+        RespondActivityTaskCompletedRequest.newBuilder();
+    if (t.getResult() != null) {
+      builder.setResult(payload(t.getResult()));
+    }
     if (t.getTaskToken() != null) {
       builder.setTaskToken(arrayToByteString(t.getTaskToken()));
     }
@@ -281,10 +326,14 @@ public class RequestMapper {
     }
     RespondActivityTaskFailedByIDRequest.Builder builder =
         RespondActivityTaskFailedByIDRequest.newBuilder()
-            .setDomain(t.getDomain())
             .setWorkflowExecution(TypeMapper.workflowRunPair(t.getWorkflowID(), t.getRunID()))
-            .setActivityId(t.getActivityID())
             .setFailure(failure(t.getReason(), t.getDetails()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getActivityID() != null) {
+      builder.setActivityId(t.getActivityID());
+    }
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
     }
@@ -342,8 +391,10 @@ public class RequestMapper {
     }
     RespondDecisionTaskFailedRequest.Builder builder =
         RespondDecisionTaskFailedRequest.newBuilder()
-            .setCause(decisionTaskFailedCause(t.getCause()))
-            .setDetails(payload(t.getDetails()));
+            .setCause(decisionTaskFailedCause(t.getCause()));
+    if (t.getDetails() != null) {
+      builder.setDetails(payload(t.getDetails()));
+    }
     if (t.getBinaryChecksum() != null) {
       builder.setBinaryChecksum(t.getBinaryChecksum());
     }
@@ -365,6 +416,9 @@ public class RequestMapper {
         WorkflowQueryResult.newBuilder()
             .setResultType(queryTaskCompletedType(t.getCompletedType()))
             .setAnswer(payload(t.getQueryResult()));
+    if (t.getQueryResult() != null) {
+      wqBuilder.setAnswer(payload(t.getQueryResult()));
+    }
     if (t.getErrorMessage() != null) {
       wqBuilder.setErrorMessage(t.getErrorMessage());
     }
@@ -383,17 +437,18 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    ScanWorkflowExecutionsRequest.Builder request =
-        ScanWorkflowExecutionsRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setPageSize(t.getPageSize());
+    ScanWorkflowExecutionsRequest.Builder builder =
+        ScanWorkflowExecutionsRequest.newBuilder().setPageSize(t.getPageSize());
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
     if (t.getNextPageToken() != null) {
-      request.setNextPageToken(arrayToByteString(t.getNextPageToken()));
+      builder.setNextPageToken(arrayToByteString(t.getNextPageToken()));
     }
     if (t.getQuery() != null) {
-      request.setQuery(t.getQuery());
+      builder.setQuery(t.getQuery());
     }
-    return request.build();
+    return builder.build();
   }
 
   public static DescribeWorkflowExecutionRequest describeWorkflowExecutionRequest(
@@ -401,11 +456,18 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    return DescribeWorkflowExecutionRequest.newBuilder()
-        .setDomain(t.getDomain())
-        .setWorkflowExecution(workflowExecution(t.getExecution()))
-        .setQueryConsistencyLevel(queryConsistencyLevel(t.getQueryConsistencyLevel()))
-        .build();
+    DescribeWorkflowExecutionRequest.Builder builder =
+        DescribeWorkflowExecutionRequest.newBuilder();
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getExecution() != null) {
+      builder.setWorkflowExecution(workflowExecution(t.getExecution()));
+    }
+    if (t.getQueryConsistencyLevel() != null) {
+      builder.setQueryConsistencyLevel(queryConsistencyLevel(t.getQueryConsistencyLevel()));
+    }
+    return builder.build();
   }
 
   public static GetWorkflowExecutionHistoryRequest getWorkflowExecutionHistoryRequest(
@@ -415,13 +477,17 @@ public class RequestMapper {
     }
     GetWorkflowExecutionHistoryRequest.Builder builder =
         GetWorkflowExecutionHistoryRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setWorkflowExecution(workflowExecution(t.getExecution()))
             .setPageSize(t.getMaximumPageSize())
             .setWaitForNewEvent(t.isWaitForNewEvent())
             .setHistoryEventFilterType(eventFilterType(t.HistoryEventFilterType))
             .setSkipArchival(t.isSkipArchival())
             .setQueryConsistencyLevel(queryConsistencyLevel(t.getQueryConsistencyLevel()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getExecution() != null) {
+      builder.setWorkflowExecution(workflowExecution(t.getExecution()));
+    }
     if (t.getNextPageToken() != null) {
       builder.setNextPageToken(arrayToByteString(t.getNextPageToken()));
     }
@@ -435,19 +501,25 @@ public class RequestMapper {
     }
     StartWorkflowExecutionRequest.Builder builder =
         StartWorkflowExecutionRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setWorkflowId(t.getWorkflowId())
             .setWorkflowType(workflowType(t.getWorkflowType()))
             .setTaskList(taskList(t.getTaskList()))
             .setInput(payload(t.getInput()))
             .setExecutionStartToCloseTimeout(
                 secondsToDuration(t.getExecutionStartToCloseTimeoutSeconds()))
             .setTaskStartToCloseTimeout(secondsToDuration(t.getTaskStartToCloseTimeoutSeconds()))
-            .setRequestId(t.getRequestId())
             .setMemo(memo(t.getMemo()))
             .setSearchAttributes(searchAttributes(t.getSearchAttributes()))
             .setHeader(header(t.getHeader()))
             .setJitterStart(secondsToDuration(t.getJitterStartSeconds()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getWorkflowId() != null) {
+      builder.setWorkflowId(t.getWorkflowId());
+    }
+    if (t.getRequestId() != null) {
+      builder.setRequestId(t.getRequestId());
+    }
     if (t.isSetFirstRunAtTimestamp()) {
       builder.setFirstRunAt(unixNanoToTime(t.getFirstRunAtTimestamp()));
     }
@@ -471,8 +543,10 @@ public class RequestMapper {
     SignalWithStartWorkflowExecutionRequest.Builder sb =
         SignalWithStartWorkflowExecutionRequest.newBuilder()
             .setStartRequest(builder.build())
-            .setSignalName(t.getSignalName())
             .setSignalInput(payload(t.getSignalInput()));
+    if (t.getSignalName() != null) {
+      sb.setSignalName(t.getSignalName());
+    }
     if (t.getControl() != null) {
       sb.setControl(arrayToByteString(t.getControl()));
     }
@@ -500,11 +574,17 @@ public class RequestMapper {
     }
     SignalWorkflowExecutionRequest.Builder builder =
         SignalWorkflowExecutionRequest.newBuilder()
-            .setDomain(t.getDomain())
             .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
-            .setSignalName(t.getSignalName())
-            .setSignalInput(payload(t.getInput()))
-            .setRequestId(t.getRequestId());
+            .setSignalInput(payload(t.getInput()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getSignalName() != null) {
+      builder.setSignalName(t.getSignalName());
+    }
+    if (t.getRequestId() != null) {
+      builder.setRequestId(t.getRequestId());
+    }
     if (t.getControl() != null) {
       builder.setControl(arrayToByteString(t.getControl()));
     }
@@ -519,14 +599,11 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    StartWorkflowExecutionRequest.Builder request =
+    StartWorkflowExecutionRequest.Builder builder =
         StartWorkflowExecutionRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setWorkflowId(t.getWorkflowId())
             .setWorkflowType(workflowType(t.getWorkflowType()))
             .setTaskList(taskList(t.getTaskList()))
             .setInput(payload(t.getInput()))
-            .setRequestId(t.getRequestId())
             .setExecutionStartToCloseTimeout(
                 secondsToDuration(t.getExecutionStartToCloseTimeoutSeconds()))
             .setTaskStartToCloseTimeout(secondsToDuration(t.getTaskStartToCloseTimeoutSeconds()))
@@ -536,19 +613,28 @@ public class RequestMapper {
             .setHeader(header(t.getHeader()))
             .setDelayStart(secondsToDuration(t.getDelayStartSeconds()))
             .setJitterStart(secondsToDuration(t.getJitterStartSeconds()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getWorkflowId() != null) {
+      builder.setWorkflowId(t.getWorkflowId());
+    }
+    if (t.getRequestId() != null) {
+      builder.setRequestId(t.getRequestId());
+    }
     if (t.isSetFirstRunAtTimestamp()) {
-      request.setFirstRunAt(unixNanoToTime(t.getFirstRunAtTimestamp()));
+      builder.setFirstRunAt(unixNanoToTime(t.getFirstRunAtTimestamp()));
     }
     if (t.getRetryPolicy() != null) {
-      request.setRetryPolicy(retryPolicy(t.getRetryPolicy()));
+      builder.setRetryPolicy(retryPolicy(t.getRetryPolicy()));
     }
     if (t.getCronSchedule() != null) {
-      request.setCronSchedule(t.getCronSchedule());
+      builder.setCronSchedule(t.getCronSchedule());
     }
     if (t.getIdentity() != null) {
-      request.setIdentity(t.getIdentity());
+      builder.setIdentity(t.getIdentity());
     }
-    return request.build();
+    return builder.build();
   }
 
   public static StartWorkflowExecutionAsyncRequest startWorkflowExecutionAsyncRequest(
@@ -571,10 +657,14 @@ public class RequestMapper {
     }
     TerminateWorkflowExecutionRequest.Builder builder =
         TerminateWorkflowExecutionRequest.newBuilder()
-            .setDomain(t.getDomain())
             .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
-            .setReason(t.getReason())
             .setDetails(payload(t.getDetails()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getReason() != null) {
+      builder.setReason(t.getReason());
+    }
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
     }
@@ -589,10 +679,14 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    return DeprecateDomainRequest.newBuilder()
-        .setName(t.getName())
-        .setSecurityToken(t.getSecurityToken())
-        .build();
+    DeprecateDomainRequest.Builder builder = DeprecateDomainRequest.newBuilder();
+    if (t.getName() != null) {
+      builder.setName(t.getName());
+    }
+    if (t.getSecurityToken() != null) {
+      builder.setSecurityToken(t.getSecurityToken());
+    }
+    return builder.build();
   }
 
   public static DescribeDomainRequest describeDomainRequest(
@@ -600,11 +694,11 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    if (t.uuid != null) {
-      return DescribeDomainRequest.newBuilder().setId(t.uuid).build();
+    if (t.getUuid() != null) {
+      return DescribeDomainRequest.newBuilder().setId(t.getUuid()).build();
     }
-    if (t.name != null) {
-      return DescribeDomainRequest.newBuilder().setName(t.name).build();
+    if (t.getName() != null) {
+      return DescribeDomainRequest.newBuilder().setName(t.getName()).build();
     }
     throw new IllegalArgumentException("neither one of field is set for DescribeDomainRequest");
   }
@@ -613,7 +707,8 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    ListDomainsRequest.Builder request = ListDomainsRequest.newBuilder().setPageSize(t.pageSize);
+    ListDomainsRequest.Builder request =
+        ListDomainsRequest.newBuilder().setPageSize(t.getPageSize());
     if (t.getNextPageToken() != null) {
       request.setNextPageToken(arrayToByteString(t.getNextPageToken()));
     }
@@ -625,10 +720,13 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    return ListTaskListPartitionsRequest.newBuilder()
-        .setDomain(t.getDomain())
-        .setTaskList(taskList(t.getTaskList()))
-        .build();
+    ListTaskListPartitionsRequest.Builder builder =
+        ListTaskListPartitionsRequest.newBuilder().setTaskList(taskList(t.getTaskList()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+
+    return builder.build();
   }
 
   public static ListWorkflowExecutionsRequest listWorkflowExecutionsRequest(
@@ -636,17 +734,18 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    ListWorkflowExecutionsRequest.Builder request =
-        ListWorkflowExecutionsRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setPageSize(t.getPageSize());
+    ListWorkflowExecutionsRequest.Builder builder =
+        ListWorkflowExecutionsRequest.newBuilder().setPageSize(t.getPageSize());
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
     if (t.getNextPageToken() != null) {
-      request.setNextPageToken(arrayToByteString(t.getNextPageToken()));
+      builder.setNextPageToken(arrayToByteString(t.getNextPageToken()));
     }
     if (t.getQuery() != null) {
-      request.setQuery(t.getQuery());
+      builder.setQuery(t.getQuery());
     }
-    return request.build();
+    return builder.build();
   }
 
   public static PollForActivityTaskRequest pollForActivityTaskRequest(
@@ -656,9 +755,11 @@ public class RequestMapper {
     }
     PollForActivityTaskRequest.Builder builder =
         PollForActivityTaskRequest.newBuilder()
-            .setDomain(t.getDomain())
             .setTaskList(taskList(t.getTaskList()))
             .setTaskListMetadata(taskListMetadata(t.getTaskListMetadata()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
     }
@@ -671,9 +772,10 @@ public class RequestMapper {
       return null;
     }
     PollForDecisionTaskRequest.Builder builder =
-        PollForDecisionTaskRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setTaskList(taskList(t.getTaskList()));
+        PollForDecisionTaskRequest.newBuilder().setTaskList(taskList(t.getTaskList()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
     if (t.getBinaryChecksum() != null) {
       builder.setBinaryChecksum(t.getBinaryChecksum());
     }
@@ -687,13 +789,16 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    return QueryWorkflowRequest.newBuilder()
-        .setDomain(t.getDomain())
-        .setWorkflowExecution(workflowExecution(t.getExecution()))
-        .setQuery(workflowQuery(t.getQuery()))
-        .setQueryRejectCondition(queryRejectCondition(t.getQueryRejectCondition()))
-        .setQueryConsistencyLevel(queryConsistencyLevel(t.getQueryConsistencyLevel()))
-        .build();
+    QueryWorkflowRequest.Builder builder =
+        QueryWorkflowRequest.newBuilder()
+            .setWorkflowExecution(workflowExecution(t.getExecution()))
+            .setQuery(workflowQuery(t.getQuery()))
+            .setQueryRejectCondition(queryRejectCondition(t.getQueryRejectCondition()))
+            .setQueryConsistencyLevel(queryConsistencyLevel(t.getQueryConsistencyLevel()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    return builder.build();
   }
 
   public static RecordActivityTaskHeartbeatByIDRequest recordActivityTaskHeartbeatByIdRequest(
@@ -703,10 +808,14 @@ public class RequestMapper {
     }
     RecordActivityTaskHeartbeatByIDRequest.Builder builder =
         RecordActivityTaskHeartbeatByIDRequest.newBuilder()
-            .setDomain(t.getDomain())
             .setWorkflowExecution(TypeMapper.workflowRunPair(t.getWorkflowID(), t.getRunID()))
-            .setActivityId(t.getActivityID())
             .setDetails(payload(t.getDetails()));
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
+    if (t.getActivityID() != null) {
+      builder.setActivityId(t.getActivityID());
+    }
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
     }
@@ -734,9 +843,8 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    RegisterDomainRequest request =
+    RegisterDomainRequest.Builder builder =
         RegisterDomainRequest.newBuilder()
-            .setName(t.getName())
             .setDescription(Helpers.nullToEmpty(t.getDescription()))
             .setOwnerEmail(Helpers.nullToEmpty(t.getOwnerEmail()))
             .setWorkflowExecutionRetentionPeriod(
@@ -749,29 +857,35 @@ public class RequestMapper {
             .setHistoryArchivalStatus(archivalStatus(t.getHistoryArchivalStatus()))
             .setHistoryArchivalUri(Helpers.nullToEmpty(t.getHistoryArchivalURI()))
             .setVisibilityArchivalStatus(archivalStatus(t.getVisibilityArchivalStatus()))
-            .setVisibilityArchivalUri(Helpers.nullToEmpty(t.getVisibilityArchivalURI()))
-            .build();
-    return request;
+            .setVisibilityArchivalUri(Helpers.nullToEmpty(t.getVisibilityArchivalURI()));
+    if (t.getName() != null) {
+      builder.setName(t.getName());
+    }
+    return builder.build();
   }
 
   public static UpdateDomainRequest updateDomainRequest(com.uber.cadence.UpdateDomainRequest t) {
     if (t == null) {
       return null;
     }
-    Builder request =
-        UpdateDomainRequest.newBuilder()
-            .setName(t.getName())
-            .setSecurityToken(t.getSecurityToken());
+    Builder builder = UpdateDomainRequest.newBuilder();
+
+    if (t.getName() != null) {
+      builder.setName(t.getName());
+    }
+    if (t.getSecurityToken() != null) {
+      builder.setSecurityToken(t.getSecurityToken());
+    }
 
     List<String> fields = new ArrayList<>();
     UpdateDomainInfo updatedInfo = t.getUpdatedInfo();
     if (updatedInfo != null) {
       if (updatedInfo.getDescription() != null) {
-        request.setDescription(updatedInfo.getDescription());
+        builder.setDescription(updatedInfo.getDescription());
         fields.add(DomainUpdateDescriptionField);
       }
       if (updatedInfo.getOwnerEmail() != null) {
-        request.setOwnerEmail(updatedInfo.getOwnerEmail());
+        builder.setOwnerEmail(updatedInfo.getOwnerEmail());
         fields.add(DomainUpdateOwnerEmailField);
       }
       if (updatedInfo.getData() != null) {
@@ -782,57 +896,57 @@ public class RequestMapper {
     DomainConfiguration configuration = t.getConfiguration();
     if (configuration != null) {
       if (configuration.getWorkflowExecutionRetentionPeriodInDays() > 0) {
-        request.setWorkflowExecutionRetentionPeriod(
+        builder.setWorkflowExecutionRetentionPeriod(
             daysToDuration(configuration.getWorkflowExecutionRetentionPeriodInDays()));
         fields.add(DomainUpdateRetentionPeriodField);
       }
       // if t.EmitMetric != null {} - DEPRECATED
       if (configuration.getBadBinaries() != null) {
-        request.setBadBinaries(badBinaries(configuration.getBadBinaries()));
+        builder.setBadBinaries(badBinaries(configuration.getBadBinaries()));
         fields.add(DomainUpdateBadBinariesField);
       }
       if (configuration.getHistoryArchivalStatus() != null) {
-        request.setHistoryArchivalStatus(archivalStatus(configuration.getHistoryArchivalStatus()));
+        builder.setHistoryArchivalStatus(archivalStatus(configuration.getHistoryArchivalStatus()));
         fields.add(DomainUpdateHistoryArchivalStatusField);
       }
       if (configuration.getHistoryArchivalURI() != null) {
-        request.setHistoryArchivalUri(configuration.getHistoryArchivalURI());
+        builder.setHistoryArchivalUri(configuration.getHistoryArchivalURI());
         fields.add(DomainUpdateHistoryArchivalURIField);
       }
       if (configuration.getVisibilityArchivalStatus() != null) {
-        request.setVisibilityArchivalStatus(
+        builder.setVisibilityArchivalStatus(
             archivalStatus(configuration.getVisibilityArchivalStatus()));
         fields.add(DomainUpdateVisibilityArchivalStatusField);
       }
       if (configuration.getVisibilityArchivalURI() != null) {
-        request.setVisibilityArchivalUri(configuration.getVisibilityArchivalURI());
+        builder.setVisibilityArchivalUri(configuration.getVisibilityArchivalURI());
         fields.add(DomainUpdateVisibilityArchivalURIField);
       }
     }
     DomainReplicationConfiguration replicationConfiguration = t.getReplicationConfiguration();
     if (replicationConfiguration != null) {
       if (replicationConfiguration.getActiveClusterName() != null) {
-        request.setActiveClusterName(replicationConfiguration.getActiveClusterName());
+        builder.setActiveClusterName(replicationConfiguration.getActiveClusterName());
         fields.add(DomainUpdateActiveClusterNameField);
       }
       if (replicationConfiguration.getClusters() != null) {
-        request.addAllClusters(
+        builder.addAllClusters(
             clusterReplicationConfigurationArray(replicationConfiguration.getClusters()));
         fields.add(DomainUpdateClustersField);
       }
     }
     if (t.getDeleteBadBinary() != null) {
-      request.setDeleteBadBinary(t.getDeleteBadBinary());
+      builder.setDeleteBadBinary(t.getDeleteBadBinary());
       fields.add(DomainUpdateDeleteBadBinaryField);
     }
     if (t.getFailoverTimeoutInSeconds() > 0) {
-      request.setFailoverTimeout(secondsToDuration(t.getFailoverTimeoutInSeconds()));
+      builder.setFailoverTimeout(secondsToDuration(t.getFailoverTimeoutInSeconds()));
       fields.add(DomainUpdateFailoverTimeoutField);
     }
 
-    request.setUpdateMask(newFieldMask(fields));
+    builder.setUpdateMask(newFieldMask(fields));
 
-    return request.build();
+    return builder.build();
   }
 
   public static ListClosedWorkflowExecutionsRequest listClosedWorkflowExecutionsRequest(
@@ -840,26 +954,27 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    ListClosedWorkflowExecutionsRequest.Builder request =
-        ListClosedWorkflowExecutionsRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setPageSize(t.getMaximumPageSize());
+    ListClosedWorkflowExecutionsRequest.Builder builder =
+        ListClosedWorkflowExecutionsRequest.newBuilder().setPageSize(t.getMaximumPageSize());
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
     if (t.getExecutionFilter() != null) {
-      request.setExecutionFilter(workflowExecutionFilter(t.getExecutionFilter()));
+      builder.setExecutionFilter(workflowExecutionFilter(t.getExecutionFilter()));
     }
     if (t.getTypeFilter() != null) {
-      request.setTypeFilter(workflowTypeFilter(t.getTypeFilter()));
+      builder.setTypeFilter(workflowTypeFilter(t.getTypeFilter()));
     }
     if (t.getStatusFilter() != null) {
-      request.setStatusFilter(statusFilter(t.getStatusFilter()));
+      builder.setStatusFilter(statusFilter(t.getStatusFilter()));
     }
     if (t.getNextPageToken() != null) {
-      request.setNextPageToken(arrayToByteString(t.getNextPageToken()));
+      builder.setNextPageToken(arrayToByteString(t.getNextPageToken()));
     }
     if (t.getStartTimeFilter() != null) {
-      request.setStartTimeFilter(startTimeFilter(t.getStartTimeFilter()));
+      builder.setStartTimeFilter(startTimeFilter(t.getStartTimeFilter()));
     }
-    return request.build();
+    return builder.build();
   }
 
   public static ListOpenWorkflowExecutionsRequest listOpenWorkflowExecutionsRequest(
@@ -867,22 +982,23 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    ListOpenWorkflowExecutionsRequest.Builder request =
-        ListOpenWorkflowExecutionsRequest.newBuilder()
-            .setDomain(t.getDomain())
-            .setPageSize(t.getMaximumPageSize());
+    ListOpenWorkflowExecutionsRequest.Builder builder =
+        ListOpenWorkflowExecutionsRequest.newBuilder().setPageSize(t.getMaximumPageSize());
+    if (t.getDomain() != null) {
+      builder.setDomain(t.getDomain());
+    }
     if (t.getExecutionFilter() != null) {
-      request.setExecutionFilter(workflowExecutionFilter(t.getExecutionFilter()));
+      builder.setExecutionFilter(workflowExecutionFilter(t.getExecutionFilter()));
     }
     if (t.getTypeFilter() != null) {
-      request.setTypeFilter(workflowTypeFilter(t.getTypeFilter()));
+      builder.setTypeFilter(workflowTypeFilter(t.getTypeFilter()));
     }
     if (t.getNextPageToken() != null) {
-      request.setNextPageToken(arrayToByteString(t.getNextPageToken()));
+      builder.setNextPageToken(arrayToByteString(t.getNextPageToken()));
     }
     if (t.getStartTimeFilter() != null) {
-      request.setStartTimeFilter(startTimeFilter(t.getStartTimeFilter()));
+      builder.setStartTimeFilter(startTimeFilter(t.getStartTimeFilter()));
     }
-    return request.build();
+    return builder.build();
   }
 }

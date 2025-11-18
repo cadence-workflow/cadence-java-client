@@ -59,11 +59,15 @@ class TypeMapper {
     if (t == null) {
       return null;
     }
-    return BadBinaryInfo.newBuilder()
-        .setReason(t.getReason())
-        .setOperator(t.getOperator())
-        .setCreatedTime(unixNanoToTime(t.getCreatedTimeNano()))
-        .build();
+    BadBinaryInfo.Builder builder =
+        BadBinaryInfo.newBuilder().setCreatedTime(unixNanoToTime(t.getCreatedTimeNano()));
+    if (t.getReason() != null) {
+      builder.setReason(t.getReason());
+    }
+    if (t.getOperator() != null) {
+      builder.setOperator(t.getOperator());
+    }
+    return builder.build();
   }
 
   static Payload payload(byte[] data) {
@@ -74,21 +78,24 @@ class TypeMapper {
   }
 
   static Failure failure(String reason, byte[] details) {
-    if (reason == null) {
-      return Failure.newBuilder().build();
+    Failure.Builder builder = Failure.newBuilder();
+    if (reason != null) {
+      builder.setReason(reason);
     }
-    return Failure.newBuilder().setReason(reason).setDetails(arrayToByteString(details)).build();
+    if (details != null) {
+      builder.setDetails(arrayToByteString(details));
+    }
+    return builder.build();
   }
 
   static WorkflowExecution workflowExecution(com.uber.cadence.WorkflowExecution t) {
     if (t == null) {
       return WorkflowExecution.newBuilder().build();
     }
-    if (t.getWorkflowId() == null && t.getRunId() == null) {
-      return WorkflowExecution.newBuilder().build();
+    WorkflowExecution.Builder builder = WorkflowExecution.newBuilder();
+    if (t.getWorkflowId() != null) {
+      builder.setWorkflowId(t.getWorkflowId());
     }
-    WorkflowExecution.Builder builder =
-        WorkflowExecution.newBuilder().setWorkflowId(t.getWorkflowId());
     if (t.getRunId() != null) {
       builder.setRunId(t.getRunId());
     }
@@ -96,31 +103,50 @@ class TypeMapper {
   }
 
   static WorkflowExecution workflowRunPair(String workflowId, String runId) {
-    if (Strings.isNullOrEmpty(workflowId) && Strings.isNullOrEmpty(runId)) {
-      return WorkflowExecution.newBuilder().build();
+    WorkflowExecution.Builder builder = WorkflowExecution.newBuilder();
+    if (!Strings.isNullOrEmpty(workflowId)) {
+      builder.setWorkflowId(workflowId);
     }
-    return WorkflowExecution.newBuilder().setWorkflowId(workflowId).setRunId(runId).build();
+    if (!Strings.isNullOrEmpty(runId)) {
+      builder.setRunId(runId);
+    }
+    return builder.build();
   }
 
   static ActivityType activityType(com.uber.cadence.ActivityType t) {
     if (t == null) {
       return ActivityType.newBuilder().build();
     }
-    return ActivityType.newBuilder().setName(t.getName()).build();
+    ActivityType.Builder builder = ActivityType.newBuilder();
+    if (t.getName() != null) {
+      builder.setName(t.getName());
+    }
+    return builder.build();
   }
 
   static WorkflowType workflowType(com.uber.cadence.WorkflowType t) {
     if (t == null) {
       return WorkflowType.newBuilder().build();
     }
-    return WorkflowType.newBuilder().setName(t.getName()).build();
+    WorkflowType.Builder builder = WorkflowType.newBuilder();
+    if (t.getName() != null) {
+      builder.setName(t.getName());
+    }
+    return builder.build();
   }
 
   static TaskList taskList(com.uber.cadence.TaskList t) {
     if (t == null) {
       return TaskList.newBuilder().build();
     }
-    return TaskList.newBuilder().setName(t.getName()).setKind(taskListKind(t.getKind())).build();
+    TaskList.Builder builder = TaskList.newBuilder();
+    if (t.getName() != null) {
+      builder.setName(t.getName());
+    }
+    if (t.getKind() != null) {
+      builder.setKind(taskListKind(t.getKind()));
+    }
+    return builder.build();
   }
 
   static TaskListMetadata taskListMetadata(com.uber.cadence.TaskListMetadata t) {
@@ -165,7 +191,7 @@ class TypeMapper {
 
   static SearchAttributes searchAttributes(com.uber.cadence.SearchAttributes t) {
     if (t == null) {
-      return SearchAttributes.newBuilder().build();
+      return SearchAttributes.newBuilder().putAllIndexedFields(Collections.emptyMap()).build();
     }
     return SearchAttributes.newBuilder()
         .putAllIndexedFields(payloadByteBufferMap(t.getIndexedFields()))
@@ -184,28 +210,42 @@ class TypeMapper {
     if (t == null) {
       return ClusterReplicationConfiguration.newBuilder().build();
     }
-    return ClusterReplicationConfiguration.newBuilder().setClusterName(t.getClusterName()).build();
+    ClusterReplicationConfiguration.Builder builder = ClusterReplicationConfiguration.newBuilder();
+    if (t.getClusterName() != null) {
+      builder.setClusterName(t.getClusterName());
+    }
+    return builder.build();
   }
 
   static WorkflowQuery workflowQuery(com.uber.cadence.WorkflowQuery t) {
     if (t == null) {
       return null;
     }
-    return WorkflowQuery.newBuilder()
-        .setQueryType(t.getQueryType())
-        .setQueryArgs(payload(t.getQueryArgs()))
-        .build();
+    WorkflowQuery.Builder builder = WorkflowQuery.newBuilder();
+    if (t.getQueryType() != null) {
+      builder.setQueryType(t.getQueryType());
+    }
+    if (t.getQueryArgs() != null) {
+      builder.setQueryArgs(payload(t.getQueryArgs()));
+    }
+    return builder.build();
   }
 
   static WorkflowQueryResult workflowQueryResult(com.uber.cadence.WorkflowQueryResult t) {
     if (t == null) {
       return WorkflowQueryResult.newBuilder().build();
     }
-    return WorkflowQueryResult.newBuilder()
-        .setResultType(queryResultType(t.getResultType()))
-        .setAnswer(payload(t.getAnswer()))
-        .setErrorMessage(t.getErrorMessage())
-        .build();
+    WorkflowQueryResult.Builder builder = WorkflowQueryResult.newBuilder();
+    if (t.getResultType() != null) {
+      builder.setResultType(queryResultType(t.getResultType()));
+    }
+    if (t.getAnswer() != null) {
+      builder.setAnswer(payload(t.getAnswer()));
+    }
+    if (t.getErrorMessage() != null) {
+      builder.setErrorMessage(t.getErrorMessage());
+    }
+    return builder.build();
   }
 
   static StickyExecutionAttributes stickyExecutionAttributes(
@@ -213,20 +253,27 @@ class TypeMapper {
     if (t == null) {
       return StickyExecutionAttributes.newBuilder().build();
     }
-    return StickyExecutionAttributes.newBuilder()
-        .setWorkerTaskList(taskList(t.getWorkerTaskList()))
-        .setScheduleToStartTimeout(secondsToDuration(t.getScheduleToStartTimeoutSeconds()))
-        .build();
+    StickyExecutionAttributes.Builder builder =
+        StickyExecutionAttributes.newBuilder()
+            .setScheduleToStartTimeout(secondsToDuration(t.getScheduleToStartTimeoutSeconds()));
+    if (t.getWorkerTaskList() != null) {
+      builder.setWorkerTaskList(taskList(t.getWorkerTaskList()));
+    }
+    return builder.build();
   }
 
   static WorkerVersionInfo workerVersionInfo(com.uber.cadence.WorkerVersionInfo t) {
     if (t == null) {
       return WorkerVersionInfo.newBuilder().build();
     }
-    return WorkerVersionInfo.newBuilder()
-        .setImpl(t.getImpl())
-        .setFeatureVersion(t.getFeatureVersion())
-        .build();
+    WorkerVersionInfo.Builder builder = WorkerVersionInfo.newBuilder();
+    if (t.getImpl() != null) {
+      builder.setImpl(t.getImpl());
+    }
+    if (t.getFeatureVersion() != null) {
+      builder.setFeatureVersion(t.getFeatureVersion());
+    }
+    return builder.build();
   }
 
   static StartTimeFilter startTimeFilter(com.uber.cadence.StartTimeFilter t) {
@@ -244,17 +291,25 @@ class TypeMapper {
     if (t == null) {
       return WorkflowExecutionFilter.newBuilder().build();
     }
-    return WorkflowExecutionFilter.newBuilder()
-        .setWorkflowId(t.getWorkflowId())
-        .setRunId(t.getRunId())
-        .build();
+    WorkflowExecutionFilter.Builder builder = WorkflowExecutionFilter.newBuilder();
+    if (t.getWorkflowId() != null) {
+      builder.setWorkflowId(t.getWorkflowId());
+    }
+    if (t.getRunId() != null) {
+      builder.setRunId(t.getRunId());
+    }
+    return builder.build();
   }
 
   static WorkflowTypeFilter workflowTypeFilter(com.uber.cadence.WorkflowTypeFilter t) {
     if (t == null) {
       return WorkflowTypeFilter.newBuilder().build();
     }
-    return WorkflowTypeFilter.newBuilder().setName(t.getName()).build();
+    WorkflowTypeFilter.Builder builder = WorkflowTypeFilter.newBuilder();
+    if (t.getName() != null) {
+      builder.setName(t.getName());
+    }
+    return builder.build();
   }
 
   static StatusFilter statusFilter(com.uber.cadence.WorkflowExecutionCloseStatus t) {
