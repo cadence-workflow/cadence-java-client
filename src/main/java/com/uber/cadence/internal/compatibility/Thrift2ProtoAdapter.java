@@ -139,7 +139,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .domainBlockingStub()
           .registerDomain(RequestMapper.registerDomainRequest(registerRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -154,7 +154,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .describeDomain(RequestMapper.describeDomainRequest(describeRequest));
       return ResponseMapper.describeDomainResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -177,7 +177,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .listDomains(RequestMapper.listDomainsRequest(listRequest));
       return ResponseMapper.listDomainsResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -192,7 +192,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .updateDomain(RequestMapper.updateDomainRequest(updateRequest));
       return ResponseMapper.updateDomainResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -205,7 +205,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .domainBlockingStub()
           .deprecateDomain(RequestMapper.deprecateDomainRequest(deprecateRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -241,7 +241,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                   RequestMapper.startWorkflowExecutionAsyncRequest(startRequest));
       return ResponseMapper.startWorkflowExecutionAsyncResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -258,7 +258,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .startWorkflowExecution(RequestMapper.startWorkflowExecutionRequest(startRequest));
       return ResponseMapper.startWorkflowExecutionResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -281,7 +281,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                   RequestMapper.getWorkflowExecutionHistoryRequest(getRequest));
       return ResponseMapper.getWorkflowExecutionHistoryResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -296,7 +296,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .pollForDecisionTask(RequestMapper.pollForDecisionTaskRequest(pollRequest));
       return ResponseMapper.pollForDecisionTaskResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -314,7 +314,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                   RequestMapper.respondDecisionTaskCompletedRequest(completeRequest));
       return ResponseMapper.respondDecisionTaskCompletedResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -328,7 +328,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .workerBlockingStub()
           .respondDecisionTaskFailed(RequestMapper.respondDecisionTaskFailedRequest(failedRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -343,7 +343,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .pollForActivityTask(RequestMapper.pollForActivityTaskRequest(pollRequest));
       return ResponseMapper.pollForActivityTaskResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -361,7 +361,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                   RequestMapper.recordActivityTaskHeartbeatRequest(heartbeatRequest));
       return ResponseMapper.recordActivityTaskHeartbeatResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -379,7 +379,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                   RequestMapper.recordActivityTaskHeartbeatByIdRequest(heartbeatRequest));
       return ResponseMapper.recordActivityTaskHeartbeatByIdResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -394,7 +394,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .respondActivityTaskCompleted(
               RequestMapper.respondActivityTaskCompletedRequest(completeRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -410,7 +410,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .respondActivityTaskCompletedByID(
               RequestMapper.respondActivityTaskCompletedByIdRequest(completeRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -424,7 +424,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .workerBlockingStub()
           .respondActivityTaskFailed(RequestMapper.respondActivityTaskFailedRequest(failRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -439,7 +439,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .respondActivityTaskFailedByID(
               RequestMapper.respondActivityTaskFailedByIdRequest(failRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -454,7 +454,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .respondActivityTaskCanceled(
               RequestMapper.respondActivityTaskCanceledRequest(canceledRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -470,7 +470,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .respondActivityTaskCanceledByID(
               RequestMapper.respondActivityTaskCanceledByIdRequest(canceledRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -488,7 +488,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .requestCancelWorkflowExecution(
               RequestMapper.requestCancelWorkflowExecutionRequest(cancelRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -505,7 +505,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .workflowBlockingStub()
           .signalWorkflowExecution(RequestMapper.signalWorkflowExecutionRequest(signalRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -524,7 +524,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                   RequestMapper.signalWithStartWorkflowExecutionRequest(signalWithStartRequest));
       return ResponseMapper.signalWithStartWorkflowExecutionResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -544,7 +544,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                       signalWithStartRequest));
       return ResponseMapper.signalWithStartWorkflowExecutionAsyncResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -570,7 +570,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .resetWorkflowExecution(RequestMapper.resetWorkflowExecutionRequest(resetRequest));
       return ResponseMapper.resetWorkflowExecutionResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -585,7 +585,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .terminateWorkflowExecution(
               RequestMapper.terminateWorkflowExecutionRequest(terminateRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -602,7 +602,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                   RequestMapper.listOpenWorkflowExecutionsRequest(listRequest));
       return ResponseMapper.listOpenWorkflowExecutionsResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -619,7 +619,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                   RequestMapper.listClosedWorkflowExecutionsRequest(listRequest));
       return ResponseMapper.listClosedWorkflowExecutionsResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -635,7 +635,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .listWorkflowExecutions(RequestMapper.listWorkflowExecutionsRequest(listRequest));
       return ResponseMapper.listWorkflowExecutionsResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -652,7 +652,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                   RequestMapper.listArchivedWorkflowExecutionsRequest(listRequest));
       return ResponseMapper.listArchivedWorkflowExecutionsResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -668,7 +668,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .scanWorkflowExecutions(RequestMapper.scanWorkflowExecutionsRequest(listRequest));
       return ResponseMapper.scanWorkflowExecutionsResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -684,7 +684,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .countWorkflowExecutions(RequestMapper.countWorkflowExecutionsRequest(countRequest));
       return ResponseMapper.countWorkflowExecutionsResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -698,7 +698,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .getSearchAttributes(GetSearchAttributesRequest.newBuilder().build());
       return ResponseMapper.getSearchAttributesResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -712,7 +712,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .respondQueryTaskCompleted(
               RequestMapper.respondQueryTaskCompletedRequest(completeRequest));
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -728,7 +728,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .resetStickyTaskList(RequestMapper.resetStickyTaskListRequest(resetRequest));
       return new ResetStickyTaskListResponse();
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -743,7 +743,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .queryWorkflow(RequestMapper.queryWorkflowRequest(queryRequest));
       return ResponseMapper.queryWorkflowResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -760,7 +760,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                   RequestMapper.describeWorkflowExecutionRequest(describeRequest));
       return ResponseMapper.describeWorkflowExecutionResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -775,7 +775,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .describeTaskList(RequestMapper.describeTaskListRequest(request));
       return ResponseMapper.describeTaskListResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -788,7 +788,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .getClusterInfo(com.uber.cadence.api.v1.GetClusterInfoRequest.newBuilder().build());
       return ResponseMapper.getClusterInfoResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -809,7 +809,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
               .listTaskListPartitions(RequestMapper.listTaskListPartitionsRequest(request));
       return ResponseMapper.listTaskListPartitionsResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -823,7 +823,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           .refreshWorkflowTasks(
               com.uber.cadence.api.v1.RefreshWorkflowTasksRequest.newBuilder().build());
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -903,7 +903,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           },
           ForkJoinPool.commonPool());
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -1026,7 +1026,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           },
           ForkJoinPool.commonPool());
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -1222,7 +1222,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           },
           ForkJoinPool.commonPool());
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -1253,7 +1253,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           },
           ForkJoinPool.commonPool());
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -1269,7 +1269,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
                   RequestMapper.getWorkflowExecutionHistoryRequest(getRequest));
       return ResponseMapper.getWorkflowExecutionHistoryResponse(response);
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -1299,7 +1299,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
           },
           ForkJoinPool.commonPool());
     } catch (StatusRuntimeException e) {
-      throw ErrorMapper.Error(e);
+      throw ErrorMapper.mapError(e);
     }
   }
 
@@ -1315,7 +1315,7 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
   private void handleAsyncException(AsyncMethodCallback callback, Exception exception) {
     if (exception instanceof ExecutionException
         && exception.getCause() instanceof StatusRuntimeException) {
-      callback.onError(ErrorMapper.Error(((StatusRuntimeException) exception.getCause())));
+      callback.onError(ErrorMapper.mapError(((StatusRuntimeException) exception.getCause())));
     } else {
       callback.onError(exception);
     }
