@@ -14,8 +14,10 @@
  */
 package com.uber.cadence.internal.compatibility.thrift;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
+import com.google.protobuf.Any;
+import com.google.protobuf.Message;
 import com.uber.cadence.AccessDeniedError;
 import com.uber.cadence.CancellationAlreadyRequestedError;
 import com.uber.cadence.ClientVersionNotSupportedError;
@@ -23,165 +25,204 @@ import com.uber.cadence.DomainAlreadyExistsError;
 import com.uber.cadence.DomainNotActiveError;
 import com.uber.cadence.EntityNotExistsError;
 import com.uber.cadence.FeatureNotEnabledError;
+import com.uber.cadence.InternalDataInconsistencyError;
 import com.uber.cadence.InternalServiceError;
 import com.uber.cadence.LimitExceededError;
+import com.uber.cadence.QueryFailedError;
 import com.uber.cadence.ServiceBusyError;
 import com.uber.cadence.WorkflowExecutionAlreadyCompletedError;
 import com.uber.cadence.WorkflowExecutionAlreadyStartedError;
-import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
-import org.apache.thrift.TException;
+import io.grpc.protobuf.StatusProto;
 import org.junit.Test;
 
 public class ErrorMapperTest {
 
   @Test
   public void testPermissionDeniedError() {
-    StatusRuntimeException ex =
-        new StatusRuntimeException(Status.PERMISSION_DENIED.withDescription("Access denied"));
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof AccessDeniedError);
+    assertEquals(
+        new AccessDeniedError("no access"),
+        ErrorMapper.mapError(toException(Status.Code.PERMISSION_DENIED, "no access")));
   }
 
   @Test
   public void testInternalServiceError() {
-    StatusRuntimeException ex =
-        new StatusRuntimeException(Status.INTERNAL.withDescription("Internal error"));
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof InternalServiceError);
+    assertEquals(
+        new InternalServiceError("no bueno"),
+        ErrorMapper.mapError(toException(Status.Code.INTERNAL, "no bueno")));
+  }
+
+  @Test
+  public void testInternalDataInconsistencyError() {
+    assertEquals(
+        new InternalDataInconsistencyError("no data"),
+        ErrorMapper.mapError(toException(Status.Code.DATA_LOSS, "no data")));
   }
 
   @Test
   public void testWorkflowExecutionAlreadyCompletedError() {
-    Metadata metadata = new Metadata();
-    metadata.put(
-        Metadata.Key.of("rpc-application-error-name", Metadata.ASCII_STRING_MARSHALLER),
-        "EntityNotExistsError");
-    StatusRuntimeException ex =
-        new StatusRuntimeException(
-            Status.NOT_FOUND.withDescription("already completed."), metadata);
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof WorkflowExecutionAlreadyCompletedError);
-  }
-
-  @Test
-  public void testEntityNotExistsError() {
-    StatusRuntimeException ex =
-        new StatusRuntimeException(Status.NOT_FOUND.withDescription("Entity not found"));
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof EntityNotExistsError);
-  }
-
-  @Test
-  public void testCancellationAlreadyRequestedError() {
-    Metadata metadata = new Metadata();
-    metadata.put(
-        Metadata.Key.of("rpc-application-error-name", Metadata.ASCII_STRING_MARSHALLER),
-        "CancellationAlreadyRequestedError");
-    StatusRuntimeException ex =
-        new StatusRuntimeException(
-            Status.ALREADY_EXISTS.withDescription("Cancellation already requested"), metadata);
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof CancellationAlreadyRequestedError);
-  }
-
-  @Test
-  public void testDomainAlreadyExistsError() {
-    Metadata metadata = new Metadata();
-    metadata.put(
-        Metadata.Key.of("rpc-application-error-name", Metadata.ASCII_STRING_MARSHALLER),
-        "DomainAlreadyExistsError");
-    StatusRuntimeException ex =
-        new StatusRuntimeException(
-            Status.ALREADY_EXISTS.withDescription("Domain already exists"), metadata);
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof DomainAlreadyExistsError);
+    assertEquals(
+        new WorkflowExecutionAlreadyCompletedError().setMessage("done"),
+        ErrorMapper.mapError(
+            toException(
+                Status.Code.NOT_FOUND,
+                "done",
+                com.uber.cadence.api.v1.WorkflowExecutionAlreadyCompletedError
+                    .getDefaultInstance())));
   }
 
   @Test
   public void testWorkflowExecutionAlreadyStartedError() {
-    Metadata metadata = new Metadata();
-    metadata.put(
-        Metadata.Key.of("rpc-application-error-name", Metadata.ASCII_STRING_MARSHALLER),
-        "WorkflowExecutionAlreadyStartedError");
-    StatusRuntimeException ex =
-        new StatusRuntimeException(
-            Status.ALREADY_EXISTS.withDescription("Workflow already started"), metadata);
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof WorkflowExecutionAlreadyStartedError);
+    assertEquals(
+        new WorkflowExecutionAlreadyStartedError()
+            .setMessage("already started")
+            .setStartRequestId("start-request-id")
+            .setRunId("run-id"),
+        ErrorMapper.mapError(
+            toException(
+                Status.Code.ALREADY_EXISTS,
+                "already started",
+                com.uber.cadence.api.v1.WorkflowExecutionAlreadyStartedError.newBuilder()
+                    .setStartRequestId("start-request-id")
+                    .setRunId("run-id")
+                    .build())));
   }
 
   @Test
-  public void testClientVersionNotSupportedError() {
-    Metadata metadata = new Metadata();
-    metadata.put(
-        Metadata.Key.of("rpc-application-error-name", Metadata.ASCII_STRING_MARSHALLER),
-        "ClientVersionNotSupportedError");
-    StatusRuntimeException ex =
-        new StatusRuntimeException(
-            Status.FAILED_PRECONDITION.withDescription("Client version not supported"), metadata);
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof ClientVersionNotSupportedError);
-  }
-
-  @Test
-  public void testFeatureNotEnabledError() {
-    Metadata metadata = new Metadata();
-    metadata.put(
-        Metadata.Key.of("rpc-application-error-name", Metadata.ASCII_STRING_MARSHALLER),
-        "FeatureNotEnabledError");
-    StatusRuntimeException ex =
-        new StatusRuntimeException(
-            Status.FAILED_PRECONDITION.withDescription("Feature not enabled"), metadata);
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof FeatureNotEnabledError);
+  public void testEntityNotExistsError() {
+    assertEquals(
+        new EntityNotExistsError()
+            .setMessage("not found")
+            .setActiveCluster("active-cluster")
+            .setCurrentCluster("current-cluster"),
+        ErrorMapper.mapError(
+            toException(
+                Status.Code.NOT_FOUND,
+                "not found",
+                com.uber.cadence.api.v1.EntityNotExistsError.newBuilder()
+                    .setActiveCluster("active-cluster")
+                    .setCurrentCluster("current-cluster")
+                    .build())));
   }
 
   @Test
   public void testDomainNotActiveError() {
-    Metadata metadata = new Metadata();
-    metadata.put(
-        Metadata.Key.of("rpc-application-error-name", Metadata.ASCII_STRING_MARSHALLER),
-        "DomainNotActiveError");
-    StatusRuntimeException ex =
-        new StatusRuntimeException(
-            Status.FAILED_PRECONDITION.withDescription("Domain not active"), metadata);
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof DomainNotActiveError);
+    assertEquals(
+        new DomainNotActiveError()
+            .setMessage("domain inactive")
+            .setDomainName("domain-name")
+            .setActiveCluster("active-cluster")
+            .setCurrentCluster("current-cluster"),
+        ErrorMapper.mapError(
+            toException(
+                Status.Code.FAILED_PRECONDITION,
+                "domain inactive",
+                com.uber.cadence.api.v1.DomainNotActiveError.newBuilder()
+                    .setDomain("domain-name")
+                    .setActiveCluster("active-cluster")
+                    .setCurrentCluster("current-cluster")
+                    .build())));
+  }
+
+  @Test
+  public void testClientVersionNotSupportedError() {
+    assertEquals(
+        new ClientVersionNotSupportedError()
+            .setFeatureVersion("feature-version")
+            .setClientImpl("client-impl")
+            .setSupportedVersions("supported-versions"),
+        ErrorMapper.mapError(
+            toException(
+                Status.Code.FAILED_PRECONDITION,
+                "unsupported version",
+                com.uber.cadence.api.v1.ClientVersionNotSupportedError.newBuilder()
+                    .setFeatureVersion("feature-version")
+                    .setClientImpl("client-impl")
+                    .setSupportedVersions("supported-versions")
+                    .build())));
+  }
+
+  @Test
+  public void testFeatureNotEnabledError() {
+    assertEquals(
+        new FeatureNotEnabledError().setFeatureFlag("feature-flag"),
+        ErrorMapper.mapError(
+            toException(
+                Status.Code.FAILED_PRECONDITION,
+                "feature not enabled",
+                com.uber.cadence.api.v1.FeatureNotEnabledError.newBuilder()
+                    .setFeatureFlag("feature-flag")
+                    .build())));
+  }
+
+  @Test
+  public void testCancellationAlreadyRequestedError() {
+    assertEquals(
+        new CancellationAlreadyRequestedError().setMessage("cancellation requested"),
+        ErrorMapper.mapError(
+            toException(
+                Status.Code.FAILED_PRECONDITION,
+                "cancellation requested",
+                com.uber.cadence.api.v1.CancellationAlreadyRequestedError.newBuilder().build())));
+  }
+
+  @Test
+  public void testDomainAlreadyExistsError() {
+    assertEquals(
+        new DomainAlreadyExistsError().setMessage("domain exists"),
+        ErrorMapper.mapError(
+            toException(
+                Status.Code.ALREADY_EXISTS,
+                "domain exists",
+                com.uber.cadence.api.v1.DomainAlreadyExistsError.newBuilder().build())));
   }
 
   @Test
   public void testLimitExceededError() {
-    Metadata metadata = new Metadata();
-    metadata.put(
-        Metadata.Key.of("rpc-application-error-name", Metadata.ASCII_STRING_MARSHALLER),
-        "LimitExceededError");
-    StatusRuntimeException ex =
-        new StatusRuntimeException(
-            Status.RESOURCE_EXHAUSTED.withDescription("Limit exceeded"), metadata);
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof LimitExceededError);
+    assertEquals(
+        new LimitExceededError().setMessage("limit exceeded"),
+        ErrorMapper.mapError(
+            toException(
+                Status.Code.RESOURCE_EXHAUSTED,
+                "limit exceeded",
+                com.uber.cadence.api.v1.LimitExceededError.newBuilder().build())));
+  }
+
+  @Test
+  public void testQueryFailedError() {
+    assertEquals(
+        new QueryFailedError().setMessage("query failed"),
+        ErrorMapper.mapError(
+            toException(
+                Status.Code.INVALID_ARGUMENT,
+                "query failed",
+                com.uber.cadence.api.v1.QueryFailedError.newBuilder().build())));
   }
 
   @Test
   public void testServiceBusyError() {
-    Metadata metadata = new Metadata();
-    metadata.put(
-        Metadata.Key.of("rpc-application-error-name", Metadata.ASCII_STRING_MARSHALLER),
-        "ServiceBusyError");
-    StatusRuntimeException ex =
-        new StatusRuntimeException(
-            Status.RESOURCE_EXHAUSTED.withDescription("Service busy"), metadata);
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof ServiceBusyError);
+    assertEquals(
+        new ServiceBusyError().setMessage("service busy"),
+        ErrorMapper.mapError(
+            toException(
+                Status.Code.UNAVAILABLE,
+                "service busy",
+                com.uber.cadence.api.v1.ServiceBusyError.newBuilder().build())));
   }
 
-  @Test
-  public void testUnknownError() {
-    StatusRuntimeException ex =
-        new StatusRuntimeException(Status.UNKNOWN.withDescription("Unknown error"));
-    TException result = ErrorMapper.Error(ex);
-    assertTrue(result instanceof TException);
+  private static StatusRuntimeException toException(Status.Code code, String message) {
+    return StatusProto.toStatusRuntimeException(
+        com.google.rpc.Status.newBuilder().setCode(code.value()).setMessage(message).build());
+  }
+
+  private static StatusRuntimeException toException(
+      Status.Code code, String message, Message details) {
+    return StatusProto.toStatusRuntimeException(
+        com.google.rpc.Status.newBuilder()
+            .setCode(code.value())
+            .addDetails(Any.pack(details))
+            .setMessage(message)
+            .build());
   }
 }

@@ -14,6 +14,7 @@
  */
 package com.uber.cadence.testUtils;
 
+import com.uber.cadence.FeatureFlags;
 import com.uber.cadence.internal.compatibility.Thrift2ProtoAdapter;
 import com.uber.cadence.internal.compatibility.proto.serviceclient.IGrpcServiceStubs;
 import com.uber.cadence.serviceclient.ClientOptions;
@@ -43,6 +44,11 @@ public final class TestEnvironment {
 
   public static IWorkflowService getDockerService() {
     return new Thrift2ProtoAdapter(
-        IGrpcServiceStubs.newInstance(ClientOptions.newBuilder().setPort(7833).build()));
+        IGrpcServiceStubs.newInstance(
+            ClientOptions.newBuilder()
+                .setPort(7833)
+                .setFeatureFlags(
+                    new FeatureFlags().setWorkflowExecutionAlreadyCompletedErrorEnabled(true))
+                .build()));
   }
 }

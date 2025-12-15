@@ -16,6 +16,8 @@
 package com.uber.cadence.internal.compatibility.proto.serviceclient;
 
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.uber.cadence.api.v1.DomainAPIGrpc;
 import com.uber.cadence.api.v1.MetaAPIGrpc;
 import com.uber.cadence.api.v1.MetaAPIGrpc.MetaAPIBlockingStub;
@@ -63,6 +65,8 @@ final class GrpcServiceStubs implements IGrpcServiceStubs {
       Metadata.Key.of("rpc-caller", Metadata.ASCII_STRING_MARSHALLER);
   private static final Metadata.Key<String> RPC_ENCODING_HEADER_KEY =
       Metadata.Key.of("rpc-encoding", Metadata.ASCII_STRING_MARSHALLER);
+  private static final Metadata.Key<String> CLIENT_FEATURE_FLAGS_HEADER_KEY =
+      Metadata.Key.of("cadence-client-feature-flags", Metadata.ASCII_STRING_MARSHALLER);
 
   private static final Metadata.Key<String> AUTHORIZATION_HEADER_KEY =
       Metadata.Key.of("cadence-authorization", Metadata.ASCII_STRING_MARSHALLER);
@@ -108,6 +112,12 @@ final class GrpcServiceStubs implements IGrpcServiceStubs {
     headers.put(RPC_ENCODING_HEADER_KEY, "proto");
     if (!Strings.isNullOrEmpty(options.getIsolationGroup())) {
       headers.put(ISOLATION_GROUP_HEADER_KEY, options.getIsolationGroup());
+    }
+    if (options.getFeatureFlags() != null) {
+      GsonBuilder gsonBuilder = new GsonBuilder();
+      Gson gson = gsonBuilder.create();
+      String serialized = gson.toJson(options.getFeatureFlags());
+      headers.put(CLIENT_FEATURE_FLAGS_HEADER_KEY, serialized);
     }
     mergeHeaders(headers, options.getHeaders());
 
