@@ -100,7 +100,7 @@ dependencies {
     testCompile group: 'com.googlecode.junit-toolbox', name: 'junit-toolbox', version: '2.4'
     testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     testCompile group: 'io.grpc', name: 'grpc-testing', version: '1.54.2'
-    testImplementation 'io.opentracing:opentracing-mock:0.33.0'
+    testImplementation 'io.opentracing:opentracing-mock:0.32.0'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.5.1'
     testImplementation "org.mockito:mockito-inline:4.5.1" // for mocking final classes
 }

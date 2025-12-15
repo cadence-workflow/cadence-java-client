@@ -86,7 +86,8 @@ public class WorkflowServiceTChannel implements IWorkflowService {
   public WorkflowServiceTChannel(ClientOptions options) {
     this.options = options;
     this.thriftHeaders = getThriftHeaders(options);
-    this.tChannel = new TChannel.Builder(options.getClientAppName()).build();
+    this.tChannel =
+        new TChannel.Builder(options.getClientAppName()).setTracer(options.getTracer()).build();
     this.tracingPropagator = new TracingPropagator(options.getTracer());
     this.tracer = options.getTracer();
 

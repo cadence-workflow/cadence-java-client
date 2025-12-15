@@ -116,8 +116,18 @@ public class WorkflowClientInternalTest {
     stub.enqueueStart("input");
 
     StartWorkflowExecutionAsyncRequest request = requestFuture.getNow(null).getStartRequest();
-    assertEquals(1, fakeService.getTracer().finishedSpans().size());
-    MockSpan mockSpan = fakeService.getTracer().finishedSpans().get(0);
+    MockSpan mockSpan =
+        fakeService
+            .getTracer()
+            .finishedSpans()
+            .stream()
+            .filter(span -> "cadence-StartWorkflowExecutionAsync".equals(span.operationName()))
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new AssertionError(
+                        "No span found for StartWorkflowExecutionAsync:"
+                            + fakeService.getTracer().finishedSpans()));
     assertEquals(
         mockSpan.context().toTraceId(),
         Charsets.UTF_8
@@ -269,8 +279,21 @@ public class WorkflowClientInternalTest {
 
     SignalWithStartWorkflowExecutionRequest request =
         requestFuture.getNow(null).getSignalWithStartRequest().getRequest();
-    assertEquals(1, fakeService.getTracer().finishedSpans().size());
-    MockSpan mockSpan = fakeService.getTracer().finishedSpans().get(0);
+    assertEquals(2, fakeService.getTracer().finishedSpans().size());
+    MockSpan mockSpan =
+        fakeService
+            .getTracer()
+            .finishedSpans()
+            .stream()
+            .filter(
+                span ->
+                    "cadence-SignalWithStartWorkflowExecutionAsync".equals(span.operationName()))
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new AssertionError(
+                        "No span found for SignalWithStartWorkflowExecutionAsync:"
+                            + fakeService.getTracer().finishedSpans()));
     assertEquals(
         mockSpan.context().toTraceId(),
         Charsets.UTF_8.decode(request.getHeader().getFields().get("traceid")).toString());
