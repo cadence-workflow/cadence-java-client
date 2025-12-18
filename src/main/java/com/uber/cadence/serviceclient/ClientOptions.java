@@ -26,6 +26,7 @@ import com.uber.m3.tally.Scope;
 import io.grpc.ManagedChannel;
 import io.opentracing.Tracer;
 import io.opentracing.noop.NoopTracerFactory;
+import io.opentracing.util.GlobalTracer;
 import java.util.Map;
 
 public class ClientOptions {
@@ -130,7 +131,13 @@ public class ClientOptions {
     }
     this.authProvider = builder.authProvider;
     this.isolationGroup = builder.isolationGroup;
-    this.tracer = builder.tracer;
+    if (builder.tracer != null) {
+      this.tracer = builder.tracer;
+    } else {
+      // Default value is GlobalTracer. If the user overrides it with null, fall back to NoopTracer.
+      // We need some tracer instance
+      this.tracer = NoopTracerFactory.create();
+    }
   }
 
   public static ClientOptions defaultInstance() {
@@ -233,8 +240,8 @@ public class ClientOptions {
     private IAuthorizationProvider authProvider;
     private FeatureFlags featureFlags;
     private String isolationGroup;
-    // by default NoopTracer
-    private Tracer tracer = NoopTracerFactory.create();
+    // by default GlobalTracer
+    private Tracer tracer = GlobalTracer.get();
 
     private Builder() {}
 

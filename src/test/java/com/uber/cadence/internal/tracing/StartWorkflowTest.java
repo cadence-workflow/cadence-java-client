@@ -267,7 +267,8 @@ public class StartWorkflowTest {
   public void testStartWorkflowTchannelNoPropagation() {
     Assume.assumeTrue(useDockerService);
     MockTracer mockTracer = new MockTracer();
-    IWorkflowService service = new WorkflowServiceTChannel(ClientOptions.newBuilder().build());
+    IWorkflowService service =
+        new WorkflowServiceTChannel(ClientOptions.newBuilder().setTracer(null).build());
     testStartWorkflowHelper(service, mockTracer, false);
   }
 
@@ -277,7 +278,8 @@ public class StartWorkflowTest {
     MockTracer mockTracer = new MockTracer();
     IWorkflowService service =
         new Thrift2ProtoAdapter(
-            IGrpcServiceStubs.newInstance(ClientOptions.newBuilder().setPort(7833).build()));
+            IGrpcServiceStubs.newInstance(
+                ClientOptions.newBuilder().setPort(7833).setTracer(null).build()));
     testStartWorkflowHelper(service, mockTracer, false);
   }
 
@@ -285,7 +287,8 @@ public class StartWorkflowTest {
   public void testSignalStartWorkflowTchannelNoPropagation() {
     Assume.assumeTrue(useDockerService);
     MockTracer mockTracer = new MockTracer();
-    IWorkflowService service = new WorkflowServiceTChannel(ClientOptions.newBuilder().build());
+    IWorkflowService service =
+        new WorkflowServiceTChannel(ClientOptions.newBuilder().setTracer(null).build());
     testSignalWithStartWorkflowHelper(service, mockTracer, false);
   }
 
@@ -295,7 +298,8 @@ public class StartWorkflowTest {
     MockTracer mockTracer = new MockTracer();
     IWorkflowService service =
         new Thrift2ProtoAdapter(
-            IGrpcServiceStubs.newInstance(ClientOptions.newBuilder().setPort(7833).build()));
+            IGrpcServiceStubs.newInstance(
+                ClientOptions.newBuilder().setPort(7833).setTracer(null).build()));
     testSignalWithStartWorkflowHelper(service, mockTracer, false);
   }
 
@@ -330,7 +334,7 @@ public class StartWorkflowTest {
       int res = wf.AddOneThenDouble(3);
       assertEquals(8, res);
     } catch (Exception e) {
-      fail("workflow failure: " + e);
+      throw new AssertionError("workflow failure", e);
     } finally {
       rootSpan.finish();
       List<MockSpan> spans = mockTracer.finishedSpans();
@@ -358,19 +362,11 @@ public class StartWorkflowTest {
       } else {
         // assert start workflow
         MockSpan spanStartWorkflow =
-            spans
-                .stream()
-                .filter(span -> span.operationName().contains("StartWorkflow"))
-                .findFirst()
-                .orElse(null);
-        if (spanStartWorkflow == null) {
-          fail("StartWorkflow span not found");
-        }
+            getFirstSpanByOperationName(spans, "cadence-StartWorkflowExecution");
 
         // assert workflow spans
-        MockSpan spanExecuteWF = getLinkedSpans(spans, spanStartWorkflow.context()).get(0);
-        assertEquals(spanExecuteWF.operationName(), "cadence-ExecuteWorkflow");
-        assertSpanReferences(spanExecuteWF, "follows_from", spanStartWorkflow);
+        MockSpan spanExecuteWF = getFirstSpanByOperationName(spans, "cadence-ExecuteWorkflow");
+        assertChildOf(spans, spanExecuteWF, spanStartWorkflow);
 
         MockSpan spanExecuteActivity = getLinkedSpans(spans, spanExecuteWF.context()).get(0);
         assertEquals(spanExecuteActivity.operationName(), "cadence-ExecuteActivity");
@@ -432,7 +428,7 @@ public class StartWorkflowTest {
       int res = wf.getResult(Integer.class);
       assertEquals(8, res);
     } catch (Exception e) {
-      fail("workflow failure: " + e);
+      throw new AssertionError("Workflow failure", e);
     } finally {
       rootSpan.finish();
       List<MockSpan> spans = mockTracer.finishedSpans();
@@ -460,21 +456,14 @@ public class StartWorkflowTest {
       } else {
         // assert start workflow
         MockSpan spanStartWorkflow =
-            spans
-                .stream()
-                .filter(span -> span.operationName().contains("StartWorkflow"))
-                .findFirst()
-                .orElse(null);
-        if (spanStartWorkflow == null) {
-          fail("StartWorkflow span not found");
-        }
+            getFirstSpanByOperationName(spans, "cadence-SignalWithStartWorkflowExecution");
 
         // assert workflow spans
         List<MockSpan> workflowSpans =
             getSpansByTraceID(spans, spanStartWorkflow.context().toTraceId());
-        MockSpan spanExecuteWF = getLinkedSpans(spans, spanStartWorkflow.context()).get(0);
-        assertEquals(spanExecuteWF.operationName(), "cadence-ExecuteWorkflow");
-        assertSpanReferences(spanExecuteWF, "follows_from", spanStartWorkflow);
+        MockSpan spanExecuteWF =
+            getFirstSpanByOperationName(workflowSpans, "cadence-ExecuteWorkflow");
+        assertChildOf(spans, spanExecuteWF, spanStartWorkflow);
 
         MockSpan spanExecuteActivity = getLinkedSpans(spans, spanExecuteWF.context()).get(0);
         assertEquals(spanExecuteActivity.operationName(), "cadence-ExecuteActivity");
@@ -491,6 +480,15 @@ public class StartWorkflowTest {
       }
       workerFactory.shutdown();
     }
+  }
+
+  private MockSpan getFirstSpanByOperationName(List<MockSpan> spans, String operation) {
+    return spans
+        .stream()
+        .filter(span -> span.operationName().equals(operation))
+        .findFirst()
+        .orElseThrow(
+            () -> new IllegalStateException("Failed to find span with operation: " + operation));
   }
 
   private List<MockSpan> getSpansByTraceID(List<MockSpan> spans, String traceID) {
@@ -515,6 +513,27 @@ public class StartWorkflowTest {
                                     .toTraceId()
                                     .equals(spanContext.toTraceId())))
         .collect(Collectors.toList());
+  }
+
+  void assertChildOf(List<MockSpan> spans, MockSpan span, MockSpan parentSpan) {
+    Map<String, MockSpan> byId = new HashMap<>();
+    for (MockSpan s : spans) {
+      byId.put(s.context().traceId() + "-" + s.context().toSpanId(), s);
+    }
+    Queue<MockSpan> toVisit = new LinkedList<>();
+    toVisit.add(span);
+    while (!toVisit.isEmpty()) {
+      MockSpan current = toVisit.poll();
+      MockSpan parent = byId.get(current.context().traceId() + "-" + current.parentId());
+      if (parent != null) {
+        if (parent.equals(parentSpan)) {
+          return;
+        } else {
+          toVisit.add(parent);
+        }
+      }
+    }
+    fail(String.format("span %s is not a child of parent span %s", span, parentSpan));
   }
 
   void assertSpanReferences(MockSpan span, String referenceType, MockSpan parentSpan) {
