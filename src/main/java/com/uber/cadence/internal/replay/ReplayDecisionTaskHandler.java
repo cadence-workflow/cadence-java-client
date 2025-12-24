@@ -274,6 +274,9 @@ public final class ReplayDecisionTaskHandler implements DecisionTaskHandler {
               .setExecution(decisionTask.getWorkflowExecution());
       GetWorkflowExecutionHistoryResponse getHistoryResponse =
           service.GetWorkflowExecutionHistory(getHistoryRequest);
+      if (getHistoryResponse.getHistory().getEventsSize() == 0) {
+        throw new RuntimeException("Failed to get workflow execution history for replay");
+      }
       decisionTask.setHistory(getHistoryResponse.getHistory());
       decisionTask.setNextPageToken(getHistoryResponse.getNextPageToken());
     }
