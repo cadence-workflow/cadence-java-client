@@ -775,6 +775,7 @@ public class WorkflowExecutionUtils {
       Gson gson = new GsonBuilder().setPrettyPrinting().create();
       return gson.toJson(json);
     } catch (Exception e) {
+      System.err.println("Error parsing JSON: " + jsonValue);
       return jsonValue;
     }
   }
