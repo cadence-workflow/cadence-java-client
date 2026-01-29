@@ -17,7 +17,9 @@ package com.uber.cadence.internal.replay;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertNotEquals;
 
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.ParentClosePolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.WorkflowType;
@@ -41,6 +43,7 @@ public class StartChildWorkflowExecutionParametersTest {
     WorkflowIdReusePolicy reusePolicy = WorkflowIdReusePolicy.AllowDuplicate;
     RetryParameters retryParameters = new RetryParameters();
     String cronSchedule = "* * * * *";
+    CronOverlapPolicy cronOverlapPolicy = CronOverlapPolicy.BUFFERONE;
     Map<String, Object> memo = new HashMap<>();
     memo.put("key1", "value1");
     Map<String, Object> searchAttributes = new HashMap<>();
@@ -62,6 +65,7 @@ public class StartChildWorkflowExecutionParametersTest {
             .setWorkflowIdReusePolicy(reusePolicy)
             .setRetryParameters(retryParameters)
             .setCronSchedule(cronSchedule)
+            .setCronOverlapPolicy(cronOverlapPolicy)
             .setMemo(memo)
             .setSearchAttributes(searchAttributes)
             .setContext(context)
@@ -78,6 +82,7 @@ public class StartChildWorkflowExecutionParametersTest {
     assertEquals(reusePolicy, parameters.getWorkflowIdReusePolicy());
     assertEquals(retryParameters, parameters.getRetryParameters());
     assertEquals(cronSchedule, parameters.getCronSchedule());
+    assertEquals(cronOverlapPolicy, parameters.getCronOverlapPolicy());
     assertEquals(memo, parameters.getMemo());
     assertEquals(searchAttributes, parameters.getSearchAttributes());
     assertEquals(context, parameters.getContext());
@@ -171,5 +176,275 @@ public class StartChildWorkflowExecutionParametersTest {
     assertTrue(parameters.toString().contains("testDomain"));
     assertTrue(parameters.toString().contains("testControl"));
     assertTrue(parameters.toString().contains("1000"));
+  }
+
+  @Test
+  public void testCronOverlapPolicyField() {
+    String domain = "testDomain";
+    String control = "testControl";
+    long executionTimeout = 1000L;
+    byte[] input = {1, 2, 3};
+    String taskList = "testTaskList";
+    long taskTimeout = 2000L;
+    String workflowId = "testWorkflowId";
+    WorkflowType workflowType = new WorkflowType().setName("testWorkflowType");
+    WorkflowIdReusePolicy reusePolicy = WorkflowIdReusePolicy.AllowDuplicate;
+    RetryParameters retryParameters = new RetryParameters();
+    String cronSchedule = "* * * * *";
+    CronOverlapPolicy cronOverlapPolicy = CronOverlapPolicy.BUFFERONE;
+    Map<String, Object> memo = new HashMap<>();
+    memo.put("key1", "value1");
+    Map<String, Object> searchAttributes = new HashMap<>();
+    searchAttributes.put("key2", "value2");
+    Map<String, byte[]> context = new HashMap<>();
+    context.put("key3", new byte[] {4, 5, 6});
+    ParentClosePolicy parentClosePolicy = ParentClosePolicy.TERMINATE;
+
+    StartChildWorkflowExecutionParameters parameters =
+        new StartChildWorkflowExecutionParameters.Builder()
+            .setDomain(domain)
+            .setControl(control)
+            .setExecutionStartToCloseTimeoutSeconds(executionTimeout)
+            .setInput(input)
+            .setTaskList(taskList)
+            .setTaskStartToCloseTimeoutSeconds(taskTimeout)
+            .setWorkflowId(workflowId)
+            .setWorkflowType(workflowType)
+            .setWorkflowIdReusePolicy(reusePolicy)
+            .setRetryParameters(retryParameters)
+            .setCronSchedule(cronSchedule)
+            .setCronOverlapPolicy(cronOverlapPolicy)
+            .setMemo(memo)
+            .setSearchAttributes(searchAttributes)
+            .setContext(context)
+            .setParentClosePolicy(parentClosePolicy)
+            .build();
+
+    assertEquals(CronOverlapPolicy.BUFFERONE, parameters.getCronOverlapPolicy());
+  }
+
+  @Test
+  public void testCronOverlapPolicyInEqualsAndHashCode() {
+    String domain = "testDomain";
+    String control = "testControl";
+    long executionTimeout = 1000L;
+    byte[] input = {1, 2, 3};
+    String taskList = "testTaskList";
+    long taskTimeout = 2000L;
+    String workflowId = "testWorkflowId";
+    WorkflowType workflowType = new WorkflowType().setName("testWorkflowType");
+    WorkflowIdReusePolicy reusePolicy = WorkflowIdReusePolicy.AllowDuplicate;
+    RetryParameters retryParameters = new RetryParameters();
+    String cronSchedule = "* * * * *";
+    CronOverlapPolicy cronOverlapPolicy = CronOverlapPolicy.BUFFERONE;
+    Map<String, Object> memo = new HashMap<>();
+    memo.put("key1", "value1");
+    Map<String, Object> searchAttributes = new HashMap<>();
+    searchAttributes.put("key2", "value2");
+    Map<String, byte[]> context = new HashMap<>();
+    context.put("key3", new byte[] {4, 5, 6});
+    ParentClosePolicy parentClosePolicy = ParentClosePolicy.TERMINATE;
+
+    StartChildWorkflowExecutionParameters params1 =
+        new StartChildWorkflowExecutionParameters.Builder()
+            .setDomain(domain)
+            .setControl(control)
+            .setExecutionStartToCloseTimeoutSeconds(executionTimeout)
+            .setInput(input)
+            .setTaskList(taskList)
+            .setTaskStartToCloseTimeoutSeconds(taskTimeout)
+            .setWorkflowId(workflowId)
+            .setWorkflowType(workflowType)
+            .setWorkflowIdReusePolicy(reusePolicy)
+            .setRetryParameters(retryParameters)
+            .setCronSchedule(cronSchedule)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
+            .setMemo(memo)
+            .setSearchAttributes(searchAttributes)
+            .setContext(context)
+            .setParentClosePolicy(parentClosePolicy)
+            .build();
+
+    StartChildWorkflowExecutionParameters params2 =
+        new StartChildWorkflowExecutionParameters.Builder()
+            .setDomain(domain)
+            .setControl(control)
+            .setExecutionStartToCloseTimeoutSeconds(executionTimeout)
+            .setInput(input)
+            .setTaskList(taskList)
+            .setTaskStartToCloseTimeoutSeconds(taskTimeout)
+            .setWorkflowId(workflowId)
+            .setWorkflowType(workflowType)
+            .setWorkflowIdReusePolicy(reusePolicy)
+            .setRetryParameters(retryParameters)
+            .setCronSchedule(cronSchedule)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
+            .setMemo(memo)
+            .setSearchAttributes(searchAttributes)
+            .setContext(context)
+            .setParentClosePolicy(parentClosePolicy)
+            .build();
+
+    StartChildWorkflowExecutionParameters params3 =
+        new StartChildWorkflowExecutionParameters.Builder()
+            .setDomain(domain)
+            .setControl(control)
+            .setExecutionStartToCloseTimeoutSeconds(executionTimeout)
+            .setInput(input)
+            .setTaskList(taskList)
+            .setTaskStartToCloseTimeoutSeconds(taskTimeout)
+            .setWorkflowId(workflowId)
+            .setWorkflowType(workflowType)
+            .setWorkflowIdReusePolicy(reusePolicy)
+            .setRetryParameters(retryParameters)
+            .setCronSchedule(cronSchedule)
+            .setCronOverlapPolicy(CronOverlapPolicy.SKIPPED)
+            .setMemo(memo)
+            .setSearchAttributes(searchAttributes)
+            .setContext(context)
+            .setParentClosePolicy(parentClosePolicy)
+            .build();
+
+    assertEquals(params1, params2);
+    assertNotEquals(params1, params3);
+    assertEquals(params1.hashCode(), params2.hashCode());
+    assertNotEquals(params1.hashCode(), params3.hashCode());
+  }
+
+  @Test
+  public void testCronOverlapPolicyInToString() {
+    String domain = "testDomain";
+    String control = "testControl";
+    long executionTimeout = 1000L;
+    byte[] input = {1, 2, 3};
+    String taskList = "testTaskList";
+    long taskTimeout = 2000L;
+    String workflowId = "testWorkflowId";
+    WorkflowType workflowType = new WorkflowType().setName("testWorkflowType");
+    WorkflowIdReusePolicy reusePolicy = WorkflowIdReusePolicy.AllowDuplicate;
+    RetryParameters retryParameters = new RetryParameters();
+    String cronSchedule = "* * * * *";
+    CronOverlapPolicy cronOverlapPolicy = CronOverlapPolicy.BUFFERONE;
+    Map<String, Object> memo = new HashMap<>();
+    memo.put("key1", "value1");
+    Map<String, Object> searchAttributes = new HashMap<>();
+    searchAttributes.put("key2", "value2");
+    Map<String, byte[]> context = new HashMap<>();
+    context.put("key3", new byte[] {4, 5, 6});
+    ParentClosePolicy parentClosePolicy = ParentClosePolicy.TERMINATE;
+
+    StartChildWorkflowExecutionParameters parameters =
+        new StartChildWorkflowExecutionParameters.Builder()
+            .setDomain(domain)
+            .setControl(control)
+            .setExecutionStartToCloseTimeoutSeconds(executionTimeout)
+            .setInput(input)
+            .setTaskList(taskList)
+            .setTaskStartToCloseTimeoutSeconds(taskTimeout)
+            .setWorkflowId(workflowId)
+            .setWorkflowType(workflowType)
+            .setWorkflowIdReusePolicy(reusePolicy)
+            .setRetryParameters(retryParameters)
+            .setCronSchedule(cronSchedule)
+            .setCronOverlapPolicy(cronOverlapPolicy)
+            .setMemo(memo)
+            .setSearchAttributes(searchAttributes)
+            .setContext(context)
+            .setParentClosePolicy(parentClosePolicy)
+            .build();
+
+    String toString = parameters.toString();
+    assertTrue(toString.contains("cronOverlapPolicy=" + cronOverlapPolicy));
+  }
+
+  @Test
+  public void testCronOverlapPolicyInCopy() {
+    String domain = "testDomain";
+    String control = "testControl";
+    long executionTimeout = 1000L;
+    byte[] input = {1, 2, 3};
+    String taskList = "testTaskList";
+    long taskTimeout = 2000L;
+    String workflowId = "testWorkflowId";
+    WorkflowType workflowType = new WorkflowType().setName("testWorkflowType");
+    WorkflowIdReusePolicy reusePolicy = WorkflowIdReusePolicy.AllowDuplicate;
+    RetryParameters retryParameters = new RetryParameters();
+    String cronSchedule = "* * * * *";
+    CronOverlapPolicy cronOverlapPolicy = CronOverlapPolicy.BUFFERONE;
+    Map<String, Object> memo = new HashMap<>();
+    memo.put("key1", "value1");
+    Map<String, Object> searchAttributes = new HashMap<>();
+    searchAttributes.put("key2", "value2");
+    Map<String, byte[]> context = new HashMap<>();
+    context.put("key3", new byte[] {4, 5, 6});
+    ParentClosePolicy parentClosePolicy = ParentClosePolicy.TERMINATE;
+
+    StartChildWorkflowExecutionParameters original =
+        new StartChildWorkflowExecutionParameters.Builder()
+            .setDomain(domain)
+            .setControl(control)
+            .setExecutionStartToCloseTimeoutSeconds(executionTimeout)
+            .setInput(input)
+            .setTaskList(taskList)
+            .setTaskStartToCloseTimeoutSeconds(taskTimeout)
+            .setWorkflowId(workflowId)
+            .setWorkflowType(workflowType)
+            .setWorkflowIdReusePolicy(reusePolicy)
+            .setRetryParameters(retryParameters)
+            .setCronSchedule(cronSchedule)
+            .setCronOverlapPolicy(cronOverlapPolicy)
+            .setMemo(memo)
+            .setSearchAttributes(searchAttributes)
+            .setContext(context)
+            .setParentClosePolicy(parentClosePolicy)
+            .build();
+
+    StartChildWorkflowExecutionParameters copy = original.copy();
+    assertEquals(original.getCronOverlapPolicy(), copy.getCronOverlapPolicy());
+    assertEquals(original, copy);
+  }
+
+  @Test
+  public void testCronOverlapPolicyDefaultValue() {
+    String domain = "testDomain";
+    String control = "testControl";
+    long executionTimeout = 1000L;
+    byte[] input = {1, 2, 3};
+    String taskList = "testTaskList";
+    long taskTimeout = 2000L;
+    String workflowId = "testWorkflowId";
+    WorkflowType workflowType = new WorkflowType().setName("testWorkflowType");
+    WorkflowIdReusePolicy reusePolicy = WorkflowIdReusePolicy.AllowDuplicate;
+    RetryParameters retryParameters = new RetryParameters();
+    String cronSchedule = "* * * * *";
+    CronOverlapPolicy cronOverlapPolicy = CronOverlapPolicy.BUFFERONE;
+    Map<String, Object> memo = new HashMap<>();
+    memo.put("key1", "value1");
+    Map<String, Object> searchAttributes = new HashMap<>();
+    searchAttributes.put("key2", "value2");
+    Map<String, byte[]> context = new HashMap<>();
+    context.put("key3", new byte[] {4, 5, 6});
+    ParentClosePolicy parentClosePolicy = ParentClosePolicy.TERMINATE;
+
+    StartChildWorkflowExecutionParameters parameters =
+        new StartChildWorkflowExecutionParameters.Builder()
+            .setDomain(domain)
+            .setControl(control)
+            .setExecutionStartToCloseTimeoutSeconds(executionTimeout)
+            .setInput(input)
+            .setTaskList(taskList)
+            .setTaskStartToCloseTimeoutSeconds(taskTimeout)
+            .setWorkflowId(workflowId)
+            .setWorkflowType(workflowType)
+            .setWorkflowIdReusePolicy(reusePolicy)
+            .setRetryParameters(retryParameters)
+            .setCronSchedule(cronSchedule)
+            .setMemo(memo)
+            .setSearchAttributes(searchAttributes)
+            .setContext(context)
+            .setParentClosePolicy(parentClosePolicy)
+            .build();
+
+    assertEquals(0, parameters.getCronOverlapPolicy()); // should default to 0
   }
 }
