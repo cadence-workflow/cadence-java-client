@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.common.WorkflowExecutionHistory;
 import com.uber.cadence.context.ContextPropagator;
-import com.uber.cadence.converter.DataConverter;
+import com.uber.cadence.internal.worker.PollerOptions;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.replay.DeciderCache;
@@ -62,7 +62,7 @@ public final class Worker implements Suspendable {
    * @param client client to the Cadence Service endpoint.
    * @param taskList task list name worker uses to poll. It uses this name for both decision and
    *     activity task list polls.
-   * @param options Options (like {@link DataConverter} override) for configuring worker.
+   * @param options Options (like {@link PollerOptions} override) for configuring worker.
    */
   Worker(
       WorkflowClient client,
