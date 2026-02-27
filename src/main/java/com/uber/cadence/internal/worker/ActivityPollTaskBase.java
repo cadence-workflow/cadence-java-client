@@ -19,6 +19,8 @@ package com.uber.cadence.internal.worker;
 
 import com.uber.cadence.CadenceError;
 import com.uber.cadence.PollForActivityTaskResponse;
+import com.uber.cadence.internal.metrics.HistogramBuckets;
+import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.m3.tally.Scope;
@@ -50,11 +52,12 @@ abstract class ActivityPollTaskBase implements Poller.PollTask<PollForActivityTa
                     MetricsTag.WORKFLOW_TYPE,
                     result.getWorkflowType().getName()));
     metricsScope.counter(MetricsType.ACTIVITY_POLL_SUCCEED_COUNTER).inc(1);
-    metricsScope
-        .timer(MetricsType.ACTIVITY_SCHEDULED_TO_START_LATENCY)
-        .record(
-            Duration.ofNanos(
-                result.getStartedTimestamp() - result.getScheduledTimestampOfThisAttempt()));
+    MetricsEmit.emitLatency(
+        metricsScope,
+        MetricsType.ACTIVITY_SCHEDULED_TO_START_LATENCY,
+        Duration.ofNanos(
+            result.getStartedTimestamp() - result.getScheduledTimestampOfThisAttempt()),
+        HistogramBuckets.HIGH_1MS_24H);
     return result;
   }
 
