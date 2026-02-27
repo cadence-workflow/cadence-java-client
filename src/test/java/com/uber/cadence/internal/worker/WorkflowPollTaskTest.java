@@ -25,6 +25,7 @@ import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.m3.tally.Counter;
+import com.uber.m3.tally.Histogram;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.tally.Timer;
@@ -43,17 +44,18 @@ public class WorkflowPollTaskTest {
     mockService = mock(IWorkflowService.class);
     mockMetricScope = mock(Scope.class);
 
-    // Mock the Timer and Stopwatch
+    // Mock the Timer and Histogram for poll latency (dual-emit)
     Timer pollLatencyTimer = mock(Timer.class);
-    Timer scheduledToStartLatencyTimer = mock(Timer.class);
-    Stopwatch sw = mock(Stopwatch.class);
+    Histogram pollLatencyHistogram = mock(Histogram.class);
+    Stopwatch timerSw = mock(Stopwatch.class);
+    Stopwatch histogramSw = mock(Stopwatch.class);
 
     // Ensure timers and stopwatch are not null and return expected values
     when(mockMetricScope.timer(MetricsType.DECISION_POLL_LATENCY)).thenReturn(pollLatencyTimer);
-    when(pollLatencyTimer.start()).thenReturn(sw);
-    when(mockMetricScope.timer(MetricsType.DECISION_SCHEDULED_TO_START_LATENCY))
-        .thenReturn(scheduledToStartLatencyTimer);
-    doNothing().when(scheduledToStartLatencyTimer).record(any(Duration.class));
+    when(pollLatencyTimer.start()).thenReturn(timerSw);
+    when(mockMetricScope.histogram(eq(MetricsType.DECISION_POLL_LATENCY), any()))
+        .thenReturn(pollLatencyHistogram);
+    when(pollLatencyHistogram.start()).thenReturn(histogramSw);
 
     // Mock counters for different metrics
     Counter pollCounter = mock(Counter.class);
@@ -99,22 +101,31 @@ public class WorkflowPollTaskTest {
     when(mockService.PollForDecisionTask(any(PollForDecisionTaskRequest.class)))
         .thenReturn(response);
 
-    // Mock the timer and stopwatch behavior
+    // Mock the timer and histogram behavior (dual-emit)
     Timer pollLatencyTimer = mock(Timer.class);
-    Timer scheduledToStartLatencyTimer = mock(Timer.class);
-    Stopwatch sw = mock(Stopwatch.class);
+    Histogram pollLatencyHistogram = mock(Histogram.class);
+    Stopwatch timerSw = mock(Stopwatch.class);
+    Stopwatch histogramSw = mock(Stopwatch.class);
     when(mockMetricScope.timer(MetricsType.DECISION_POLL_LATENCY)).thenReturn(pollLatencyTimer);
-    when(pollLatencyTimer.start()).thenReturn(sw);
+    when(pollLatencyTimer.start()).thenReturn(timerSw);
+    when(mockMetricScope.histogram(eq(MetricsType.DECISION_POLL_LATENCY), any()))
+        .thenReturn(pollLatencyHistogram);
+    when(pollLatencyHistogram.start()).thenReturn(histogramSw);
 
     // Mock the tagged scope for workflow type
     Scope taggedScope = mock(Scope.class);
     when(mockMetricScope.tagged(ImmutableMap.of(MetricsTag.WORKFLOW_TYPE, "testWorkflowType")))
         .thenReturn(taggedScope);
 
-    // Ensure DECISION_SCHEDULED_TO_START_LATENCY timer in taggedScope is not null
+    // Mock scheduled-to-start latency timer and histogram (dual-emit)
+    Timer scheduledToStartLatencyTimer = mock(Timer.class);
+    Histogram scheduledToStartLatencyHistogram = mock(Histogram.class);
     when(taggedScope.timer(MetricsType.DECISION_SCHEDULED_TO_START_LATENCY))
         .thenReturn(scheduledToStartLatencyTimer);
+    when(taggedScope.histogram(eq(MetricsType.DECISION_SCHEDULED_TO_START_LATENCY), any()))
+        .thenReturn(scheduledToStartLatencyHistogram);
     doNothing().when(scheduledToStartLatencyTimer).record(any(Duration.class));
+    doNothing().when(scheduledToStartLatencyHistogram).recordDuration(any(Duration.class));
 
     // Mock counters for DECISION_POLL_COUNTER and DECISION_POLL_SUCCEED_COUNTER
     Counter pollCounter = mock(Counter.class);
@@ -128,16 +139,19 @@ public class WorkflowPollTaskTest {
     assertNotNull(result);
     assertArrayEquals("testToken".getBytes(), result.getTaskToken());
 
-    // Verify counter and timer behavior
+    // Verify counter and timer/histogram behavior (dual-emit)
     verify(pollCounter, times(1)).inc(1);
     verify(succeedCounter, times(1)).inc(1);
     verify(pollLatencyTimer, times(1)).start();
-    verify(sw, times(1)).stop();
+    verify(pollLatencyHistogram, times(1)).start();
+    verify(timerSw, times(1)).stop();
+    verify(histogramSw, times(1)).stop();
 
-    // Verify that record() on scheduledToStartLatencyTimer was called with correct duration
+    // Verify that record() on scheduledToStartLatency metrics was called with correct duration
     Duration expectedDuration =
-        Duration.ofNanos(result.getStartedTimestamp() - result.getScheduledTimestamp());
+        Duration.ofNanos(response.getStartedTimestamp() - response.getScheduledTimestamp());
     verify(scheduledToStartLatencyTimer, times(1)).record(eq(expectedDuration));
+    verify(scheduledToStartLatencyHistogram, times(1)).recordDuration(eq(expectedDuration));
   }
 
   @Test(expected = InternalServiceError.class)
