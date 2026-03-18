@@ -1145,6 +1145,34 @@ public final class Workflow {
   }
 
   /**
+   * Get Version is used to safely perform backwards incompatible changes to workflow definitions.
+   * This overload accepts options to control version selection behavior.
+   *
+   * @param options controls which version is recorded when no cached version exists
+   */
+  public static int getVersion(
+      String changeID, int minSupported, int maxSupported, GetVersionOptions options) {
+    return WorkflowInternal.getVersion(changeID, minSupported, maxSupported, options);
+  }
+
+  /**
+   * Convenience method that forces first-write execution with a specific version.
+   *
+   * @param customVersion the version to use; must be within [minSupported, maxSupported]
+   */
+  public static int getVersionWithCustomVersion(
+      String changeID, int minSupported, int maxSupported, int customVersion) {
+    return WorkflowInternal.getVersion(
+        changeID, minSupported, maxSupported, GetVersionOptions.executeWithVersion(customVersion));
+  }
+
+  /** Convenience method that forces first-write execution with minSupported version. */
+  public static int getVersionWithMinVersion(String changeID, int minSupported, int maxSupported) {
+    return WorkflowInternal.getVersion(
+        changeID, minSupported, maxSupported, GetVersionOptions.executeWithMinVersion());
+  }
+
+  /**
    * Get scope for reporting business metrics in workflow logic. This should be used instead of
    * creating new metrics scopes as it is able to dedup metrics during replay.
    *

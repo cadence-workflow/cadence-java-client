@@ -36,6 +36,7 @@ import com.uber.cadence.workflow.ContinueAsNewOptions;
 import com.uber.cadence.workflow.ExternalWorkflowStub;
 import com.uber.cadence.workflow.Functions;
 import com.uber.cadence.workflow.Functions.Func;
+import com.uber.cadence.workflow.GetVersionOptions;
 import com.uber.cadence.workflow.Promise;
 import com.uber.cadence.workflow.QueryMethod;
 import com.uber.cadence.workflow.Workflow;
@@ -250,7 +251,12 @@ public final class WorkflowInternal {
   }
 
   public static int getVersion(String changeID, int minSupported, int maxSupported) {
-    return getWorkflowInterceptor().getVersion(changeID, minSupported, maxSupported);
+    return getVersion(changeID, minSupported, maxSupported, null);
+  }
+
+  public static int getVersion(
+      String changeID, int minSupported, int maxSupported, GetVersionOptions options) {
+    return getWorkflowInterceptor().getVersion(changeID, minSupported, maxSupported, options);
   }
 
   public static <U> Promise<List<U>> promiseAllOf(Collection<Promise<U>> promises) {

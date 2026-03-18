@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Add GetVersionOptions to Workflow.getVersion() for controlled version selection (executeWithVersion, executeWithMinVersion)
+
 ## 3.12.7
 - Release use versions from git tags instead of static value (#1002)
 - support for testrunner for java in vscode (#1001)

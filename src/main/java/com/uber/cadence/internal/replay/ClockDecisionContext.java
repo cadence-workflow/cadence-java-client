@@ -33,6 +33,7 @@ import com.uber.cadence.internal.worker.LocalActivityWorker;
 import com.uber.cadence.workflow.ActivityFailureException;
 import com.uber.cadence.workflow.Functions.Func;
 import com.uber.cadence.workflow.Functions.Func1;
+import com.uber.cadence.workflow.GetVersionOptions;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -320,6 +321,16 @@ public final class ClockDecisionContext {
 
   GetVersionResult getVersion(
       String changeId, DataConverter converter, int minSupported, int maxSupported) {
+    return getVersion(changeId, converter, minSupported, maxSupported, null);
+  }
+
+  GetVersionResult getVersion(
+      String changeId,
+      DataConverter converter,
+      int minSupported,
+      int maxSupported,
+      GetVersionOptions options) {
+
     Predicate<MarkerRecordedEventAttributes> changeIdEquals =
         (attributes) -> {
           MarkerHandler.MarkerInterface markerData =
@@ -336,14 +347,36 @@ public final class ClockDecisionContext {
               if (stored.isPresent()) {
                 return Optional.empty();
               }
-              return Optional.of(converter.toData(maxSupported));
+              // Select version based on options priority
+              int versionToRecord;
+              if (options != null && options.getCustomVersion() != null) {
+                int cv = options.getCustomVersion();
+                if (cv < minSupported || cv > maxSupported) {
+                  throw new IllegalArgumentException(
+                      "customVersion "
+                          + cv
+                          + " is not within ["
+                          + minSupported
+                          + ", "
+                          + maxSupported
+                          + "]");
+                }
+                versionToRecord = cv; // priority #2
+              } else if (options != null && options.isUseMinVersion()) {
+                versionToRecord = minSupported; // priority #3
+              } else {
+                versionToRecord = maxSupported; // priority #4 (default)
+              }
+              return Optional.of(converter.toData(versionToRecord));
             });
 
     final boolean isNewlyAdded = result.isNewlyStored();
     Map<String, Object> searchAttributesForChangeVersion = null;
     if (isNewlyAdded) {
+      Integer recordedVersion =
+          converter.fromData(result.getStoredData().get(), Integer.class, Integer.class);
       searchAttributesForChangeVersion =
-          createSearchAttributesForChangeVersion(changeId, maxSupported, versionMap);
+          createSearchAttributesForChangeVersion(changeId, recordedVersion, versionMap);
     }
 
     Integer version = versionMap.get(changeId);

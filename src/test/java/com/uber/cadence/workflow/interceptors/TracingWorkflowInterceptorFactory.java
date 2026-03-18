@@ -23,6 +23,7 @@ import com.uber.cadence.activity.LocalActivityOptions;
 import com.uber.cadence.internal.sync.SyncWorkflowDefinition;
 import com.uber.cadence.internal.worker.WorkflowExecutionException;
 import com.uber.cadence.workflow.*;
+import com.uber.cadence.workflow.GetVersionOptions;
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.*;
@@ -205,6 +206,13 @@ public class TracingWorkflowInterceptorFactory
     public int getVersion(String changeID, int minSupported, int maxSupported) {
       trace.add("getVersion");
       return next.getVersion(changeID, minSupported, maxSupported);
+    }
+
+    @Override
+    public int getVersion(
+        String changeID, int minSupported, int maxSupported, GetVersionOptions options) {
+      trace.add("getVersion");
+      return next.getVersion(changeID, minSupported, maxSupported, options);
     }
 
     @Override

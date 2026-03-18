@@ -127,6 +127,16 @@ public interface WorkflowInterceptor {
 
   int getVersion(String changeID, int minSupported, int maxSupported);
 
+  /**
+   * @implNote Custom implementations should override this method to pass {@code options} through
+   *     the interceptor chain. The default delegates to the 3-arg overload, silently dropping
+   *     options.
+   */
+  default int getVersion(
+      String changeID, int minSupported, int maxSupported, GetVersionOptions options) {
+    return getVersion(changeID, minSupported, maxSupported);
+  }
+
   void continueAsNew(
       Optional<String> workflowType, Optional<ContinueAsNewOptions> options, Object[] args);
 

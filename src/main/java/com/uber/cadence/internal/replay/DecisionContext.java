@@ -25,6 +25,7 @@ import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.workflow.Functions.Func;
 import com.uber.cadence.workflow.Functions.Func1;
+import com.uber.cadence.workflow.GetVersionOptions;
 import com.uber.cadence.workflow.Promise;
 import com.uber.m3.tally.Scope;
 import java.time.Duration;
@@ -193,6 +194,19 @@ public interface DecisionContext extends ReplayAware {
    * @return version
    */
   int getVersion(String changeID, DataConverter dataConverter, int minSupported, int maxSupported);
+
+  /**
+   * @implNote Custom implementations should override this method to pass {@code options} through.
+   *     The default delegates to the 4-arg overload, silently dropping options.
+   */
+  default int getVersion(
+      String changeID,
+      DataConverter dataConverter,
+      int minSupported,
+      int maxSupported,
+      GetVersionOptions options) {
+    return getVersion(changeID, dataConverter, minSupported, maxSupported);
+  }
 
   Random newRandom();
 
