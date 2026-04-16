@@ -53,7 +53,8 @@ public class ActivityPollTaskTest {
     // Mock the Histogram and its Stopwatch (for dual-emit)
     Histogram histogram = mock(Histogram.class);
     Stopwatch histogramStopwatch = mock(Stopwatch.class);
-    when(metricsScope.histogram(eq(MetricsType.ACTIVITY_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
+    when(metricsScope.histogram(
+            eq(MetricsType.ACTIVITY_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
         .thenReturn(histogram);
     when(histogram.start()).thenReturn(histogramStopwatch);
 
@@ -91,7 +92,8 @@ public class ActivityPollTaskTest {
     Timer timer = mock(Timer.class);
     Histogram histogram = mock(Histogram.class);
     when(metricsScope.timer(MetricsType.ACTIVITY_POLL_LATENCY)).thenReturn(timer);
-    when(metricsScope.histogram(eq(MetricsType.ACTIVITY_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
+    when(metricsScope.histogram(
+            eq(MetricsType.ACTIVITY_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
         .thenReturn(histogram);
     Stopwatch timerSw = mock(Stopwatch.class);
     Stopwatch histogramSw = mock(Stopwatch.class);

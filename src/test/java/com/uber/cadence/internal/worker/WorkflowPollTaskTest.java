@@ -54,7 +54,8 @@ public class WorkflowPollTaskTest {
     // Ensure timers and stopwatch are not null and return expected values
     when(mockMetricScope.timer(MetricsType.DECISION_POLL_LATENCY)).thenReturn(pollLatencyTimer);
     when(pollLatencyTimer.start()).thenReturn(timerSw);
-    when(mockMetricScope.histogram(eq(MetricsType.DECISION_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
+    when(mockMetricScope.histogram(
+            eq(MetricsType.DECISION_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
         .thenReturn(pollLatencyHistogram);
     when(pollLatencyHistogram.start()).thenReturn(histogramSw);
 
@@ -109,7 +110,8 @@ public class WorkflowPollTaskTest {
     Stopwatch histogramSw = mock(Stopwatch.class);
     when(mockMetricScope.timer(MetricsType.DECISION_POLL_LATENCY)).thenReturn(pollLatencyTimer);
     when(pollLatencyTimer.start()).thenReturn(timerSw);
-    when(mockMetricScope.histogram(eq(MetricsType.DECISION_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
+    when(mockMetricScope.histogram(
+            eq(MetricsType.DECISION_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
         .thenReturn(pollLatencyHistogram);
     when(pollLatencyHistogram.start()).thenReturn(histogramSw);
 
@@ -123,7 +125,9 @@ public class WorkflowPollTaskTest {
     Histogram scheduledToStartLatencyHistogram = mock(Histogram.class);
     when(taggedScope.timer(MetricsType.DECISION_SCHEDULED_TO_START_LATENCY))
         .thenReturn(scheduledToStartLatencyTimer);
-    when(taggedScope.histogram(eq(MetricsType.DECISION_SCHEDULED_TO_START_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
+    when(taggedScope.histogram(
+            eq(MetricsType.DECISION_SCHEDULED_TO_START_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX),
+            any()))
         .thenReturn(scheduledToStartLatencyHistogram);
     doNothing().when(scheduledToStartLatencyTimer).record(any(Duration.class));
     doNothing().when(scheduledToStartLatencyHistogram).recordDuration(any(Duration.class));
