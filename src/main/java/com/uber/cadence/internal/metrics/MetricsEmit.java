@@ -35,6 +35,10 @@ import com.uber.m3.util.Duration;
  *
  * <p>Example usage:
  *
+ * <p>In EMIT_BOTH mode, the timer uses the original metric name and the histogram uses the same
+ * name with a {@code _ns} suffix (e.g. {@code cadence-decision-poll-latency} for the timer and
+ * {@code cadence-decision-poll-latency_ns} for the histogram), consistent with the Go client.
+ *
  * <pre>{@code
  * // Direct latency recording
  * Duration latency = Duration.ofMillis(150);
@@ -102,19 +106,26 @@ public final class MetricsEmit {
   }
 
   /**
+   * Suffix appended to the timer metric name to form the histogram metric name when dual-emitting.
+   * Consistent with the Go client naming convention.
+   */
+  static final String HISTOGRAM_SUFFIX = "_ns";
+
+  /**
    * Records latency based on the current emit mode setting.
    *
    * <p>This helper function supports flexible metric emission during timer→histogram migration. The
    * behavior depends on the current emit mode:
    *
    * <ul>
-   *   <li>EMIT_TIMERS_ONLY: Only timer metrics are emitted
-   *   <li>EMIT_BOTH: Both timer and histogram metrics are emitted (default)
-   *   <li>EMIT_HISTOGRAMS_ONLY: Only histogram metrics are emitted
+   *   <li>EMIT_TIMERS_ONLY: Only timer metrics are emitted (using {@code name})
+   *   <li>EMIT_BOTH: Both timer and histogram metrics are emitted (timer uses {@code name},
+   *       histogram uses {@code name + "_ns"})
+   *   <li>EMIT_HISTOGRAMS_ONLY: Only histogram metrics are emitted (using {@code name + "_ns"})
    * </ul>
    *
    * @param scope The tally scope to emit metrics to
-   * @param name The metric name (without suffix)
+   * @param name The timer metric name; histogram name is derived by appending {@code _ns}
    * @param latency The duration to record
    * @param buckets The histogram bucket configuration to use
    */
@@ -126,10 +137,10 @@ public final class MetricsEmit {
         break;
       case EMIT_BOTH:
         scope.timer(name).record(latency);
-        scope.histogram(name, buckets).recordDuration(latency);
+        scope.histogram(name + HISTOGRAM_SUFFIX, buckets).recordDuration(latency);
         break;
       case EMIT_HISTOGRAMS_ONLY:
-        scope.histogram(name, buckets).recordDuration(latency);
+        scope.histogram(name + HISTOGRAM_SUFFIX, buckets).recordDuration(latency);
         break;
     }
   }
@@ -138,10 +149,10 @@ public final class MetricsEmit {
    * Creates a stopwatch that emits based on current emit mode setting.
    *
    * <p>Call .stop() on the returned stopwatch to record the duration. The behavior depends on the
-   * current emit mode.
+   * current emit mode. The timer uses {@code name} and the histogram uses {@code name + "_ns"}.
    *
    * @param scope The tally scope to emit metrics to
-   * @param name The metric name (without suffix)
+   * @param name The timer metric name; histogram name is derived by appending {@code _ns}
    * @param buckets The histogram bucket configuration to use
    * @return A dual stopwatch that records based on emit mode
    */
@@ -156,10 +167,10 @@ public final class MetricsEmit {
         break;
       case EMIT_BOTH:
         timerSW = scope.timer(name).start();
-        histogramSW = scope.histogram(name, buckets).start();
+        histogramSW = scope.histogram(name + HISTOGRAM_SUFFIX, buckets).start();
         break;
       case EMIT_HISTOGRAMS_ONLY:
-        histogramSW = scope.histogram(name, buckets).start();
+        histogramSW = scope.histogram(name + HISTOGRAM_SUFFIX, buckets).start();
         break;
     }
 

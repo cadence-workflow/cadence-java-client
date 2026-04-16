@@ -58,7 +58,7 @@ public class MetricsEmitTest {
   @Test
   public void testEmitLatency_DualEmit() {
     when(mockScope.timer("test-metric")).thenReturn(mockTimer);
-    when(mockScope.histogram(eq("test-metric"), any())).thenReturn(mockHistogram);
+    when(mockScope.histogram(eq("test-metric_ns"), any())).thenReturn(mockHistogram);
 
     Duration latency = Duration.ofNanos(TimeUnit.MILLISECONDS.toNanos(150));
     MetricsEmit.emitLatency(mockScope, "test-metric", latency, HistogramBuckets.DEFAULT_1MS_100S);
@@ -75,7 +75,7 @@ public class MetricsEmitTest {
 
     when(mockScope.timer("test-metric")).thenReturn(mockTimer);
     when(mockTimer.start()).thenReturn(mockTimerSW);
-    when(mockScope.histogram(eq("test-metric"), any())).thenReturn(mockHistogram);
+    when(mockScope.histogram(eq("test-metric_ns"), any())).thenReturn(mockHistogram);
     when(mockHistogram.start()).thenReturn(mockHistogramSW);
 
     MetricsEmit.DualStopwatch sw =
@@ -96,7 +96,7 @@ public class MetricsEmitTest {
 
     when(mockScope.timer("test-metric")).thenReturn(mockTimer);
     when(mockTimer.start()).thenReturn(mockTimerSW);
-    when(mockScope.histogram(eq("test-metric"), any())).thenReturn(mockHistogram);
+    when(mockScope.histogram(eq("test-metric_ns"), any())).thenReturn(mockHistogram);
     when(mockHistogram.start()).thenReturn(mockHistogramSW);
 
     MetricsEmit.DualStopwatch sw =
@@ -174,7 +174,7 @@ public class MetricsEmitTest {
   public void testEmitLatency_HistogramsOnly() {
     MetricsEmit.setEmitMode(MetricEmitMode.EMIT_HISTOGRAMS_ONLY);
 
-    when(mockScope.histogram(eq("test-metric"), any())).thenReturn(mockHistogram);
+    when(mockScope.histogram(eq("test-metric_ns"), any())).thenReturn(mockHistogram);
 
     Duration latency = Duration.ofNanos(TimeUnit.MILLISECONDS.toNanos(150));
     MetricsEmit.emitLatency(mockScope, "test-metric", latency, HistogramBuckets.DEFAULT_1MS_100S);
@@ -209,7 +209,7 @@ public class MetricsEmitTest {
 
     Stopwatch mockHistogramSW = mock(Stopwatch.class);
 
-    when(mockScope.histogram(eq("test-metric"), any())).thenReturn(mockHistogram);
+    when(mockScope.histogram(eq("test-metric_ns"), any())).thenReturn(mockHistogram);
     when(mockHistogram.start()).thenReturn(mockHistogramSW);
 
     MetricsEmit.DualStopwatch sw =
