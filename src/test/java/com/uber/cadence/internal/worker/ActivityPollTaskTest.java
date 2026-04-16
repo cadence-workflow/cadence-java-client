@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.uber.cadence.*;
+import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.serviceclient.IWorkflowService;
@@ -52,7 +53,7 @@ public class ActivityPollTaskTest {
     // Mock the Histogram and its Stopwatch (for dual-emit)
     Histogram histogram = mock(Histogram.class);
     Stopwatch histogramStopwatch = mock(Stopwatch.class);
-    when(metricsScope.histogram(eq(MetricsType.ACTIVITY_POLL_LATENCY), any()))
+    when(metricsScope.histogram(eq(MetricsType.ACTIVITY_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
         .thenReturn(histogram);
     when(histogram.start()).thenReturn(histogramStopwatch);
 
@@ -90,7 +91,7 @@ public class ActivityPollTaskTest {
     Timer timer = mock(Timer.class);
     Histogram histogram = mock(Histogram.class);
     when(metricsScope.timer(MetricsType.ACTIVITY_POLL_LATENCY)).thenReturn(timer);
-    when(metricsScope.histogram(eq(MetricsType.ACTIVITY_POLL_LATENCY), any()))
+    when(metricsScope.histogram(eq(MetricsType.ACTIVITY_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
         .thenReturn(histogram);
     Stopwatch timerSw = mock(Stopwatch.class);
     Stopwatch histogramSw = mock(Stopwatch.class);
