@@ -109,7 +109,7 @@ public final class MetricsEmit {
    * Suffix appended to the timer metric name to form the histogram metric name when dual-emitting.
    * Consistent with the Go client naming convention.
    */
-  static final String HISTOGRAM_SUFFIX = "_ns";
+  public static final String HISTOGRAM_SUFFIX = "_ns";
 
   /**
    * Records latency based on the current emit mode setting.
