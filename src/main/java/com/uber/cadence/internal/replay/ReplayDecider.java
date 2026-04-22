@@ -24,6 +24,8 @@ import com.uber.cadence.*;
 import com.uber.cadence.common.RetryOptions;
 import com.uber.cadence.internal.common.OptionsUtils;
 import com.uber.cadence.internal.common.RpcRetryer;
+import com.uber.cadence.internal.metrics.HistogramBuckets;
+import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.replay.HistoryHelper.DecisionEvents;
@@ -35,7 +37,6 @@ import com.uber.cadence.internal.worker.WorkflowExecutionException;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.workflow.Functions;
 import com.uber.m3.tally.Scope;
-import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.util.ImmutableMap;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -299,7 +300,8 @@ class ReplayDecider implements Decider {
 
     long nanoTime = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
     com.uber.m3.util.Duration d = com.uber.m3.util.Duration.ofNanos(nanoTime - wfStartTimeNanos);
-    metricsScope.timer(MetricsType.WORKFLOW_E2E_LATENCY).record(d);
+    MetricsEmit.emitLatency(
+        metricsScope, MetricsType.WORKFLOW_E2E_LATENCY, d, HistogramBuckets.HIGH_1MS_24H);
   }
 
   private void updateTimers() {
@@ -667,7 +669,11 @@ class ReplayDecider implements Decider {
           }
 
           metricsScope.counter(MetricsType.WORKFLOW_GET_HISTORY_COUNTER).inc(1);
-          Stopwatch sw = metricsScope.timer(MetricsType.WORKFLOW_GET_HISTORY_LATENCY).start();
+          MetricsEmit.DualStopwatch sw =
+              MetricsEmit.startLatency(
+                  metricsScope,
+                  MetricsType.WORKFLOW_GET_HISTORY_LATENCY,
+                  HistogramBuckets.DEFAULT_1MS_100S);
           RetryOptions retryOptions =
               new RetryOptions.Builder()
                   .setExpiration(decisionTaskRemainingTime)

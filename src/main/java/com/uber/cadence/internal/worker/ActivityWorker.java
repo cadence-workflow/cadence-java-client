@@ -21,6 +21,8 @@ import com.uber.cadence.*;
 import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.internal.common.RpcRetryer;
 import com.uber.cadence.internal.logging.LoggerTag;
+import com.uber.cadence.internal.metrics.HistogramBuckets;
+import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.tracing.TracingPropagator;
@@ -28,7 +30,6 @@ import com.uber.cadence.internal.worker.ActivityTaskHandler.Result;
 import com.uber.cadence.internal.worker.Poller.PollTask;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.m3.tally.Scope;
-import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.util.Duration;
 import com.uber.m3.util.ImmutableMap;
 import io.opentracing.Span;
@@ -127,11 +128,11 @@ public class ActivityWorker extends SuspendableWorkerBase {
                       MetricsTag.WORKFLOW_TYPE,
                       task.getWorkflowType().getName()));
 
-      metricsScope
-          .timer(MetricsType.ACTIVITY_SCHEDULED_TO_START_LATENCY)
-          .record(
-              Duration.ofNanos(
-                  task.getStartedTimestamp() - task.getScheduledTimestampOfThisAttempt()));
+      MetricsEmit.emitLatency(
+          metricsScope,
+          MetricsType.ACTIVITY_SCHEDULED_TO_START_LATENCY,
+          Duration.ofNanos(task.getStartedTimestamp() - task.getScheduledTimestampOfThisAttempt()),
+          HistogramBuckets.HIGH_1MS_24H);
 
       // The following tags are for logging.
       MDC.put(LoggerTag.ACTIVITY_ID, task.getActivityId());
@@ -143,25 +144,35 @@ public class ActivityWorker extends SuspendableWorkerBase {
       propagateContext(task);
       Span span = spanFactory.spanForExecuteActivity(task);
       try (io.opentracing.Scope scope = tracer.activateSpan(span)) {
-        Stopwatch sw = metricsScope.timer(MetricsType.ACTIVITY_EXEC_LATENCY).start();
+        MetricsEmit.DualStopwatch sw =
+            MetricsEmit.startLatency(
+                metricsScope, MetricsType.ACTIVITY_EXEC_LATENCY, HistogramBuckets.HIGH_1MS_24H);
         ActivityTaskHandler.Result response = handler.handle(task, metricsScope, false);
         sw.stop();
 
-        sw = metricsScope.timer(MetricsType.ACTIVITY_RESP_LATENCY).start();
+        sw =
+            MetricsEmit.startLatency(
+                metricsScope, MetricsType.ACTIVITY_RESP_LATENCY, HistogramBuckets.DEFAULT_1MS_100S);
         sendReply(task, response, metricsScope);
         sw.stop();
 
         long nanoTime =
             TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
         Duration duration = Duration.ofNanos(nanoTime - task.getScheduledTimestampOfThisAttempt());
-        metricsScope.timer(MetricsType.ACTIVITY_E2E_LATENCY).record(duration);
+        MetricsEmit.emitLatency(
+            metricsScope,
+            MetricsType.ACTIVITY_E2E_LATENCY,
+            duration,
+            HistogramBuckets.HIGH_1MS_24H);
 
       } catch (CancellationException e) {
         RespondActivityTaskCanceledRequest cancelledRequest =
             new RespondActivityTaskCanceledRequest();
         cancelledRequest.setDetails(
             String.valueOf(e.getMessage()).getBytes(StandardCharsets.UTF_8));
-        Stopwatch sw = metricsScope.timer(MetricsType.ACTIVITY_RESP_LATENCY).start();
+        MetricsEmit.DualStopwatch sw =
+            MetricsEmit.startLatency(
+                metricsScope, MetricsType.ACTIVITY_RESP_LATENCY, HistogramBuckets.DEFAULT_1MS_100S);
         sendReply(task, new Result(null, null, cancelledRequest), metricsScope);
         sw.stop();
       } finally {

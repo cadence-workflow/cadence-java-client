@@ -22,11 +22,12 @@ import static com.uber.cadence.internal.metrics.MetricsTagValue.SERVICE_BUSY;
 
 import com.uber.cadence.*;
 import com.uber.cadence.common.BinaryChecksum;
+import com.uber.cadence.internal.metrics.HistogramBuckets;
+import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.m3.tally.Scope;
-import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.util.Duration;
 import com.uber.m3.util.ImmutableMap;
 import java.util.Objects;
@@ -61,7 +62,9 @@ final class WorkflowPollTask implements Poller.PollTask<PollForDecisionTaskRespo
   @Override
   public PollForDecisionTaskResponse poll() throws CadenceError {
     metricScope.counter(MetricsType.DECISION_POLL_COUNTER).inc(1);
-    Stopwatch sw = metricScope.timer(MetricsType.DECISION_POLL_LATENCY).start();
+    MetricsEmit.DualStopwatch sw =
+        MetricsEmit.startLatency(
+            metricScope, MetricsType.DECISION_POLL_LATENCY, HistogramBuckets.DEFAULT_1MS_100S);
 
     PollForDecisionTaskRequest pollRequest = new PollForDecisionTaskRequest();
     pollRequest.setDomain(domain);
@@ -118,9 +121,13 @@ final class WorkflowPollTask implements Poller.PollTask<PollForDecisionTaskRespo
         metricScope.tagged(
             ImmutableMap.of(MetricsTag.WORKFLOW_TYPE, result.getWorkflowType().getName()));
     metricsScope.counter(MetricsType.DECISION_POLL_SUCCEED_COUNTER).inc(1);
-    metricsScope
-        .timer(MetricsType.DECISION_SCHEDULED_TO_START_LATENCY)
-        .record(Duration.ofNanos(result.getStartedTimestamp() - result.getScheduledTimestamp()));
+    Duration scheduledToStartLatency =
+        Duration.ofNanos(result.getStartedTimestamp() - result.getScheduledTimestamp());
+    MetricsEmit.emitLatency(
+        metricsScope,
+        MetricsType.DECISION_SCHEDULED_TO_START_LATENCY,
+        scheduledToStartLatency,
+        HistogramBuckets.DEFAULT_1MS_100S);
     sw.stop();
     return result;
   }

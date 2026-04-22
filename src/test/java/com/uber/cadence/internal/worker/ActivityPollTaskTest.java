@@ -21,10 +21,12 @@ import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.uber.cadence.*;
+import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.m3.tally.Counter;
+import com.uber.m3.tally.Histogram;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.tally.Timer;
@@ -47,6 +49,14 @@ public class ActivityPollTaskTest {
     Stopwatch stopwatch = mock(Stopwatch.class);
     when(metricsScope.timer(MetricsType.ACTIVITY_POLL_LATENCY)).thenReturn(timer);
     when(timer.start()).thenReturn(stopwatch);
+
+    // Mock the Histogram and its Stopwatch (for dual-emit)
+    Histogram histogram = mock(Histogram.class);
+    Stopwatch histogramStopwatch = mock(Stopwatch.class);
+    when(metricsScope.histogram(
+            eq(MetricsType.ACTIVITY_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
+        .thenReturn(histogram);
+    when(histogram.start()).thenReturn(histogramStopwatch);
 
     // Mock the Counter and its inc() method
     Counter counter = mock(Counter.class);
@@ -77,22 +87,30 @@ public class ActivityPollTaskTest {
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
         .thenReturn(response);
 
-    // Mock the timer and stopwatch behavior
+    // Mock the timer and histogram behavior
     Scope metricsScope = options.getMetricsScope();
     Timer timer = mock(Timer.class);
+    Histogram histogram = mock(Histogram.class);
     when(metricsScope.timer(MetricsType.ACTIVITY_POLL_LATENCY)).thenReturn(timer);
-    Stopwatch sw = mock(Stopwatch.class);
-    when(timer.start()).thenReturn(sw);
+    when(metricsScope.histogram(
+            eq(MetricsType.ACTIVITY_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
+        .thenReturn(histogram);
+    Stopwatch timerSw = mock(Stopwatch.class);
+    Stopwatch histogramSw = mock(Stopwatch.class);
+    when(timer.start()).thenReturn(timerSw);
+    when(histogram.start()).thenReturn(histogramSw);
 
     PollForActivityTaskResponse result = pollTask.pollTask();
 
     assertNotNull(result);
     assertArrayEquals("testToken".getBytes(), result.getTaskToken());
 
-    // Verify the counters and the timer behavior
+    // Verify the counters and the timer/histogram behavior (dual-emit)
     verify(metricsScope.counter(MetricsType.ACTIVITY_POLL_COUNTER), times(1)).inc(1);
     verify(timer, times(1)).start();
-    verify(sw, times(1)).stop();
+    verify(histogram, times(1)).start();
+    verify(timerSw, times(1)).stop();
+    verify(histogramSw, times(1)).stop();
   }
 
   @Test(expected = InternalServiceError.class)

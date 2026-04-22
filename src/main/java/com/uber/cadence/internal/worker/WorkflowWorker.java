@@ -24,12 +24,13 @@ import com.uber.cadence.common.WorkflowExecutionHistory;
 import com.uber.cadence.internal.common.RpcRetryer;
 import com.uber.cadence.internal.common.WorkflowExecutionUtils;
 import com.uber.cadence.internal.logging.LoggerTag;
+import com.uber.cadence.internal.metrics.HistogramBuckets;
+import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.worker.LocallyDispatchedActivityWorker.Task;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.m3.tally.Scope;
-import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.util.ImmutableMap;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -201,11 +202,19 @@ public final class WorkflowWorker extends SuspendableWorkerBase
       }
 
       try {
-        Stopwatch sw = metricsScope.timer(MetricsType.DECISION_EXECUTION_LATENCY).start();
+        MetricsEmit.DualStopwatch sw =
+            MetricsEmit.startLatency(
+                metricsScope,
+                MetricsType.DECISION_EXECUTION_LATENCY,
+                HistogramBuckets.DEFAULT_1MS_100S);
         DecisionTaskHandler.Result response = handler.handleDecisionTask(task);
         sw.stop();
 
-        sw = metricsScope.timer(MetricsType.DECISION_RESPONSE_LATENCY).start();
+        sw =
+            MetricsEmit.startLatency(
+                metricsScope,
+                MetricsType.DECISION_RESPONSE_LATENCY,
+                HistogramBuckets.DEFAULT_1MS_100S);
         sendReply(service, task, response);
         sw.stop();
 
