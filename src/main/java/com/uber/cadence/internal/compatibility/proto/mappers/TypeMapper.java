@@ -152,7 +152,11 @@ class TypeMapper {
     if (t == null) {
       return TaskList.newBuilder().build();
     }
-    return TaskList.newBuilder().setName(t.getName()).setKind(taskListKind(t.getKind())).build();
+    return TaskList.newBuilder()
+        .setName(Helpers.nullToEmpty(t.getName()))
+        .setKind(taskListKind(t.getKind()))
+        .setBaseName(Helpers.nullToEmpty(t.getBaseName()))
+        .build();
   }
 
   static TaskListMetadata taskListMetadata(com.uber.cadence.TaskListMetadata t) {
@@ -420,6 +424,7 @@ class TypeMapper {
     com.uber.cadence.TaskList taskList = new com.uber.cadence.TaskList();
     taskList.setName(t.getName());
     taskList.setKind(taskListKind(t.getKind()));
+    taskList.setBaseName(t.getBaseName());
     return taskList;
   }
 
@@ -956,5 +961,131 @@ class TypeMapper {
       v.put(key, activityLocalDispatchInfo(t.get(key)));
     }
     return v;
+  }
+
+  static ActiveClusters activeClusters(com.uber.cadence.ActiveClusters t) {
+    if (t == null) {
+      return ActiveClusters.newBuilder().build();
+    }
+    Map<String, ClusterAttributeScope> clusterAttributeScopes = new HashMap<>();
+    if (t.getActiveClustersByClusterAttribute() != null) {
+      for (Map.Entry<String, com.uber.cadence.ClusterAttributeScope> entry :
+          t.getActiveClustersByClusterAttribute().entrySet()) {
+        clusterAttributeScopes.put(entry.getKey(), clusterAttributeScope(entry.getValue()));
+      }
+    }
+    return ActiveClusters.newBuilder()
+        .putAllActiveClustersByClusterAttribute(clusterAttributeScopes)
+        .build();
+  }
+
+  static com.uber.cadence.ActiveClusters activeClusters(ActiveClusters t) {
+    if (t == null || t == ActiveClusters.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.ActiveClusters activeClusters = new com.uber.cadence.ActiveClusters();
+    Map<String, com.uber.cadence.ClusterAttributeScope> clusterAttributeScopes = new HashMap<>();
+    if (t.getActiveClustersByClusterAttributeMap() != null) {
+      for (Map.Entry<String, ClusterAttributeScope> entry :
+          t.getActiveClustersByClusterAttributeMap().entrySet()) {
+        clusterAttributeScopes.put(entry.getKey(), clusterAttributeScope(entry.getValue()));
+      }
+    }
+    activeClusters.setActiveClustersByClusterAttribute(clusterAttributeScopes);
+    return activeClusters;
+  }
+
+  static ClusterAttributeScope clusterAttributeScope(com.uber.cadence.ClusterAttributeScope t) {
+    if (t == null) {
+      return ClusterAttributeScope.newBuilder().build();
+    }
+    Map<String, ActiveClusterInfo> clusterAttributes = new HashMap<>();
+    if (t.getClusterAttributes() != null) {
+      for (Map.Entry<String, com.uber.cadence.ActiveClusterInfo> entry :
+          t.getClusterAttributes().entrySet()) {
+        clusterAttributes.put(entry.getKey(), activeClusterInfo(entry.getValue()));
+      }
+    }
+    return ClusterAttributeScope.newBuilder().putAllClusterAttributes(clusterAttributes).build();
+  }
+
+  static com.uber.cadence.ClusterAttributeScope clusterAttributeScope(ClusterAttributeScope t) {
+    if (t == null || t == ClusterAttributeScope.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.ClusterAttributeScope scope = new com.uber.cadence.ClusterAttributeScope();
+    Map<String, com.uber.cadence.ActiveClusterInfo> clusterAttributes = new HashMap<>();
+    if (t.getClusterAttributesMap() != null) {
+      for (Map.Entry<String, ActiveClusterInfo> entry : t.getClusterAttributesMap().entrySet()) {
+        clusterAttributes.put(entry.getKey(), activeClusterInfo(entry.getValue()));
+      }
+    }
+    scope.setClusterAttributes(clusterAttributes);
+    return scope;
+  }
+
+  static ActiveClusterInfo activeClusterInfo(com.uber.cadence.ActiveClusterInfo t) {
+    if (t == null) {
+      return ActiveClusterInfo.newBuilder().build();
+    }
+    return ActiveClusterInfo.newBuilder()
+        .setActiveClusterName(Helpers.nullToEmpty(t.getActiveClusterName()))
+        .setFailoverVersion(t.getFailoverVersion())
+        .build();
+  }
+
+  static com.uber.cadence.ActiveClusterInfo activeClusterInfo(ActiveClusterInfo t) {
+    if (t == null || t == ActiveClusterInfo.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.ActiveClusterInfo info = new com.uber.cadence.ActiveClusterInfo();
+    info.setActiveClusterName(t.getActiveClusterName());
+    info.setFailoverVersion(t.getFailoverVersion());
+    return info;
+  }
+
+  static ActiveClusterSelectionPolicy activeClusterSelectionPolicy(
+      com.uber.cadence.ActiveClusterSelectionPolicy t) {
+    if (t == null) {
+      return ActiveClusterSelectionPolicy.newBuilder().build();
+    }
+    ActiveClusterSelectionPolicy.Builder builder = ActiveClusterSelectionPolicy.newBuilder();
+    if (t.getClusterAttribute() != null) {
+      builder.setClusterAttribute(clusterAttribute(t.getClusterAttribute()));
+    }
+    return builder.build();
+  }
+
+  static com.uber.cadence.ActiveClusterSelectionPolicy activeClusterSelectionPolicy(
+      ActiveClusterSelectionPolicy t) {
+    if (t == null || t == ActiveClusterSelectionPolicy.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.ActiveClusterSelectionPolicy policy =
+        new com.uber.cadence.ActiveClusterSelectionPolicy();
+    if (t.hasClusterAttribute()) {
+      policy.setClusterAttribute(clusterAttribute(t.getClusterAttribute()));
+    }
+    return policy;
+  }
+
+  static ClusterAttribute clusterAttribute(com.uber.cadence.ClusterAttribute t) {
+    if (t == null) {
+      return ClusterAttribute.newBuilder().build();
+    }
+    return ClusterAttribute.newBuilder()
+        .setScope(Helpers.nullToEmpty(t.getScope()))
+        .setName(Helpers.nullToEmpty(t.getName()))
+        .build();
+  }
+
+  static com.uber.cadence.ClusterAttribute clusterAttribute(ClusterAttribute t) {
+    if (t == null || t == ClusterAttribute.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.ClusterAttribute attr = new com.uber.cadence.ClusterAttribute();
+    attr.setScope(t.getScope());
+    attr.setName(t.getName());
+    return attr;
   }
 }

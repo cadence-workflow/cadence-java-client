@@ -35,4 +35,6 @@ public class WorkflowExecutionStartedEventAttributes {
   private Header header;
   private Map<String, String> partitionConfig = new HashMap<>();;
   private String requestId;
+  private CronOverlapPolicy cronOverlapPolicy;
+  private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
 }

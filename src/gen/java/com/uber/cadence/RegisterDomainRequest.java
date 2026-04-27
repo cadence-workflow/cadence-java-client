@@ -14,6 +14,8 @@ public class RegisterDomainRequest {
   private boolean emitMetric;
   private List<ClusterReplicationConfiguration> clusters = new ArrayList<>();;
   private String activeClusterName;
+  private Map<String, String> activeClustersByRegion = new HashMap<>();;
+  private ActiveClusters activeClusters;
   private Map<String, String> data = new HashMap<>();;
   private String securityToken;
   private boolean isGlobalDomain;

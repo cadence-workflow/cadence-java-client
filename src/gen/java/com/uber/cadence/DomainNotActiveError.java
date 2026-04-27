@@ -12,6 +12,7 @@ public class DomainNotActiveError extends CadenceError {
   private String domainName;
   private String currentCluster;
   private String activeCluster;
+  private List<String> activeClusters;
 
   public DomainNotActiveError() {
     super();

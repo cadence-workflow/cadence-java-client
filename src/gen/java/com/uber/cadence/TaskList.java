@@ -9,4 +9,5 @@ import lombok.experimental.Accessors;
 public class TaskList {
   private String name;
   private TaskListKind kind;
+  private String baseName;
 }

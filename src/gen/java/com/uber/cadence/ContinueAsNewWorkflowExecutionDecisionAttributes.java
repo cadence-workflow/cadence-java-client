@@ -23,4 +23,6 @@ public class ContinueAsNewWorkflowExecutionDecisionAttributes {
   private Memo memo;
   private SearchAttributes searchAttributes;
   private int jitterStartSeconds;
+  private CronOverlapPolicy cronOverlapPolicy;
+  private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
 }

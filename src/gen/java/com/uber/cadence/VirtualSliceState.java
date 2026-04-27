@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class FeatureFlags {
-  private boolean WorkflowExecutionAlreadyCompletedErrorEnabled;
-  private boolean AutoForwardingEnabled;
+public class VirtualSliceState {
+  private TaskRange taskRange;
+  private Predicate predicate;
 }

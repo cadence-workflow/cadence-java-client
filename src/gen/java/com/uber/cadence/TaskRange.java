@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class FeatureFlags {
-  private boolean WorkflowExecutionAlreadyCompletedErrorEnabled;
-  private boolean AutoForwardingEnabled;
+public class TaskRange {
+  private TaskKey inclusiveMin;
+  private TaskKey exclusiveMax;
 }

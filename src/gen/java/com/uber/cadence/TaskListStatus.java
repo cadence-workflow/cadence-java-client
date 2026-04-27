@@ -14,4 +14,5 @@ public class TaskListStatus {
   private TaskIDBlock taskIDBlock;
   private Map<String, IsolationGroupMetrics> isolationGroupMetrics = new HashMap<>();;
   private double newTasksPerSecond;
+  private boolean empty;
 }

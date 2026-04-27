@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 public class EntityNotExistsError extends CadenceError {
   private String currentCluster;
   private String activeCluster;
+  private List<String> activeClusters;
 
   public EntityNotExistsError() {
     super();

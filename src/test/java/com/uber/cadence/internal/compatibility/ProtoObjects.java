@@ -31,7 +31,11 @@ public final class ProtoObjects {
   public static final ActivityType ACTIVITY_TYPE =
       ActivityType.newBuilder().setName("activityName").build();
   public static final TaskList TASK_LIST =
-      TaskList.newBuilder().setName("taskList").setKind(TaskListKind.TASK_LIST_KIND_NORMAL).build();
+      TaskList.newBuilder()
+          .setName("taskList")
+          .setKind(TaskListKind.TASK_LIST_KIND_NORMAL)
+          .setBaseName("baseName")
+          .build();
   public static final TaskListMetadata TASK_LIST_METADATA =
       TaskListMetadata.newBuilder()
           .setMaxTasksPerSecond(DoubleValue.newBuilder().setValue(10.0).build())
@@ -98,6 +102,25 @@ public final class ProtoObjects {
       ResetPoints.newBuilder().addPoints(RESET_POINT_INFO).build();
   public static final ClusterReplicationConfiguration CLUSTER_REPLICATION_CONFIGURATION =
       ClusterReplicationConfiguration.newBuilder().setClusterName("cluster").build();
+  public static final ActiveClusterInfo ACTIVE_CLUSTER_INFO =
+      ActiveClusterInfo.newBuilder()
+          .setActiveClusterName("activeCluster")
+          .setFailoverVersion(1)
+          .build();
+  public static final ClusterAttributeScope CLUSTER_ATTRIBUTE_SCOPE =
+      ClusterAttributeScope.newBuilder()
+          .putClusterAttributes("region", ACTIVE_CLUSTER_INFO)
+          .build();
+  public static final ActiveClusters ACTIVE_CLUSTERS =
+      ActiveClusters.newBuilder()
+          .putActiveClustersByClusterAttribute("region", CLUSTER_ATTRIBUTE_SCOPE)
+          .build();
+  public static final ClusterAttribute CLUSTER_ATTRIBUTE =
+      ClusterAttribute.newBuilder().setScope("scope").setName("region").build();
+  public static final ActiveClusterSelectionPolicy ACTIVE_CLUSTER_SELECTION_POLICY =
+      ActiveClusterSelectionPolicy.newBuilder().setClusterAttribute(CLUSTER_ATTRIBUTE).build();
+  public static final CronOverlapPolicy CRON_OVERLAP_POLICY =
+      CronOverlapPolicy.CRON_OVERLAP_POLICY_SKIPPED;
   public static final PollerInfo POLLER_INFO =
       PollerInfo.newBuilder()
           .setIdentity("identity")
@@ -330,7 +353,9 @@ public final class ProtoObjects {
                   .setMemo(MEMO)
                   .setSearchAttributes(SEARCH_ATTRIBUTES)
                   .setRetryPolicy(RETRY_POLICY)
-                  .setCronSchedule("cron"))
+                  .setCronSchedule("cron")
+                  .setCronOverlapPolicy(CRON_OVERLAP_POLICY)
+                  .setActiveClusterSelectionPolicy(ACTIVE_CLUSTER_SELECTION_POLICY))
           .build();
   public static Decision DECISION_START_CHILD_WORKFLOW_EXECUTION =
       Decision.newBuilder()
@@ -351,7 +376,9 @@ public final class ProtoObjects {
                   .setControl(utf8("control"))
                   .setParentClosePolicy(ParentClosePolicy.PARENT_CLOSE_POLICY_ABANDON)
                   .setWorkflowIdReusePolicy(
-                      WorkflowIdReusePolicy.WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE))
+                      WorkflowIdReusePolicy.WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE)
+                  .setCronOverlapPolicy(CRON_OVERLAP_POLICY)
+                  .setActiveClusterSelectionPolicy(ACTIVE_CLUSTER_SELECTION_POLICY))
           .build();
   public static Decision DECISION_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION =
       Decision.newBuilder()
@@ -1023,6 +1050,8 @@ public final class ProtoObjects {
           .setDelayStart(seconds(3))
           .setJitterStart(seconds(0))
           .setFirstRunAt(timestampNanos(123456789))
+          .setCronOverlapPolicy(CRON_OVERLAP_POLICY)
+          .setActiveClusterSelectionPolicy(ACTIVE_CLUSTER_SELECTION_POLICY)
           .build();
 
   public static final SignalWithStartWorkflowExecutionRequest SIGNAL_WITH_START_WORKFLOW_EXECUTION =
@@ -1157,6 +1186,7 @@ public final class ProtoObjects {
           .setHistoryArchivalUri("historyArchivalUri")
           .setVisibilityArchivalStatus(ArchivalStatus.ARCHIVAL_STATUS_DISABLED)
           .setVisibilityArchivalUri("visibilityArchivalUri")
+          .setActiveClusters(ACTIVE_CLUSTERS)
           .build();
 
   public static final UpdateDomainRequest UPDATE_DOMAIN_REQUEST =
@@ -1181,6 +1211,7 @@ public final class ProtoObjects {
           .setVisibilityArchivalUri("visibilityArchivalUri")
           .addAllClusters(ImmutableList.of(CLUSTER_REPLICATION_CONFIGURATION))
           .setActiveClusterName("activeCluster")
+          .setActiveClusters(ACTIVE_CLUSTERS)
           .setDeleteBadBinary("deleteBadBinary")
           .setFailoverTimeout(seconds(1))
           .setUpdateMask(
@@ -1196,6 +1227,7 @@ public final class ProtoObjects {
                   .addPaths("visibility_archival_uri")
                   .addPaths("active_cluster_name")
                   .addPaths("clusters")
+                  .addPaths("active_clusters")
                   .addPaths("delete_bad_binary")
                   .addPaths("failover_timeout")
                   .build())

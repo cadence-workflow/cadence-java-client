@@ -181,8 +181,37 @@ clean {
     delete protobuf.generatedFilesBaseDir
 }
 
+// This is to suppress the deprecation warning in the generated file, because it uses a deprecated proto message.
+// Remove this once the deprecated proto message is deleted.
+task replaceGeneratedSources {
+    dependsOn 'generateProto'
+    doLast {
+        def file = file("$buildDir/generated-sources/proto/main/java/com/uber/cadence/api/v1/ActiveClusterSelectionPolicy.java")
+
+        if (!file.exists()) {
+            return
+        }
+
+        def content = file.text
+
+        def updated = content.replaceFirst(
+            /public\s+.*class\s+ActiveClusterSelectionPolicy/,
+            '@SuppressWarnings("deprecation")\n$0'
+        )
+
+        if (content == updated) {
+            println("❌ Pattern did NOT match")
+        } else {
+            file.text = updated
+            println("✅ Replacement applied")
+        }
+
+    }
+}
+
 compileJava {
     dependsOn 'googleJavaFormat'
+    dependsOn 'replaceGeneratedSources'
     options.encoding = 'UTF-8'
     options.compilerArgs << '-Xlint:none' << '-Xlint:deprecation' << '-Werror'
     options.errorprone.excludedPaths = '.*/generated-sources/.*'

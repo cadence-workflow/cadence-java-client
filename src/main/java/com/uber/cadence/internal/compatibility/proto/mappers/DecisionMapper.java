@@ -16,11 +16,13 @@
 package com.uber.cadence.internal.compatibility.proto.mappers;
 
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.continueAsNewInitiator;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.cronOverlapPolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.parentClosePolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.workflowIdReusePolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.arrayToByteString;
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.longToInt;
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.secondsToDuration;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.activeClusterSelectionPolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.activityType;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.failure;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.header;
@@ -193,6 +195,13 @@ class DecisionMapper {
           if (attr.getCronSchedule() != null) {
             builder.setCronSchedule(attr.getCronSchedule());
           }
+          if (attr.getCronOverlapPolicy() != null) {
+            builder.setCronOverlapPolicy(cronOverlapPolicy(attr.getCronOverlapPolicy()));
+          }
+          if (attr.getActiveClusterSelectionPolicy() != null) {
+            builder.setActiveClusterSelectionPolicy(
+                activeClusterSelectionPolicy(attr.getActiveClusterSelectionPolicy()));
+          }
           decision.setContinueAsNewWorkflowExecutionDecisionAttributes(builder);
         }
         break;
@@ -224,6 +233,13 @@ class DecisionMapper {
           }
           if (attr.getCronSchedule() != null) {
             builder.setCronSchedule(attr.getCronSchedule());
+          }
+          if (attr.getCronOverlapPolicy() != null) {
+            builder.setCronOverlapPolicy(cronOverlapPolicy(attr.getCronOverlapPolicy()));
+          }
+          if (attr.getActiveClusterSelectionPolicy() != null) {
+            builder.setActiveClusterSelectionPolicy(
+                activeClusterSelectionPolicy(attr.getActiveClusterSelectionPolicy()));
           }
           decision.setStartChildWorkflowExecutionDecisionAttributes(builder);
         }

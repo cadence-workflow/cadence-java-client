@@ -25,4 +25,6 @@ public class StartWorkflowExecutionRequest {
   private int delayStartSeconds;
   private int jitterStartSeconds;
   private long firstRunAtTimestamp;
+  private CronOverlapPolicy cronOverlapPolicy;
+  private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
 }
