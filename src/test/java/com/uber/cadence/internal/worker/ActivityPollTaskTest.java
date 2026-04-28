@@ -20,11 +20,11 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableMap;
+import com.uber.cadence.*;
 import com.uber.cadence.InternalServiceError;
 import com.uber.cadence.PollForActivityTaskRequest;
 import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.ServiceBusyError;
-import com.uber.cadence.*;
 import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;

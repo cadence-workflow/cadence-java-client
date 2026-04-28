@@ -32,7 +32,6 @@ import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.serviceclient.IWorkflowService;
-import com.uber.m3.tally.Stopwatch;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
