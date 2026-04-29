@@ -22,4 +22,6 @@ public class StartChildWorkflowExecutionDecisionAttributes {
   private Header header;
   private Memo memo;
   private SearchAttributes searchAttributes;
+  private CronOverlapPolicy cronOverlapPolicy;
+  private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
 }

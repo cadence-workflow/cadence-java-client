@@ -17,6 +17,7 @@ package com.uber.cadence.internal.compatibility.proto.mappers;
 
 import static com.uber.cadence.internal.compatibility.proto.mappers.DecisionMapper.decisionArray;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.archivalStatus;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.cronOverlapPolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.decisionTaskFailedCause;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.eventFilterType;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.queryConsistencyLevel;
@@ -29,6 +30,8 @@ import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.days
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.newFieldMask;
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.nullToEmpty;
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.secondsToDuration;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.activeClusterSelectionPolicy;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.activeClusters;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.badBinaries;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.clusterReplicationConfigurationArray;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.failure;
@@ -112,6 +115,7 @@ public class RequestMapper {
   private static final String DomainUpdateVisibilityArchivalURIField = "visibility_archival_uri";
   private static final String DomainUpdateActiveClusterNameField = "active_cluster_name";
   private static final String DomainUpdateClustersField = "clusters";
+  private static final String DomainUpdateActiveClustersField = "active_clusters";
   private static final String DomainUpdateDeleteBadBinaryField = "delete_bad_binary";
   private static final String DomainUpdateFailoverTimeoutField = "failover_timeout";
 
@@ -462,6 +466,13 @@ public class RequestMapper {
       builder.setDelayStart(secondsToDuration(t.getDelayStartSeconds()));
     }
     builder.setJitterStart(secondsToDuration(t.getJitterStartSeconds()));
+    if (t.getCronOverlapPolicy() != null) {
+      builder.setCronOverlapPolicy(cronOverlapPolicy(t.getCronOverlapPolicy()));
+    }
+    if (t.getActiveClusterSelectionPolicy() != null) {
+      builder.setActiveClusterSelectionPolicy(
+          activeClusterSelectionPolicy(t.getActiveClusterSelectionPolicy()));
+    }
 
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
@@ -540,6 +551,13 @@ public class RequestMapper {
     }
     if (t.getCronSchedule() != null) {
       request.setCronSchedule(t.getCronSchedule());
+    }
+    if (t.getCronOverlapPolicy() != null) {
+      request.setCronOverlapPolicy(cronOverlapPolicy(t.getCronOverlapPolicy()));
+    }
+    if (t.getActiveClusterSelectionPolicy() != null) {
+      request.setActiveClusterSelectionPolicy(
+          activeClusterSelectionPolicy(t.getActiveClusterSelectionPolicy()));
     }
     if (t.getIdentity() != null) {
       request.setIdentity(t.getIdentity());
@@ -731,7 +749,7 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    RegisterDomainRequest request =
+    RegisterDomainRequest.Builder builder =
         RegisterDomainRequest.newBuilder()
             .setName(t.getName())
             .setDescription(Helpers.nullToEmpty(t.getDescription()))
@@ -746,9 +764,11 @@ public class RequestMapper {
             .setHistoryArchivalStatus(archivalStatus(t.getHistoryArchivalStatus()))
             .setHistoryArchivalUri(Helpers.nullToEmpty(t.getHistoryArchivalURI()))
             .setVisibilityArchivalStatus(archivalStatus(t.getVisibilityArchivalStatus()))
-            .setVisibilityArchivalUri(Helpers.nullToEmpty(t.getVisibilityArchivalURI()))
-            .build();
-    return request;
+            .setVisibilityArchivalUri(Helpers.nullToEmpty(t.getVisibilityArchivalURI()));
+    if (t.getActiveClusters() != null) {
+      builder.setActiveClusters(activeClusters(t.getActiveClusters()));
+    }
+    return builder.build();
   }
 
   public static RestartWorkflowExecutionRequest restartWorkflowExecutionRequest(
@@ -830,6 +850,10 @@ public class RequestMapper {
         request.addAllClusters(
             clusterReplicationConfigurationArray(replicationConfiguration.getClusters()));
         fields.add(DomainUpdateClustersField);
+      }
+      if (replicationConfiguration.getActiveClusters() != null) {
+        request.setActiveClusters(activeClusters(replicationConfiguration.getActiveClusters()));
+        fields.add(DomainUpdateActiveClustersField);
       }
     }
     if (t.getDeleteBadBinary() != null) {

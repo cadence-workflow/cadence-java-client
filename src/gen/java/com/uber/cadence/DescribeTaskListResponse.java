@@ -9,4 +9,5 @@ import lombok.experimental.Accessors;
 public class DescribeTaskListResponse {
   private List<PollerInfo> pollers = new ArrayList<>();;
   private TaskListStatus taskListStatus;
+  private TaskList taskList;
 }

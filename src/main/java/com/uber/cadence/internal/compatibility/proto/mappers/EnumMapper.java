@@ -58,6 +58,8 @@ public final class EnumMapper {
         return TaskListKind.TASK_LIST_KIND_NORMAL;
       case STICKY:
         return TaskListKind.TASK_LIST_KIND_STICKY;
+      case EPHEMERAL:
+        return TaskListKind.TASK_LIST_KIND_EPHEMERAL;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
@@ -289,6 +291,8 @@ public final class EnumMapper {
         return com.uber.cadence.TaskListKind.NORMAL;
       case TASK_LIST_KIND_STICKY:
         return com.uber.cadence.TaskListKind.STICKY;
+      case TASK_LIST_KIND_EPHEMERAL:
+        return com.uber.cadence.TaskListKind.EPHEMERAL;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
@@ -581,6 +585,31 @@ public final class EnumMapper {
         return null;
       case CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_RUNNING:
         return com.uber.cadence.ChildWorkflowExecutionFailedCause.WORKFLOW_ALREADY_RUNNING;
+    }
+    throw new IllegalArgumentException("unexpected enum value");
+  }
+
+  public static CronOverlapPolicy cronOverlapPolicy(com.uber.cadence.CronOverlapPolicy t) {
+    if (t == null) {
+      return CronOverlapPolicy.CRON_OVERLAP_POLICY_INVALID;
+    }
+    switch (t) {
+      case SKIPPED:
+        return CronOverlapPolicy.CRON_OVERLAP_POLICY_SKIPPED;
+      case BUFFERONE:
+        return CronOverlapPolicy.CRON_OVERLAP_POLICY_BUFFER_ONE;
+    }
+    throw new IllegalArgumentException("unexpected enum value");
+  }
+
+  public static com.uber.cadence.CronOverlapPolicy cronOverlapPolicy(CronOverlapPolicy t) {
+    switch (t) {
+      case CRON_OVERLAP_POLICY_INVALID:
+        return null;
+      case CRON_OVERLAP_POLICY_SKIPPED:
+        return com.uber.cadence.CronOverlapPolicy.SKIPPED;
+      case CRON_OVERLAP_POLICY_BUFFER_ONE:
+        return com.uber.cadence.CronOverlapPolicy.BUFFERONE;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }

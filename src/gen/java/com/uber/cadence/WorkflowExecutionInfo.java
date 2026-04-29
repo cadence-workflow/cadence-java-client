@@ -22,7 +22,13 @@ public class WorkflowExecutionInfo {
   private SearchAttributes searchAttributes;
   private ResetPoints autoResetPoints;
   private String taskList;
+  private TaskList taskListInfo;
   private boolean isCron;
   private long updateTime;
   private Map<String, String> partitionConfig = new HashMap<>();;
+  private CronOverlapPolicy cronOverlapPolicy;
+  private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
+  private String cronSchedule;
+  private WorkflowExecutionStatus executionStatus;
+  private long scheduledExecutionTime;
 }

@@ -6,8 +6,9 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class DomainReplicationConfiguration {
-  private String activeClusterName;
-  private List<ClusterReplicationConfiguration> clusters = new ArrayList<>();;
+public class FailoverDomainRequest {
+  private String domainName;
+  private String domainActiveClusterName;
   private ActiveClusters activeClusters;
+  private String reason;
 }

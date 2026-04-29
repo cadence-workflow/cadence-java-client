@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class FeatureFlags {
-  private boolean WorkflowExecutionAlreadyCompletedErrorEnabled;
-  private boolean AutoForwardingEnabled;
+public class DeleteDomainRequest {
+  private String name;
+  private String securityToken;
 }
