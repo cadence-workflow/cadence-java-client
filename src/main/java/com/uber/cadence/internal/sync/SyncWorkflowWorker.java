@@ -17,7 +17,6 @@
 
 package com.uber.cadence.internal.sync;
 
-import com.uber.cadence.PollForDecisionTaskResponse;
 import com.uber.cadence.common.WorkflowExecutionHistory;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.internal.common.InternalUtils;
@@ -37,15 +36,12 @@ import com.uber.cadence.worker.WorkflowImplementationOptions;
 import com.uber.cadence.workflow.Functions.Func;
 import com.uber.cadence.workflow.WorkflowInterceptor;
 import java.lang.reflect.Type;
-import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /** Workflow worker that supports POJO workflow implementations. */
-public class SyncWorkflowWorker
-    implements SuspendableWorker, Consumer<PollForDecisionTaskResponse> {
+public class SyncWorkflowWorker implements SuspendableWorker {
 
   private final WorkflowWorker workflowWorker;
   private final LocalActivityWorker laWorker;
@@ -68,7 +64,6 @@ public class SyncWorkflowWorker
       SingleWorkerOptions locallyDispatchedActivityOptions,
       DeciderCache cache,
       String stickyTaskListName,
-      Duration stickyDecisionScheduleToStartTimeout,
       ThreadPoolExecutor workflowThreadPool) {
     Objects.requireNonNull(workflowThreadPool);
     this.dataConverter = workflowOptions.getDataConverter();
@@ -100,7 +95,7 @@ public class SyncWorkflowWorker
             cache,
             workflowOptions,
             stickyTaskListName,
-            stickyDecisionScheduleToStartTimeout,
+            workflowOptions.getStickyTaskListScheduleToStartTimeout(),
             service,
             laWorker.getLocalActivityTaskPoller());
 
@@ -239,11 +234,6 @@ public class SyncWorkflowWorker
     byte[] serializedArgs = dataConverter.toData(args);
     byte[] result = workflowWorker.queryWorkflowExecution(history, queryType, serializedArgs);
     return dataConverter.fromData(result, resultClass, resultType);
-  }
-
-  @Override
-  public void accept(PollForDecisionTaskResponse pollForDecisionTaskResponse) {
-    workflowWorker.accept(pollForDecisionTaskResponse);
   }
 
   public CompletableFuture<Boolean> isHealthy() {

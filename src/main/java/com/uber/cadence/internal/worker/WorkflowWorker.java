@@ -38,23 +38,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.Lock;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import org.slf4j.MDC;
 
-public final class WorkflowWorker extends SuspendableWorkerBase
-    implements Consumer<PollForDecisionTaskResponse> {
+public final class WorkflowWorker extends SuspendableWorkerBase {
+  private static final double STICKY_TO_NORMAL_RATIO = 5;
 
   private static final String POLL_THREAD_NAME_PREFIX = "Workflow Poller taskList=";
+  private static final String STICKY_POLL_THREAD_NAME_PREFIX = "Sticky Workflow Poller taskList=";
   private final DecisionTaskHandler handler;
   private final IWorkflowService service;
   private final String domain;
   private final String taskList;
   private final SingleWorkerOptions options;
+  private final PollerOptions stickyPollerOptions;
   private final String stickyTaskListName;
   private final WorkflowRunLockManager runLocks = new WorkflowRunLockManager();
   private final Function<Task, Boolean> ldaTaskPoller;
   private PollTaskExecutor<PollForDecisionTaskResponse> pollTaskExecutor;
+  private SuspendableWorker stickyPoller;
 
   public WorkflowWorker(
       IWorkflowService service,
@@ -80,6 +82,17 @@ public final class WorkflowWorker extends SuspendableWorkerBase
               .build();
     }
     this.options = SingleWorkerOptions.newBuilder(options).setPollerOptions(pollerOptions).build();
+    this.stickyPollerOptions =
+        stickyTaskListName != null ? getStickyPollerOptions(this.options) : null;
+  }
+
+  private PollerOptions getStickyPollerOptions(SingleWorkerOptions options) {
+    PollerOptions pollerOptions = options.getPollerOptions();
+    return PollerOptions.newBuilder(pollerOptions)
+        .setPollThreadNamePrefix(
+            STICKY_POLL_THREAD_NAME_PREFIX + "\"" + taskList + "\", domain=\"" + domain + "\"")
+        .setPollThreadCount((int) (pollerOptions.getPollThreadCount() * STICKY_TO_NORMAL_RATIO))
+        .build();
   }
 
   @Override
@@ -103,6 +116,31 @@ public final class WorkflowWorker extends SuspendableWorkerBase
               options.getExecutorWrapper());
       poller.start();
       setPoller(poller);
+
+      if (stickyPollerOptions != null) {
+        Scope stickyScope =
+            options
+                .getMetricsScope()
+                .tagged(
+                    ImmutableMap.of(
+                        MetricsTag.TASK_LIST, String.format("%s:%s", taskList, "sticky")));
+        stickyPoller =
+            new Poller<>(
+                options.getIdentity(),
+                new WorkflowPollTask(
+                    service,
+                    domain,
+                    stickyTaskListName,
+                    TaskListKind.STICKY,
+                    stickyScope,
+                    options.getIdentity()),
+                pollTaskExecutor,
+                stickyPollerOptions,
+                stickyScope,
+                options.getExecutorWrapper());
+        stickyPoller.start();
+      }
+
       options.getMetricsScope().counter(MetricsType.WORKER_START_COUNTER).inc(1);
     }
   }
@@ -171,8 +209,53 @@ public final class WorkflowWorker extends SuspendableWorkerBase
   }
 
   @Override
-  public void accept(PollForDecisionTaskResponse pollForDecisionTaskResponse) {
-    pollTaskExecutor.process(pollForDecisionTaskResponse);
+  public void shutdown() {
+    super.shutdown();
+    if (stickyPoller != null) {
+      stickyPoller.shutdown();
+    }
+  }
+
+  @Override
+  public void shutdownNow() {
+    super.shutdownNow();
+    if (stickyPoller != null) {
+      stickyPoller.shutdownNow();
+    }
+  }
+
+  @Override
+  public void awaitTermination(long timeout, java.util.concurrent.TimeUnit unit) {
+    super.awaitTermination(timeout, unit);
+    if (stickyPoller != null) {
+      long timeoutMillis = unit.toMillis(timeout);
+      stickyPoller.awaitTermination(timeoutMillis, java.util.concurrent.TimeUnit.MILLISECONDS);
+    }
+  }
+
+  @Override
+  public void suspendPolling() {
+    super.suspendPolling();
+    if (stickyPoller != null) {
+      stickyPoller.suspendPolling();
+    }
+  }
+
+  @Override
+  public void resumePolling() {
+    super.resumePolling();
+    if (stickyPoller != null) {
+      stickyPoller.resumePolling();
+    }
+  }
+
+  @Override
+  public boolean isTerminated() {
+    boolean terminated = super.isTerminated();
+    if (stickyPoller != null) {
+      terminated = terminated && stickyPoller.isTerminated();
+    }
+    return terminated;
   }
 
   private class TaskHandlerImpl

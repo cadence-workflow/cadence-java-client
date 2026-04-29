@@ -26,10 +26,7 @@ public class WorkerFactoryOptions {
   }
 
   private static final WorkerFactoryOptions DEFAULT_INSTANCE;
-  private static final int DEFAULT_STICKY_POLLER_COUNT = 5;
   private static final int DEFAULT_STICKY_CACHE_SIZE = 600;
-  private static final Duration DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT =
-      Duration.ofSeconds(5);
   private static final int DEFAULT_MAX_WORKFLOW_THREAD_COUNT = 600;
 
   static {
@@ -42,12 +39,9 @@ public class WorkerFactoryOptions {
 
   public static class Builder {
     private boolean disableStickyExecution;
-    private Duration stickyTaskScheduleToStartTimeout =
-        DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT;
     private int stickyCacheSize = DEFAULT_STICKY_CACHE_SIZE;
     private int maxWorkflowThreadCount = DEFAULT_MAX_WORKFLOW_THREAD_COUNT;
     private boolean enableLoggingInReplay;
-    private int stickyPollerCount = DEFAULT_STICKY_POLLER_COUNT;
     private ExecutorWrapper executorWrapper = ExecutorWrapper.newDefaultInstance();
 
     private Builder() {}
@@ -87,9 +81,13 @@ public class WorkerFactoryOptions {
     /**
      * Timeout for sticky workflow decision to be picked up by the host assigned to it. Once it
      * times out then it can be picked up by any worker. Default value is 5 seconds.
+     *
+     * @deprecated use {@link
+     *     WorkerOptions.Builder#setStickyTaskListScheduleToStartTimeout(Duration)} to specify this
+     *     value per-worker instead
      */
+    @Deprecated
     public Builder setStickyTaskScheduleToStartTimeout(Duration stickyTaskScheduleToStartTimeout) {
-      this.stickyTaskScheduleToStartTimeout = stickyTaskScheduleToStartTimeout;
       return this;
     }
 
@@ -97,8 +95,8 @@ public class WorkerFactoryOptions {
      * PollerOptions for poller responsible for polling for decisions for workflows cached by all
      * workers created by this factory.
      */
+    @Deprecated
     public Builder setStickyPollerCount(int stickyPollerCount) {
-      this.stickyPollerCount = stickyPollerCount;
       return this;
     }
 
@@ -117,8 +115,6 @@ public class WorkerFactoryOptions {
           disableStickyExecution,
           stickyCacheSize,
           maxWorkflowThreadCount,
-          stickyTaskScheduleToStartTimeout,
-          stickyPollerCount,
           enableLoggingInReplay,
           executorWrapper);
     }
@@ -127,7 +123,6 @@ public class WorkerFactoryOptions {
   private final boolean disableStickyExecution;
   private final int cacheMaximumSize;
   private final int maxWorkflowThreadCount;
-  private Duration stickyTaskScheduleToStartTimeout;
   private boolean enableLoggingInReplay;
   private int stickyPollerCount;
   private ExecutorWrapper executorWrapper;
@@ -136,8 +131,6 @@ public class WorkerFactoryOptions {
       boolean disableStickyExecution,
       int cacheMaximumSize,
       int maxWorkflowThreadCount,
-      Duration stickyTaskScheduleToStartTimeout,
-      int stickyPollerCount,
       boolean enableLoggingInReplay,
       ExecutorWrapper executorWrapper) {
     Preconditions.checkArgument(cacheMaximumSize > 0, "cacheMaximumSize should be greater than 0");
@@ -147,9 +140,7 @@ public class WorkerFactoryOptions {
     this.disableStickyExecution = disableStickyExecution;
     this.cacheMaximumSize = cacheMaximumSize;
     this.maxWorkflowThreadCount = maxWorkflowThreadCount;
-    this.stickyPollerCount = stickyPollerCount;
     this.enableLoggingInReplay = enableLoggingInReplay;
-    this.stickyTaskScheduleToStartTimeout = stickyTaskScheduleToStartTimeout;
     this.executorWrapper = executorWrapper;
   }
 
@@ -169,12 +160,14 @@ public class WorkerFactoryOptions {
     return enableLoggingInReplay;
   }
 
+  @Deprecated
   public int getStickyPollerCount() {
-    return stickyPollerCount;
+    return 0;
   }
 
+  @Deprecated
   public Duration getStickyTaskScheduleToStartTimeout() {
-    return stickyTaskScheduleToStartTimeout;
+    return Duration.ZERO;
   }
 
   public ExecutorWrapper getExecutorWrapper() {
