@@ -31,18 +31,19 @@ import com.uber.m3.tally.Scope;
 import com.uber.m3.util.Duration;
 import com.uber.m3.util.ImmutableMap;
 import java.util.Objects;
+import java.util.concurrent.Semaphore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class WorkflowPollTask implements Poller.PollTask<PollForDecisionTaskResponse> {
+final class WorkflowPollTask implements Poller.PollTask<DecisionTask> {
 
   private static final Logger log = LoggerFactory.getLogger(WorkflowWorker.class);
   private final Scope metricScope;
   private final IWorkflowService service;
   private final String domain;
   private final String taskList;
-  private final TaskListKind taskListKind;
-  private final String identity;
+  private final Semaphore decisionTaskExecutorSemaphore;
+  private final PollForDecisionTaskRequest pollRequest;
 
   WorkflowPollTask(
       IWorkflowService service,
@@ -50,85 +51,106 @@ final class WorkflowPollTask implements Poller.PollTask<PollForDecisionTaskRespo
       String taskList,
       TaskListKind taskListKind,
       Scope metricScope,
-      String identity) {
-    this.identity = Objects.requireNonNull(identity);
+      String identity,
+      Semaphore decisionTaskExecutorSemaphore) {
     this.service = Objects.requireNonNull(service);
     this.domain = Objects.requireNonNull(domain);
     this.taskList = Objects.requireNonNull(taskList);
-    this.taskListKind = Objects.requireNonNull(taskListKind);
     this.metricScope = Objects.requireNonNull(metricScope);
-  }
+    this.decisionTaskExecutorSemaphore = Objects.requireNonNull(decisionTaskExecutorSemaphore);
 
-  @Override
-  public PollForDecisionTaskResponse poll() throws CadenceError {
-    metricScope.counter(MetricsType.DECISION_POLL_COUNTER).inc(1);
-    MetricsEmit.DualStopwatch sw =
-        MetricsEmit.startLatency(
-            metricScope, MetricsType.DECISION_POLL_LATENCY, HistogramBuckets.DEFAULT_1MS_100S);
-
-    PollForDecisionTaskRequest pollRequest = new PollForDecisionTaskRequest();
+    this.pollRequest = new PollForDecisionTaskRequest();
     pollRequest.setDomain(domain);
     pollRequest.setIdentity(identity);
     pollRequest.setBinaryChecksum(BinaryChecksum.getBinaryChecksum());
-
     TaskList tl = new TaskList().setName(taskList).setKind(taskListKind);
     pollRequest.setTaskList(tl);
+  }
 
-    if (log.isDebugEnabled()) {
-      log.debug("poll request begin: " + pollRequest);
-    }
-    PollForDecisionTaskResponse result;
+  @Override
+  public DecisionTask poll() throws CadenceError {
     try {
-      result = service.PollForDecisionTask(pollRequest);
-    } catch (InternalServiceError e) {
-      metricScope
-          .tagged(ImmutableMap.of(MetricsTag.CAUSE, INTERNAL_SERVICE_ERROR))
-          .counter(MetricsType.DECISION_POLL_TRANSIENT_FAILED_COUNTER)
-          .inc(1);
-      throw e;
-    } catch (ServiceBusyError e) {
-      metricScope
-          .tagged(ImmutableMap.of(MetricsTag.CAUSE, SERVICE_BUSY))
-          .counter(MetricsType.DECISION_POLL_TRANSIENT_FAILED_COUNTER)
-          .inc(1);
-      throw e;
-    } catch (CadenceError e) {
-      metricScope.counter(MetricsType.DECISION_POLL_FAILED_COUNTER).inc(1);
-      throw e;
-    }
-
-    if (log.isDebugEnabled()) {
-      log.debug(
-          "poll request returned decision task: workflowType="
-              + result.getWorkflowType()
-              + ", workflowExecution="
-              + result.getWorkflowExecution()
-              + ", startedEventId="
-              + result.getStartedEventId()
-              + ", previousStartedEventId="
-              + result.getPreviousStartedEventId()
-              + (result.getQuery() != null
-                  ? ", queryType=" + result.getQuery().getQueryType()
-                  : ""));
-    }
-
-    if (result == null || result.getTaskToken() == null) {
-      metricScope.counter(MetricsType.DECISION_POLL_NO_TASK_COUNTER).inc(1);
+      decisionTaskExecutorSemaphore.acquire();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       return null;
     }
 
-    Scope metricsScope =
-        metricScope.tagged(
-            ImmutableMap.of(MetricsTag.WORKFLOW_TYPE, result.getWorkflowType().getName()));
-    metricsScope.counter(MetricsType.DECISION_POLL_SUCCEED_COUNTER).inc(1);
-    Duration scheduledToStartLatency =
-        Duration.ofNanos(result.getStartedTimestamp() - result.getScheduledTimestamp());
-    MetricsEmit.emitLatency(
-        metricsScope,
-        MetricsType.DECISION_SCHEDULED_TO_START_LATENCY,
-        scheduledToStartLatency,
-        HistogramBuckets.DEFAULT_1MS_100S);
-    sw.stop();
-    return result;
+    boolean taskAcquired = false;
+    try {
+      metricScope.counter(MetricsType.DECISION_POLL_COUNTER).inc(1);
+      MetricsEmit.DualStopwatch sw =
+          MetricsEmit.startLatency(
+              metricScope, MetricsType.DECISION_POLL_LATENCY, HistogramBuckets.DEFAULT_1MS_100S);
+
+      if (log.isDebugEnabled()) {
+        log.debug("poll request begin: " + pollRequest);
+      }
+      PollForDecisionTaskResponse result;
+      try {
+        log.info("polling for decision task");
+        result = service.PollForDecisionTask(pollRequest);
+      } catch (InternalServiceError e) {
+        metricScope
+            .tagged(ImmutableMap.of(MetricsTag.CAUSE, INTERNAL_SERVICE_ERROR))
+            .counter(MetricsType.DECISION_POLL_TRANSIENT_FAILED_COUNTER)
+            .inc(1);
+        throw e;
+      } catch (ServiceBusyError e) {
+        metricScope
+            .tagged(ImmutableMap.of(MetricsTag.CAUSE, SERVICE_BUSY))
+            .counter(MetricsType.DECISION_POLL_TRANSIENT_FAILED_COUNTER)
+            .inc(1);
+        throw e;
+      } catch (CadenceError e) {
+        metricScope.counter(MetricsType.DECISION_POLL_FAILED_COUNTER).inc(1);
+        throw e;
+      }
+
+      if (log.isDebugEnabled()) {
+        log.debug(
+            "poll request returned decision task: workflowType="
+                + result.getWorkflowType()
+                + ", workflowExecution="
+                + result.getWorkflowExecution()
+                + ", startedEventId="
+                + result.getStartedEventId()
+                + ", previousStartedEventId="
+                + result.getPreviousStartedEventId()
+                + (result.getQuery() != null
+                    ? ", queryType=" + result.getQuery().getQueryType()
+                    : ""));
+      }
+
+      if (result == null || result.getTaskToken() == null) {
+        metricScope.counter(MetricsType.DECISION_POLL_NO_TASK_COUNTER).inc(1);
+        return null;
+      }
+
+      Scope metricsScope =
+          metricScope.tagged(
+              ImmutableMap.of(MetricsTag.WORKFLOW_TYPE, result.getWorkflowType().getName()));
+      metricsScope.counter(MetricsType.DECISION_POLL_SUCCEED_COUNTER).inc(1);
+      Duration scheduledToStartLatency =
+          Duration.ofNanos(result.getStartedTimestamp() - result.getScheduledTimestamp());
+      MetricsEmit.emitLatency(
+          metricsScope,
+          MetricsType.DECISION_SCHEDULED_TO_START_LATENCY,
+          scheduledToStartLatency,
+          HistogramBuckets.DEFAULT_1MS_100S);
+      sw.stop();
+      taskAcquired = true;
+      log.info(
+          "task acquired: "
+              + result.getWorkflowExecution()
+              + " startEventId: "
+              + result.getStartedEventId());
+      return new DecisionTask(result, decisionTaskExecutorSemaphore::release);
+    } finally {
+      if (!taskAcquired) {
+        log.info("releasing permits: " + decisionTaskExecutorSemaphore.availablePermits());
+        decisionTaskExecutorSemaphore.release();
+      }
+    }
   }
 }

@@ -17,15 +17,14 @@
 
 package com.uber.cadence.internal.worker;
 
-import com.uber.cadence.PollForDecisionTaskResponse;
 import com.uber.cadence.TaskListKind;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.m3.tally.Scope;
 import java.util.Objects;
+import java.util.concurrent.Semaphore;
 import java.util.function.Supplier;
 
-public class WorkflowPollTaskFactory
-    implements Supplier<Poller.PollTask<PollForDecisionTaskResponse>> {
+public class WorkflowPollTaskFactory implements Supplier<Poller.PollTask<DecisionTask>> {
 
   private final IWorkflowService service;
   private final String domain;
@@ -33,6 +32,7 @@ public class WorkflowPollTaskFactory
   private final TaskListKind taskListKind;
   private final Scope metricScope;
   private final String identity;
+  private final Semaphore decisionTaskExecutorSemaphore;
 
   public WorkflowPollTaskFactory(
       IWorkflowService service,
@@ -40,17 +40,28 @@ public class WorkflowPollTaskFactory
       String taskList,
       TaskListKind taskListKind,
       Scope metricScope,
-      String identity) {
+      String identity,
+      Semaphore decisionTaskExecutorSemaphore) {
     this.service = Objects.requireNonNull(service, "service should not be null");
     this.domain = Objects.requireNonNull(domain, "domain should not be null");
     this.taskList = Objects.requireNonNull(taskList, "taskList should not be null");
     this.taskListKind = Objects.requireNonNull(taskListKind, "taskList should not be null");
     this.metricScope = Objects.requireNonNull(metricScope, "metricScope should not be null");
     this.identity = Objects.requireNonNull(identity, "identity should not be null");
+    this.decisionTaskExecutorSemaphore =
+        Objects.requireNonNull(
+            decisionTaskExecutorSemaphore, "decisionTaskExecutorSemaphore should not be null");
   }
 
   @Override
-  public Poller.PollTask<PollForDecisionTaskResponse> get() {
-    return new WorkflowPollTask(service, domain, taskList, taskListKind, metricScope, identity);
+  public Poller.PollTask<DecisionTask> get() {
+    return new WorkflowPollTask(
+        service,
+        domain,
+        taskList,
+        taskListKind,
+        metricScope,
+        identity,
+        decisionTaskExecutorSemaphore);
   }
 }

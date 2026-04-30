@@ -37,12 +37,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 public final class WorkflowWorker extends SuspendableWorkerBase {
   private static final double STICKY_TO_NORMAL_RATIO = 5;
+
+  private static final Logger log = LoggerFactory.getLogger(WorkflowWorker.class);
 
   private static final String POLL_THREAD_NAME_PREFIX = "Workflow Poller taskList=";
   private static final String STICKY_POLL_THREAD_NAME_PREFIX = "Sticky Workflow Poller taskList=";
@@ -55,7 +60,7 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
   private final String stickyTaskListName;
   private final WorkflowRunLockManager runLocks = new WorkflowRunLockManager();
   private final Function<Task, Boolean> ldaTaskPoller;
-  private PollTaskExecutor<PollForDecisionTaskResponse> pollTaskExecutor;
+  private PollTaskExecutor<DecisionTask> pollTaskExecutor;
   private SuspendableWorker stickyPoller;
 
   public WorkflowWorker(
@@ -98,6 +103,9 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
   @Override
   public void start() {
     if (handler.isAnyTypeSupported()) {
+      Semaphore decisionTaskExecutorSemaphore =
+          new Semaphore(options.getTaskExecutorThreadPoolSize());
+
       pollTaskExecutor =
           new PollTaskExecutor<>(domain, taskList, options, new TaskHandlerImpl(handler));
       SuspendableWorker poller =
@@ -109,7 +117,8 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
                   taskList,
                   TaskListKind.NORMAL,
                   options.getMetricsScope(),
-                  options.getIdentity()),
+                  options.getIdentity(),
+                  decisionTaskExecutorSemaphore),
               pollTaskExecutor,
               options.getPollerOptions(),
               options.getMetricsScope(),
@@ -133,7 +142,8 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
                     stickyTaskListName,
                     TaskListKind.STICKY,
                     stickyScope,
-                    options.getIdentity()),
+                    options.getIdentity(),
+                    decisionTaskExecutorSemaphore),
                 pollTaskExecutor,
                 stickyPollerOptions,
                 stickyScope,
@@ -258,8 +268,7 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
     return terminated;
   }
 
-  private class TaskHandlerImpl
-      implements PollTaskExecutor.TaskHandler<PollForDecisionTaskResponse> {
+  private class TaskHandlerImpl implements PollTaskExecutor.TaskHandler<DecisionTask> {
 
     final DecisionTaskHandler handler;
 
@@ -268,19 +277,26 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
     }
 
     @Override
-    public void handle(PollForDecisionTaskResponse task) throws Exception {
+    public void handle(DecisionTask task) throws Exception {
+      PollForDecisionTaskResponse response = task.getResponse();
+      log.info(
+          "Handling decision task: "
+              + response.getWorkflowExecution()
+              + " startEventId: "
+              + response.getStartedEventId());
       Scope metricsScope =
           options
               .getMetricsScope()
-              .tagged(ImmutableMap.of(MetricsTag.WORKFLOW_TYPE, task.getWorkflowType().getName()));
+              .tagged(
+                  ImmutableMap.of(MetricsTag.WORKFLOW_TYPE, response.getWorkflowType().getName()));
 
-      MDC.put(LoggerTag.WORKFLOW_ID, task.getWorkflowExecution().getWorkflowId());
-      MDC.put(LoggerTag.WORKFLOW_TYPE, task.getWorkflowType().getName());
-      MDC.put(LoggerTag.RUN_ID, task.getWorkflowExecution().getRunId());
+      MDC.put(LoggerTag.WORKFLOW_ID, response.getWorkflowExecution().getWorkflowId());
+      MDC.put(LoggerTag.WORKFLOW_TYPE, response.getWorkflowType().getName());
+      MDC.put(LoggerTag.RUN_ID, response.getWorkflowExecution().getRunId());
 
       Lock runLock = null;
       if (!Strings.isNullOrEmpty(stickyTaskListName)) {
-        runLock = runLocks.getLockForLocking(task.getWorkflowExecution().getRunId());
+        runLock = runLocks.getLockForLocking(response.getWorkflowExecution().getRunId());
         runLock.lock();
       }
 
@@ -290,7 +306,7 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
                 metricsScope,
                 MetricsType.DECISION_EXECUTION_LATENCY,
                 HistogramBuckets.DEFAULT_1MS_100S);
-        DecisionTaskHandler.Result response = handler.handleDecisionTask(task);
+        DecisionTaskHandler.Result handlerResponse = handler.handleDecisionTask(response);
         sw.stop();
 
         sw =
@@ -298,7 +314,7 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
                 metricsScope,
                 MetricsType.DECISION_RESPONSE_LATENCY,
                 HistogramBuckets.DEFAULT_1MS_100S);
-        sendReply(service, task, response);
+        sendReply(service, response, handlerResponse);
         sw.stop();
 
         metricsScope.counter(MetricsType.DECISION_TASK_COMPLETED_COUNTER).inc(1);
@@ -307,15 +323,22 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
         MDC.remove(LoggerTag.WORKFLOW_TYPE);
         MDC.remove(LoggerTag.RUN_ID);
 
+        task.getCompletionCallback().apply();
+        log.info(
+            "completion callback applied "
+                + response.getWorkflowExecution()
+                + " startEventId: "
+                + response.getStartedEventId());
+
         if (runLock != null) {
-          runLocks.unlock(task.getWorkflowExecution().getRunId());
+          runLocks.unlock(response.getWorkflowExecution().getRunId());
         }
       }
     }
 
     @Override
-    public Throwable wrapFailure(PollForDecisionTaskResponse task, Throwable failure) {
-      WorkflowExecution execution = task.getWorkflowExecution();
+    public Throwable wrapFailure(DecisionTask task, Throwable failure) {
+      WorkflowExecution execution = task.getResponse().getWorkflowExecution();
       return new RuntimeException(
           "Failure processing decision task. WorkflowID="
               + execution.getWorkflowId()
