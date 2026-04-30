@@ -27,10 +27,11 @@ import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.ServiceBusyError;
 import com.uber.cadence.TaskList;
 import com.uber.cadence.TaskListMetadata;
+import com.uber.cadence.internal.metrics.HistogramBuckets;
+import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.serviceclient.IWorkflowService;
-import com.uber.m3.tally.Stopwatch;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,11 @@ final class ActivityPollTask extends ActivityPollTaskBase {
   @Override
   protected PollForActivityTaskResponse pollTask() throws TException {
     options.getMetricsScope().counter(MetricsType.ACTIVITY_POLL_COUNTER).inc(1);
-    Stopwatch sw = options.getMetricsScope().timer(MetricsType.ACTIVITY_POLL_LATENCY).start();
+    MetricsEmit.DualStopwatch sw =
+        MetricsEmit.startLatency(
+            options.getMetricsScope(),
+            MetricsType.ACTIVITY_POLL_LATENCY,
+            HistogramBuckets.DEFAULT_1MS_100S);
     PollForActivityTaskRequest pollRequest = new PollForActivityTaskRequest();
     pollRequest.setDomain(domain);
     pollRequest.setIdentity(options.getIdentity());

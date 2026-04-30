@@ -27,6 +27,8 @@ import com.uber.cadence.common.WorkflowExecutionHistory;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.common.RpcRetryer;
 import com.uber.cadence.internal.common.WorkflowExecutionUtils;
+import com.uber.cadence.internal.metrics.HistogramBuckets;
+import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.testing.TestEnvironmentOptions;
@@ -35,7 +37,6 @@ import com.uber.cadence.worker.Worker;
 import com.uber.cadence.worker.WorkflowImplementationOptions;
 import com.uber.cadence.workflow.Functions;
 import com.uber.m3.tally.Scope;
-import com.uber.m3.tally.Stopwatch;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -204,7 +205,9 @@ public final class ReplayWorkflowActivityImpl implements ReplayWorkflowActivity 
   protected boolean replayWorkflowHistory(
       String domain, WorkflowExecution execution, WorkflowExecutionHistory workflowHistory)
       throws Exception {
-    Stopwatch sw = this.metricsScope.timer(MetricsType.REPLAY_LATENCY).start();
+    MetricsEmit.DualStopwatch sw =
+        MetricsEmit.startLatency(
+            this.metricsScope, MetricsType.REPLAY_LATENCY, HistogramBuckets.DEFAULT_1MS_100S);
     try {
       worker.replayWorkflowExecution(workflowHistory);
     } catch (Exception e) {
