@@ -83,7 +83,11 @@ final class WorkflowPollTask implements Poller.PollTask<DecisionTask> {
     stickyPollRequest.setDomain(domain);
     stickyPollRequest.setIdentity(identity);
     stickyPollRequest.setBinaryChecksum(BinaryChecksum.getBinaryChecksum());
-    TaskList stickyTl = new TaskList().setName(stickyTaskListName).setKind(TaskListKind.STICKY);
+    TaskList stickyTl =
+        new TaskList()
+            .setName(stickyTaskListName)
+            .setKind(TaskListKind.STICKY)
+            .setBaseName(taskList);
     stickyPollRequest.setTaskList(stickyTl);
   }
 
@@ -110,15 +114,9 @@ final class WorkflowPollTask implements Poller.PollTask<DecisionTask> {
       }
       isSuccessful = true;
       stickyQueueBalancer.finishPoll(taskListKind, response.getBacklogCountHint());
-      log.info(
-          "task acquired: "
-              + response.getWorkflowExecution()
-              + " startEventId: "
-              + response.getStartedEventId());
       return new DecisionTask(response, decisionTaskExecutorSemaphore::release);
     } finally {
       if (!isSuccessful) {
-        log.info("releasing permits: " + decisionTaskExecutorSemaphore.availablePermits());
         decisionTaskExecutorSemaphore.release();
         stickyQueueBalancer.finishPoll(taskListKind);
       }
@@ -137,7 +135,6 @@ final class WorkflowPollTask implements Poller.PollTask<DecisionTask> {
     }
     PollForDecisionTaskResponse result;
     try {
-      log.info("polling for decision task: " + request);
       result = service.PollForDecisionTask(request);
     } catch (InternalServiceError e) {
       scope

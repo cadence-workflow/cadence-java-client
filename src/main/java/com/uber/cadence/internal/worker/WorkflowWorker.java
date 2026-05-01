@@ -230,11 +230,6 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
     @Override
     public void handle(DecisionTask task) throws Exception {
       PollForDecisionTaskResponse response = task.getResponse();
-      log.info(
-          "Handling decision task: "
-              + response.getWorkflowExecution()
-              + " startEventId: "
-              + response.getStartedEventId());
       Scope metricsScope =
           options
               .getMetricsScope()
@@ -275,11 +270,6 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
         MDC.remove(LoggerTag.RUN_ID);
 
         task.getCompletionCallback().apply();
-        log.info(
-            "completion callback applied "
-                + response.getWorkflowExecution()
-                + " startEventId: "
-                + response.getStartedEventId());
 
         if (runLock != null) {
           runLocks.unlock(response.getWorkflowExecution().getRunId());
