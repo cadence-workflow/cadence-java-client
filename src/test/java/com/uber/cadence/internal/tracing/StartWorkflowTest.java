@@ -177,7 +177,7 @@ public class StartWorkflowTest {
     Worker worker;
     worker =
         workerFactory.newWorker(
-            TASK_LIST, WorkerOptions.newBuilder().setMaxConcurrentWorkflowExecutionSize(2).build());
+            TASK_LIST, WorkerOptions.newBuilder().setMaxConcurrentWorkflowExecutionSize(20).build());
     worker.registerActivitiesImplementations(new TestActivityImpl(mockTracer, true));
     worker.registerWorkflowImplementationTypes(TestWorkflowImpl.class, DoubleWorkflowImpl.class);
     workerFactory.start();
