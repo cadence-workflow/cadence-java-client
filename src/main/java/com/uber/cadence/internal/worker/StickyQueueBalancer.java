@@ -16,7 +16,6 @@
 package com.uber.cadence.internal.worker;
 
 import com.uber.cadence.TaskListKind;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.ThreadSafe;
 
 @ThreadSafe
@@ -24,9 +23,9 @@ public class StickyQueueBalancer {
 
   private final int pollersCount;
   private final boolean stickyQueueEnabled;
-  private final AtomicInteger stickyPollers = new AtomicInteger(0);
-  private final AtomicInteger normalPollers = new AtomicInteger(0);
-  private volatile long stickyBacklogSize = 0;
+  private int stickyPollers = 0;
+  private int normalPollers = 0;
+  private long stickyBacklogSize = 0;
 
   public StickyQueueBalancer(int pollersCount, boolean stickyQueueEnabled) {
     this.pollersCount = pollersCount;
@@ -34,25 +33,29 @@ public class StickyQueueBalancer {
   }
 
   /** @return task list kind that should be used for the next poll */
-  public TaskListKind makePoll() {
+  public synchronized TaskListKind makePoll() {
     if (stickyQueueEnabled) {
-      if (stickyBacklogSize > pollersCount || stickyPollers.get() <= normalPollers.get()) {
-        stickyPollers.incrementAndGet();
+      // If pollersCount >= stickyBacklogSize > 0 we want to go back to a normal ratio to avoid a
+      // situation that too many pollers (all of them in the worst case) will open only sticky queue
+      // polls observing a stickyBacklogSize == 1 for example (which actually can be 0 already at
+      // that moment) and get stuck causing dip in worker load.
+      if (stickyBacklogSize > pollersCount || stickyPollers <= normalPollers) {
+        stickyPollers++;
         return TaskListKind.STICKY;
       }
     }
-    normalPollers.incrementAndGet();
+    normalPollers++;
     return TaskListKind.NORMAL;
   }
 
   /** @param taskListKind what kind of task list poll was just finished */
-  public void finishPoll(TaskListKind taskListKind) {
+  public synchronized void finishPoll(TaskListKind taskListKind) {
     switch (taskListKind) {
       case NORMAL:
-        normalPollers.decrementAndGet();
+        normalPollers--;
         break;
       case STICKY:
-        stickyPollers.decrementAndGet();
+        stickyPollers--;
         break;
       default:
         throw new IllegalArgumentException("Invalid task list kind: " + taskListKind);
@@ -63,7 +66,7 @@ public class StickyQueueBalancer {
    * @param taskListKind what kind of task list poll was just finished
    * @param backlogSize backlog size from the poll response
    */
-  public void finishPoll(TaskListKind taskListKind, long backlogSize) {
+  public synchronized void finishPoll(TaskListKind taskListKind, long backlogSize) {
     finishPoll(taskListKind);
     if (TaskListKind.STICKY.equals(taskListKind)) {
       stickyBacklogSize = backlogSize;
