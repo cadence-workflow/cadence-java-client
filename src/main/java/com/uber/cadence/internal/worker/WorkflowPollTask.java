@@ -130,60 +130,64 @@ final class WorkflowPollTask implements Poller.PollTask<DecisionTask> {
         MetricsEmit.startLatency(
             scope, MetricsType.DECISION_POLL_LATENCY, HistogramBuckets.DEFAULT_1MS_100S);
 
-    if (log.isDebugEnabled()) {
-      log.debug("poll request begin: " + request);
-    }
     PollForDecisionTaskResponse result;
     try {
-      result = service.PollForDecisionTask(request);
-    } catch (InternalServiceError e) {
-      scope
-          .tagged(ImmutableMap.of(MetricsTag.CAUSE, INTERNAL_SERVICE_ERROR))
-          .counter(MetricsType.DECISION_POLL_TRANSIENT_FAILED_COUNTER)
-          .inc(1);
-      throw e;
-    } catch (ServiceBusyError e) {
-      scope
-          .tagged(ImmutableMap.of(MetricsTag.CAUSE, SERVICE_BUSY))
-          .counter(MetricsType.DECISION_POLL_TRANSIENT_FAILED_COUNTER)
-          .inc(1);
-      throw e;
-    } catch (CadenceError e) {
-      scope.counter(MetricsType.DECISION_POLL_FAILED_COUNTER).inc(1);
-      throw e;
-    }
+      if (log.isDebugEnabled()) {
+        log.debug("poll request begin: " + request);
+      }
+      try {
+        result = service.PollForDecisionTask(request);
+      } catch (InternalServiceError e) {
+        scope
+            .tagged(ImmutableMap.of(MetricsTag.CAUSE, INTERNAL_SERVICE_ERROR))
+            .counter(MetricsType.DECISION_POLL_TRANSIENT_FAILED_COUNTER)
+            .inc(1);
+        throw e;
+      } catch (ServiceBusyError e) {
+        scope
+            .tagged(ImmutableMap.of(MetricsTag.CAUSE, SERVICE_BUSY))
+            .counter(MetricsType.DECISION_POLL_TRANSIENT_FAILED_COUNTER)
+            .inc(1);
+        throw e;
+      } catch (CadenceError e) {
+        scope.counter(MetricsType.DECISION_POLL_FAILED_COUNTER).inc(1);
+        throw e;
+      }
 
-    if (log.isDebugEnabled()) {
-      log.debug(
-          "poll request returned decision task: workflowType="
-              + result.getWorkflowType()
-              + ", workflowExecution="
-              + result.getWorkflowExecution()
-              + ", startedEventId="
-              + result.getStartedEventId()
-              + ", previousStartedEventId="
-              + result.getPreviousStartedEventId()
-              + (result.getQuery() != null
-                  ? ", queryType=" + result.getQuery().getQueryType()
-                  : ""));
-    }
+      if (log.isDebugEnabled()) {
+        log.debug(
+            "poll request returned decision task: workflowType="
+                + result.getWorkflowType()
+                + ", workflowExecution="
+                + result.getWorkflowExecution()
+                + ", startedEventId="
+                + result.getStartedEventId()
+                + ", previousStartedEventId="
+                + result.getPreviousStartedEventId()
+                + (result.getQuery() != null
+                    ? ", queryType=" + result.getQuery().getQueryType()
+                    : ""));
+      }
 
-    if (result == null || result.getTaskToken() == null) {
-      scope.counter(MetricsType.DECISION_POLL_NO_TASK_COUNTER).inc(1);
-      return null;
-    }
+      if (result == null || result.getTaskToken() == null) {
+        scope.counter(MetricsType.DECISION_POLL_NO_TASK_COUNTER).inc(1);
+        return null;
+      }
 
-    Scope metricsScope =
-        scope.tagged(ImmutableMap.of(MetricsTag.WORKFLOW_TYPE, result.getWorkflowType().getName()));
-    metricsScope.counter(MetricsType.DECISION_POLL_SUCCEED_COUNTER).inc(1);
-    Duration scheduledToStartLatency =
-        Duration.ofNanos(result.getStartedTimestamp() - result.getScheduledTimestamp());
-    MetricsEmit.emitLatency(
-        metricsScope,
-        MetricsType.DECISION_SCHEDULED_TO_START_LATENCY,
-        scheduledToStartLatency,
-        HistogramBuckets.DEFAULT_1MS_100S);
-    sw.stop();
+      Scope metricsScope =
+          scope.tagged(
+              ImmutableMap.of(MetricsTag.WORKFLOW_TYPE, result.getWorkflowType().getName()));
+      metricsScope.counter(MetricsType.DECISION_POLL_SUCCEED_COUNTER).inc(1);
+      Duration scheduledToStartLatency =
+          Duration.ofNanos(result.getStartedTimestamp() - result.getScheduledTimestamp());
+      MetricsEmit.emitLatency(
+          metricsScope,
+          MetricsType.DECISION_SCHEDULED_TO_START_LATENCY,
+          scheduledToStartLatency,
+          HistogramBuckets.DEFAULT_1MS_100S);
+    } finally {
+      sw.stop();
+    }
     return result;
   }
 }
