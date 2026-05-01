@@ -5,7 +5,7 @@
 
 `cadence-client` is the framework for authoring workflows and activities in Java.
 
-If you are authoring in Go, see [Go Cadence Client](https://github.com/cadence-workflow-go/cadence-client).
+If you are authoring in Go, see [Go Cadence Client](https://github.com/cadence-workflow-go/cadence-go-client).
 
 ## Samples
 
