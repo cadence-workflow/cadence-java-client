@@ -45,23 +45,19 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 public final class WorkflowWorker extends SuspendableWorkerBase {
-  private static final double STICKY_TO_NORMAL_RATIO = 5;
 
   private static final Logger log = LoggerFactory.getLogger(WorkflowWorker.class);
 
   private static final String POLL_THREAD_NAME_PREFIX = "Workflow Poller taskList=";
-  private static final String STICKY_POLL_THREAD_NAME_PREFIX = "Sticky Workflow Poller taskList=";
   private final DecisionTaskHandler handler;
   private final IWorkflowService service;
   private final String domain;
   private final String taskList;
   private final SingleWorkerOptions options;
-  private final PollerOptions stickyPollerOptions;
   private final String stickyTaskListName;
   private final WorkflowRunLockManager runLocks = new WorkflowRunLockManager();
   private final Function<Task, Boolean> ldaTaskPoller;
   private PollTaskExecutor<DecisionTask> pollTaskExecutor;
-  private SuspendableWorker stickyPoller;
 
   public WorkflowWorker(
       IWorkflowService service,
@@ -86,18 +82,11 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
                   POLL_THREAD_NAME_PREFIX + "\"" + taskList + "\", domain=\"" + domain + "\"")
               .build();
     }
+    // ensure at least 2 poll threads
+    if (pollerOptions.getPollThreadCount() < 2 && stickyTaskListName != null) {
+      pollerOptions = PollerOptions.newBuilder(pollerOptions).setPollThreadCount(2).build();
+    }
     this.options = SingleWorkerOptions.newBuilder(options).setPollerOptions(pollerOptions).build();
-    this.stickyPollerOptions =
-        stickyTaskListName != null ? getStickyPollerOptions(this.options) : null;
-  }
-
-  private PollerOptions getStickyPollerOptions(SingleWorkerOptions options) {
-    PollerOptions pollerOptions = options.getPollerOptions();
-    return PollerOptions.newBuilder(pollerOptions)
-        .setPollThreadNamePrefix(
-            STICKY_POLL_THREAD_NAME_PREFIX + "\"" + taskList + "\", domain=\"" + domain + "\"")
-        .setPollThreadCount((int) (pollerOptions.getPollThreadCount() * STICKY_TO_NORMAL_RATIO))
-        .build();
   }
 
   @Override
@@ -108,6 +97,12 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
 
       pollTaskExecutor =
           new PollTaskExecutor<>(domain, taskList, options, new TaskHandlerImpl(handler));
+
+      // Create sticky queue balancer
+      StickyQueueBalancer stickyQueueBalancer =
+          new StickyQueueBalancer(
+              options.getPollerOptions().getPollThreadCount(), stickyTaskListName != null);
+
       SuspendableWorker poller =
           new Poller<>(
               options.getIdentity(),
@@ -115,41 +110,17 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
                   service,
                   domain,
                   taskList,
-                  TaskListKind.NORMAL,
+                  stickyTaskListName,
                   options.getMetricsScope(),
                   options.getIdentity(),
-                  decisionTaskExecutorSemaphore),
+                  decisionTaskExecutorSemaphore,
+                  stickyQueueBalancer),
               pollTaskExecutor,
               options.getPollerOptions(),
               options.getMetricsScope(),
               options.getExecutorWrapper());
       poller.start();
       setPoller(poller);
-
-      if (stickyPollerOptions != null) {
-        Scope stickyScope =
-            options
-                .getMetricsScope()
-                .tagged(
-                    ImmutableMap.of(
-                        MetricsTag.TASK_LIST, String.format("%s:%s", taskList, "sticky")));
-        stickyPoller =
-            new Poller<>(
-                options.getIdentity(),
-                new WorkflowPollTask(
-                    service,
-                    domain,
-                    stickyTaskListName,
-                    TaskListKind.STICKY,
-                    stickyScope,
-                    options.getIdentity(),
-                    decisionTaskExecutorSemaphore),
-                pollTaskExecutor,
-                stickyPollerOptions,
-                stickyScope,
-                options.getExecutorWrapper());
-        stickyPoller.start();
-      }
 
       options.getMetricsScope().counter(MetricsType.WORKER_START_COUNTER).inc(1);
     }
@@ -221,51 +192,31 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
   @Override
   public void shutdown() {
     super.shutdown();
-    if (stickyPoller != null) {
-      stickyPoller.shutdown();
-    }
   }
 
   @Override
   public void shutdownNow() {
     super.shutdownNow();
-    if (stickyPoller != null) {
-      stickyPoller.shutdownNow();
-    }
   }
 
   @Override
   public void awaitTermination(long timeout, java.util.concurrent.TimeUnit unit) {
     super.awaitTermination(timeout, unit);
-    if (stickyPoller != null) {
-      long timeoutMillis = unit.toMillis(timeout);
-      stickyPoller.awaitTermination(timeoutMillis, java.util.concurrent.TimeUnit.MILLISECONDS);
-    }
   }
 
   @Override
   public void suspendPolling() {
     super.suspendPolling();
-    if (stickyPoller != null) {
-      stickyPoller.suspendPolling();
-    }
   }
 
   @Override
   public void resumePolling() {
     super.resumePolling();
-    if (stickyPoller != null) {
-      stickyPoller.resumePolling();
-    }
   }
 
   @Override
   public boolean isTerminated() {
-    boolean terminated = super.isTerminated();
-    if (stickyPoller != null) {
-      terminated = terminated && stickyPoller.isTerminated();
-    }
-    return terminated;
+    return super.isTerminated();
   }
 
   private class TaskHandlerImpl implements PollTaskExecutor.TaskHandler<DecisionTask> {

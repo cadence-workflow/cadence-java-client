@@ -80,16 +80,20 @@ public class WorkflowPollTaskTest {
     when(mockMetricScope.counter(MetricsType.DECISION_POLL_SUCCEED_COUNTER))
         .thenReturn(succeedCounter);
 
+    // Create a sticky queue balancer (disabled for test)
+    StickyQueueBalancer stickyQueueBalancer = new StickyQueueBalancer(1, false);
+
     // Initialize pollTask with the mocked dependencies
     pollTask =
         new WorkflowPollTask(
             mockService,
             "test-domain",
             "test-taskList",
-            TaskListKind.NORMAL,
+            "test-taskList-sticky",
             mockMetricScope,
             "test-identity",
-            semaphore);
+            semaphore,
+            stickyQueueBalancer);
   }
 
   @Test
