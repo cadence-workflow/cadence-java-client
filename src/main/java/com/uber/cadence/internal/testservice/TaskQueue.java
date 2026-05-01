@@ -58,12 +58,12 @@ class TaskQueue<E> {
    *
    * @return a Future providing one-shot access to the head of this queue.
    */
-  synchronized Future<E> poll() {
+  Future<E> poll() {
     final PollFuture future = new PollFuture();
     E element;
     synchronized (this) {
       if (backlog.isEmpty()) {
-        waiters.add(future); // Add to tail for FIFO
+        waiters.push(future);
         return future;
       }
       element = backlog.pop();
