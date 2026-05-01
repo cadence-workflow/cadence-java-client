@@ -9,14 +9,14 @@ Join our community on the CNCF Slack workspace at [cloud-native.slack.com](https
 ## Development Environment
 
 * Java 11 (currently, we use Java 11 to compile Java 8 code).
-* Gradle build tool [6.x](https://github.com/uber/cadence-java-client/blob/master/gradle/wrapper/gradle-wrapper.properties)
+* Gradle build tool [6.x](https://github.com/cadence-workflow/cadence-java-client/blob/master/gradle/wrapper/gradle-wrapper.properties)
 * Docker
 
 :warning: Note 1: It's currently compatible with Java 8 compiler but no guarantee in the future.
 
 ## IntelliJ IDE integration (Optional)
 
-* Make sure you set the gradle path with the right version ([currently 6.x](https://github.com/uber/cadence-java-client/blob/master/gradle/wrapper/gradle-wrapper.properties))
+* Make sure you set the gradle path with the right version ([currently 6.x](https://github.com/cadence-workflow/cadence-java-client/blob/master/gradle/wrapper/gradle-wrapper.properties))
 
 ![IntelliJ](https://user-images.githubusercontent.com/4523955/135696878-81c1e62e-eb04-45e6-9bcb-785ac38b6607.png)
 
@@ -55,9 +55,9 @@ Build with:
 To test locally, you can publish to [MavenLocal](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:case-for-maven-local)
 
 1. Change `build.gradle`:
-Comment out the first section in `publications` ( line 160 to line 191 in [this commit](https://github.com/uber/cadence-java-client/blob/c9ec6786aa9f866b0310292ea3ee5df63adc8799/build.gradle#L160))
+Comment out the first section in `publications` ( line 160 to line 191 in [this commit](https://github.com/cadence-workflow/cadence-java-client/blob/c9ec6786aa9f866b0310292ea3ee5df63adc8799/build.gradle#L160))
 
-2. Change the [version](https://github.com/uber/cadence-java-client/blob/c9ec6786aa9f866b0310292ea3ee5df63adc8799/build.gradle#L43) to add a `local` suffix. E.g.
+2. Change the [version](https://github.com/cadence-workflow/cadence-java-client/blob/c9ec6786aa9f866b0310292ea3ee5df63adc8799/build.gradle#L43) to add a `local` suffix. E.g.
 ```
 version = '3.3.0'
 ````
@@ -71,13 +71,13 @@ Then run the command
 ```
 Now you have the local cadence-java-client in your machine using veriosn `3.3.0-local`
 
-3. To test with Cadence Java Samples, [change](https://github.com/uber/cadence-java-samples/blob/master/build.gradle#L32) `mavenCentral()` to `mavenLocal()`
-and also change the [version](https://github.com/uber/cadence-java-samples/blob/a79d8d6e5860cf9986bf549fc1f96badecb09f8f/build.gradle#L38) with your suffix.
+3. To test with Cadence Java Samples, [change](https://github.com/cadence-workflow/cadence-java-samples/blob/master/build.gradle#L32) `mavenCentral()` to `mavenLocal()`
+and also change the [version](https://github.com/cadence-workflow/cadence-java-samples/blob/a79d8d6e5860cf9986bf549fc1f96badecb09f8f/build.gradle#L38) with your suffix.
 
-Then `./gradlew build` and refer to the sample repo for how to run the code(it needs to run with a [Cadence server](https://github.com/uber/cadence)).
+Then `./gradlew build` and refer to the sample repo for how to run the code(it needs to run with a [Cadence server](https://github.com/cadence-workflow/cadence)).
 
-:warning: If you run into problem with `version.properties` [creation task](https://github.com/uber/cadence-java-client/blob/c9ec6786aa9f866b0310292ea3ee5df63adc8799/build.gradle#L109), you can comment the task out. It's okay for local testing.
-The property file is being used by [Version class](https://github.com/uber/cadence-java-client/blob/master/src/main/java/com/uber/cadence/internal/Version.java#L39)to report the library version for logging/metrics.
+:warning: If you run into problem with `version.properties` [creation task](https://github.com/cadence-workflow/cadence-java-client/blob/c9ec6786aa9f866b0310292ea3ee5df63adc8799/build.gradle#L109), you can comment the task out. It's okay for local testing.
+The property file is being used by [Version class](https://github.com/cadence-workflow/cadence-java-client/blob/master/src/main/java/com/uber/cadence/internal/Version.java#L39)to report the library version for logging/metrics.
 
 ## Unit & Integration Test
 
