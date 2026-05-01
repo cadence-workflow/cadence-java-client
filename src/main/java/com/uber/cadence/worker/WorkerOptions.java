@@ -21,6 +21,7 @@ import com.uber.cadence.internal.worker.PollerOptions;
 import com.uber.cadence.workflow.WorkflowInterceptor;
 import io.opentracing.Tracer;
 import io.opentracing.noop.NoopTracerFactory;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -39,6 +40,8 @@ public final class WorkerOptions {
 
   private static final WorkerOptions DEFAULT_INSTANCE;
 
+  static final Duration DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT = Duration.ofSeconds(5);
+
   static {
     DEFAULT_INSTANCE = WorkerOptions.newBuilder().build();
   }
@@ -53,6 +56,7 @@ public final class WorkerOptions {
     private PollerOptions activityPollerOptions;
     private PollerOptions workflowPollerOptions;
     private Function<WorkflowInterceptor, WorkflowInterceptor> interceptorFactory = (n) -> n;
+    private Duration stickyTaskListScheduleToStartTimeout;
     // by default NoopTracer
     private Tracer tracer = NoopTracerFactory.create();
 
@@ -68,6 +72,7 @@ public final class WorkerOptions {
       this.activityPollerOptions = options.activityPollerOptions;
       this.workflowPollerOptions = options.workflowPollerOptions;
       this.interceptorFactory = options.interceptorFactory;
+      this.stickyTaskListScheduleToStartTimeout = options.stickyTaskListScheduleToStartTimeout;
       this.tracer = options.tracer;
     }
 
@@ -151,7 +156,21 @@ public final class WorkerOptions {
       return this;
     }
 
+    /**
+     * Timeout for sticky decision task to be picked up by the host assigned to it. Once it times
+     * out then it can be picked up by any worker. Default value is 5 seconds.
+     */
+    public Builder setStickyTaskListScheduleToStartTimeout(
+        Duration stickyTaskListScheduleToStartTimeout) {
+      this.stickyTaskListScheduleToStartTimeout = stickyTaskListScheduleToStartTimeout;
+      return this;
+    }
+
     public WorkerOptions build() {
+      Duration stickyTimeout = stickyTaskListScheduleToStartTimeout;
+      if (stickyTimeout == null) {
+        stickyTimeout = DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT;
+      }
       return new WorkerOptions(
           workerActivitiesPerSecond,
           maxConcurrentActivityExecutionSize,
@@ -161,7 +180,8 @@ public final class WorkerOptions {
           activityPollerOptions,
           workflowPollerOptions,
           interceptorFactory,
-          tracer);
+          tracer,
+          stickyTimeout);
     }
   }
 
@@ -174,6 +194,7 @@ public final class WorkerOptions {
   private final PollerOptions workflowPollerOptions;
   private final Function<WorkflowInterceptor, WorkflowInterceptor> interceptorFactory;
   private final Tracer tracer;
+  private final Duration stickyTaskListScheduleToStartTimeout;
 
   private WorkerOptions(
       double workerActivitiesPerSecond,
@@ -184,7 +205,8 @@ public final class WorkerOptions {
       PollerOptions activityPollerOptions,
       PollerOptions workflowPollerOptions,
       Function<WorkflowInterceptor, WorkflowInterceptor> interceptorFactory,
-      Tracer tracer) {
+      Tracer tracer,
+      Duration stickyTaskListScheduleToStartTimeout) {
     this.workerActivitiesPerSecond = workerActivitiesPerSecond;
     this.maxConcurrentActivityExecutionSize = maxConcurrentActivityExecutionSize;
     this.maxConcurrentWorkflowExecutionSize = maxConcurrentWorkflowExecutionSize;
@@ -194,6 +216,7 @@ public final class WorkerOptions {
     this.workflowPollerOptions = workflowPollerOptions;
     this.interceptorFactory = interceptorFactory;
     this.tracer = tracer;
+    this.stickyTaskListScheduleToStartTimeout = stickyTaskListScheduleToStartTimeout;
   }
 
   public double getWorkerActivitiesPerSecond() {
@@ -232,6 +255,10 @@ public final class WorkerOptions {
     return tracer;
   }
 
+  public Duration getStickyTaskListScheduleToStartTimeout() {
+    return stickyTaskListScheduleToStartTimeout;
+  }
+
   @Override
   public String toString() {
     return "WorkerOptions{"
@@ -249,6 +276,8 @@ public final class WorkerOptions {
         + activityPollerOptions
         + ", workflowPollerOptions="
         + workflowPollerOptions
+        + ", stickyTaskListScheduleToStartTimeout="
+        + stickyTaskListScheduleToStartTimeout
         + '}';
   }
 }

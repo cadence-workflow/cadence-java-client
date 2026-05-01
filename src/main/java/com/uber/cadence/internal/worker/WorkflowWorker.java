@@ -37,13 +37,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
-import java.util.function.Consumer;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-public final class WorkflowWorker extends SuspendableWorkerBase
-    implements Consumer<PollForDecisionTaskResponse> {
+public final class WorkflowWorker extends SuspendableWorkerBase {
+
+  private static final Logger log = LoggerFactory.getLogger(WorkflowWorker.class);
 
   private static final String POLL_THREAD_NAME_PREFIX = "Workflow Poller taskList=";
   private final DecisionTaskHandler handler;
@@ -54,7 +57,7 @@ public final class WorkflowWorker extends SuspendableWorkerBase
   private final String stickyTaskListName;
   private final WorkflowRunLockManager runLocks = new WorkflowRunLockManager();
   private final Function<Task, Boolean> ldaTaskPoller;
-  private PollTaskExecutor<PollForDecisionTaskResponse> pollTaskExecutor;
+  private PollTaskExecutor<DecisionTask> pollTaskExecutor;
 
   public WorkflowWorker(
       IWorkflowService service,
@@ -79,14 +82,27 @@ public final class WorkflowWorker extends SuspendableWorkerBase
                   POLL_THREAD_NAME_PREFIX + "\"" + taskList + "\", domain=\"" + domain + "\"")
               .build();
     }
+    // ensure at least 2 poll threads
+    if (pollerOptions.getPollThreadCount() < 2 && stickyTaskListName != null) {
+      pollerOptions = PollerOptions.newBuilder(pollerOptions).setPollThreadCount(2).build();
+    }
     this.options = SingleWorkerOptions.newBuilder(options).setPollerOptions(pollerOptions).build();
   }
 
   @Override
   public void start() {
     if (handler.isAnyTypeSupported()) {
+      Semaphore decisionTaskExecutorSemaphore =
+          new Semaphore(options.getTaskExecutorThreadPoolSize());
+
       pollTaskExecutor =
           new PollTaskExecutor<>(domain, taskList, options, new TaskHandlerImpl(handler));
+
+      // Create sticky queue balancer
+      StickyQueueBalancer stickyQueueBalancer =
+          new StickyQueueBalancer(
+              options.getPollerOptions().getPollThreadCount(), stickyTaskListName != null);
+
       SuspendableWorker poller =
           new Poller<>(
               options.getIdentity(),
@@ -94,15 +110,18 @@ public final class WorkflowWorker extends SuspendableWorkerBase
                   service,
                   domain,
                   taskList,
-                  TaskListKind.NORMAL,
+                  stickyTaskListName,
                   options.getMetricsScope(),
-                  options.getIdentity()),
+                  options.getIdentity(),
+                  decisionTaskExecutorSemaphore,
+                  stickyQueueBalancer),
               pollTaskExecutor,
               options.getPollerOptions(),
               options.getMetricsScope(),
               options.getExecutorWrapper());
       poller.start();
       setPoller(poller);
+
       options.getMetricsScope().counter(MetricsType.WORKER_START_COUNTER).inc(1);
     }
   }
@@ -171,12 +190,36 @@ public final class WorkflowWorker extends SuspendableWorkerBase
   }
 
   @Override
-  public void accept(PollForDecisionTaskResponse pollForDecisionTaskResponse) {
-    pollTaskExecutor.process(pollForDecisionTaskResponse);
+  public void shutdown() {
+    super.shutdown();
   }
 
-  private class TaskHandlerImpl
-      implements PollTaskExecutor.TaskHandler<PollForDecisionTaskResponse> {
+  @Override
+  public void shutdownNow() {
+    super.shutdownNow();
+  }
+
+  @Override
+  public void awaitTermination(long timeout, java.util.concurrent.TimeUnit unit) {
+    super.awaitTermination(timeout, unit);
+  }
+
+  @Override
+  public void suspendPolling() {
+    super.suspendPolling();
+  }
+
+  @Override
+  public void resumePolling() {
+    super.resumePolling();
+  }
+
+  @Override
+  public boolean isTerminated() {
+    return super.isTerminated();
+  }
+
+  private class TaskHandlerImpl implements PollTaskExecutor.TaskHandler<DecisionTask> {
 
     final DecisionTaskHandler handler;
 
@@ -185,19 +228,21 @@ public final class WorkflowWorker extends SuspendableWorkerBase
     }
 
     @Override
-    public void handle(PollForDecisionTaskResponse task) throws Exception {
+    public void handle(DecisionTask task) throws Exception {
+      PollForDecisionTaskResponse response = task.getResponse();
       Scope metricsScope =
           options
               .getMetricsScope()
-              .tagged(ImmutableMap.of(MetricsTag.WORKFLOW_TYPE, task.getWorkflowType().getName()));
+              .tagged(
+                  ImmutableMap.of(MetricsTag.WORKFLOW_TYPE, response.getWorkflowType().getName()));
 
-      MDC.put(LoggerTag.WORKFLOW_ID, task.getWorkflowExecution().getWorkflowId());
-      MDC.put(LoggerTag.WORKFLOW_TYPE, task.getWorkflowType().getName());
-      MDC.put(LoggerTag.RUN_ID, task.getWorkflowExecution().getRunId());
+      MDC.put(LoggerTag.WORKFLOW_ID, response.getWorkflowExecution().getWorkflowId());
+      MDC.put(LoggerTag.WORKFLOW_TYPE, response.getWorkflowType().getName());
+      MDC.put(LoggerTag.RUN_ID, response.getWorkflowExecution().getRunId());
 
       Lock runLock = null;
       if (!Strings.isNullOrEmpty(stickyTaskListName)) {
-        runLock = runLocks.getLockForLocking(task.getWorkflowExecution().getRunId());
+        runLock = runLocks.getLockForLocking(response.getWorkflowExecution().getRunId());
         runLock.lock();
       }
 
@@ -207,7 +252,7 @@ public final class WorkflowWorker extends SuspendableWorkerBase
                 metricsScope,
                 MetricsType.DECISION_EXECUTION_LATENCY,
                 HistogramBuckets.DEFAULT_1MS_100S);
-        DecisionTaskHandler.Result response = handler.handleDecisionTask(task);
+        DecisionTaskHandler.Result handlerResponse = handler.handleDecisionTask(response);
         sw.stop();
 
         sw =
@@ -215,7 +260,7 @@ public final class WorkflowWorker extends SuspendableWorkerBase
                 metricsScope,
                 MetricsType.DECISION_RESPONSE_LATENCY,
                 HistogramBuckets.DEFAULT_1MS_100S);
-        sendReply(service, task, response);
+        sendReply(service, response, handlerResponse);
         sw.stop();
 
         metricsScope.counter(MetricsType.DECISION_TASK_COMPLETED_COUNTER).inc(1);
@@ -224,15 +269,17 @@ public final class WorkflowWorker extends SuspendableWorkerBase
         MDC.remove(LoggerTag.WORKFLOW_TYPE);
         MDC.remove(LoggerTag.RUN_ID);
 
+        task.getCompletionCallback().apply();
+
         if (runLock != null) {
-          runLocks.unlock(task.getWorkflowExecution().getRunId());
+          runLocks.unlock(response.getWorkflowExecution().getRunId());
         }
       }
     }
 
     @Override
-    public Throwable wrapFailure(PollForDecisionTaskResponse task, Throwable failure) {
-      WorkflowExecution execution = task.getWorkflowExecution();
+    public Throwable wrapFailure(DecisionTask task, Throwable failure) {
+      WorkflowExecution execution = task.getResponse().getWorkflowExecution();
       return new RuntimeException(
           "Failure processing decision task. WorkflowID="
               + execution.getWorkflowId()
