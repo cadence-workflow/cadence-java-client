@@ -1,4 +1,4 @@
-module github.com/uber/cadence-idl/java/generator
+module github.com/cadence-workflow/cadence-idl/java/generator
 
 go 1.18
 

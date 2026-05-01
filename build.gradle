@@ -291,11 +291,11 @@ publishing {
             pom {
                 name = 'cadence-client'
                 description = 'Uber Cadence Java Client'
-                url = 'https://github.com/uber-java/cadence-client'
+                url = 'https://github.com/cadence-workflow/cadence-java-client'
                 scm {
-                    url = 'https://github.com/uber-java/cadence-client'
-                    connection = 'scm:git:git@github.com:uber-java/cadence-client.git/'
-                    developerConnection = 'scm:git:git@github.com:uber-java/cadence-client.git/'
+                    url = 'https://github.com/cadence-workflow/cadence-java-client'
+                    connection = 'scm:git:git@github.com:cadence-workflow/cadence-java-client.git'
+                    developerConnection = 'scm:git:git@github.com:cadence-workflow/cadence-java-client.git'
                 }
                 licenses {
                     license {

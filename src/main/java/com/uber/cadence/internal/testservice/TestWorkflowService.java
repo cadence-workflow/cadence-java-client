@@ -616,7 +616,7 @@ public final class TestWorkflowService implements IWorkflowService {
     return new SignalWithStartWorkflowExecutionAsyncResponse();
   }
 
-  // TODO: https://github.com/uber/cadence-java-client/issues/359
+  // TODO: https://github.com/cadence-workflow/cadence-java-client/issues/359
   @Override
   public ResetWorkflowExecutionResponse ResetWorkflowExecution(
       ResetWorkflowExecutionRequest resetRequest)
