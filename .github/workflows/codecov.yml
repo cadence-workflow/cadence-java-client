@@ -16,3 +16,5 @@ jobs:
           file: ./build/reports/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: cadence-workflow/cadence-java-client
+          fail_ci_if_error: true # This forces the step to fail if the upload fails
+          verbose: true
