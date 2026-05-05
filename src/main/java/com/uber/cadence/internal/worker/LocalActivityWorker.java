@@ -24,13 +24,14 @@ import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.common.RetryOptions;
 import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.internal.common.LocalActivityMarkerData;
+import com.uber.cadence.internal.metrics.HistogramBuckets;
+import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.replay.ClockDecisionContext;
 import com.uber.cadence.internal.replay.ExecuteLocalActivityParameters;
 import com.uber.cadence.internal.tracing.TracingPropagator;
 import com.uber.m3.tally.Scope;
-import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.util.ImmutableMap;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
@@ -198,7 +199,11 @@ public final class LocalActivityWorker extends SuspendableWorkerBase {
       pollTask.setInput(task.params.getInput());
       pollTask.setAttempt(task.params.getAttempt());
 
-      Stopwatch sw = metricsScope.timer(MetricsType.LOCAL_ACTIVITY_EXECUTION_LATENCY).start();
+      MetricsEmit.DualStopwatch sw =
+          MetricsEmit.startLatency(
+              metricsScope,
+              MetricsType.LOCAL_ACTIVITY_EXECUTION_LATENCY,
+              HistogramBuckets.DEFAULT_1MS_100S);
       ActivityTaskHandler.Result result = handler.handle(pollTask, metricsScope, true);
       sw.stop();
       result.setAttempt(task.params.getAttempt());
