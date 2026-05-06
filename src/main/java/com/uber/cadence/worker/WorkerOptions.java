@@ -56,7 +56,8 @@ public final class WorkerOptions {
     private PollerOptions activityPollerOptions;
     private PollerOptions workflowPollerOptions;
     private Function<WorkflowInterceptor, WorkflowInterceptor> interceptorFactory = (n) -> n;
-    private Duration stickyTaskListScheduleToStartTimeout;
+    private Duration stickyTaskListScheduleToStartTimeout =
+        DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT;
     // by default NoopTracer
     private Tracer tracer = NoopTracerFactory.create();
 
@@ -162,15 +163,14 @@ public final class WorkerOptions {
      */
     public Builder setStickyTaskListScheduleToStartTimeout(
         Duration stickyTaskListScheduleToStartTimeout) {
+      if (stickyTaskListScheduleToStartTimeout == null) {
+        stickyTaskListScheduleToStartTimeout = DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT;
+      }
       this.stickyTaskListScheduleToStartTimeout = stickyTaskListScheduleToStartTimeout;
       return this;
     }
 
     public WorkerOptions build() {
-      Duration stickyTimeout = stickyTaskListScheduleToStartTimeout;
-      if (stickyTimeout == null) {
-        stickyTimeout = DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT;
-      }
       return new WorkerOptions(
           workerActivitiesPerSecond,
           maxConcurrentActivityExecutionSize,
@@ -181,7 +181,7 @@ public final class WorkerOptions {
           workflowPollerOptions,
           interceptorFactory,
           tracer,
-          stickyTimeout);
+          stickyTaskListScheduleToStartTimeout);
     }
   }
 

@@ -42,11 +42,11 @@ final class WorkflowPollTask implements Poller.PollTask<DecisionTask> {
   private final Scope stickyMetricScope;
   private final IWorkflowService service;
   private final String domain;
+  private final String identity;
   private final String taskList;
+  private final String stickyTaskListName;
   private final Semaphore decisionTaskExecutorSemaphore;
   private final StickyQueueBalancer stickyQueueBalancer;
-  private final PollForDecisionTaskRequest pollRequest;
-  private final PollForDecisionTaskRequest stickyPollRequest;
 
   WorkflowPollTask(
       IWorkflowService service,
@@ -59,7 +59,9 @@ final class WorkflowPollTask implements Poller.PollTask<DecisionTask> {
       StickyQueueBalancer stickyQueueBalancer) {
     this.service = Objects.requireNonNull(service);
     this.domain = Objects.requireNonNull(domain);
+    this.identity = identity;
     this.taskList = Objects.requireNonNull(taskList);
+    this.stickyTaskListName = stickyTaskListName;
     this.metricScope = Objects.requireNonNull(metricScope);
     this.stickyQueueBalancer = Objects.requireNonNull(stickyQueueBalancer);
     this.decisionTaskExecutorSemaphore = Objects.requireNonNull(decisionTaskExecutorSemaphore);
@@ -69,26 +71,6 @@ final class WorkflowPollTask implements Poller.PollTask<DecisionTask> {
             new ImmutableMap.Builder<String, String>(1)
                 .put(MetricsTag.TASK_LIST, String.format("%s:%s", taskList, "sticky"))
                 .build());
-
-    // Normal poll request
-    this.pollRequest = new PollForDecisionTaskRequest();
-    pollRequest.setDomain(domain);
-    pollRequest.setIdentity(identity);
-    pollRequest.setBinaryChecksum(BinaryChecksum.getBinaryChecksum());
-    TaskList tl = new TaskList().setName(taskList).setKind(TaskListKind.NORMAL);
-    pollRequest.setTaskList(tl);
-
-    // Sticky poll request
-    this.stickyPollRequest = new PollForDecisionTaskRequest();
-    stickyPollRequest.setDomain(domain);
-    stickyPollRequest.setIdentity(identity);
-    stickyPollRequest.setBinaryChecksum(BinaryChecksum.getBinaryChecksum());
-    TaskList stickyTl =
-        new TaskList()
-            .setName(stickyTaskListName)
-            .setKind(TaskListKind.STICKY)
-            .setBaseName(taskList);
-    stickyPollRequest.setTaskList(stickyTl);
   }
 
   @Override
@@ -103,7 +85,22 @@ final class WorkflowPollTask implements Poller.PollTask<DecisionTask> {
 
     TaskListKind taskListKind = stickyQueueBalancer.makePoll();
     boolean isSticky = TaskListKind.STICKY.equals(taskListKind);
-    PollForDecisionTaskRequest request = isSticky ? stickyPollRequest : pollRequest;
+    PollForDecisionTaskRequest request =
+        isSticky
+            ? new PollForDecisionTaskRequest()
+                .setDomain(domain)
+                .setIdentity(identity)
+                .setBinaryChecksum(BinaryChecksum.getBinaryChecksum())
+                .setTaskList(
+                    new TaskList()
+                        .setName(stickyTaskListName)
+                        .setKind(TaskListKind.STICKY)
+                        .setBaseName(taskList))
+            : new PollForDecisionTaskRequest()
+                .setDomain(domain)
+                .setIdentity(identity)
+                .setBinaryChecksum(BinaryChecksum.getBinaryChecksum())
+                .setTaskList(new TaskList().setName(taskList).setKind(TaskListKind.NORMAL));
     Scope scope = isSticky ? stickyMetricScope : metricScope;
 
     log.trace("poll request begin: {}", request);

@@ -189,36 +189,6 @@ public final class WorkflowWorker extends SuspendableWorkerBase {
     throw new RuntimeException("Query returned wrong response: " + result);
   }
 
-  @Override
-  public void shutdown() {
-    super.shutdown();
-  }
-
-  @Override
-  public void shutdownNow() {
-    super.shutdownNow();
-  }
-
-  @Override
-  public void awaitTermination(long timeout, java.util.concurrent.TimeUnit unit) {
-    super.awaitTermination(timeout, unit);
-  }
-
-  @Override
-  public void suspendPolling() {
-    super.suspendPolling();
-  }
-
-  @Override
-  public void resumePolling() {
-    super.resumePolling();
-  }
-
-  @Override
-  public boolean isTerminated() {
-    return super.isTerminated();
-  }
-
   private class TaskHandlerImpl implements PollTaskExecutor.TaskHandler<DecisionTask> {
 
     final DecisionTaskHandler handler;
