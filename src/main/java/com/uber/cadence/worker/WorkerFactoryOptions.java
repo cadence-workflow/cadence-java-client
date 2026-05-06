@@ -18,7 +18,6 @@
 package com.uber.cadence.worker;
 
 import com.google.common.base.Preconditions;
-import java.time.Duration;
 
 public class WorkerFactoryOptions {
   public static Builder newBuilder() {
@@ -75,28 +74,6 @@ public class WorkerFactoryOptions {
      */
     public Builder setMaxWorkflowThreadCount(int maxWorkflowThreadCount) {
       this.maxWorkflowThreadCount = maxWorkflowThreadCount;
-      return this;
-    }
-
-    /**
-     * Timeout for sticky workflow decision to be picked up by the host assigned to it. Once it
-     * times out then it can be picked up by any worker. Default value is 5 seconds.
-     *
-     * @deprecated use {@link
-     *     WorkerOptions.Builder#setStickyTaskListScheduleToStartTimeout(Duration)} to specify this
-     *     value per-worker instead
-     */
-    @Deprecated
-    public Builder setStickyTaskScheduleToStartTimeout(Duration stickyTaskScheduleToStartTimeout) {
-      return this;
-    }
-
-    /**
-     * PollerOptions for poller responsible for polling for decisions for workflows cached by all
-     * workers created by this factory.
-     */
-    @Deprecated
-    public Builder setStickyPollerCount(int stickyPollerCount) {
       return this;
     }
 
@@ -158,16 +135,6 @@ public class WorkerFactoryOptions {
 
   public boolean isEnableLoggingInReplay() {
     return enableLoggingInReplay;
-  }
-
-  @Deprecated
-  public int getStickyPollerCount() {
-    return 0;
-  }
-
-  @Deprecated
-  public Duration getStickyTaskScheduleToStartTimeout() {
-    return Duration.ZERO;
   }
 
   public ExecutorWrapper getExecutorWrapper() {
