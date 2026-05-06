@@ -393,10 +393,29 @@ public final class TestWorkflowService implements IWorkflowService {
   public PollForDecisionTaskResponse PollForDecisionTask(PollForDecisionTaskRequest pollRequest)
       throws BadRequestError, InternalServiceError, ServiceBusyError, CadenceError {
     PollForDecisionTaskResponse task;
+    java.util.concurrent.Future<PollForDecisionTaskResponse> future =
+        store.pollForDecisionTask(pollRequest);
     try {
-      task = store.pollForDecisionTask(pollRequest);
+      // Poll with 60 second timeout to match production long poll behavior
+      task = future.get(60, java.util.concurrent.TimeUnit.SECONDS);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      future.cancel(true); // Cancel the Future to remove it from waiters queue
       return new PollForDecisionTaskResponse();
+    } catch (java.util.concurrent.TimeoutException e) {
+      // Poll timed out - cancel to remove from waiters queue
+      future.cancel(true);
+      return new PollForDecisionTaskResponse();
+    } catch (java.util.concurrent.CancellationException e) {
+      // Poll was cancelled - return empty response
+      return new PollForDecisionTaskResponse();
+    } catch (java.util.concurrent.ExecutionException e) {
+      future.cancel(true);
+      throw new InternalServiceError("Error polling for decision task: " + e.getMessage());
+    }
+    // Return empty response if poll timed out
+    if (task.getWorkflowExecution() == null) {
+      return task;
     }
     ExecutionId executionId = new ExecutionId(pollRequest.getDomain(), task.getWorkflowExecution());
     TestWorkflowMutableState mutableState = getMutableState(executionId);
@@ -440,10 +459,29 @@ public final class TestWorkflowService implements IWorkflowService {
       throws BadRequestError, InternalServiceError, ServiceBusyError, CadenceError {
     PollForActivityTaskResponse task;
     while (true) {
+      java.util.concurrent.Future<PollForActivityTaskResponse> future =
+          store.pollForActivityTask(pollRequest);
       try {
-        task = store.pollForActivityTask(pollRequest);
+        // Poll with 60 second timeout to match production long poll behavior
+        task = future.get(60, java.util.concurrent.TimeUnit.SECONDS);
       } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        future.cancel(true); // Cancel the Future to remove it from waiters queue
         return new PollForActivityTaskResponse();
+      } catch (java.util.concurrent.TimeoutException e) {
+        // Poll timed out - cancel to remove from waiters queue
+        future.cancel(true);
+        return new PollForActivityTaskResponse();
+      } catch (java.util.concurrent.CancellationException e) {
+        // Poll was cancelled - return empty response
+        return new PollForActivityTaskResponse();
+      } catch (java.util.concurrent.ExecutionException e) {
+        future.cancel(true);
+        throw new InternalServiceError("Error polling for activity task: " + e.getMessage());
+      }
+      // Return empty response if poll timed out
+      if (task.getWorkflowExecution() == null) {
+        return task;
       }
       ExecutionId executionId =
           new ExecutionId(pollRequest.getDomain(), task.getWorkflowExecution());

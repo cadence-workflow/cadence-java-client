@@ -21,8 +21,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.uber.cadence.PollForDecisionTaskResponse;
-import com.uber.cadence.TaskListKind;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.converter.JsonDataConverter;
@@ -32,12 +30,9 @@ import com.uber.cadence.internal.replay.DeciderCache;
 import com.uber.cadence.internal.worker.*;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.util.ImmutableMap;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -64,14 +59,10 @@ public final class WorkerFactory {
 
   private final List<Worker> workers = new ArrayList<>();
   private final WorkflowClient workflowClient;
-  // Guarantee uniqueness for stickyTaskListName when multiple factories
-  private final UUID stickyTasklistRandomId = UUID.randomUUID();
   private final ThreadPoolExecutor workflowThreadPool;
   private final AtomicInteger workflowThreadCounter = new AtomicInteger();
   private final WorkerFactoryOptions factoryOptions;
 
-  private Poller<PollForDecisionTaskResponse> stickyPoller;
-  private PollDecisionTaskDispatcher dispatcher;
   private DeciderCache cache;
 
   private State state = State.Initial;
@@ -79,9 +70,7 @@ public final class WorkerFactory {
   private final String statusErrorMessage =
       "attempted to %s while in %s state. Acceptable States: %s";
   private static final Logger log = LoggerFactory.getLogger(WorkerFactory.class);
-  private static final String STICKY_TASK_LIST_PREFIX = "sticky";
-  private static final String STICKY_TASK_LIST_METRIC_TAG = "__" + STICKY_TASK_LIST_PREFIX + "__";
-  private static final String POLL_THREAD_NAME = "Sticky Task Poller";
+  private static final String STICKY_TASK_LIST_METRIC_TAG = "__sticky__";
 
   /**
    * Creates a factory. Workers will be connect to the cadence-server using the workflowService
@@ -115,7 +104,8 @@ public final class WorkerFactory {
     // initialize the JsonDataConverter with the metrics scope
     JsonDataConverter.setMetricsScope(workflowClient.getOptions().getMetricsScope());
 
-    Scope stickyScope =
+    // Tag the cache metrics scope with a constant sticky tag since cache is shared across workers
+    Scope metricsScope =
         workflowClient
             .getOptions()
             .getMetricsScope()
@@ -125,27 +115,7 @@ public final class WorkerFactory {
                     workflowClient.getOptions().getDomain(),
                     MetricsTag.TASK_LIST,
                     STICKY_TASK_LIST_METRIC_TAG));
-
-    this.cache = new DeciderCache(this.factoryOptions.getCacheMaximumSize(), stickyScope);
-    dispatcher = new PollDecisionTaskDispatcher(workflowClient.getService());
-    stickyPoller =
-        new Poller<>(
-            workflowClient.getOptions().getIdentity(),
-            new WorkflowPollTaskFactory(
-                    workflowClient.getService(),
-                    workflowClient.getOptions().getDomain(),
-                    getStickyTaskListName(),
-                    TaskListKind.STICKY,
-                    stickyScope,
-                    workflowClient.getOptions().getIdentity())
-                .get(),
-            dispatcher,
-            PollerOptions.newBuilder()
-                .setPollThreadNamePrefix(POLL_THREAD_NAME)
-                .setPollThreadCount(this.factoryOptions.getStickyPollerCount())
-                .build(),
-            stickyScope,
-            factoryOptions.getExecutorWrapper());
+    this.cache = new DeciderCache(this.factoryOptions.getCacheMaximumSize(), metricsScope);
   }
 
   /**
@@ -185,15 +155,11 @@ public final class WorkerFactory {
             factoryOptions,
             options,
             cache,
-            getStickyTaskListName(),
-            factoryOptions.getStickyTaskScheduleToStartTimeout(),
+            !factoryOptions.isDisableStickyExecution(),
             workflowThreadPool,
             workflowClient.getOptions().getContextPropagators());
     workers.add(worker);
 
-    if (!this.factoryOptions.isDisableStickyExecution()) {
-      dispatcher.subscribe(taskList, worker.getWorkflowWorker());
-    }
     return worker;
   }
 
@@ -214,10 +180,6 @@ public final class WorkerFactory {
     for (Worker worker : workers) {
       worker.start();
     }
-
-    if (stickyPoller != null) {
-      stickyPoller.start();
-    }
   }
 
   /** Was {@link #start()} called. */
@@ -237,11 +199,6 @@ public final class WorkerFactory {
   public synchronized boolean isTerminated() {
     if (state != State.Shutdown) {
       return false;
-    }
-    if (stickyPoller != null) {
-      if (!stickyPoller.isTerminated()) {
-        return false;
-      }
     }
     for (Worker worker : workers) {
       if (!worker.isTerminated()) {
@@ -267,11 +224,6 @@ public final class WorkerFactory {
   public synchronized void shutdown() {
     log.info("shutdown");
     state = State.Shutdown;
-    if (stickyPoller != null) {
-      stickyPoller.shutdown();
-      // To ensure that it doesn't get new tasks before workers are shutdown.
-      stickyPoller.awaitTermination(1, TimeUnit.SECONDS);
-    }
     for (Worker worker : workers) {
       worker.shutdown();
     }
@@ -289,11 +241,6 @@ public final class WorkerFactory {
   public synchronized void shutdownNow() {
     log.info("shutdownNow");
     state = State.Shutdown;
-    if (stickyPoller != null) {
-      stickyPoller.shutdownNow();
-      // To ensure that it doesn't get new tasks before workers are shutdown.
-      stickyPoller.awaitTermination(1, TimeUnit.SECONDS);
-    }
     for (Worker worker : workers) {
       worker.shutdownNow();
     }
@@ -320,7 +267,6 @@ public final class WorkerFactory {
   public void awaitTermination(long timeout, TimeUnit unit) {
     log.debug("awaitTermination begin");
     long timeoutMillis = unit.toMillis(timeout);
-    timeoutMillis = InternalUtils.awaitTermination(stickyPoller, timeoutMillis);
     for (Worker worker : workers) {
       long t = timeoutMillis; // closure needs immutable value
       timeoutMillis =
@@ -335,21 +281,6 @@ public final class WorkerFactory {
     return this.cache;
   }
 
-  private String getHostName() {
-    try {
-      return InetAddress.getLocalHost().getHostName();
-    } catch (UnknownHostException e) {
-      return "UnknownHost";
-    }
-  }
-
-  @VisibleForTesting
-  String getStickyTaskListName() {
-    return this.factoryOptions.isDisableStickyExecution()
-        ? null
-        : String.format("%s:%s:%s", STICKY_TASK_LIST_PREFIX, getHostName(), stickyTasklistRandomId);
-  }
-
   public synchronized void suspendPolling() {
     if (state != State.Started) {
       return;
@@ -357,9 +288,6 @@ public final class WorkerFactory {
 
     log.info("suspendPolling");
     state = State.Suspended;
-    if (stickyPoller != null) {
-      stickyPoller.suspendPolling();
-    }
     for (Worker worker : workers) {
       worker.suspendPolling();
     }
@@ -372,9 +300,6 @@ public final class WorkerFactory {
 
     log.info("resumePolling");
     state = State.Started;
-    if (stickyPoller != null) {
-      stickyPoller.resumePolling();
-    }
     for (Worker worker : workers) {
       worker.resumePolling();
     }

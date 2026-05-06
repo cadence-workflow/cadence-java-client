@@ -48,6 +48,7 @@ public final class SingleWorkerOptions {
     private List<ContextPropagator> contextPropagators;
     private Tracer tracer;
     private ExecutorWrapper executorWrapper;
+    private Duration stickyTaskListScheduleToStartTimeout;
 
     private Builder() {}
 
@@ -62,6 +63,7 @@ public final class SingleWorkerOptions {
       this.contextPropagators = options.getContextPropagators();
       this.tracer = options.getTracer();
       this.executorWrapper = options.getExecutorWrapper();
+      this.stickyTaskListScheduleToStartTimeout = options.getStickyTaskListScheduleToStartTimeout();
     }
 
     public Builder setIdentity(String identity) {
@@ -115,6 +117,12 @@ public final class SingleWorkerOptions {
       return this;
     }
 
+    public Builder setStickyTaskListScheduleToStartTimeout(
+        Duration stickyTaskListScheduleToStartTimeout) {
+      this.stickyTaskListScheduleToStartTimeout = stickyTaskListScheduleToStartTimeout;
+      return this;
+    }
+
     public SingleWorkerOptions build() {
       if (pollerOptions == null) {
         pollerOptions =
@@ -143,7 +151,8 @@ public final class SingleWorkerOptions {
           enableLoggingInReplay,
           contextPropagators,
           tracer,
-          executorWrapper);
+          executorWrapper,
+          stickyTaskListScheduleToStartTimeout);
     }
   }
 
@@ -157,6 +166,7 @@ public final class SingleWorkerOptions {
   private List<ContextPropagator> contextPropagators;
   private final Tracer tracer;
   private final ExecutorWrapper executorWrapper;
+  private final Duration stickyTaskListScheduleToStartTimeout;
 
   private SingleWorkerOptions(
       String identity,
@@ -168,7 +178,8 @@ public final class SingleWorkerOptions {
       boolean enableLoggingInReplay,
       List<ContextPropagator> contextPropagators,
       Tracer tracer,
-      ExecutorWrapper executorWrapper) {
+      ExecutorWrapper executorWrapper,
+      Duration stickyTaskListScheduleToStartTimeout) {
     this.identity = identity;
     this.dataConverter = dataConverter;
     this.taskExecutorThreadPoolSize = taskExecutorThreadPoolSize;
@@ -179,6 +190,7 @@ public final class SingleWorkerOptions {
     this.contextPropagators = contextPropagators;
     this.tracer = tracer;
     this.executorWrapper = executorWrapper;
+    this.stickyTaskListScheduleToStartTimeout = stickyTaskListScheduleToStartTimeout;
   }
 
   public String getIdentity() {
@@ -219,5 +231,9 @@ public final class SingleWorkerOptions {
 
   public ExecutorWrapper getExecutorWrapper() {
     return executorWrapper;
+  }
+
+  public Duration getStickyTaskListScheduleToStartTimeout() {
+    return stickyTaskListScheduleToStartTimeout;
   }
 }
