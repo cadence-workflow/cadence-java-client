@@ -19,7 +19,6 @@ package com.uber.cadence.internal.worker;
 
 import com.uber.cadence.ActivityType;
 import com.uber.cadence.Header;
-import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.internal.worker.Poller.PollTask;
@@ -48,7 +47,7 @@ public final class LocallyDispatchedActivityWorker extends ActivityWorker {
     ldaPollTask = new LocallyDispatchedActivityPollTask(options);
   }
 
-  protected PollTask<PollForActivityTaskResponse> getOrCreateActivityPollTask() {
+  protected PollTask<ActivityTask> getOrCreateActivityPollTask() {
     return ldaPollTask;
   }
 
