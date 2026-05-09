@@ -51,6 +51,7 @@ public class ActivityWorker extends SuspendableWorkerBase {
   private final String taskList;
   private final Tracer tracer;
   private final TracingPropagator spanFactory;
+  private PollTask<ActivityTask> cachedActivityPollTask;
 
   public ActivityWorker(
       IWorkflowService service,
@@ -84,6 +85,7 @@ public class ActivityWorker extends SuspendableWorkerBase {
               .build();
     }
     this.options = SingleWorkerOptions.newBuilder(options).setPollerOptions(pollerOptions).build();
+    this.cachedActivityPollTask = new ActivityPollTask(service, domain, taskList, this.options);
   }
 
   @Override
@@ -104,7 +106,7 @@ public class ActivityWorker extends SuspendableWorkerBase {
   }
 
   protected PollTask<ActivityTask> getOrCreateActivityPollTask() {
-    return new ActivityPollTask(service, domain, taskList, options);
+    return cachedActivityPollTask;
   }
 
   private class TaskHandlerImpl implements PollTaskExecutor.TaskHandler<ActivityTask> {
@@ -144,11 +146,12 @@ public class ActivityWorker extends SuspendableWorkerBase {
 
       propagateContext(response);
       Span span = spanFactory.spanForExecuteActivity(response);
+      ActivityTaskHandler.Result handlerResponse = null;
       try (io.opentracing.Scope scope = tracer.activateSpan(span)) {
         MetricsEmit.DualStopwatch sw =
             MetricsEmit.startLatency(
                 metricsScope, MetricsType.ACTIVITY_EXEC_LATENCY, HistogramBuckets.HIGH_1MS_24H);
-        ActivityTaskHandler.Result handlerResponse = handler.handle(response, metricsScope, false);
+        handlerResponse = handler.handle(task, metricsScope, false);
         sw.stop();
 
         sw =
@@ -175,7 +178,8 @@ public class ActivityWorker extends SuspendableWorkerBase {
         MetricsEmit.DualStopwatch sw =
             MetricsEmit.startLatency(
                 metricsScope, MetricsType.ACTIVITY_RESP_LATENCY, HistogramBuckets.DEFAULT_1MS_100S);
-        sendReply(response, new Result(null, null, cancelledRequest), metricsScope);
+        handlerResponse = new Result(null, null, cancelledRequest, false);
+        sendReply(response, handlerResponse, metricsScope);
         sw.stop();
       } finally {
         span.finish();
@@ -185,7 +189,9 @@ public class ActivityWorker extends SuspendableWorkerBase {
         MDC.remove(LoggerTag.RUN_ID);
         MDC.remove(LoggerTag.ATTEMPT);
         unsetCurrentContext();
-        task.getCompletionHandle().apply();
+        if (handlerResponse != null && !handlerResponse.isManualCompletion()) {
+          task.getCompletionHandle().apply();
+        }
       }
     }
 

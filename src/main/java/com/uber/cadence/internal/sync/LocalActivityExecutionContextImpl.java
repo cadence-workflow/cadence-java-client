@@ -19,6 +19,7 @@ package com.uber.cadence.internal.sync;
 
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.activity.ActivityTask;
+import com.uber.cadence.client.ActivityCompletionClient;
 import com.uber.cadence.client.ActivityCompletionException;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.lang.reflect.Type;
@@ -72,6 +73,18 @@ class LocalActivityExecutionContextImpl implements ActivityExecutionContext {
   public boolean isDoNotCompleteOnReturn() {
     throw new UnsupportedOperationException(
         "isDoNotCompleteOnReturn is not supported for local activities");
+  }
+
+  @Override
+  public boolean isUseLocalManualCompletion() {
+    throw new UnsupportedOperationException(
+        "isUseLocalManualCompletion is not supported for local activities");
+  }
+
+  @Override
+  public ActivityCompletionClient useLocalManualCompletion() {
+    throw new UnsupportedOperationException(
+        "useLocalManualCompletion is not supported for local activities");
   }
 
   @Override

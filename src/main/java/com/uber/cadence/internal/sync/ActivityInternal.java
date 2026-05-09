@@ -26,7 +26,7 @@ public final class ActivityInternal {
 
   private ActivityInternal() {}
 
-  static ActivityExecutionContext getContext() {
+  public static ActivityExecutionContext getContext() {
     return CurrentActivityExecutionContext.get();
   }
 

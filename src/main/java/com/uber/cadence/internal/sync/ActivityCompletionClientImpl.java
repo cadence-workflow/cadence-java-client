@@ -21,45 +21,73 @@ import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.client.ActivityCompletionClient;
 import com.uber.cadence.client.ActivityCompletionException;
 import com.uber.cadence.internal.external.ManualActivityCompletionClientFactory;
+import com.uber.cadence.workflow.Functions;
 
 class ActivityCompletionClientImpl implements ActivityCompletionClient {
 
   private final ManualActivityCompletionClientFactory factory;
+  private final Functions.Proc completionHandle;
 
   public ActivityCompletionClientImpl(
-      ManualActivityCompletionClientFactory manualActivityCompletionClientFactory) {
+      ManualActivityCompletionClientFactory manualActivityCompletionClientFactory,
+      Functions.Proc completionHandle) {
     this.factory = manualActivityCompletionClientFactory;
+    this.completionHandle = completionHandle;
   }
 
   @Override
   public <R> void complete(byte[] taskToken, R result) {
-    factory.getClient(taskToken).complete(result);
+    try {
+      factory.getClient(taskToken).complete(result);
+    } finally {
+      completionHandle.apply();
+    }
   }
 
   @Override
   public <R> void complete(WorkflowExecution execution, String activityId, R result) {
-    factory.getClient(execution, activityId).complete(result);
+    try {
+      factory.getClient(execution, activityId).complete(result);
+    } finally {
+      completionHandle.apply();
+    }
   }
 
   @Override
   public void completeExceptionally(byte[] taskToken, Exception result) {
-    factory.getClient(taskToken).fail(result);
+    try {
+      factory.getClient(taskToken).fail(result);
+    } finally {
+      completionHandle.apply();
+    }
   }
 
   @Override
   public void completeExceptionally(
       WorkflowExecution execution, String activityId, Exception result) {
-    factory.getClient(execution, activityId).fail(result);
+    try {
+      factory.getClient(execution, activityId).fail(result);
+    } finally {
+      completionHandle.apply();
+    }
   }
 
   @Override
   public <V> void reportCancellation(byte[] taskToken, V details) {
-    factory.getClient(taskToken).reportCancellation(details);
+    try {
+      factory.getClient(taskToken).reportCancellation(details);
+    } finally {
+      completionHandle.apply();
+    }
   }
 
   @Override
   public <V> void reportCancellation(WorkflowExecution execution, String activityId, V details) {
-    factory.getClient(execution, activityId).reportCancellation(details);
+    try {
+      factory.getClient(execution, activityId).reportCancellation(details);
+    } finally {
+      completionHandle.apply();
+    }
   }
 
   @Override

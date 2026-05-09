@@ -20,7 +20,7 @@ package com.uber.cadence.internal.worker;
 import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.workflow.Functions;
 
-final class ActivityTask {
+public final class ActivityTask {
   private final PollForActivityTaskResponse response;
   private final Functions.Proc completionHandle;
 

@@ -204,7 +204,8 @@ public final class LocalActivityWorker extends SuspendableWorkerBase {
               metricsScope,
               MetricsType.LOCAL_ACTIVITY_EXECUTION_LATENCY,
               HistogramBuckets.DEFAULT_1MS_100S);
-      ActivityTaskHandler.Result result = handler.handle(pollTask, metricsScope, true);
+      ActivityTask activityTask = new ActivityTask(pollTask, () -> {});
+      ActivityTaskHandler.Result result = handler.handle(activityTask, metricsScope, true);
       sw.stop();
       result.setAttempt(task.params.getAttempt());
 

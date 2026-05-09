@@ -181,7 +181,27 @@ public class TestWorkflowRule implements TestRule {
   private String init(Description description) {
     String testMethod = description.getMethodName();
     String taskList = "WorkflowTest-" + testMethod + "-" + UUID.randomUUID().toString();
-    Worker worker = testEnvironment.newWorker(taskList, (b) -> b);
+    WorkerOptions finalWorkerOptions = workerOptions;
+    Worker worker =
+        testEnvironment.newWorker(
+            taskList,
+            b -> {
+              if (finalWorkerOptions != null) {
+                b.setMaxConcurrentActivityExecutionSize(
+                        finalWorkerOptions.getMaxConcurrentActivityExecutionSize())
+                    .setMaxConcurrentWorkflowExecutionSize(
+                        finalWorkerOptions.getMaxConcurrentWorkflowExecutionSize())
+                    .setMaxConcurrentLocalActivityExecutionSize(
+                        finalWorkerOptions.getMaxConcurrentLocalActivityExecutionSize());
+                if (finalWorkerOptions.getActivityPollerOptions() != null) {
+                  b.setActivityPollerOptions(finalWorkerOptions.getActivityPollerOptions());
+                }
+                if (finalWorkerOptions.getWorkflowPollerOptions() != null) {
+                  b.setWorkflowPollerOptions(finalWorkerOptions.getWorkflowPollerOptions());
+                }
+              }
+              return b;
+            });
     if (workflowTypes != null) {
       worker.registerWorkflowImplementationTypes(workflowTypes);
     }

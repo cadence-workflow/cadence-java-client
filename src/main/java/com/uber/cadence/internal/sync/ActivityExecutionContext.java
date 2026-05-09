@@ -18,6 +18,7 @@
 package com.uber.cadence.internal.sync;
 
 import com.uber.cadence.activity.ActivityTask;
+import com.uber.cadence.client.ActivityCompletionClient;
 import com.uber.cadence.client.ActivityCompletionException;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.lang.reflect.Type;
@@ -59,11 +60,36 @@ public interface ActivityExecutionContext {
   /**
    * If this method is called during an activity execution then activity is not going to complete
    * when its method returns. It is expected to be completed asynchronously using {@link
-   * com.uber.cadence.client.ActivityCompletionClient}.
+   * com.uber.cadence.client.ActivityCompletionClient}. Note that async activities that have {@link
+   * #isUseLocalManualCompletion()} set to false would not respect the limit defined by {@link
+   * com.uber.cadence.worker.WorkerOptions#getMaxConcurrentActivityExecutionSize()}. If you want to
+   * limit the number of concurrent async activities and if you always complete those activities
+   * from the same activity worker you should use {@link #useLocalManualCompletion()} instead.
    */
   void doNotCompleteOnReturn();
 
   boolean isDoNotCompleteOnReturn();
+
+  /**
+   * Returns true if {@link #useLocalManualCompletion()} method has been called on this context. If
+   * this flag is set to true, {@link com.uber.cadence.internal.worker.ActivityWorker} would not
+   * release concurrency semaphore and delegate release function to the manual activity client
+   * returned by {@link #useLocalManualCompletion()}
+   */
+  boolean isUseLocalManualCompletion();
+
+  /**
+   * Local manual completion, sets {@link #doNotCompleteOnReturn()} flag making activity completion
+   * asynchronous, also returns completion client. Returned completion client must be used to
+   * complete the activity on the same machine. Main difference from calling {@link
+   * #doNotCompleteOnReturn()} directly is that by using this method maximum number of concurrent
+   * activities defined by {@link
+   * com.uber.cadence.worker.WorkerOptions#getMaxConcurrentActivityExecutionSize()} will be
+   * respected. Users must be careful and always call completion method on the {@link
+   * ActivityCompletionClient} otherwise activity worker could stop polling new work as it will
+   * consider all activities that didn't explicitly finish as still running.
+   */
+  ActivityCompletionClient useLocalManualCompletion();
 
   /**
    * @return an instance of the Simple Workflow Java client that is the same used by the invoked

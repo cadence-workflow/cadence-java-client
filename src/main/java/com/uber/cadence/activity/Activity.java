@@ -309,6 +309,14 @@ public final class Activity {
   }
 
   /**
+   * @return the activity execution context for the currently executing activity. This can be used
+   *     to access activity task metadata and use manual completion.
+   */
+  public static com.uber.cadence.internal.sync.ActivityExecutionContext getExecutionContext() {
+    return ActivityInternal.getContext();
+  }
+
+  /**
    * If there is a need to return a checked exception from an activity do not add the exception to a
    * method signature but rethrow it using this method. The library code will unwrap it
    * automatically when propagating exception to the caller. There is no need to wrap unchecked
