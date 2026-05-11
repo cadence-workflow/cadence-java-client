@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.RateLimiter;
 import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.RespondActivityTaskCompletedRequest;
 import com.uber.cadence.RespondActivityTaskFailedRequest;
+import com.uber.cadence.activity.ActivityExecutionContext;
 import com.uber.cadence.activity.ActivityMethod;
 import com.uber.cadence.activity.ActivityTask;
 import com.uber.cadence.client.ActivityCancelledException;

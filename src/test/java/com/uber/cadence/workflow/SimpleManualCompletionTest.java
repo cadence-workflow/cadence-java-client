@@ -20,13 +20,13 @@ package com.uber.cadence.workflow;
 import static org.junit.Assert.assertEquals;
 
 import com.uber.cadence.activity.Activity;
+import com.uber.cadence.activity.ActivityExecutionContext;
 import com.uber.cadence.activity.ActivityMethod;
 import com.uber.cadence.activity.ActivityOptions;
 import com.uber.cadence.client.ActivityCompletionClient;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.common.RetryOptions;
-import com.uber.cadence.internal.sync.ActivityExecutionContext;
 import com.uber.cadence.worker.WorkerOptions;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;

@@ -17,6 +17,8 @@
 
 package com.uber.cadence.internal.sync;
 
+import com.uber.cadence.activity.ActivityExecutionContext;
+
 /**
  * Thread local store of the context object passed to an activity implementation. Avoid using this
  * class directly.

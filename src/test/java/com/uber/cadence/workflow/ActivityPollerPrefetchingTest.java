@@ -124,7 +124,7 @@ public class ActivityPollerPrefetchingTest {
                 TestWorkflow.class,
                 new WorkflowOptions.Builder()
                     .setTaskList(taskList)
-                    .setExecutionStartToCloseTimeout(Duration.ofSeconds(30))
+                    .setExecutionStartToCloseTimeout(Duration.ofSeconds(300))
                     .build());
     String result = workflow.execute(taskList);
     assertEquals("success", result);

@@ -25,7 +25,8 @@ import com.uber.cadence.serviceclient.IWorkflowService;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-class LocalActivityExecutionContextImpl implements ActivityExecutionContext {
+class LocalActivityExecutionContextImpl
+    implements com.uber.cadence.activity.ActivityExecutionContext {
   private final IWorkflowService service;
   private final String domain;
   private final ActivityTask task;
@@ -41,20 +42,24 @@ class LocalActivityExecutionContextImpl implements ActivityExecutionContext {
     throw new UnsupportedOperationException("getTaskToken is not supported for local activities");
   }
 
-  @Override
-  public WorkflowExecution getWorkflowExecution() {
-    return task.getWorkflowExecution();
-  }
-
-  @Override
   public ActivityTask getTask() {
     return task;
   }
 
   @Override
-  public <V> void recordActivityHeartbeat(V details) throws ActivityCompletionException {
+  public ActivityTask getInfo() {
+    return task;
+  }
+
+  @Override
+  public <V> void heartbeat(V details) throws ActivityCompletionException {
+    throw new UnsupportedOperationException("heartbeat is not supported for local activities");
+  }
+
+  @Override
+  public <V> Optional<V> getHeartbeatDetails(Class<V> detailsClass) {
     throw new UnsupportedOperationException(
-        "recordActivityHeartbeat is not supported for local activities");
+        "getHeartbeatDetails is not supported for local activities");
   }
 
   @Override
@@ -95,5 +100,10 @@ class LocalActivityExecutionContextImpl implements ActivityExecutionContext {
   @Override
   public String getDomain() {
     return domain;
+  }
+
+  @Override
+  public WorkflowExecution getWorkflowExecution() {
+    return task.getWorkflowExecution();
   }
 }

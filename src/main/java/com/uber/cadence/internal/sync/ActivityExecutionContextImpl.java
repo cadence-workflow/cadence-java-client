@@ -42,12 +42,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base implementation of an {@link ActivityExecutionContext}.
+ * Base implementation of an {@link com.uber.cadence.activity.ActivityExecutionContext}.
  *
  * @author fateev, suskin
- * @see ActivityExecutionContext
+ * @see com.uber.cadence.activity.ActivityExecutionContext
  */
-class ActivityExecutionContextImpl implements ActivityExecutionContext {
+class ActivityExecutionContextImpl implements com.uber.cadence.activity.ActivityExecutionContext {
 
   private static final Logger log = LoggerFactory.getLogger(ActivityExecutionContextImpl.class);
   private static final long HEARTBEAT_RETRY_WAIT_MILLIS = 1000;
@@ -91,9 +91,13 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
         new ManualActivityCompletionClientFactoryImpl(service, domain, dataConverter, metricsScope);
   }
 
-  /** @see ActivityExecutionContext#recordActivityHeartbeat(Object) */
   @Override
-  public <V> void recordActivityHeartbeat(V details) throws ActivityCompletionException {
+  public ActivityTask getInfo() {
+    return task;
+  }
+
+  @Override
+  public <V> void heartbeat(V details) throws ActivityCompletionException {
     if (heartbeatExecutor.isShutdown()) {
       throw new ActivityWorkerShutdownException(task);
     }
@@ -112,6 +116,11 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
     } finally {
       lock.unlock();
     }
+  }
+
+  @Override
+  public <V> Optional<V> getHeartbeatDetails(Class<V> detailsClass) {
+    return getHeartbeatDetails(detailsClass, detailsClass);
   }
 
   @Override
@@ -234,7 +243,6 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
   }
 
   /** @see ActivityExecutionContext#getTask() */
-  @Override
   public ActivityTask getTask() {
     return task;
   }
