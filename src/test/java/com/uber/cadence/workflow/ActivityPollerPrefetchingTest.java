@@ -40,7 +40,6 @@ public class ActivityPollerPrefetchingTest {
           .withWorkerOptions(
               WorkerOptions.newBuilder()
                   .setMaxConcurrentActivityExecutionSize(1)
-                  .setTaskListActivitiesPerSecond(1.0)
                   .setActivityPollerOptions(
                       com.uber.cadence.internal.worker.PollerOptions.newBuilder()
                           .setPollThreadCount(5)
@@ -72,7 +71,7 @@ public class ActivityPollerPrefetchingTest {
               new ActivityOptions.Builder()
                   .setScheduleToStartTimeout(Duration.ofSeconds(10))
                   .setScheduleToCloseTimeout(Duration.ofSeconds(10))
-                  .setHeartbeatTimeout(Duration.ofSeconds(1))
+                  .setHeartbeatTimeout(Duration.ofSeconds(3))
                   .setRetryOptions(
                       new RetryOptions.Builder()
                           .setInitialInterval(Duration.ofSeconds(1))

@@ -35,6 +35,7 @@ abstract class ActivityPollTaskBase implements Poller.PollTask<ActivityTask> {
 
   public ActivityPollTaskBase(SingleWorkerOptions options) {
     this.options = options;
+    // TODO: we need to share this semaphore with the locally dispatched activity poll task
     this.pollSemaphore = new Semaphore(options.getTaskExecutorThreadPoolSize());
   }
 

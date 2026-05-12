@@ -25,13 +25,13 @@ import com.uber.cadence.RespondActivityTaskCompletedRequest;
 import com.uber.cadence.RespondActivityTaskFailedRequest;
 import com.uber.cadence.activity.ActivityExecutionContext;
 import com.uber.cadence.activity.ActivityMethod;
-import com.uber.cadence.activity.ActivityTask;
 import com.uber.cadence.client.ActivityCancelledException;
 import com.uber.cadence.common.MethodRetry;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.internal.common.CheckedExceptionWrapper;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.metrics.MetricsType;
+import com.uber.cadence.internal.worker.ActivityTask;
 import com.uber.cadence.internal.worker.ActivityTaskHandler;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.testing.SimulatedTimeoutException;
@@ -114,7 +114,7 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
   }
 
   private ActivityTaskHandler.Result mapToActivityFailure(
-      Throwable failure, Scope metricsScope, boolean isLocalActivity, boolean manualCompletion) {
+      Throwable failure, Scope metricsScope, boolean isLocalActivity) {
 
     if (failure instanceof ActivityCancelledException) {
       if (isLocalActivity) {
@@ -152,7 +152,7 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
     result.setReason(failure.getClass().getName());
     result.setDetails(dataConverter.toData(failure));
     return new ActivityTaskHandler.Result(
-        null, new Result.TaskFailedResult(result, failure), null, manualCompletion);
+        null, new Result.TaskFailedResult(result, failure), null, false);
   }
 
   @Override
@@ -175,13 +175,10 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
   }
 
   @Override
-  public Result handle(
-      com.uber.cadence.internal.worker.ActivityTask activityTask,
-      Scope metricsScope,
-      boolean isLocalActivity) {
+  public Result handle(ActivityTask activityTask, Scope metricsScope, boolean isLocalActivity) {
     PollForActivityTaskResponse pollResponse = activityTask.getResponse();
     String activityType = pollResponse.getActivityType().getName();
-    ActivityTaskImpl task = new ActivityTaskImpl(pollResponse);
+    ActivityTaskImpl task = new ActivityTaskImpl(pollResponse, activityTask.getCompletionHandle());
     ActivityTaskExecutor activity = activities.get(activityType);
     if (activity == null) {
       String knownTypes = Joiner.on(", ").join(activities.keySet());
@@ -192,8 +189,7 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
                   + "\" is not registered with a worker. Known types are: "
                   + knownTypes),
           metricsScope,
-          isLocalActivity,
-          false);
+          isLocalActivity);
     }
     if (metricsRateLimiter.tryAcquire(1)) {
       if (isLocalActivity) {
@@ -204,14 +200,11 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
         metricsScope.gauge(MetricsType.ACTIVITY_ACTIVE_THREAD_COUNT).update(Thread.activeCount());
       }
     }
-    return activity.execute(task, activityTask.getCompletionHandle(), metricsScope);
+    return activity.execute(task, metricsScope);
   }
 
   interface ActivityTaskExecutor {
-    ActivityTaskHandler.Result execute(
-        ActivityTask task,
-        com.uber.cadence.workflow.Functions.Proc completionHandle,
-        Scope metricsScope);
+    ActivityTaskHandler.Result execute(ActivityTaskImpl task, Scope metricsScope);
   }
 
   private class POJOActivityImplementation implements ActivityTaskExecutor {
@@ -224,10 +217,7 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
     }
 
     @Override
-    public ActivityTaskHandler.Result execute(
-        ActivityTask task,
-        com.uber.cadence.workflow.Functions.Proc completionHandle,
-        Scope metricsScope) {
+    public ActivityTaskHandler.Result execute(ActivityTaskImpl task, Scope metricsScope) {
       ActivityExecutionContext context =
           new ActivityExecutionContextImpl(
               service,
@@ -235,7 +225,7 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
               task,
               dataConverter,
               heartbeatExecutor,
-              completionHandle,
+              task.getCompletionHandle(),
               metricsScope);
       byte[] input = task.getInput();
       CurrentActivityExecutionContext.set(context);
@@ -253,10 +243,10 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
         return new ActivityTaskHandler.Result(request, null, null, false);
       } catch (RuntimeException | IllegalAccessException e) {
         // Always release semaphore on failure, even if manual completion was requested
-        return mapToActivityFailure(e, metricsScope, false, false);
+        return mapToActivityFailure(e, metricsScope, false);
       } catch (InvocationTargetException e) {
         // Always release semaphore on failure, even if manual completion was requested
-        return mapToActivityFailure(e.getTargetException(), metricsScope, false, false);
+        return mapToActivityFailure(e.getTargetException(), metricsScope, false);
       } finally {
         CurrentActivityExecutionContext.unset();
       }
@@ -273,10 +263,7 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
     }
 
     @Override
-    public ActivityTaskHandler.Result execute(
-        ActivityTask task,
-        com.uber.cadence.workflow.Functions.Proc completionHandle,
-        Scope metricsScope) {
+    public ActivityTaskHandler.Result execute(ActivityTaskImpl task, Scope metricsScope) {
       ActivityExecutionContext context =
           new LocalActivityExecutionContextImpl(service, domain, task);
       CurrentActivityExecutionContext.set(context);
@@ -290,9 +277,9 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
         }
         return new ActivityTaskHandler.Result(request, null, null, false);
       } catch (RuntimeException | IllegalAccessException e) {
-        return mapToActivityFailure(e, metricsScope, true, false);
+        return mapToActivityFailure(e, metricsScope, true);
       } catch (InvocationTargetException e) {
-        return mapToActivityFailure(e.getTargetException(), metricsScope, true, false);
+        return mapToActivityFailure(e.getTargetException(), metricsScope, true);
       } finally {
         CurrentActivityExecutionContext.unset();
       }

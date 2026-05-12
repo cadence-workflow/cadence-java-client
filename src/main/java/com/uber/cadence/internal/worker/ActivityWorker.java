@@ -51,7 +51,6 @@ public class ActivityWorker extends SuspendableWorkerBase {
   private final String taskList;
   private final Tracer tracer;
   private final TracingPropagator spanFactory;
-  private PollTask<ActivityTask> cachedActivityPollTask;
 
   public ActivityWorker(
       IWorkflowService service,
@@ -85,7 +84,6 @@ public class ActivityWorker extends SuspendableWorkerBase {
               .build();
     }
     this.options = SingleWorkerOptions.newBuilder(options).setPollerOptions(pollerOptions).build();
-    this.cachedActivityPollTask = new ActivityPollTask(service, domain, taskList, this.options);
   }
 
   @Override
@@ -106,7 +104,7 @@ public class ActivityWorker extends SuspendableWorkerBase {
   }
 
   protected PollTask<ActivityTask> getOrCreateActivityPollTask() {
-    return cachedActivityPollTask;
+    return new ActivityPollTask(service, domain, taskList, options);
   }
 
   private class TaskHandlerImpl implements PollTaskExecutor.TaskHandler<ActivityTask> {
@@ -189,6 +187,8 @@ public class ActivityWorker extends SuspendableWorkerBase {
         MDC.remove(LoggerTag.RUN_ID);
         MDC.remove(LoggerTag.ATTEMPT);
         unsetCurrentContext();
+        // Apply completion handle if task has been completed synchronously or is async and manual
+        // completion hasn't been requested.
         if (handlerResponse != null && !handlerResponse.isManualCompletion()) {
           task.getCompletionHandle().apply();
         }

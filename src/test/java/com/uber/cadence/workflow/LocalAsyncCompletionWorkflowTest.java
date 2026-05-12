@@ -40,6 +40,8 @@ import org.junit.Test;
 public class LocalAsyncCompletionWorkflowTest {
 
   public static final int MAX_CONCURRENT_ACTIVITIES = 1;
+  public static final double TASK_LIST_ACTIVITIES_PER_SECOND =
+      100.0; // change this to 0.0 after we add semaphore limit for locally dispatched activities
 
   @Rule
   public CadenceTestRule testWorkflowRule =
@@ -47,6 +49,7 @@ public class LocalAsyncCompletionWorkflowTest {
           .withWorkerOptions(
               WorkerOptions.newBuilder()
                   .setMaxConcurrentActivityExecutionSize(MAX_CONCURRENT_ACTIVITIES)
+                  .setTaskListActivitiesPerSecond(TASK_LIST_ACTIVITIES_PER_SECOND)
                   .setActivityPollerOptions(
                       com.uber.cadence.internal.worker.PollerOptions.newBuilder()
                           .setPollThreadCount(5)
@@ -72,7 +75,7 @@ public class LocalAsyncCompletionWorkflowTest {
               new ActivityOptions.Builder()
                   .setScheduleToStartTimeout(Duration.ofSeconds(10))
                   .setScheduleToCloseTimeout(Duration.ofSeconds(10))
-                  .setHeartbeatTimeout(Duration.ofSeconds(1))
+                  .setHeartbeatTimeout(Duration.ofSeconds(3))
                   .setRetryOptions(
                       new RetryOptions.Builder()
                           .setMaximumAttempts(1)

@@ -21,14 +21,17 @@ import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.activity.ActivityTask;
+import com.uber.cadence.workflow.Functions;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 final class ActivityTaskImpl implements ActivityTask {
   private final PollForActivityTaskResponse response;
+  private final Functions.Proc completionHandle;
 
-  ActivityTaskImpl(PollForActivityTaskResponse response) {
+  ActivityTaskImpl(PollForActivityTaskResponse response, Functions.Proc completionHandle) {
     this.response = response;
+    this.completionHandle = completionHandle;
   }
 
   @Override
@@ -94,5 +97,9 @@ final class ActivityTaskImpl implements ActivityTask {
 
   public byte[] getInput() {
     return response.getInput();
+  }
+
+  public Functions.Proc getCompletionHandle() {
+    return completionHandle;
   }
 }
