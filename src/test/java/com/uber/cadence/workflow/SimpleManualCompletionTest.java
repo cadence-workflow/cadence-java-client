@@ -27,6 +27,7 @@ import com.uber.cadence.client.ActivityCompletionClient;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.common.RetryOptions;
+import com.uber.cadence.testUtils.CadenceTestRule;
 import com.uber.cadence.worker.WorkerOptions;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,12 +37,13 @@ import org.junit.Test;
 public class SimpleManualCompletionTest {
 
   @Rule
-  public TestWorkflowRule testWorkflowRule =
-      TestWorkflowRule.newBuilder()
-          .setWorkerOptions(
+  public CadenceTestRule testWorkflowRule =
+      CadenceTestRule.builder()
+          .withWorkerOptions(
               WorkerOptions.newBuilder().setMaxConcurrentActivityExecutionSize(1).build())
-          .setWorkflowTypes(TestWorkflowImpl.class)
-          .setActivityImplementations(new SimpleActivity())
+          .withWorkflowTypes(TestWorkflowImpl.class)
+          .withActivities(new SimpleActivity())
+          .startWorkersAutomatically()
           .build();
 
   public interface TestWorkflow {

@@ -41,10 +41,6 @@ public final class TestEnvironmentOptions {
 
     private WorkflowClientOptions workflowClientOptions = WorkflowClientOptions.defaultInstance();
 
-    private boolean useExternalService;
-
-    private String target;
-
     public Builder setWorkflowClientOptions(WorkflowClientOptions workflowClientOptions) {
       this.workflowClientOptions = workflowClientOptions;
       return this;
@@ -79,27 +75,6 @@ public final class TestEnvironmentOptions {
       return this;
     }
 
-    /**
-     * Set to true in order to make test environment use external Cadence service or false for
-     * in-memory test implementation.
-     */
-    public Builder setUseExternalService(boolean useExternalService) {
-      this.useExternalService = useExternalService;
-      return this;
-    }
-
-    /**
-     * Optional parameter that defines an endpoint which will be used for the communication with
-     * standalone Cadence service. Has no effect if {@link #setUseExternalService(boolean)} is set
-     * to false.
-     *
-     * <p>Defaults to 127.0.0.1:7933
-     */
-    public Builder setTarget(String target) {
-      this.target = target;
-      return this;
-    }
-
     public TestEnvironmentOptions build() {
       if (factoryOptions == null) {
         factoryOptions = WorkerFactoryOptions.newBuilder().setDisableStickyExecution(false).build();
@@ -110,9 +85,7 @@ public final class TestEnvironmentOptions {
           interceptorFactory,
           factoryOptions,
           workflowClientOptions,
-          enableLoggingInReplay,
-          useExternalService,
-          target);
+          enableLoggingInReplay);
     }
   }
 
@@ -121,24 +94,18 @@ public final class TestEnvironmentOptions {
   private final boolean enableLoggingInReplay;
   private final WorkerFactoryOptions workerFactoryOptions;
   private final WorkflowClientOptions workflowClientOptions;
-  private final boolean useExternalService;
-  private final String target;
 
   private TestEnvironmentOptions(
       DataConverter dataConverter,
       Function<WorkflowInterceptor, WorkflowInterceptor> interceptorFactory,
       WorkerFactoryOptions options,
       WorkflowClientOptions workflowClientOptions,
-      boolean enableLoggingInReplay,
-      boolean useExternalService,
-      String target) {
+      boolean enableLoggingInReplay) {
     this.dataConverter = dataConverter;
     this.interceptorFactory = interceptorFactory;
     this.workerFactoryOptions = options;
     this.workflowClientOptions = workflowClientOptions;
     this.enableLoggingInReplay = enableLoggingInReplay;
-    this.useExternalService = useExternalService;
-    this.target = target;
   }
 
   public DataConverter getDataConverter() {
@@ -161,14 +128,6 @@ public final class TestEnvironmentOptions {
     return workflowClientOptions;
   }
 
-  public boolean isUseExternalService() {
-    return useExternalService;
-  }
-
-  public String getTarget() {
-    return target;
-  }
-
   @Override
   public String toString() {
     return "TestEnvironmentOptions{"
@@ -178,10 +137,6 @@ public final class TestEnvironmentOptions {
         + workerFactoryOptions
         + ", workflowClientOptions="
         + workflowClientOptions
-        + ", useExternalService="
-        + useExternalService
-        + ", target="
-        + target
         + '}';
   }
 }

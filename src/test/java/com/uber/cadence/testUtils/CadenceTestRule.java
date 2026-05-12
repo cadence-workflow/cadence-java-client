@@ -23,6 +23,7 @@ import com.uber.cadence.testing.TestEnvironmentOptions;
 import com.uber.cadence.testing.TestWorkflowEnvironment;
 import com.uber.cadence.worker.Worker;
 import com.uber.cadence.worker.WorkerFactoryOptions;
+import com.uber.cadence.worker.WorkerOptions;
 import com.uber.cadence.workflow.interceptors.TracingWorkflowInterceptorFactory;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -101,6 +102,10 @@ public class CadenceTestRule implements TestRule {
 
   public String getDefaultTaskList() {
     return context.getDefaultTaskList();
+  }
+
+  public String getTaskList() {
+    return getDefaultTaskList();
   }
 
   public void start() {
@@ -196,14 +201,15 @@ public class CadenceTestRule implements TestRule {
     if (isDockerService()) {
       this.context =
           CadenceTestContext.forRealService(
-              clientOptions, defaultTaskList, builder.workerFactoryOptions);
+              clientOptions, defaultTaskList, builder.workerFactoryOptions, builder.workerOptions);
     } else {
       this.context =
           CadenceTestContext.forTestService(
               builder.testWorkflowEnvironmentProvider,
               clientOptions,
               defaultTaskList,
-              builder.workerFactoryOptions);
+              builder.workerFactoryOptions,
+              builder.workerOptions);
     }
 
     if (!builder.activities.isEmpty() || !builder.workflowTypes.isEmpty()) {
@@ -251,6 +257,7 @@ public class CadenceTestRule implements TestRule {
     private List<Class<?>> workflowTypes = new ArrayList<>();
     private List<Object> activities = new ArrayList<>();
     private WorkerFactoryOptions workerFactoryOptions = WorkerFactoryOptions.newBuilder().build();
+    private WorkerOptions workerOptions;
     private Function<TestEnvironmentOptions, TestWorkflowEnvironment>
         testWorkflowEnvironmentProvider = TestWorkflowEnvironment::newInstance;
     private WorkflowClientOptions clientOptions = WorkflowClientOptions.newBuilder().build();
@@ -271,6 +278,11 @@ public class CadenceTestRule implements TestRule {
 
     public Builder withWorkerFactoryOptions(WorkerFactoryOptions options) {
       this.workerFactoryOptions = options;
+      return this;
+    }
+
+    public Builder withWorkerOptions(WorkerOptions options) {
+      this.workerOptions = options;
       return this;
     }
 

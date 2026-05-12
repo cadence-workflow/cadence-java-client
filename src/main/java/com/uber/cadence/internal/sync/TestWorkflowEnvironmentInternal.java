@@ -144,26 +144,9 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
       this.service = workflowServiceWrapper;
     }
 
-    IWorkflowService workflowService;
-    if (this.testEnvironmentOptions.isUseExternalService()) {
-      // Use external Cadence service
-      com.uber.cadence.serviceclient.ClientOptions.Builder clientOptionsBuilder =
-          com.uber.cadence.serviceclient.ClientOptions.newBuilder();
-      if (this.testEnvironmentOptions.getTarget() != null
-          && !this.testEnvironmentOptions.getTarget().isEmpty()) {
-        clientOptionsBuilder.setHost(this.testEnvironmentOptions.getTarget());
-      }
-      workflowService =
-          new com.uber.cadence.serviceclient.WorkflowServiceGrpc(clientOptionsBuilder.build());
-    } else {
-      // Use in-memory test service
-      this.service.lockTimeSkipping("TestWorkflowEnvironmentInternal constructor");
-      workflowService = this.service;
-    }
-
+    this.service.lockTimeSkipping("TestWorkflowEnvironmentInternal constructor");
     WorkflowClient client =
-        WorkflowClient.newInstance(
-            workflowService, testEnvironmentOptions.getWorkflowClientOptions());
+        WorkflowClient.newInstance(this.service, testEnvironmentOptions.getWorkflowClientOptions());
     workerFactory =
         WorkerFactory.newInstance(client, testEnvironmentOptions.getWorkerFactoryOptions());
   }

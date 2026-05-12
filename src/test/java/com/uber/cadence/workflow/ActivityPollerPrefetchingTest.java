@@ -24,6 +24,7 @@ import com.uber.cadence.activity.ActivityMethod;
 import com.uber.cadence.activity.ActivityOptions;
 import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.common.RetryOptions;
+import com.uber.cadence.testUtils.CadenceTestRule;
 import com.uber.cadence.worker.WorkerOptions;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -34,20 +35,20 @@ import org.junit.Test;
 public class ActivityPollerPrefetchingTest {
 
   @Rule
-  public TestWorkflowRule testWorkflowRule =
-      TestWorkflowRule.newBuilder()
-          .setWorkerOptions(
+  public CadenceTestRule testWorkflowRule =
+      CadenceTestRule.builder()
+          .withWorkerOptions(
               WorkerOptions.newBuilder()
                   .setMaxConcurrentActivityExecutionSize(1)
+                  .setTaskListActivitiesPerSecond(1.0)
                   .setActivityPollerOptions(
                       com.uber.cadence.internal.worker.PollerOptions.newBuilder()
                           .setPollThreadCount(5)
                           .build())
                   .build())
-          .setWorkflowTypes(TestWorkflowImpl.class)
-          .setActivityImplementations(new SleepyMultiplier())
-          .setUseExternalService(Boolean.parseBoolean(System.getenv("USE_DOCKER_SERVICE")))
-          .setTarget(System.getenv("CADENCE_SERVICE_ADDRESS"))
+          .withWorkflowTypes(TestWorkflowImpl.class)
+          .withActivities(new SleepyMultiplier())
+          .startWorkersAutomatically()
           .build();
 
   public interface TestWorkflow {

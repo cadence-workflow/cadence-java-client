@@ -27,6 +27,7 @@ import com.uber.cadence.client.ActivityCompletionClient;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.common.RetryOptions;
+import com.uber.cadence.testUtils.CadenceTestRule;
 import com.uber.cadence.worker.WorkerOptions;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -41,9 +42,9 @@ public class LocalAsyncCompletionWorkflowTest {
   public static final int MAX_CONCURRENT_ACTIVITIES = 1;
 
   @Rule
-  public TestWorkflowRule testWorkflowRule =
-      TestWorkflowRule.newBuilder()
-          .setWorkerOptions(
+  public CadenceTestRule testWorkflowRule =
+      CadenceTestRule.builder()
+          .withWorkerOptions(
               WorkerOptions.newBuilder()
                   .setMaxConcurrentActivityExecutionSize(MAX_CONCURRENT_ACTIVITIES)
                   .setActivityPollerOptions(
@@ -51,10 +52,9 @@ public class LocalAsyncCompletionWorkflowTest {
                           .setPollThreadCount(5)
                           .build())
                   .build())
-          .setWorkflowTypes(TestWorkflowImpl.class)
-          .setActivityImplementations(new AsyncActivityWithManualCompletion())
-          .setUseExternalService(Boolean.parseBoolean(System.getenv("USE_DOCKER_SERVICE")))
-          .setTarget(System.getenv("CADENCE_SERVICE_ADDRESS"))
+          .withWorkflowTypes(TestWorkflowImpl.class)
+          .withActivities(new AsyncActivityWithManualCompletion())
+          .startWorkersAutomatically()
           .build();
 
   public interface TestWorkflow {
