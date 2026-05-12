@@ -45,6 +45,7 @@ public class CadenceTestContext {
   private final WorkflowClient workflowClient;
   private final String defaultTaskList;
   private final TracingWorkflowInterceptorFactory tracer;
+  private final WorkerOptions workerOptions;
   private WorkerFactory workerFactory;
   // Real Service only
   private ScheduledExecutorService scheduledExecutor;
@@ -57,7 +58,8 @@ public class CadenceTestContext {
       TracingWorkflowInterceptorFactory tracer,
       WorkerFactory workerFactory,
       ScheduledExecutorService scheduledExecutor,
-      TestWorkflowEnvironment testEnvironment) {
+      TestWorkflowEnvironment testEnvironment,
+      WorkerOptions workerOptions) {
     this.wfService = workflowClient.getService();
     this.workflowClient = workflowClient;
     this.defaultTaskList = defaultTaskList;
@@ -65,6 +67,7 @@ public class CadenceTestContext {
     this.workerFactory = workerFactory;
     this.scheduledExecutor = scheduledExecutor;
     this.testEnvironment = testEnvironment;
+    this.workerOptions = workerOptions;
   }
 
   public Worker getDefaultWorker() {
@@ -179,23 +182,55 @@ public class CadenceTestContext {
 
   private Worker createWorker(String taskList) {
     if (isRealService()) {
-      return workerFactory.newWorker(
-          taskList,
-          WorkerOptions.newBuilder()
-              .setActivityPollerOptions(PollerOptions.newBuilder().setPollThreadCount(5).build())
-              .setMaxConcurrentActivityExecutionSize(1000)
-              .setInterceptorFactory(tracer)
-              .build());
+      WorkerOptions options =
+          workerOptions != null
+              ? workerOptions
+              : WorkerOptions.newBuilder()
+                  .setActivityPollerOptions(
+                      PollerOptions.newBuilder().setPollThreadCount(5).build())
+                  .setMaxConcurrentActivityExecutionSize(1000)
+                  .setInterceptorFactory(tracer)
+                  .build();
+      return workerFactory.newWorker(taskList, options);
     } else {
-      return testEnvironment.newWorker(taskList);
+      if (workerOptions != null) {
+        return testEnvironment.newWorker(
+            taskList, builder -> applyWorkerOptions(builder, workerOptions));
+      } else {
+        return testEnvironment.newWorker(taskList);
+      }
     }
+  }
+
+  private static WorkerOptions.Builder applyWorkerOptions(
+      WorkerOptions.Builder builder, WorkerOptions options) {
+    if (options.getMaxConcurrentActivityExecutionSize() != 0) {
+      builder.setMaxConcurrentActivityExecutionSize(
+          options.getMaxConcurrentActivityExecutionSize());
+    }
+    if (options.getMaxConcurrentWorkflowExecutionSize() != 0) {
+      builder.setMaxConcurrentWorkflowExecutionSize(
+          options.getMaxConcurrentWorkflowExecutionSize());
+    }
+    if (options.getMaxConcurrentLocalActivityExecutionSize() != 0) {
+      builder.setMaxConcurrentLocalActivityExecutionSize(
+          options.getMaxConcurrentLocalActivityExecutionSize());
+    }
+    if (options.getActivityPollerOptions() != null) {
+      builder.setActivityPollerOptions(options.getActivityPollerOptions());
+    }
+    if (options.getWorkflowPollerOptions() != null) {
+      builder.setWorkflowPollerOptions(options.getWorkflowPollerOptions());
+    }
+    return builder;
   }
 
   public static CadenceTestContext forTestService(
       Function<TestEnvironmentOptions, TestWorkflowEnvironment> envFactory,
       WorkflowClientOptions clientOptions,
       String defaultTaskList,
-      WorkerFactoryOptions workerFactoryOptions) {
+      WorkerFactoryOptions workerFactoryOptions,
+      WorkerOptions workerOptions) {
     TracingWorkflowInterceptorFactory tracer = new TracingWorkflowInterceptorFactory();
 
     TestEnvironmentOptions testOptions =
@@ -211,13 +246,15 @@ public class CadenceTestContext {
         tracer,
         testEnvironment.getWorkerFactory(),
         null,
-        testEnvironment);
+        testEnvironment,
+        workerOptions);
   }
 
   public static CadenceTestContext forRealService(
       WorkflowClientOptions clientOptions,
       String defaultTaskList,
-      WorkerFactoryOptions workerFactoryOptions) {
+      WorkerFactoryOptions workerFactoryOptions,
+      WorkerOptions workerOptions) {
     TracingWorkflowInterceptorFactory tracer = new TracingWorkflowInterceptorFactory();
 
     IWorkflowService wfService = TestEnvironment.getDockerService();
@@ -225,6 +262,12 @@ public class CadenceTestContext {
     WorkerFactory workerFactory = new WorkerFactory(workflowClient, workerFactoryOptions);
     ScheduledExecutorService scheduledExecutor = new ScheduledThreadPoolExecutor(1);
     return new CadenceTestContext(
-        workflowClient, defaultTaskList, tracer, workerFactory, scheduledExecutor, null);
+        workflowClient,
+        defaultTaskList,
+        tracer,
+        workerFactory,
+        scheduledExecutor,
+        null,
+        workerOptions);
   }
 }
