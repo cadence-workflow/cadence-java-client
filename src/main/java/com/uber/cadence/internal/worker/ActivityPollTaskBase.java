@@ -23,10 +23,12 @@ import com.uber.cadence.internal.metrics.HistogramBuckets;
 import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
+import com.uber.cadence.workflow.Functions;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.util.Duration;
 import com.uber.m3.util.ImmutableMap;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 abstract class ActivityPollTaskBase implements Poller.PollTask<ActivityTask> {
 
@@ -71,7 +73,15 @@ abstract class ActivityPollTaskBase implements Poller.PollTask<ActivityTask> {
               result.getStartedTimestamp() - result.getScheduledTimestampOfThisAttempt()),
           HistogramBuckets.HIGH_1MS_24H);
       isSuccessful = true;
-      return new ActivityTask(result, pollSemaphore::release);
+      // Wrap semaphore release to make it idempotent
+      AtomicBoolean released = new AtomicBoolean(false);
+      Functions.Proc completionHandle =
+          () -> {
+            if (released.compareAndSet(false, true)) {
+              pollSemaphore.release();
+            }
+          };
+      return new ActivityTask(result, completionHandle);
     } finally {
       if (!isSuccessful) {
         pollSemaphore.release();
