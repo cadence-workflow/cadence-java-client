@@ -103,12 +103,11 @@ public class ActivityWorker extends SuspendableWorkerBase {
     }
   }
 
-  protected PollTask<PollForActivityTaskResponse> getOrCreateActivityPollTask() {
+  protected PollTask<ActivityTask> getOrCreateActivityPollTask() {
     return new ActivityPollTask(service, domain, taskList, options);
   }
 
-  private class TaskHandlerImpl
-      implements PollTaskExecutor.TaskHandler<PollForActivityTaskResponse> {
+  private class TaskHandlerImpl implements PollTaskExecutor.TaskHandler<ActivityTask> {
 
     final ActivityTaskHandler handler;
 
@@ -117,48 +116,52 @@ public class ActivityWorker extends SuspendableWorkerBase {
     }
 
     @Override
-    public void handle(PollForActivityTaskResponse task) throws Exception {
+    public void handle(ActivityTask task) throws Exception {
+      PollForActivityTaskResponse response = task.getResponse();
       Scope metricsScope =
           options
               .getMetricsScope()
               .tagged(
                   ImmutableMap.of(
                       MetricsTag.ACTIVITY_TYPE,
-                      task.getActivityType().getName(),
+                      response.getActivityType().getName(),
                       MetricsTag.WORKFLOW_TYPE,
-                      task.getWorkflowType().getName()));
+                      response.getWorkflowType().getName()));
 
       MetricsEmit.emitLatency(
           metricsScope,
           MetricsType.ACTIVITY_SCHEDULED_TO_START_LATENCY,
-          Duration.ofNanos(task.getStartedTimestamp() - task.getScheduledTimestampOfThisAttempt()),
+          Duration.ofNanos(
+              response.getStartedTimestamp() - response.getScheduledTimestampOfThisAttempt()),
           HistogramBuckets.HIGH_1MS_24H);
 
       // The following tags are for logging.
-      MDC.put(LoggerTag.ACTIVITY_ID, task.getActivityId());
-      MDC.put(LoggerTag.ACTIVITY_TYPE, task.getActivityType().getName());
-      MDC.put(LoggerTag.WORKFLOW_ID, task.getWorkflowExecution().getWorkflowId());
-      MDC.put(LoggerTag.RUN_ID, task.getWorkflowExecution().getRunId());
-      MDC.put(LoggerTag.ATTEMPT, String.valueOf(task.getAttempt()));
+      MDC.put(LoggerTag.ACTIVITY_ID, response.getActivityId());
+      MDC.put(LoggerTag.ACTIVITY_TYPE, response.getActivityType().getName());
+      MDC.put(LoggerTag.WORKFLOW_ID, response.getWorkflowExecution().getWorkflowId());
+      MDC.put(LoggerTag.RUN_ID, response.getWorkflowExecution().getRunId());
+      MDC.put(LoggerTag.ATTEMPT, String.valueOf(response.getAttempt()));
 
-      propagateContext(task);
-      Span span = spanFactory.spanForExecuteActivity(task);
+      propagateContext(response);
+      Span span = spanFactory.spanForExecuteActivity(response);
+      ActivityTaskHandler.Result handlerResponse = null;
       try (io.opentracing.Scope scope = tracer.activateSpan(span)) {
         MetricsEmit.DualStopwatch sw =
             MetricsEmit.startLatency(
                 metricsScope, MetricsType.ACTIVITY_EXEC_LATENCY, HistogramBuckets.HIGH_1MS_24H);
-        ActivityTaskHandler.Result response = handler.handle(task, metricsScope, false);
+        handlerResponse = handler.handle(task, metricsScope, false);
         sw.stop();
 
         sw =
             MetricsEmit.startLatency(
                 metricsScope, MetricsType.ACTIVITY_RESP_LATENCY, HistogramBuckets.DEFAULT_1MS_100S);
-        sendReply(task, response, metricsScope);
+        sendReply(response, handlerResponse, metricsScope);
         sw.stop();
 
         long nanoTime =
             TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-        Duration duration = Duration.ofNanos(nanoTime - task.getScheduledTimestampOfThisAttempt());
+        Duration duration =
+            Duration.ofNanos(nanoTime - response.getScheduledTimestampOfThisAttempt());
         MetricsEmit.emitLatency(
             metricsScope,
             MetricsType.ACTIVITY_E2E_LATENCY,
@@ -173,7 +176,8 @@ public class ActivityWorker extends SuspendableWorkerBase {
         MetricsEmit.DualStopwatch sw =
             MetricsEmit.startLatency(
                 metricsScope, MetricsType.ACTIVITY_RESP_LATENCY, HistogramBuckets.DEFAULT_1MS_100S);
-        sendReply(task, new Result(null, null, cancelledRequest), metricsScope);
+        handlerResponse = new Result(null, null, cancelledRequest, false);
+        sendReply(response, handlerResponse, metricsScope);
         sw.stop();
       } finally {
         span.finish();
@@ -183,6 +187,11 @@ public class ActivityWorker extends SuspendableWorkerBase {
         MDC.remove(LoggerTag.RUN_ID);
         MDC.remove(LoggerTag.ATTEMPT);
         unsetCurrentContext();
+        // Apply completion handle if task has been completed synchronously or is async and manual
+        // completion hasn't been requested.
+        if (handlerResponse != null && !handlerResponse.isManualCompletion()) {
+          task.getCompletionHandle().apply();
+        }
       }
     }
 
@@ -216,17 +225,18 @@ public class ActivityWorker extends SuspendableWorkerBase {
     }
 
     @Override
-    public Throwable wrapFailure(PollForActivityTaskResponse task, Throwable failure) {
-      WorkflowExecution execution = task.getWorkflowExecution();
+    public Throwable wrapFailure(ActivityTask task, Throwable failure) {
+      PollForActivityTaskResponse response = task.getResponse();
+      WorkflowExecution execution = response.getWorkflowExecution();
       return new RuntimeException(
           "Failure processing activity task. WorkflowID="
               + execution.getWorkflowId()
               + ", RunID="
               + execution.getRunId()
               + ", ActivityType="
-              + task.getActivityType().getName()
+              + response.getActivityType().getName()
               + ", ActivityID="
-              + task.getActivityId(),
+              + response.getActivityId(),
           failure);
     }
 

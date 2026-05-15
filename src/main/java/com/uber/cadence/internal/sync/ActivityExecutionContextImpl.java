@@ -20,12 +20,17 @@ package com.uber.cadence.internal.sync;
 import com.uber.cadence.*;
 import com.uber.cadence.activity.ActivityTask;
 import com.uber.cadence.client.ActivityCancelledException;
+import com.uber.cadence.client.ActivityCompletionClient;
 import com.uber.cadence.client.ActivityCompletionException;
 import com.uber.cadence.client.ActivityCompletionFailureException;
 import com.uber.cadence.client.ActivityNotExistsException;
 import com.uber.cadence.client.ActivityWorkerShutdownException;
 import com.uber.cadence.converter.DataConverter;
+import com.uber.cadence.internal.external.ManualActivityCompletionClientFactory;
+import com.uber.cadence.internal.external.ManualActivityCompletionClientFactoryImpl;
 import com.uber.cadence.serviceclient.IWorkflowService;
+import com.uber.cadence.workflow.Functions;
+import com.uber.m3.tally.Scope;
 import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,12 +42,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base implementation of an {@link ActivityExecutionContext}.
+ * Base implementation of an {@link com.uber.cadence.activity.ActivityExecutionContext}.
  *
  * @author fateev, suskin
- * @see ActivityExecutionContext
+ * @see com.uber.cadence.activity.ActivityExecutionContext
  */
-class ActivityExecutionContextImpl implements ActivityExecutionContext {
+class ActivityExecutionContextImpl implements com.uber.cadence.activity.ActivityExecutionContext {
 
   private static final Logger log = LoggerFactory.getLogger(ActivityExecutionContextImpl.class);
   private static final long HEARTBEAT_RETRY_WAIT_MILLIS = 1000;
@@ -60,6 +65,9 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
   private Lock lock = new ReentrantLock();
   private ScheduledFuture future;
   private ActivityCompletionException lastException;
+  private final ManualActivityCompletionClientFactory manualCompletionClientFactory;
+  private Functions.Proc completionHandle;
+  private boolean useLocalManualCompletion;
 
   /** Create an ActivityExecutionContextImpl with the given attributes. */
   ActivityExecutionContextImpl(
@@ -67,7 +75,9 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
       String domain,
       ActivityTask task,
       DataConverter dataConverter,
-      ScheduledExecutorService heartbeatExecutor) {
+      ScheduledExecutorService heartbeatExecutor,
+      Functions.Proc completionHandle,
+      Scope metricsScope) {
     this.domain = domain;
     this.service = service;
     this.task = task;
@@ -76,11 +86,18 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
         Math.min(
             (long) (0.8 * task.getHeartbeatTimeout().toMillis()), MAX_HEARTBEAT_INTERVAL_MILLIS);
     this.heartbeatExecutor = heartbeatExecutor;
+    this.completionHandle = completionHandle;
+    this.manualCompletionClientFactory =
+        new ManualActivityCompletionClientFactoryImpl(service, domain, dataConverter, metricsScope);
   }
 
-  /** @see ActivityExecutionContext#recordActivityHeartbeat(Object) */
   @Override
-  public <V> void recordActivityHeartbeat(V details) throws ActivityCompletionException {
+  public ActivityTask getInfo() {
+    return task;
+  }
+
+  @Override
+  public <V> void heartbeat(V details) throws ActivityCompletionException {
     if (heartbeatExecutor.isShutdown()) {
       throw new ActivityWorkerShutdownException(task);
     }
@@ -99,6 +116,11 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
     } finally {
       lock.unlock();
     }
+  }
+
+  @Override
+  public <V> Optional<V> getHeartbeatDetails(Class<V> detailsClass) {
+    return getHeartbeatDetails(detailsClass, detailsClass);
   }
 
   @Override
@@ -180,16 +202,47 @@ class ActivityExecutionContextImpl implements ActivityExecutionContext {
 
   @Override
   public void doNotCompleteOnReturn() {
-    doNotCompleteOnReturn = true;
+    lock.lock();
+    try {
+      doNotCompleteOnReturn = true;
+    } finally {
+      lock.unlock();
+    }
   }
 
   @Override
   public boolean isDoNotCompleteOnReturn() {
-    return doNotCompleteOnReturn;
+    lock.lock();
+    try {
+      return doNotCompleteOnReturn;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  public boolean isUseLocalManualCompletion() {
+    lock.lock();
+    try {
+      return useLocalManualCompletion;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  public ActivityCompletionClient useLocalManualCompletion() {
+    lock.lock();
+    try {
+      doNotCompleteOnReturn = true;
+      useLocalManualCompletion = true;
+      return new ActivityCompletionClientImpl(manualCompletionClientFactory, completionHandle);
+    } finally {
+      lock.unlock();
+    }
   }
 
   /** @see ActivityExecutionContext#getTask() */
-  @Override
   public ActivityTask getTask() {
     return task;
   }

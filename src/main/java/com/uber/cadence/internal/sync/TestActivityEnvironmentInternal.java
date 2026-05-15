@@ -159,7 +159,9 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
               .setRunId(UUID.randomUUID().toString()));
       task.setWorkflowType(new WorkflowType().setName("test-workflow"));
       task.setActivityType(new ActivityType().setName(activityType));
-      Result taskResult = activityTaskHandler.handle(task, NoopScope.getInstance(), false);
+      com.uber.cadence.internal.worker.ActivityTask activityTask =
+          new com.uber.cadence.internal.worker.ActivityTask(task, () -> {});
+      Result taskResult = activityTaskHandler.handle(activityTask, NoopScope.getInstance(), false);
       return Workflow.newPromise(getReply(task, taskResult, resultClass, resultType));
     }
 

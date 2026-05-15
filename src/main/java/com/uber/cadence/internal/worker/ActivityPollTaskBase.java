@@ -23,42 +23,70 @@ import com.uber.cadence.internal.metrics.HistogramBuckets;
 import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
+import com.uber.cadence.workflow.Functions;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.util.Duration;
 import com.uber.m3.util.ImmutableMap;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-abstract class ActivityPollTaskBase implements Poller.PollTask<PollForActivityTaskResponse> {
+abstract class ActivityPollTaskBase implements Poller.PollTask<ActivityTask> {
 
   protected final SingleWorkerOptions options;
+  private final Semaphore pollSemaphore;
 
   public ActivityPollTaskBase(SingleWorkerOptions options) {
     this.options = options;
+    // TODO: we need to share this semaphore with the locally dispatched activity poll task
+    this.pollSemaphore = new Semaphore(options.getTaskExecutorThreadPoolSize());
   }
 
-  public PollForActivityTaskResponse poll() throws CadenceError {
+  public ActivityTask poll() throws CadenceError {
+    boolean isSuccessful = false;
 
-    PollForActivityTaskResponse result = pollTask();
-    if (result == null || result.getTaskToken() == null) {
+    try {
+      pollSemaphore.acquire();
+    } catch (InterruptedException e) {
       return null;
     }
 
-    Scope metricsScope =
-        options
-            .getMetricsScope()
-            .tagged(
-                ImmutableMap.of(
-                    MetricsTag.ACTIVITY_TYPE,
-                    result.getActivityType().getName(),
-                    MetricsTag.WORKFLOW_TYPE,
-                    result.getWorkflowType().getName()));
-    metricsScope.counter(MetricsType.ACTIVITY_POLL_SUCCEED_COUNTER).inc(1);
-    MetricsEmit.emitLatency(
-        metricsScope,
-        MetricsType.ACTIVITY_SCHEDULED_TO_START_LATENCY,
-        Duration.ofNanos(
-            result.getStartedTimestamp() - result.getScheduledTimestampOfThisAttempt()),
-        HistogramBuckets.HIGH_1MS_24H);
-    return result;
+    try {
+      PollForActivityTaskResponse result = pollTask();
+      if (result == null || result.getTaskToken() == null) {
+        return null;
+      }
+
+      Scope metricsScope =
+          options
+              .getMetricsScope()
+              .tagged(
+                  ImmutableMap.of(
+                      MetricsTag.ACTIVITY_TYPE,
+                      result.getActivityType().getName(),
+                      MetricsTag.WORKFLOW_TYPE,
+                      result.getWorkflowType().getName()));
+      metricsScope.counter(MetricsType.ACTIVITY_POLL_SUCCEED_COUNTER).inc(1);
+      MetricsEmit.emitLatency(
+          metricsScope,
+          MetricsType.ACTIVITY_SCHEDULED_TO_START_LATENCY,
+          Duration.ofNanos(
+              result.getStartedTimestamp() - result.getScheduledTimestampOfThisAttempt()),
+          HistogramBuckets.HIGH_1MS_24H);
+      isSuccessful = true;
+      // Wrap semaphore release to make it idempotent
+      AtomicBoolean released = new AtomicBoolean(false);
+      Functions.Proc completionHandle =
+          () -> {
+            if (released.compareAndSet(false, true)) {
+              pollSemaphore.release();
+            }
+          };
+      return new ActivityTask(result, completionHandle);
+    } finally {
+      if (!isSuccessful) {
+        pollSemaphore.release();
+      }
+    }
   }
 
   protected abstract PollForActivityTaskResponse pollTask() throws CadenceError;

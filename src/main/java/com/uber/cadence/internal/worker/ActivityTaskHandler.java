@@ -17,7 +17,6 @@
 
 package com.uber.cadence.internal.worker;
 
-import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.RespondActivityTaskCanceledRequest;
 import com.uber.cadence.RespondActivityTaskCompletedRequest;
 import com.uber.cadence.RespondActivityTaskFailedRequest;
@@ -36,6 +35,7 @@ public interface ActivityTaskHandler {
     private final RespondActivityTaskCompletedRequest taskCompleted;
     private final TaskFailedResult taskFailed;
     private final RespondActivityTaskCanceledRequest taskCancelled;
+    private final boolean manualCompletion;
     private int attempt;
     private Duration backoff;
 
@@ -66,10 +66,12 @@ public interface ActivityTaskHandler {
     public Result(
         RespondActivityTaskCompletedRequest taskCompleted,
         TaskFailedResult taskFailed,
-        RespondActivityTaskCanceledRequest taskCancelled) {
+        RespondActivityTaskCanceledRequest taskCancelled,
+        boolean manualCompletion) {
       this.taskCompleted = taskCompleted;
       this.taskFailed = taskFailed;
       this.taskCancelled = taskCancelled;
+      this.manualCompletion = manualCompletion;
     }
 
     public RespondActivityTaskCompletedRequest getTaskCompleted() {
@@ -99,6 +101,10 @@ public interface ActivityTaskHandler {
     public Duration getBackoff() {
       return backoff;
     }
+
+    public boolean isManualCompletion() {
+      return manualCompletion;
+    }
   }
 
   /**
@@ -109,8 +115,7 @@ public interface ActivityTaskHandler {
    * @param activityTask activity task which is response to PollForActivityTask call.
    * @return One of the possible decision task replies.
    */
-  Result handle(
-      PollForActivityTaskResponse activityTask, Scope metricsScope, boolean isLocalActivity);
+  Result handle(ActivityTask activityTask, Scope metricsScope, boolean isLocalActivity);
 
   /** True if this handler handles at least one activity type. */
   boolean isAnyTypeSupported();

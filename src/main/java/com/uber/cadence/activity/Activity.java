@@ -234,7 +234,7 @@ public final class Activity {
    * for an "external system finished" signal containing the final result.
    */
   public static void doNotCompleteOnReturn() {
-    ActivityInternal.doNotCompleteOnReturn();
+    getExecutionContext().doNotCompleteOnReturn();
   }
 
   /**
@@ -242,17 +242,17 @@ public final class Activity {
    *     is used.
    */
   public static byte[] getTaskToken() {
-    return ActivityInternal.getTask().getTaskToken();
+    return getExecutionContext().getTaskToken();
   }
 
   /** @return workfow execution that requested the activity execution */
   public static com.uber.cadence.WorkflowExecution getWorkflowExecution() {
-    return ActivityInternal.getTask().getWorkflowExecution();
+    return getExecutionContext().getWorkflowExecution();
   }
 
   /** @return task that caused activity execution */
   public static ActivityTask getTask() {
-    return ActivityInternal.getTask();
+    return getExecutionContext().getInfo();
   }
 
   /**
@@ -265,7 +265,7 @@ public final class Activity {
    *     exception.
    */
   public static <V> void heartbeat(V details) throws ActivityCompletionException {
-    ActivityInternal.recordActivityHeartbeat(details);
+    getExecutionContext().heartbeat(details);
   }
 
   /**
@@ -281,7 +281,7 @@ public final class Activity {
    * @param detailsClass type of the heartbeat details
    */
   public static <V> Optional<V> getHeartbeatDetails(Class<V> detailsClass) {
-    return ActivityInternal.getHeartbeatDetails(detailsClass, detailsClass);
+    return getExecutionContext().getHeartbeatDetails(detailsClass);
   }
 
   /**
@@ -291,7 +291,7 @@ public final class Activity {
    * @param detailsType type including generic information of the heartbeat details.
    */
   public static <V> Optional<V> getHeartbeatDetails(Class<V> detailsClass, Type detailsType) {
-    return ActivityInternal.getHeartbeatDetails(detailsClass, detailsType);
+    return getExecutionContext().getHeartbeatDetails(detailsClass, detailsType);
   }
 
   /**
@@ -301,11 +301,19 @@ public final class Activity {
    *     hide the service.
    */
   public static IWorkflowService getService() {
-    return ActivityInternal.getService();
+    return getExecutionContext().getService();
   }
 
   public static String getDomain() {
-    return ActivityInternal.getDomain();
+    return getExecutionContext().getDomain();
+  }
+
+  /**
+   * @return the activity execution context for the currently executing activity. This can be used
+   *     to access activity task metadata and use manual completion.
+   */
+  public static ActivityExecutionContext getExecutionContext() {
+    return ActivityInternal.getExecutionContext();
   }
 
   /**

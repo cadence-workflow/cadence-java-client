@@ -23,14 +23,15 @@ import com.google.common.util.concurrent.RateLimiter;
 import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.RespondActivityTaskCompletedRequest;
 import com.uber.cadence.RespondActivityTaskFailedRequest;
+import com.uber.cadence.activity.ActivityExecutionContext;
 import com.uber.cadence.activity.ActivityMethod;
-import com.uber.cadence.activity.ActivityTask;
 import com.uber.cadence.client.ActivityCancelledException;
 import com.uber.cadence.common.MethodRetry;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.internal.common.CheckedExceptionWrapper;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.metrics.MetricsType;
+import com.uber.cadence.internal.worker.ActivityTask;
 import com.uber.cadence.internal.worker.ActivityTaskHandler;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.testing.SimulatedTimeoutException;
@@ -150,7 +151,8 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
     failure = CheckedExceptionWrapper.unwrap(failure);
     result.setReason(failure.getClass().getName());
     result.setDetails(dataConverter.toData(failure));
-    return new ActivityTaskHandler.Result(null, new Result.TaskFailedResult(result, failure), null);
+    return new ActivityTaskHandler.Result(
+        null, new Result.TaskFailedResult(result, failure), null, false);
   }
 
   @Override
@@ -173,10 +175,10 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
   }
 
   @Override
-  public Result handle(
-      PollForActivityTaskResponse pollResponse, Scope metricsScope, boolean isLocalActivity) {
+  public Result handle(ActivityTask activityTask, Scope metricsScope, boolean isLocalActivity) {
+    PollForActivityTaskResponse pollResponse = activityTask.getResponse();
     String activityType = pollResponse.getActivityType().getName();
-    ActivityTaskImpl activityTask = new ActivityTaskImpl(pollResponse);
+    ActivityTaskImpl task = new ActivityTaskImpl(pollResponse, activityTask.getCompletionHandle());
     ActivityTaskExecutor activity = activities.get(activityType);
     if (activity == null) {
       String knownTypes = Joiner.on(", ").join(activities.keySet());
@@ -198,11 +200,11 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
         metricsScope.gauge(MetricsType.ACTIVITY_ACTIVE_THREAD_COUNT).update(Thread.activeCount());
       }
     }
-    return activity.execute(activityTask, metricsScope);
+    return activity.execute(task, metricsScope);
   }
 
   interface ActivityTaskExecutor {
-    ActivityTaskHandler.Result execute(ActivityTask task, Scope metricsScope);
+    ActivityTaskHandler.Result execute(ActivityTaskImpl task, Scope metricsScope);
   }
 
   private class POJOActivityImplementation implements ActivityTaskExecutor {
@@ -215,25 +217,35 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
     }
 
     @Override
-    public ActivityTaskHandler.Result execute(ActivityTask task, Scope metricsScope) {
+    public ActivityTaskHandler.Result execute(ActivityTaskImpl task, Scope metricsScope) {
       ActivityExecutionContext context =
-          new ActivityExecutionContextImpl(service, domain, task, dataConverter, heartbeatExecutor);
+          new ActivityExecutionContextImpl(
+              service,
+              domain,
+              task,
+              dataConverter,
+              heartbeatExecutor,
+              task.getCompletionHandle(),
+              metricsScope);
       byte[] input = task.getInput();
       CurrentActivityExecutionContext.set(context);
       try {
         Object[] args = dataConverter.fromDataArray(input, method.getGenericParameterTypes());
         Object result = method.invoke(activity, args);
-        RespondActivityTaskCompletedRequest request = new RespondActivityTaskCompletedRequest();
         if (context.isDoNotCompleteOnReturn()) {
-          return new ActivityTaskHandler.Result(null, null, null);
+          return new ActivityTaskHandler.Result(
+              null, null, null, context.isUseLocalManualCompletion());
         }
+        RespondActivityTaskCompletedRequest request = new RespondActivityTaskCompletedRequest();
         if (method.getReturnType() != Void.TYPE) {
           request.setResult(dataConverter.toData(result));
         }
-        return new ActivityTaskHandler.Result(request, null, null);
+        return new ActivityTaskHandler.Result(request, null, null, false);
       } catch (RuntimeException | IllegalAccessException e) {
+        // Always release semaphore on failure, even if manual completion was requested
         return mapToActivityFailure(e, metricsScope, false);
       } catch (InvocationTargetException e) {
+        // Always release semaphore on failure, even if manual completion was requested
         return mapToActivityFailure(e.getTargetException(), metricsScope, false);
       } finally {
         CurrentActivityExecutionContext.unset();
@@ -251,7 +263,7 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
     }
 
     @Override
-    public ActivityTaskHandler.Result execute(ActivityTask task, Scope metricsScope) {
+    public ActivityTaskHandler.Result execute(ActivityTaskImpl task, Scope metricsScope) {
       ActivityExecutionContext context =
           new LocalActivityExecutionContextImpl(service, domain, task);
       CurrentActivityExecutionContext.set(context);
@@ -263,7 +275,7 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
         if (method.getReturnType() != Void.TYPE) {
           request.setResult(dataConverter.toData(result));
         }
-        return new ActivityTaskHandler.Result(request, null, null);
+        return new ActivityTaskHandler.Result(request, null, null, false);
       } catch (RuntimeException | IllegalAccessException e) {
         return mapToActivityFailure(e, metricsScope, true);
       } catch (InvocationTargetException e) {
