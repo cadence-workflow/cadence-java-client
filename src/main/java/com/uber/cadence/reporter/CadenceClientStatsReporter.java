@@ -96,10 +96,7 @@ public class CadenceClientStatsReporter implements StatsReporter {
       Duration bucketLowerBound,
       Duration bucketUpperBound,
       long samples) {
-    io.micrometer.core.instrument.Timer timer = Metrics.timer(name, getTags(tags));
-    for (long i = 0; i < samples; i++) {
-      timer.record(bucketUpperBound.getNanos(), TimeUnit.NANOSECONDS);
-    }
+    // NOOP: histogram data is consumed via tally's native reporters, not the Micrometer bridge
   }
 
   private Iterable<Tag> getTags(Map<String, String> tags) {

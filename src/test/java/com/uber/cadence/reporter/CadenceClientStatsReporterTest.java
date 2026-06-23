@@ -98,16 +98,12 @@ public class CadenceClientStatsReporterTest {
   }
 
   @Test
-  public void testHistogramDurationSamplesShouldRecordUpperBoundAsTimerForEachSample() {
+  public void testHistogramDurationSamplesShouldBeNoop() {
     cadenceClientStatsReporter.reportHistogramDurationSamples(
         DEFAULT_REPORT_NAME, DEFAULT_REPORT_TAGS, null, Duration.ofSeconds(5), DEFAULT_DURATION, 3);
 
-    assertEquals(
-        EXPECTED_REPORT_TAGS,
-        Metrics.globalRegistry.get(DEFAULT_REPORT_NAME).timer().getId().getTags());
-    assertEquals(3, Metrics.globalRegistry.get(DEFAULT_REPORT_NAME).timer().count());
-    assertEquals(
-        30, Metrics.globalRegistry.get(DEFAULT_REPORT_NAME).timer().totalTime(TimeUnit.SECONDS), 0);
+    // Histogram duration samples are a NOOP - no metrics should be registered
+    assertEquals(0, Metrics.globalRegistry.getMeters().size());
   }
 
   private void callDefaultCounter() {
