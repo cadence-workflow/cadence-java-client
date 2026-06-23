@@ -96,7 +96,10 @@ public class CadenceClientStatsReporter implements StatsReporter {
       Duration bucketLowerBound,
       Duration bucketUpperBound,
       long samples) {
-    // NOOP
+    io.micrometer.core.instrument.Timer timer = Metrics.timer(name, getTags(tags));
+    for (long i = 0; i < samples; i++) {
+      timer.record(bucketUpperBound.getNanos(), TimeUnit.NANOSECONDS);
+    }
   }
 
   private Iterable<Tag> getTags(Map<String, String> tags) {

@@ -97,6 +97,19 @@ public class CadenceClientStatsReporterTest {
     assertEquals(1.0, Metrics.globalRegistry.get(DEFAULT_REPORT_NAME).gauge().value(), 0);
   }
 
+  @Test
+  public void testHistogramDurationSamplesShouldRecordUpperBoundAsTimerForEachSample() {
+    cadenceClientStatsReporter.reportHistogramDurationSamples(
+        DEFAULT_REPORT_NAME, DEFAULT_REPORT_TAGS, null, Duration.ofSeconds(5), DEFAULT_DURATION, 3);
+
+    assertEquals(
+        EXPECTED_REPORT_TAGS,
+        Metrics.globalRegistry.get(DEFAULT_REPORT_NAME).timer().getId().getTags());
+    assertEquals(3, Metrics.globalRegistry.get(DEFAULT_REPORT_NAME).timer().count());
+    assertEquals(
+        30, Metrics.globalRegistry.get(DEFAULT_REPORT_NAME).timer().totalTime(TimeUnit.SECONDS), 0);
+  }
+
   private void callDefaultCounter() {
     cadenceClientStatsReporter.reportCounter(
         DEFAULT_REPORT_NAME, DEFAULT_REPORT_TAGS, DEFAULT_COUNT);

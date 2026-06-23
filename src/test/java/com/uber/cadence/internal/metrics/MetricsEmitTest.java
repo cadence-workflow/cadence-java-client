@@ -46,7 +46,7 @@ public class MetricsEmitTest {
     // Save original mode to restore after each test
     originalMode = MetricsEmit.getEmitMode();
     // Reset to default mode for each test
-    MetricsEmit.setEmitMode(MetricEmitMode.EMIT_BOTH);
+    MetricsEmit.setEmitMode(MetricEmitMode.EMIT_HISTOGRAMS_ONLY);
   }
 
   @After
@@ -57,6 +57,8 @@ public class MetricsEmitTest {
 
   @Test
   public void testEmitLatency_DualEmit() {
+    MetricsEmit.setEmitMode(MetricEmitMode.EMIT_BOTH);
+
     when(mockScope.timer("test-metric")).thenReturn(mockTimer);
     when(mockScope.histogram(eq("test-metric_ns"), any())).thenReturn(mockHistogram);
 
@@ -70,6 +72,8 @@ public class MetricsEmitTest {
 
   @Test
   public void testStartLatency_DualEmit() {
+    MetricsEmit.setEmitMode(MetricEmitMode.EMIT_BOTH);
+
     Stopwatch mockTimerSW = mock(Stopwatch.class);
     Stopwatch mockHistogramSW = mock(Stopwatch.class);
 
@@ -91,6 +95,8 @@ public class MetricsEmitTest {
 
   @Test
   public void testStartLatency_StopNotCalledTwice() {
+    MetricsEmit.setEmitMode(MetricEmitMode.EMIT_BOTH);
+
     Stopwatch mockTimerSW = mock(Stopwatch.class);
     Stopwatch mockHistogramSW = mock(Stopwatch.class);
 
@@ -135,8 +141,8 @@ public class MetricsEmitTest {
 
   @Test
   public void testEmitMode_Default() {
-    // Default mode should be EMIT_BOTH
-    assertEquals(MetricEmitMode.EMIT_BOTH, MetricsEmit.getEmitMode());
+    // Default mode should be EMIT_HISTOGRAMS_ONLY
+    assertEquals(MetricEmitMode.EMIT_HISTOGRAMS_ONLY, MetricsEmit.getEmitMode());
   }
 
   @Test
