@@ -29,7 +29,6 @@ import com.uber.m3.tally.Counter;
 import com.uber.m3.tally.Histogram;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.tally.Stopwatch;
-import com.uber.m3.tally.Timer;
 import com.uber.m3.util.Duration;
 import java.util.concurrent.Semaphore;
 import org.junit.Before;
@@ -48,15 +47,11 @@ public class WorkflowPollTaskTest {
     mockMetricScope = mock(Scope.class);
     semaphore = new Semaphore(100);
 
-    // Mock the Timer and Histogram for poll latency (dual-emit)
-    Timer pollLatencyTimer = mock(Timer.class);
+    // Mock the Histogram for poll latency (histogram-only by default)
     Histogram pollLatencyHistogram = mock(Histogram.class);
-    Stopwatch timerSw = mock(Stopwatch.class);
     Stopwatch histogramSw = mock(Stopwatch.class);
 
-    // Ensure timers and stopwatch are not null and return expected values
-    when(mockMetricScope.timer(MetricsType.DECISION_POLL_LATENCY)).thenReturn(pollLatencyTimer);
-    when(pollLatencyTimer.start()).thenReturn(timerSw);
+    // Ensure histogram and stopwatch are not null and return expected values
     when(mockMetricScope.histogram(
             eq(MetricsType.DECISION_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
         .thenReturn(pollLatencyHistogram);
@@ -111,13 +106,9 @@ public class WorkflowPollTaskTest {
     when(mockService.PollForDecisionTask(any(PollForDecisionTaskRequest.class)))
         .thenReturn(response);
 
-    // Mock the timer and histogram behavior (dual-emit)
-    Timer pollLatencyTimer = mock(Timer.class);
+    // Mock the histogram behavior (default mode is EMIT_HISTOGRAMS_ONLY)
     Histogram pollLatencyHistogram = mock(Histogram.class);
-    Stopwatch timerSw = mock(Stopwatch.class);
     Stopwatch histogramSw = mock(Stopwatch.class);
-    when(mockMetricScope.timer(MetricsType.DECISION_POLL_LATENCY)).thenReturn(pollLatencyTimer);
-    when(pollLatencyTimer.start()).thenReturn(timerSw);
     when(mockMetricScope.histogram(
             eq(MetricsType.DECISION_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
         .thenReturn(pollLatencyHistogram);
@@ -128,16 +119,12 @@ public class WorkflowPollTaskTest {
     when(mockMetricScope.tagged(ImmutableMap.of(MetricsTag.WORKFLOW_TYPE, "testWorkflowType")))
         .thenReturn(taggedScope);
 
-    // Mock scheduled-to-start latency timer and histogram (dual-emit)
-    Timer scheduledToStartLatencyTimer = mock(Timer.class);
+    // Mock scheduled-to-start latency histogram (histogram-only by default)
     Histogram scheduledToStartLatencyHistogram = mock(Histogram.class);
-    when(taggedScope.timer(MetricsType.DECISION_SCHEDULED_TO_START_LATENCY))
-        .thenReturn(scheduledToStartLatencyTimer);
     when(taggedScope.histogram(
             eq(MetricsType.DECISION_SCHEDULED_TO_START_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX),
             any()))
         .thenReturn(scheduledToStartLatencyHistogram);
-    doNothing().when(scheduledToStartLatencyTimer).record(any(Duration.class));
     doNothing().when(scheduledToStartLatencyHistogram).recordDuration(any(Duration.class));
 
     // Mock counters for DECISION_POLL_COUNTER and DECISION_POLL_SUCCEED_COUNTER
@@ -152,18 +139,16 @@ public class WorkflowPollTaskTest {
     assertNotNull(result);
     assertArrayEquals("testToken".getBytes(), result.getResponse().getTaskToken());
 
-    // Verify counter and timer/histogram behavior (dual-emit)
+    // Verify counter and histogram behavior (histogram-only by default)
     verify(pollCounter, times(1)).inc(1);
     verify(succeedCounter, times(1)).inc(1);
-    verify(pollLatencyTimer, times(1)).start();
     verify(pollLatencyHistogram, times(1)).start();
-    verify(timerSw, times(1)).stop();
     verify(histogramSw, times(1)).stop();
 
-    // Verify that record() on scheduledToStartLatency metrics was called with correct duration
+    // Verify that recordDuration() on scheduledToStartLatency histogram was called with correct
+    // duration
     Duration expectedDuration =
         Duration.ofNanos(response.getStartedTimestamp() - response.getScheduledTimestamp());
-    verify(scheduledToStartLatencyTimer, times(1)).record(eq(expectedDuration));
     verify(scheduledToStartLatencyHistogram, times(1)).recordDuration(eq(expectedDuration));
 
     // Verify the completion callback releases the semaphore
