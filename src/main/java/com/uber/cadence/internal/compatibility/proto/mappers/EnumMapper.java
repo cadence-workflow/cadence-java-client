@@ -613,4 +613,74 @@ public final class EnumMapper {
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
+
+  public static ScheduleOverlapPolicy scheduleOverlapPolicy(
+      com.uber.cadence.client.schedule.ScheduleOverlapPolicy t) {
+    if (t == null) {
+      return ScheduleOverlapPolicy.SCHEDULE_OVERLAP_POLICY_INVALID;
+    }
+    switch (t) {
+      case SKIP_NEW:
+        return ScheduleOverlapPolicy.SCHEDULE_OVERLAP_POLICY_SKIP_NEW;
+      case BUFFER:
+        return ScheduleOverlapPolicy.SCHEDULE_OVERLAP_POLICY_BUFFER;
+      case CONCURRENT:
+        return ScheduleOverlapPolicy.SCHEDULE_OVERLAP_POLICY_CONCURRENT;
+      case CANCEL_PREVIOUS:
+        return ScheduleOverlapPolicy.SCHEDULE_OVERLAP_POLICY_CANCEL_PREVIOUS;
+      case TERMINATE_PREVIOUS:
+        return ScheduleOverlapPolicy.SCHEDULE_OVERLAP_POLICY_TERMINATE_PREVIOUS;
+    }
+    throw new IllegalArgumentException("unexpected enum value");
+  }
+
+  public static com.uber.cadence.client.schedule.ScheduleOverlapPolicy scheduleOverlapPolicy(
+      ScheduleOverlapPolicy t) {
+    switch (t) {
+      case SCHEDULE_OVERLAP_POLICY_INVALID:
+        return null;
+      case SCHEDULE_OVERLAP_POLICY_SKIP_NEW:
+        return com.uber.cadence.client.schedule.ScheduleOverlapPolicy.SKIP_NEW;
+      case SCHEDULE_OVERLAP_POLICY_BUFFER:
+        return com.uber.cadence.client.schedule.ScheduleOverlapPolicy.BUFFER;
+      case SCHEDULE_OVERLAP_POLICY_CONCURRENT:
+        return com.uber.cadence.client.schedule.ScheduleOverlapPolicy.CONCURRENT;
+      case SCHEDULE_OVERLAP_POLICY_CANCEL_PREVIOUS:
+        return com.uber.cadence.client.schedule.ScheduleOverlapPolicy.CANCEL_PREVIOUS;
+      case SCHEDULE_OVERLAP_POLICY_TERMINATE_PREVIOUS:
+        return com.uber.cadence.client.schedule.ScheduleOverlapPolicy.TERMINATE_PREVIOUS;
+    }
+    throw new IllegalArgumentException("unexpected enum value");
+  }
+
+  public static ScheduleCatchUpPolicy scheduleCatchUpPolicy(
+      com.uber.cadence.client.schedule.ScheduleCatchUpPolicy t) {
+    if (t == null) {
+      return ScheduleCatchUpPolicy.SCHEDULE_CATCH_UP_POLICY_INVALID;
+    }
+    switch (t) {
+      case SKIP:
+        return ScheduleCatchUpPolicy.SCHEDULE_CATCH_UP_POLICY_SKIP;
+      case ONE:
+        return ScheduleCatchUpPolicy.SCHEDULE_CATCH_UP_POLICY_ONE;
+      case ALL:
+        return ScheduleCatchUpPolicy.SCHEDULE_CATCH_UP_POLICY_ALL;
+    }
+    throw new IllegalArgumentException("unexpected enum value");
+  }
+
+  public static com.uber.cadence.client.schedule.ScheduleCatchUpPolicy scheduleCatchUpPolicy(
+      ScheduleCatchUpPolicy t) {
+    switch (t) {
+      case SCHEDULE_CATCH_UP_POLICY_INVALID:
+        return null;
+      case SCHEDULE_CATCH_UP_POLICY_SKIP:
+        return com.uber.cadence.client.schedule.ScheduleCatchUpPolicy.SKIP;
+      case SCHEDULE_CATCH_UP_POLICY_ONE:
+        return com.uber.cadence.client.schedule.ScheduleCatchUpPolicy.ONE;
+      case SCHEDULE_CATCH_UP_POLICY_ALL:
+        return com.uber.cadence.client.schedule.ScheduleCatchUpPolicy.ALL;
+    }
+    throw new IllegalArgumentException("unexpected enum value");
+  }
 }

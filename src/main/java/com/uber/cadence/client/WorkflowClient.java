@@ -21,6 +21,14 @@ import com.uber.cadence.CadenceError;
 import com.uber.cadence.RefreshWorkflowTasksRequest;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.activity.Activity;
+import com.uber.cadence.client.schedule.ListSchedulesResult;
+import com.uber.cadence.client.schedule.ScheduleAction;
+import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
+import com.uber.cadence.client.schedule.ScheduleDescription;
+import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
+import com.uber.cadence.client.schedule.SchedulePolicies;
+import com.uber.cadence.client.schedule.ScheduleSpec;
+import com.uber.cadence.client.schedule.ScheduleState;
 import com.uber.cadence.internal.sync.WorkflowClientInternal;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.workflow.Functions;
@@ -261,6 +269,123 @@ public interface WorkflowClient {
    */
   void refreshWorkflowTasks(RefreshWorkflowTasksRequest refreshWorkflowTasksRequest)
       throws CadenceError;
+
+  /**
+   * Creates a new schedule in the current domain.
+   *
+   * @param scheduleId unique identifier for the schedule within the domain
+   * @param spec when the schedule should fire (cron expression, start/end time, jitter)
+   * @param action what to do when the schedule fires (start a workflow)
+   * @param policies overlap, catch-up, and failure-handling policies; {@code null} uses server
+   *     defaults
+   * @param state initial pause state; {@code null} starts unpaused
+   * @param memo optional key-value annotations attached to the schedule; {@code null} means none
+   * @throws com.uber.cadence.EntityNotExistsError if the domain does not exist
+   * @throws com.uber.cadence.DomainNotActiveError if the domain is not active in this cluster
+   */
+  void createSchedule(
+      String scheduleId,
+      ScheduleSpec spec,
+      ScheduleAction action,
+      SchedulePolicies policies,
+      ScheduleState state,
+      java.util.Map<String, Object> memo)
+      throws CadenceError;
+
+  /**
+   * Returns the full configuration and current runtime state of a schedule.
+   *
+   * @param scheduleId the schedule to describe
+   * @return mutable description that can be passed to {@link #updateSchedule}
+   * @throws com.uber.cadence.EntityNotExistsError if the schedule does not exist
+   */
+  ScheduleDescription describeSchedule(String scheduleId) throws CadenceError;
+
+  /**
+   * Updates a schedule using a describe-first (read-modify-write) pattern.
+   *
+   * <p>The {@code updater} function receives the current {@link
+   * com.uber.cadence.client.ScheduleDescription} fetched from the server and must return the
+   * desired new state. The SDK then applies the mutation and sends a single update to the server.
+   * Never write field values directly without fetching current state first; the server replaces the
+   * entire schedule on every update.
+   *
+   * @param scheduleId the schedule to update
+   * @param updater function that receives the current description and returns the updated one
+   * @throws com.uber.cadence.EntityNotExistsError if the schedule does not exist
+   */
+  void updateSchedule(
+      String scheduleId,
+      java.util.function.Function<ScheduleDescription, ScheduleDescription> updater)
+      throws CadenceError;
+
+  /**
+   * Permanently deletes a schedule. Any in-flight workflow runs started by the schedule are not
+   * affected.
+   *
+   * @param scheduleId the schedule to delete
+   * @throws com.uber.cadence.EntityNotExistsError if the schedule does not exist
+   */
+  void deleteSchedule(String scheduleId) throws CadenceError;
+
+  /**
+   * Pauses a schedule, preventing new workflow runs from being started. Already-running workflows
+   * are not affected.
+   *
+   * @param scheduleId the schedule to pause
+   * @param reason human-readable reason logged with the pause event
+   * @throws com.uber.cadence.EntityNotExistsError if the schedule does not exist
+   */
+  void pauseSchedule(String scheduleId, String reason) throws CadenceError;
+
+  /**
+   * Resumes a paused schedule. Uses the catch-up policy configured in {@link
+   * com.uber.cadence.client.SchedulePolicies#getCatchUpPolicy()}.
+   *
+   * @param scheduleId the schedule to unpause
+   * @param reason human-readable reason logged with the unpause event
+   * @throws com.uber.cadence.EntityNotExistsError if the schedule does not exist
+   */
+  void unpauseSchedule(String scheduleId, String reason) throws CadenceError;
+
+  /**
+   * Resumes a paused schedule with an explicit catch-up policy override for this unpause only.
+   *
+   * @param scheduleId the schedule to unpause
+   * @param reason human-readable reason logged with the unpause event
+   * @param catchUpPolicy overrides the schedule's configured catch-up policy for this unpause only;
+   *     {@code null} uses the schedule's configured policy
+   * @throws com.uber.cadence.EntityNotExistsError if the schedule does not exist
+   */
+  void unpauseSchedule(String scheduleId, String reason, ScheduleCatchUpPolicy catchUpPolicy)
+      throws CadenceError;
+
+  /**
+   * Triggers workflow runs for a historical time range, as if the schedule had been active during
+   * that period. Useful for backfilling missed runs after an extended pause or outage.
+   *
+   * @param scheduleId the schedule to backfill
+   * @param startTime start of the backfill time range (inclusive)
+   * @param endTime end of the backfill time range (inclusive)
+   * @param overlapPolicy how to handle overlap with already-running workflows; {@code null} uses
+   *     the schedule's configured overlap policy
+   * @throws com.uber.cadence.EntityNotExistsError if the schedule does not exist
+   */
+  void backfillSchedule(
+      String scheduleId,
+      java.time.Instant startTime,
+      java.time.Instant endTime,
+      ScheduleOverlapPolicy overlapPolicy)
+      throws CadenceError;
+
+  /**
+   * Returns a page of schedules in the current domain.
+   *
+   * @param pageSize maximum number of entries to return
+   * @param nextPageToken pagination token from a previous call; {@code null} for the first page
+   * @return result containing schedule entries and a token for the next page
+   */
+  ListSchedulesResult listSchedules(int pageSize, byte[] nextPageToken) throws CadenceError;
 
   /**
    * Executes zero argument workflow with void return type

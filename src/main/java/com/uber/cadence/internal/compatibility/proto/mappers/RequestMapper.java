@@ -53,9 +53,13 @@ import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.w
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowType;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.workflowTypeFilter;
 
+import com.uber.cadence.api.v1.BackfillScheduleRequest;
 import com.uber.cadence.api.v1.CountWorkflowExecutionsRequest;
+import com.uber.cadence.api.v1.CreateScheduleRequest;
+import com.uber.cadence.api.v1.DeleteScheduleRequest;
 import com.uber.cadence.api.v1.DeprecateDomainRequest;
 import com.uber.cadence.api.v1.DescribeDomainRequest;
+import com.uber.cadence.api.v1.DescribeScheduleRequest;
 import com.uber.cadence.api.v1.DescribeTaskListRequest;
 import com.uber.cadence.api.v1.DescribeWorkflowExecutionRequest;
 import com.uber.cadence.api.v1.GetTaskListsByDomainRequest;
@@ -64,8 +68,10 @@ import com.uber.cadence.api.v1.ListArchivedWorkflowExecutionsRequest;
 import com.uber.cadence.api.v1.ListClosedWorkflowExecutionsRequest;
 import com.uber.cadence.api.v1.ListDomainsRequest;
 import com.uber.cadence.api.v1.ListOpenWorkflowExecutionsRequest;
+import com.uber.cadence.api.v1.ListSchedulesRequest;
 import com.uber.cadence.api.v1.ListTaskListPartitionsRequest;
 import com.uber.cadence.api.v1.ListWorkflowExecutionsRequest;
+import com.uber.cadence.api.v1.PauseScheduleRequest;
 import com.uber.cadence.api.v1.PollForActivityTaskRequest;
 import com.uber.cadence.api.v1.PollForDecisionTaskRequest;
 import com.uber.cadence.api.v1.QueryWorkflowRequest;
@@ -93,8 +99,10 @@ import com.uber.cadence.api.v1.SignalWorkflowExecutionRequest;
 import com.uber.cadence.api.v1.StartWorkflowExecutionAsyncRequest;
 import com.uber.cadence.api.v1.StartWorkflowExecutionRequest;
 import com.uber.cadence.api.v1.TerminateWorkflowExecutionRequest;
+import com.uber.cadence.api.v1.UnpauseScheduleRequest;
 import com.uber.cadence.api.v1.UpdateDomainRequest;
 import com.uber.cadence.api.v1.UpdateDomainRequest.Builder;
+import com.uber.cadence.api.v1.UpdateScheduleRequest;
 import com.uber.cadence.api.v1.WorkflowQueryResult;
 import java.util.ArrayList;
 import java.util.List;
@@ -1010,5 +1018,137 @@ public class RequestMapper {
     return RefreshWorkflowTasksRequest.newBuilder()
         .setDomain(request.getDomain() != null ? request.getDomain() : "")
         .build();
+  }
+
+  public static CreateScheduleRequest createScheduleRequest(
+      com.uber.cadence.CreateScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    CreateScheduleRequest.Builder b =
+        CreateScheduleRequest.newBuilder()
+            .setDomain(nullToEmpty(t.getDomain()))
+            .setScheduleId(nullToEmpty(t.getScheduleId()))
+            .setSpec(TypeMapper.scheduleSpec(t.getSpec()))
+            .setAction(TypeMapper.scheduleAction(t.getAction()))
+            .setPolicies(TypeMapper.schedulePolicies(t.getPolicies()));
+    if (t.getMemo() != null) {
+      b.setMemo(memo(t.getMemo()));
+    }
+    if (t.getSearchAttributes() != null) {
+      b.setSearchAttributes(searchAttributes(t.getSearchAttributes()));
+    }
+    return b.build();
+  }
+
+  public static DescribeScheduleRequest describeScheduleRequest(
+      com.uber.cadence.DescribeScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    return DescribeScheduleRequest.newBuilder()
+        .setDomain(nullToEmpty(t.getDomain()))
+        .setScheduleId(nullToEmpty(t.getScheduleId()))
+        .build();
+  }
+
+  public static UpdateScheduleRequest updateScheduleRequest(
+      com.uber.cadence.UpdateScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    UpdateScheduleRequest.Builder b =
+        UpdateScheduleRequest.newBuilder()
+            .setDomain(nullToEmpty(t.getDomain()))
+            .setScheduleId(nullToEmpty(t.getScheduleId()))
+            .setSpec(TypeMapper.scheduleSpec(t.getSpec()))
+            .setAction(TypeMapper.scheduleAction(t.getAction()))
+            .setPolicies(TypeMapper.schedulePolicies(t.getPolicies()));
+    if (t.getSearchAttributes() != null) {
+      b.setSearchAttributes(searchAttributes(t.getSearchAttributes()));
+    }
+    return b.build();
+  }
+
+  public static DeleteScheduleRequest deleteScheduleRequest(
+      com.uber.cadence.DeleteScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    return DeleteScheduleRequest.newBuilder()
+        .setDomain(nullToEmpty(t.getDomain()))
+        .setScheduleId(nullToEmpty(t.getScheduleId()))
+        .build();
+  }
+
+  public static PauseScheduleRequest pauseScheduleRequest(com.uber.cadence.PauseScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    PauseScheduleRequest.Builder b =
+        PauseScheduleRequest.newBuilder()
+            .setDomain(nullToEmpty(t.getDomain()))
+            .setScheduleId(nullToEmpty(t.getScheduleId()));
+    if (t.getReason() != null) {
+      b.setReason(t.getReason());
+    }
+    if (t.getIdentity() != null) {
+      b.setIdentity(t.getIdentity());
+    }
+    return b.build();
+  }
+
+  public static UnpauseScheduleRequest unpauseScheduleRequest(
+      com.uber.cadence.UnpauseScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    UnpauseScheduleRequest.Builder b =
+        UnpauseScheduleRequest.newBuilder()
+            .setDomain(nullToEmpty(t.getDomain()))
+            .setScheduleId(nullToEmpty(t.getScheduleId()));
+    if (t.getReason() != null) {
+      b.setReason(t.getReason());
+    }
+    if (t.getCatchUpPolicy() != null) {
+      b.setCatchUpPolicy(EnumMapper.scheduleCatchUpPolicy(t.getCatchUpPolicy()));
+    }
+    return b.build();
+  }
+
+  public static BackfillScheduleRequest backfillScheduleRequest(
+      com.uber.cadence.BackfillScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    BackfillScheduleRequest.Builder b =
+        BackfillScheduleRequest.newBuilder()
+            .setDomain(nullToEmpty(t.getDomain()))
+            .setScheduleId(nullToEmpty(t.getScheduleId()))
+            .setOverlapPolicy(EnumMapper.scheduleOverlapPolicy(t.getOverlapPolicy()));
+    if (t.getStartTime() != null) {
+      b.setStartTime(Helpers.instantToTimestamp(t.getStartTime()));
+    }
+    if (t.getEndTime() != null) {
+      b.setEndTime(Helpers.instantToTimestamp(t.getEndTime()));
+    }
+    if (t.getBackfillId() != null) {
+      b.setBackfillId(t.getBackfillId());
+    }
+    return b.build();
+  }
+
+  public static ListSchedulesRequest listSchedulesRequest(com.uber.cadence.ListSchedulesRequest t) {
+    if (t == null) {
+      return null;
+    }
+    ListSchedulesRequest.Builder b =
+        ListSchedulesRequest.newBuilder()
+            .setDomain(nullToEmpty(t.getDomain()))
+            .setPageSize(t.getPageSize());
+    if (t.getNextPageToken() != null) {
+      b.setNextPageToken(arrayToByteString(t.getNextPageToken()));
+    }
+    return b.build();
   }
 }

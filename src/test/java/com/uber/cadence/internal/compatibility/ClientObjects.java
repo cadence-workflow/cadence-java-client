@@ -1198,6 +1198,90 @@ public class ClientObjects {
           .setFailoverVersion(1)
           .setGlobalDomain(true);
 
+  // --- Schedule fixtures ---
+
+  private static final com.uber.cadence.client.schedule.ScheduleSpec SCHEDULE_SPEC =
+      com.uber.cadence.client.schedule.ScheduleSpec.newBuilder()
+          .setCronExpression("0 6 * * *")
+          .setStartTime(java.time.Instant.ofEpochSecond(1000))
+          .setEndTime(java.time.Instant.ofEpochSecond(2000))
+          .setJitter(java.time.Duration.ofSeconds(60))
+          .build();
+
+  private static final com.uber.cadence.client.schedule.ScheduleAction SCHEDULE_ACTION =
+      com.uber.cadence.client.schedule.ScheduleAction.newBuilder()
+          .setStartWorkflow(
+              com.uber.cadence.client.schedule.ScheduleAction.StartWorkflowAction.newBuilder()
+                  .setWorkflowType("workflowType")
+                  .setTaskList("schedule-tl")
+                  .setWorkflowIdPrefix("sched-")
+                  .setExecutionStartToCloseTimeout(java.time.Duration.ofSeconds(60))
+                  .setTaskStartToCloseTimeout(java.time.Duration.ofSeconds(10))
+                  .build())
+          .build();
+
+  private static final com.uber.cadence.client.schedule.SchedulePolicies SCHEDULE_POLICIES =
+      com.uber.cadence.client.schedule.SchedulePolicies.newBuilder()
+          .setOverlapPolicy(com.uber.cadence.client.schedule.ScheduleOverlapPolicy.SKIP_NEW)
+          .setCatchUpPolicy(com.uber.cadence.client.schedule.ScheduleCatchUpPolicy.SKIP)
+          .setCatchUpWindow(java.time.Duration.ofSeconds(3600))
+          .setPauseOnFailure(true)
+          .setBufferLimit(5)
+          .setConcurrencyLimit(2)
+          .build();
+
+  public static final com.uber.cadence.CreateScheduleRequest CREATE_SCHEDULE_REQUEST =
+      new com.uber.cadence.CreateScheduleRequest()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .setSpec(SCHEDULE_SPEC)
+          .setAction(SCHEDULE_ACTION)
+          .setPolicies(SCHEDULE_POLICIES);
+
+  public static final com.uber.cadence.DescribeScheduleRequest DESCRIBE_SCHEDULE_REQUEST =
+      new com.uber.cadence.DescribeScheduleRequest()
+          .setDomain("domain")
+          .setScheduleId("schedule-id");
+
+  public static final com.uber.cadence.UpdateScheduleRequest UPDATE_SCHEDULE_REQUEST =
+      new com.uber.cadence.UpdateScheduleRequest()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .setSpec(SCHEDULE_SPEC)
+          .setAction(SCHEDULE_ACTION)
+          .setPolicies(SCHEDULE_POLICIES);
+
+  public static final com.uber.cadence.DeleteScheduleRequest DELETE_SCHEDULE_REQUEST =
+      new com.uber.cadence.DeleteScheduleRequest().setDomain("domain").setScheduleId("schedule-id");
+
+  public static final com.uber.cadence.PauseScheduleRequest PAUSE_SCHEDULE_REQUEST =
+      new com.uber.cadence.PauseScheduleRequest()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .setReason("pausing");
+
+  public static final com.uber.cadence.UnpauseScheduleRequest UNPAUSE_SCHEDULE_REQUEST =
+      new com.uber.cadence.UnpauseScheduleRequest()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .setReason("resuming")
+          .setCatchUpPolicy(com.uber.cadence.client.schedule.ScheduleCatchUpPolicy.SKIP);
+
+  public static final com.uber.cadence.BackfillScheduleRequest BACKFILL_SCHEDULE_REQUEST =
+      new com.uber.cadence.BackfillScheduleRequest()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .setOverlapPolicy(com.uber.cadence.client.schedule.ScheduleOverlapPolicy.BUFFER)
+          .setStartTime(java.time.Instant.ofEpochSecond(1000))
+          .setEndTime(java.time.Instant.ofEpochSecond(2000))
+          .setBackfillId("bf-1");
+
+  public static final com.uber.cadence.ListSchedulesRequest LIST_SCHEDULES_REQUEST =
+      new com.uber.cadence.ListSchedulesRequest()
+          .setDomain("domain")
+          .setPageSize(50)
+          .setNextPageToken(utf8("token"));
+
   private ClientObjects() {}
 
   public static byte[] utf8(String value) {

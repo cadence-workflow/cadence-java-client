@@ -19,8 +19,18 @@ package com.uber.cadence.internal.sync;
 
 import com.google.common.base.Strings;
 import com.google.common.reflect.TypeToken;
+import com.uber.cadence.BackfillScheduleRequest;
 import com.uber.cadence.CadenceError;
+import com.uber.cadence.CreateScheduleRequest;
+import com.uber.cadence.DeleteScheduleRequest;
+import com.uber.cadence.DescribeScheduleRequest;
+import com.uber.cadence.DescribeScheduleResponse;
+import com.uber.cadence.ListSchedulesRequest;
+import com.uber.cadence.ListSchedulesResponse;
+import com.uber.cadence.PauseScheduleRequest;
 import com.uber.cadence.RefreshWorkflowTasksRequest;
+import com.uber.cadence.UnpauseScheduleRequest;
+import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.client.ActivityCompletionClient;
 import com.uber.cadence.client.BatchRequest;
@@ -29,6 +39,14 @@ import com.uber.cadence.client.WorkflowClientInterceptor;
 import com.uber.cadence.client.WorkflowClientOptions;
 import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.client.WorkflowStub;
+import com.uber.cadence.client.schedule.ListSchedulesResult;
+import com.uber.cadence.client.schedule.ScheduleAction;
+import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
+import com.uber.cadence.client.schedule.ScheduleDescription;
+import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
+import com.uber.cadence.client.schedule.SchedulePolicies;
+import com.uber.cadence.client.schedule.ScheduleSpec;
+import com.uber.cadence.client.schedule.ScheduleState;
 import com.uber.cadence.internal.external.GenericWorkflowClientExternalImpl;
 import com.uber.cadence.internal.external.ManualActivityCompletionClientFactory;
 import com.uber.cadence.internal.external.ManualActivityCompletionClientFactoryImpl;
@@ -41,12 +59,15 @@ import com.uber.cadence.workflow.WorkflowMethod;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.time.Instant;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public final class WorkflowClientInternal implements WorkflowClient {
 
@@ -222,6 +243,115 @@ public final class WorkflowClientInternal implements WorkflowClient {
   public void refreshWorkflowTasks(RefreshWorkflowTasksRequest refreshWorkflowTasksRequest)
       throws CadenceError {
     workflowService.RefreshWorkflowTasks(refreshWorkflowTasksRequest);
+  }
+
+  @Override
+  public void createSchedule(
+      String scheduleId,
+      ScheduleSpec spec,
+      ScheduleAction action,
+      SchedulePolicies policies,
+      ScheduleState state,
+      Map<String, Object> memo)
+      throws CadenceError {
+    String domain = clientOptions.getDomain();
+    CreateScheduleRequest req =
+        new CreateScheduleRequest()
+            .setDomain(domain)
+            .setScheduleId(scheduleId)
+            .setSpec(spec)
+            .setAction(action)
+            .setPolicies(policies);
+    workflowService.CreateSchedule(req);
+  }
+
+  @Override
+  public ScheduleDescription describeSchedule(String scheduleId) throws CadenceError {
+    String domain = clientOptions.getDomain();
+    DescribeScheduleResponse resp =
+        workflowService.DescribeSchedule(
+            new DescribeScheduleRequest().setDomain(domain).setScheduleId(scheduleId));
+    return new ScheduleDescription(
+        resp.getSpec(),
+        resp.getAction(),
+        resp.getPolicies(),
+        resp.getState(),
+        resp.getInfo(),
+        null,
+        null);
+  }
+
+  @Override
+  public void updateSchedule(
+      String scheduleId, Function<ScheduleDescription, ScheduleDescription> updater)
+      throws CadenceError {
+    ScheduleDescription current = describeSchedule(scheduleId);
+    ScheduleDescription updated = updater.apply(current);
+    String domain = clientOptions.getDomain();
+    workflowService.UpdateSchedule(
+        new UpdateScheduleRequest()
+            .setDomain(domain)
+            .setScheduleId(scheduleId)
+            .setSpec(updated.getSpec())
+            .setAction(updated.getAction())
+            .setPolicies(updated.getPolicies()));
+  }
+
+  @Override
+  public void deleteSchedule(String scheduleId) throws CadenceError {
+    String domain = clientOptions.getDomain();
+    workflowService.DeleteSchedule(
+        new DeleteScheduleRequest().setDomain(domain).setScheduleId(scheduleId));
+  }
+
+  @Override
+  public void pauseSchedule(String scheduleId, String reason) throws CadenceError {
+    String domain = clientOptions.getDomain();
+    workflowService.PauseSchedule(
+        new PauseScheduleRequest().setDomain(domain).setScheduleId(scheduleId).setReason(reason));
+  }
+
+  @Override
+  public void unpauseSchedule(String scheduleId, String reason) throws CadenceError {
+    unpauseSchedule(scheduleId, reason, null);
+  }
+
+  @Override
+  public void unpauseSchedule(String scheduleId, String reason, ScheduleCatchUpPolicy catchUpPolicy)
+      throws CadenceError {
+    String domain = clientOptions.getDomain();
+    workflowService.UnpauseSchedule(
+        new UnpauseScheduleRequest()
+            .setDomain(domain)
+            .setScheduleId(scheduleId)
+            .setReason(reason)
+            .setCatchUpPolicy(catchUpPolicy));
+  }
+
+  @Override
+  public void backfillSchedule(
+      String scheduleId, Instant startTime, Instant endTime, ScheduleOverlapPolicy overlapPolicy)
+      throws CadenceError {
+    String domain = clientOptions.getDomain();
+    workflowService.BackfillSchedule(
+        new BackfillScheduleRequest()
+            .setDomain(domain)
+            .setScheduleId(scheduleId)
+            .setStartTime(startTime)
+            .setEndTime(endTime)
+            .setOverlapPolicy(overlapPolicy));
+  }
+
+  @Override
+  public ListSchedulesResult listSchedules(int pageSize, byte[] nextPageToken) throws CadenceError {
+    String domain = clientOptions.getDomain();
+    ListSchedulesResponse resp =
+        workflowService.ListSchedules(
+            new ListSchedulesRequest()
+                .setDomain(domain)
+                .setPageSize(pageSize)
+                .setNextPageToken(nextPageToken));
+    return new ListSchedulesResult(resp.getSchedules(), resp.getNextPageToken());
   }
 
   public static WorkflowExecution start(Functions.Proc workflow) {

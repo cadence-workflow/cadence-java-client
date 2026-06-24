@@ -278,7 +278,44 @@ public class RequestMapperTest<T, P extends Message> {
         testCase(
             ClientObjects.LIST_WORKFLOW_EXECUTIONS_REQUEST,
             ProtoObjects.LIST_WORKFLOW_EXECUTIONS_REQUEST,
-            RequestMapper::listWorkflowExecutionsRequest));
+            RequestMapper::listWorkflowExecutionsRequest),
+        // Schedule API
+        testCase(
+            ClientObjects.CREATE_SCHEDULE_REQUEST,
+            ProtoObjects.CREATE_SCHEDULE_REQUEST,
+            RequestMapper::createScheduleRequest,
+            "memo", // not mapped yet
+            "searchAttributes"), // not mapped yet
+        testCase(
+            ClientObjects.DESCRIBE_SCHEDULE_REQUEST,
+            ProtoObjects.DESCRIBE_SCHEDULE_REQUEST,
+            RequestMapper::describeScheduleRequest),
+        testCase(
+            ClientObjects.UPDATE_SCHEDULE_REQUEST,
+            ProtoObjects.UPDATE_SCHEDULE_REQUEST,
+            RequestMapper::updateScheduleRequest,
+            "searchAttributes"), // not mapped yet
+        testCase(
+            ClientObjects.DELETE_SCHEDULE_REQUEST,
+            ProtoObjects.DELETE_SCHEDULE_REQUEST,
+            RequestMapper::deleteScheduleRequest),
+        testCase(
+            ClientObjects.PAUSE_SCHEDULE_REQUEST,
+            ProtoObjects.PAUSE_SCHEDULE_REQUEST,
+            RequestMapper::pauseScheduleRequest,
+            "identity"), // optional field
+        testCase(
+            ClientObjects.UNPAUSE_SCHEDULE_REQUEST,
+            ProtoObjects.UNPAUSE_SCHEDULE_REQUEST,
+            RequestMapper::unpauseScheduleRequest),
+        testCase(
+            ClientObjects.BACKFILL_SCHEDULE_REQUEST,
+            ProtoObjects.BACKFILL_SCHEDULE_REQUEST,
+            RequestMapper::backfillScheduleRequest),
+        testCase(
+            ClientObjects.LIST_SCHEDULES_REQUEST,
+            ProtoObjects.LIST_SCHEDULES_REQUEST,
+            RequestMapper::listSchedulesRequest));
   }
 
   private static <T, P> Object[] testCase(

@@ -25,6 +25,7 @@ import com.google.protobuf.Int64Value;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Durations;
 import com.google.protobuf.util.Timestamps;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -95,5 +96,33 @@ class Helpers {
       return null;
     }
     return t.toByteArray();
+  }
+
+  static Timestamp instantToTimestamp(Instant t) {
+    if (t == null) {
+      return null;
+    }
+    return Timestamp.newBuilder().setSeconds(t.getEpochSecond()).setNanos(t.getNano()).build();
+  }
+
+  static Instant timestampToInstant(Timestamp t) {
+    if (t == null || (t.getSeconds() == 0 && t.getNanos() == 0)) {
+      return null;
+    }
+    return Instant.ofEpochSecond(t.getSeconds(), t.getNanos());
+  }
+
+  static Duration javaDurationToProtoDuration(java.time.Duration d) {
+    if (d == null) {
+      return null;
+    }
+    return Duration.newBuilder().setSeconds(d.getSeconds()).setNanos(d.getNano()).build();
+  }
+
+  static java.time.Duration protoDurationToJavaDuration(Duration d) {
+    if (d == null || (d.getSeconds() == 0 && d.getNanos() == 0)) {
+      return null;
+    }
+    return java.time.Duration.ofSeconds(d.getSeconds(), d.getNanos());
   }
 }

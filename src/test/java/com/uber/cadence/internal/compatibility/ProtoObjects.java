@@ -1463,6 +1463,147 @@ public final class ProtoObjects {
   public static final RefreshWorkflowTasksResponse REFRESH_WORKFLOW_TASKS_RESPONSE =
       RefreshWorkflowTasksResponse.getDefaultInstance();
 
+  // --- Schedule fixtures ---
+
+  public static final Timestamp SCHEDULE_TIMESTAMP =
+      Timestamp.newBuilder().setSeconds(1000).build();
+  public static final Duration SCHEDULE_DURATION = Duration.newBuilder().setSeconds(60).build();
+
+  public static final ScheduleSpec SCHEDULE_SPEC =
+      ScheduleSpec.newBuilder()
+          .setCronExpression("0 6 * * *")
+          .setStartTime(SCHEDULE_TIMESTAMP)
+          .setEndTime(Timestamp.newBuilder().setSeconds(2000).build())
+          .setJitter(SCHEDULE_DURATION)
+          .build();
+
+  public static final ScheduleAction SCHEDULE_ACTION =
+      ScheduleAction.newBuilder()
+          .setStartWorkflow(
+              ScheduleAction.StartWorkflowAction.newBuilder()
+                  .setWorkflowType(WORKFLOW_TYPE)
+                  .setTaskList(TaskList.newBuilder().setName("schedule-tl").build())
+                  .setWorkflowIdPrefix("sched-")
+                  .setExecutionStartToCloseTimeout(SCHEDULE_DURATION)
+                  .setTaskStartToCloseTimeout(Duration.newBuilder().setSeconds(10).build())
+                  .build())
+          .build();
+
+  public static final SchedulePolicies SCHEDULE_POLICIES =
+      SchedulePolicies.newBuilder()
+          .setOverlapPolicy(ScheduleOverlapPolicy.SCHEDULE_OVERLAP_POLICY_SKIP_NEW)
+          .setCatchUpPolicy(ScheduleCatchUpPolicy.SCHEDULE_CATCH_UP_POLICY_SKIP)
+          .setCatchUpWindow(Duration.newBuilder().setSeconds(3600).build())
+          .setPauseOnFailure(true)
+          .setBufferLimit(5)
+          .setConcurrencyLimit(2)
+          .build();
+
+  public static final ScheduleState SCHEDULE_STATE =
+      ScheduleState.newBuilder()
+          .setPaused(true)
+          .setPauseInfo(
+              SchedulePauseInfo.newBuilder()
+                  .setReason("testing")
+                  .setPausedAt(SCHEDULE_TIMESTAMP)
+                  .setPausedBy("test-user")
+                  .build())
+          .build();
+
+  public static final ScheduleInfo SCHEDULE_INFO =
+      ScheduleInfo.newBuilder()
+          .setLastRunTime(SCHEDULE_TIMESTAMP)
+          .setNextRunTime(Timestamp.newBuilder().setSeconds(1060).build())
+          .setTotalRuns(42)
+          .setCreateTime(Timestamp.newBuilder().setSeconds(500).build())
+          .setLastUpdateTime(Timestamp.newBuilder().setSeconds(900).build())
+          .build();
+
+  public static final com.uber.cadence.api.v1.CreateScheduleRequest CREATE_SCHEDULE_REQUEST =
+      com.uber.cadence.api.v1.CreateScheduleRequest.newBuilder()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .setSpec(SCHEDULE_SPEC)
+          .setAction(SCHEDULE_ACTION)
+          .setPolicies(SCHEDULE_POLICIES)
+          .build();
+
+  public static final com.uber.cadence.api.v1.DescribeScheduleRequest DESCRIBE_SCHEDULE_REQUEST =
+      com.uber.cadence.api.v1.DescribeScheduleRequest.newBuilder()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .build();
+
+  public static final com.uber.cadence.api.v1.UpdateScheduleRequest UPDATE_SCHEDULE_REQUEST =
+      com.uber.cadence.api.v1.UpdateScheduleRequest.newBuilder()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .setSpec(SCHEDULE_SPEC)
+          .setAction(SCHEDULE_ACTION)
+          .setPolicies(SCHEDULE_POLICIES)
+          .build();
+
+  public static final com.uber.cadence.api.v1.DeleteScheduleRequest DELETE_SCHEDULE_REQUEST =
+      com.uber.cadence.api.v1.DeleteScheduleRequest.newBuilder()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .build();
+
+  public static final com.uber.cadence.api.v1.PauseScheduleRequest PAUSE_SCHEDULE_REQUEST =
+      com.uber.cadence.api.v1.PauseScheduleRequest.newBuilder()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .setReason("pausing")
+          .build();
+
+  public static final com.uber.cadence.api.v1.UnpauseScheduleRequest UNPAUSE_SCHEDULE_REQUEST =
+      com.uber.cadence.api.v1.UnpauseScheduleRequest.newBuilder()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .setReason("resuming")
+          .setCatchUpPolicy(ScheduleCatchUpPolicy.SCHEDULE_CATCH_UP_POLICY_SKIP)
+          .build();
+
+  public static final com.uber.cadence.api.v1.BackfillScheduleRequest BACKFILL_SCHEDULE_REQUEST =
+      com.uber.cadence.api.v1.BackfillScheduleRequest.newBuilder()
+          .setDomain("domain")
+          .setScheduleId("schedule-id")
+          .setOverlapPolicy(ScheduleOverlapPolicy.SCHEDULE_OVERLAP_POLICY_BUFFER)
+          .setStartTime(SCHEDULE_TIMESTAMP)
+          .setEndTime(Timestamp.newBuilder().setSeconds(2000).build())
+          .setBackfillId("bf-1")
+          .build();
+
+  public static final com.uber.cadence.api.v1.ListSchedulesRequest LIST_SCHEDULES_REQUEST =
+      com.uber.cadence.api.v1.ListSchedulesRequest.newBuilder()
+          .setDomain("domain")
+          .setPageSize(50)
+          .setNextPageToken(utf8("token"))
+          .build();
+
+  public static final com.uber.cadence.api.v1.DescribeScheduleResponse DESCRIBE_SCHEDULE_RESPONSE =
+      com.uber.cadence.api.v1.DescribeScheduleResponse.newBuilder()
+          .setSpec(SCHEDULE_SPEC)
+          .setAction(SCHEDULE_ACTION)
+          .setPolicies(SCHEDULE_POLICIES)
+          .setState(SCHEDULE_STATE)
+          .setInfo(SCHEDULE_INFO)
+          .build();
+
+  public static final ScheduleListEntry SCHEDULE_LIST_ENTRY =
+      ScheduleListEntry.newBuilder()
+          .setScheduleId("schedule-id")
+          .setWorkflowType(WORKFLOW_TYPE)
+          .setState(ScheduleState.newBuilder().setPaused(false).build())
+          .setCronExpression("0 6 * * *")
+          .build();
+
+  public static final com.uber.cadence.api.v1.ListSchedulesResponse LIST_SCHEDULES_RESPONSE =
+      com.uber.cadence.api.v1.ListSchedulesResponse.newBuilder()
+          .addSchedules(SCHEDULE_LIST_ENTRY)
+          .setNextPageToken(utf8("token"))
+          .build();
+
   private ProtoObjects() {}
 
   public static Payload payload(String value) {

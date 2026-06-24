@@ -518,4 +518,35 @@ public class ResponseMapper {
                 Collectors.toMap(Map.Entry::getKey, e -> describeTaskListResponse(e.getValue()))));
     return res;
   }
+
+  public static com.uber.cadence.DescribeScheduleResponse describeScheduleResponse(
+      com.uber.cadence.api.v1.DescribeScheduleResponse t) {
+    if (t == null) {
+      return null;
+    }
+    return new com.uber.cadence.DescribeScheduleResponse()
+        .setSpec(TypeMapper.scheduleSpec(t.getSpec()))
+        .setAction(TypeMapper.scheduleAction(t.getAction()))
+        .setPolicies(TypeMapper.schedulePolicies(t.getPolicies()))
+        .setState(TypeMapper.scheduleState(t.getState()))
+        .setInfo(TypeMapper.scheduleInfo(t.getInfo()));
+  }
+
+  public static com.uber.cadence.ListSchedulesResponse listSchedulesResponse(
+      com.uber.cadence.api.v1.ListSchedulesResponse t) {
+    if (t == null) {
+      return null;
+    }
+    java.util.List<com.uber.cadence.client.schedule.ScheduleListEntry> entries =
+        new java.util.ArrayList<>();
+    for (com.uber.cadence.api.v1.ScheduleListEntry e : t.getSchedulesList()) {
+      com.uber.cadence.client.schedule.ScheduleListEntry entry = TypeMapper.scheduleListEntry(e);
+      if (entry != null) {
+        entries.add(entry);
+      }
+    }
+    return new com.uber.cadence.ListSchedulesResponse()
+        .setSchedules(entries)
+        .setNextPageToken(byteStringToArray(t.getNextPageToken()));
+  }
 }

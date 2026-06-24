@@ -1088,4 +1088,235 @@ class TypeMapper {
     attr.setName(t.getName());
     return attr;
   }
+
+  // --- Schedule type helpers ---
+
+  static com.uber.cadence.api.v1.ScheduleSpec scheduleSpec(
+      com.uber.cadence.client.schedule.ScheduleSpec t) {
+    if (t == null) {
+      return com.uber.cadence.api.v1.ScheduleSpec.newBuilder().build();
+    }
+    com.uber.cadence.api.v1.ScheduleSpec.Builder b =
+        com.uber.cadence.api.v1.ScheduleSpec.newBuilder();
+    if (t.getCronExpression() != null) {
+      b.setCronExpression(t.getCronExpression());
+    }
+    if (t.getStartTime() != null) {
+      b.setStartTime(Helpers.instantToTimestamp(t.getStartTime()));
+    }
+    if (t.getEndTime() != null) {
+      b.setEndTime(Helpers.instantToTimestamp(t.getEndTime()));
+    }
+    if (t.getJitter() != null) {
+      b.setJitter(Helpers.javaDurationToProtoDuration(t.getJitter()));
+    }
+    return b.build();
+  }
+
+  static com.uber.cadence.client.schedule.ScheduleSpec scheduleSpec(
+      com.uber.cadence.api.v1.ScheduleSpec t) {
+    if (t == null) {
+      return null;
+    }
+    return com.uber.cadence.client.schedule.ScheduleSpec.newBuilder()
+        .setCronExpression(t.getCronExpression().isEmpty() ? null : t.getCronExpression())
+        .setStartTime(Helpers.timestampToInstant(t.getStartTime()))
+        .setEndTime(Helpers.timestampToInstant(t.getEndTime()))
+        .setJitter(Helpers.protoDurationToJavaDuration(t.getJitter()))
+        .build();
+  }
+
+  static com.uber.cadence.api.v1.ScheduleAction scheduleAction(
+      com.uber.cadence.client.schedule.ScheduleAction t) {
+    if (t == null) {
+      return com.uber.cadence.api.v1.ScheduleAction.newBuilder().build();
+    }
+    com.uber.cadence.api.v1.ScheduleAction.Builder b =
+        com.uber.cadence.api.v1.ScheduleAction.newBuilder();
+    if (t.getStartWorkflow() != null) {
+      b.setStartWorkflow(startWorkflowAction(t.getStartWorkflow()));
+    }
+    return b.build();
+  }
+
+  private static com.uber.cadence.api.v1.ScheduleAction.StartWorkflowAction startWorkflowAction(
+      com.uber.cadence.client.schedule.ScheduleAction.StartWorkflowAction t) {
+    com.uber.cadence.api.v1.ScheduleAction.StartWorkflowAction.Builder b =
+        com.uber.cadence.api.v1.ScheduleAction.StartWorkflowAction.newBuilder();
+    if (t.getWorkflowType() != null) {
+      b.setWorkflowType(WorkflowType.newBuilder().setName(t.getWorkflowType()).build());
+    }
+    if (t.getTaskList() != null) {
+      b.setTaskList(TaskList.newBuilder().setName(t.getTaskList()).build());
+    }
+    if (t.getInput() != null) {
+      b.setInput(
+          Payload.newBuilder()
+              .setData(com.google.protobuf.ByteString.copyFrom(t.getInput()))
+              .build());
+    }
+    if (t.getWorkflowIdPrefix() != null) {
+      b.setWorkflowIdPrefix(t.getWorkflowIdPrefix());
+    }
+    if (t.getExecutionStartToCloseTimeout() != null) {
+      b.setExecutionStartToCloseTimeout(
+          Helpers.javaDurationToProtoDuration(t.getExecutionStartToCloseTimeout()));
+    }
+    if (t.getTaskStartToCloseTimeout() != null) {
+      b.setTaskStartToCloseTimeout(
+          Helpers.javaDurationToProtoDuration(t.getTaskStartToCloseTimeout()));
+    }
+    if (t.getRetryOptions() != null) {
+      b.setRetryPolicy(retryPolicyFromOptions(t.getRetryOptions()));
+    }
+    return b.build();
+  }
+
+  private static RetryPolicy retryPolicyFromOptions(com.uber.cadence.common.RetryOptions t) {
+    RetryPolicy.Builder b = RetryPolicy.newBuilder();
+    if (t.getInitialInterval() != null) {
+      b.setInitialInterval(Helpers.javaDurationToProtoDuration(t.getInitialInterval()));
+    }
+    b.setBackoffCoefficient(t.getBackoffCoefficient());
+    if (t.getMaximumInterval() != null) {
+      b.setMaximumInterval(Helpers.javaDurationToProtoDuration(t.getMaximumInterval()));
+    }
+    b.setMaximumAttempts(t.getMaximumAttempts());
+    if (t.getExpiration() != null) {
+      b.setExpirationInterval(Helpers.javaDurationToProtoDuration(t.getExpiration()));
+    }
+    if (t.getDoNotRetry() != null) {
+      for (Class<? extends Throwable> c : t.getDoNotRetry()) {
+        b.addNonRetryableErrorReasons(c.getName());
+      }
+    }
+    return b.build();
+  }
+
+  static com.uber.cadence.client.schedule.ScheduleAction scheduleAction(
+      com.uber.cadence.api.v1.ScheduleAction t) {
+    if (t == null || !t.hasStartWorkflow()) {
+      return null;
+    }
+    return com.uber.cadence.client.schedule.ScheduleAction.newBuilder()
+        .setStartWorkflow(startWorkflowAction(t.getStartWorkflow()))
+        .build();
+  }
+
+  private static com.uber.cadence.client.schedule.ScheduleAction.StartWorkflowAction
+      startWorkflowAction(com.uber.cadence.api.v1.ScheduleAction.StartWorkflowAction t) {
+    com.uber.cadence.client.schedule.ScheduleAction.StartWorkflowAction.Builder b =
+        com.uber.cadence.client.schedule.ScheduleAction.StartWorkflowAction.newBuilder();
+    if (t.hasWorkflowType()) {
+      b.setWorkflowType(t.getWorkflowType().getName());
+    }
+    if (t.hasTaskList()) {
+      b.setTaskList(t.getTaskList().getName());
+    }
+    if (t.hasInput() && !t.getInput().getData().isEmpty()) {
+      b.setInput(t.getInput().getData().toByteArray());
+    }
+    if (!t.getWorkflowIdPrefix().isEmpty()) {
+      b.setWorkflowIdPrefix(t.getWorkflowIdPrefix());
+    }
+    if (t.hasExecutionStartToCloseTimeout()) {
+      b.setExecutionStartToCloseTimeout(
+          Helpers.protoDurationToJavaDuration(t.getExecutionStartToCloseTimeout()));
+    }
+    if (t.hasTaskStartToCloseTimeout()) {
+      b.setTaskStartToCloseTimeout(
+          Helpers.protoDurationToJavaDuration(t.getTaskStartToCloseTimeout()));
+    }
+    return b.build();
+  }
+
+  static com.uber.cadence.api.v1.SchedulePolicies schedulePolicies(
+      com.uber.cadence.client.schedule.SchedulePolicies t) {
+    if (t == null) {
+      return com.uber.cadence.api.v1.SchedulePolicies.newBuilder().build();
+    }
+    com.uber.cadence.api.v1.SchedulePolicies.Builder b =
+        com.uber.cadence.api.v1.SchedulePolicies.newBuilder()
+            .setOverlapPolicy(EnumMapper.scheduleOverlapPolicy(t.getOverlapPolicy()))
+            .setCatchUpPolicy(EnumMapper.scheduleCatchUpPolicy(t.getCatchUpPolicy()))
+            .setPauseOnFailure(t.isPauseOnFailure())
+            .setBufferLimit(t.getBufferLimit())
+            .setConcurrencyLimit(t.getConcurrencyLimit());
+    if (t.getCatchUpWindow() != null) {
+      b.setCatchUpWindow(Helpers.javaDurationToProtoDuration(t.getCatchUpWindow()));
+    }
+    return b.build();
+  }
+
+  static com.uber.cadence.client.schedule.SchedulePolicies schedulePolicies(
+      com.uber.cadence.api.v1.SchedulePolicies t) {
+    if (t == null) {
+      return null;
+    }
+    return com.uber.cadence.client.schedule.SchedulePolicies.newBuilder()
+        .setOverlapPolicy(EnumMapper.scheduleOverlapPolicy(t.getOverlapPolicy()))
+        .setCatchUpPolicy(EnumMapper.scheduleCatchUpPolicy(t.getCatchUpPolicy()))
+        .setCatchUpWindow(Helpers.protoDurationToJavaDuration(t.getCatchUpWindow()))
+        .setPauseOnFailure(t.getPauseOnFailure())
+        .setBufferLimit(t.getBufferLimit())
+        .setConcurrencyLimit(t.getConcurrencyLimit())
+        .build();
+  }
+
+  static com.uber.cadence.client.schedule.ScheduleState scheduleState(
+      com.uber.cadence.api.v1.ScheduleState t) {
+    if (t == null) {
+      return new com.uber.cadence.client.schedule.ScheduleState(false, null, null, null);
+    }
+    String pauseReason = null;
+    java.time.Instant pausedAt = null;
+    String pausedBy = null;
+    if (t.getPaused() && t.hasPauseInfo()) {
+      com.uber.cadence.api.v1.SchedulePauseInfo pi = t.getPauseInfo();
+      pauseReason = pi.getReason().isEmpty() ? null : pi.getReason();
+      pausedAt = Helpers.timestampToInstant(pi.getPausedAt());
+      pausedBy = pi.getPausedBy().isEmpty() ? null : pi.getPausedBy();
+    }
+    return new com.uber.cadence.client.schedule.ScheduleState(
+        t.getPaused(), pauseReason, pausedAt, pausedBy);
+  }
+
+  static com.uber.cadence.client.schedule.ScheduleInfo scheduleInfo(
+      com.uber.cadence.api.v1.ScheduleInfo t) {
+    if (t == null) {
+      return null;
+    }
+    java.util.List<com.uber.cadence.client.schedule.ScheduleInfo.BackfillInfo> backfills =
+        new java.util.ArrayList<>();
+    for (com.uber.cadence.api.v1.BackfillInfo bf : t.getOngoingBackfillsList()) {
+      backfills.add(
+          new com.uber.cadence.client.schedule.ScheduleInfo.BackfillInfo(
+              bf.getBackfillId().isEmpty() ? null : bf.getBackfillId(),
+              Helpers.timestampToInstant(bf.getStartTime()),
+              Helpers.timestampToInstant(bf.getEndTime()),
+              bf.getRunsCompleted(),
+              bf.getRunsTotal()));
+    }
+    return new com.uber.cadence.client.schedule.ScheduleInfo(
+        Helpers.timestampToInstant(t.getLastRunTime()),
+        Helpers.timestampToInstant(t.getNextRunTime()),
+        t.getTotalRuns(),
+        Helpers.timestampToInstant(t.getCreateTime()),
+        Helpers.timestampToInstant(t.getLastUpdateTime()),
+        backfills,
+        0,
+        0);
+  }
+
+  static com.uber.cadence.client.schedule.ScheduleListEntry scheduleListEntry(
+      com.uber.cadence.api.v1.ScheduleListEntry t) {
+    if (t == null) {
+      return null;
+    }
+    return new com.uber.cadence.client.schedule.ScheduleListEntry(
+        t.getScheduleId(),
+        t.hasWorkflowType() ? t.getWorkflowType().getName() : null,
+        scheduleState(t.hasState() ? t.getState() : null),
+        t.getCronExpression().isEmpty() ? null : t.getCronExpression());
+  }
 }

@@ -110,7 +110,7 @@ dependencies {
 license {
     header rootProject.file('license-header.txt')
     skipExistingHeaders true
-    excludes(["**/*.json", "**/idls","com/uber/cadence/*.java", "com/uber/cadence/shadower/*.java"]) // config files and generated code
+    excludes(["**/*.json", "**/idls","com/uber/cadence/*.java", "com/uber/cadence/shadower/*.java", "com/uber/cadence/client/schedule/*.java", "**/client/schedule/*.java"]) // config files and generated code
 }
 
 task printVersion {
@@ -194,7 +194,11 @@ task replaceGeneratedSources {
 
         def content = file.text
 
-        def updated = content.replaceFirst(
+        // Remove any pre-existing @SuppressWarnings("deprecation") annotations immediately before the class
+        // (newer protoc versions may already emit them, so we normalize to exactly one)
+        def stripped = content.replaceAll(/@SuppressWarnings\("deprecation"\)\n(?=@SuppressWarnings|public\s+.*class\s+ActiveClusterSelectionPolicy)/, '')
+
+        def updated = stripped.replaceFirst(
             /public\s+.*class\s+ActiveClusterSelectionPolicy/,
             '@SuppressWarnings("deprecation")\n$0'
         )

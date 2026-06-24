@@ -1392,4 +1392,117 @@ public class WorkflowServiceGrpc implements IWorkflowService {
       throws CadenceError {
     throw new UnsupportedOperationException("Unimplemented method 'DiagnoseWorkflowExecution'");
   }
+
+  // ---- Schedule API ----
+
+  @Override
+  public com.uber.cadence.CreateScheduleResponse CreateSchedule(
+      com.uber.cadence.CreateScheduleRequest request)
+      throws BadRequestError, WorkflowExecutionAlreadyStartedError, EntityNotExistsError,
+          ServiceBusyError, DomainNotActiveError, LimitExceededError, CadenceError {
+    try {
+      com.uber.cadence.api.v1.CreateScheduleResponse resp =
+          grpcServiceStubs
+              .scheduleBlockingStub()
+              .createSchedule(RequestMapper.createScheduleRequest(request));
+      return new com.uber.cadence.CreateScheduleResponse().setScheduleId(resp.getScheduleId());
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
+  }
+
+  @Override
+  public com.uber.cadence.DescribeScheduleResponse DescribeSchedule(
+      com.uber.cadence.DescribeScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, CadenceError {
+    try {
+      com.uber.cadence.api.v1.DescribeScheduleResponse resp =
+          grpcServiceStubs
+              .scheduleBlockingStub()
+              .describeSchedule(RequestMapper.describeScheduleRequest(request));
+      return ResponseMapper.describeScheduleResponse(resp);
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
+  }
+
+  @Override
+  public void UpdateSchedule(com.uber.cadence.UpdateScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, CadenceError {
+    try {
+      grpcServiceStubs
+          .scheduleBlockingStub()
+          .updateSchedule(RequestMapper.updateScheduleRequest(request));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
+  }
+
+  @Override
+  public void DeleteSchedule(com.uber.cadence.DeleteScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          CadenceError {
+    try {
+      grpcServiceStubs
+          .scheduleBlockingStub()
+          .deleteSchedule(RequestMapper.deleteScheduleRequest(request));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
+  }
+
+  @Override
+  public void PauseSchedule(com.uber.cadence.PauseScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          CadenceError {
+    try {
+      grpcServiceStubs
+          .scheduleBlockingStub()
+          .pauseSchedule(RequestMapper.pauseScheduleRequest(request));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
+  }
+
+  @Override
+  public void UnpauseSchedule(com.uber.cadence.UnpauseScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          CadenceError {
+    try {
+      grpcServiceStubs
+          .scheduleBlockingStub()
+          .unpauseSchedule(RequestMapper.unpauseScheduleRequest(request));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
+  }
+
+  @Override
+  public void BackfillSchedule(com.uber.cadence.BackfillScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, CadenceError {
+    try {
+      grpcServiceStubs
+          .scheduleBlockingStub()
+          .backfillSchedule(RequestMapper.backfillScheduleRequest(request));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
+  }
+
+  @Override
+  public com.uber.cadence.ListSchedulesResponse ListSchedules(
+      com.uber.cadence.ListSchedulesRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, CadenceError {
+    try {
+      com.uber.cadence.api.v1.ListSchedulesResponse resp =
+          grpcServiceStubs
+              .scheduleBlockingStub()
+              .listSchedules(RequestMapper.listSchedulesRequest(request));
+      return ResponseMapper.listSchedulesResponse(resp);
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
+  }
 }
