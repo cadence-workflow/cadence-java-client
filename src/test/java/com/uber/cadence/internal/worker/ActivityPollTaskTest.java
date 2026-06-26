@@ -33,7 +33,6 @@ import com.uber.m3.tally.Counter;
 import com.uber.m3.tally.Histogram;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.tally.Stopwatch;
-import com.uber.m3.tally.Timer;
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,13 +48,7 @@ public class ActivityPollTaskTest {
     mockService = mock(IWorkflowService.class);
     Scope metricsScope = mock(Scope.class); // Mock Scope to avoid NoopScope
 
-    // Mock the Timer and Stopwatch
-    Timer timer = mock(Timer.class);
-    Stopwatch stopwatch = mock(Stopwatch.class);
-    when(metricsScope.timer(MetricsType.ACTIVITY_POLL_LATENCY)).thenReturn(timer);
-    when(timer.start()).thenReturn(stopwatch);
-
-    // Mock the Histogram and its Stopwatch (for dual-emit)
+    // Mock the Histogram and its Stopwatch (histogram-only by default)
     Histogram histogram = mock(Histogram.class);
     Stopwatch histogramStopwatch = mock(Stopwatch.class);
     when(metricsScope.histogram(
@@ -92,17 +85,13 @@ public class ActivityPollTaskTest {
     when(mockService.PollForActivityTask(any(PollForActivityTaskRequest.class)))
         .thenReturn(response);
 
-    // Mock the timer and histogram behavior
+    // Mock the histogram behavior (default mode is EMIT_HISTOGRAMS_ONLY)
     Scope metricsScope = options.getMetricsScope();
-    Timer timer = mock(Timer.class);
     Histogram histogram = mock(Histogram.class);
-    when(metricsScope.timer(MetricsType.ACTIVITY_POLL_LATENCY)).thenReturn(timer);
     when(metricsScope.histogram(
             eq(MetricsType.ACTIVITY_POLL_LATENCY + MetricsEmit.HISTOGRAM_SUFFIX), any()))
         .thenReturn(histogram);
-    Stopwatch timerSw = mock(Stopwatch.class);
     Stopwatch histogramSw = mock(Stopwatch.class);
-    when(timer.start()).thenReturn(timerSw);
     when(histogram.start()).thenReturn(histogramSw);
 
     PollForActivityTaskResponse result = pollTask.pollTask();
@@ -110,11 +99,9 @@ public class ActivityPollTaskTest {
     assertNotNull(result);
     assertArrayEquals("testToken".getBytes(), result.getTaskToken());
 
-    // Verify the counters and the timer/histogram behavior (dual-emit)
+    // Verify the counters and the histogram behavior (histogram-only by default)
     verify(metricsScope.counter(MetricsType.ACTIVITY_POLL_COUNTER), times(1)).inc(1);
-    verify(timer, times(1)).start();
     verify(histogram, times(1)).start();
-    verify(timerSw, times(1)).stop();
     verify(histogramSw, times(1)).stop();
   }
 
