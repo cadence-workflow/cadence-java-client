@@ -96,7 +96,7 @@ public class CadenceClientStatsReporter implements StatsReporter {
       Duration bucketLowerBound,
       Duration bucketUpperBound,
       long samples) {
-    // NOOP
+    // NOOP: histogram data is consumed via tally's native reporters, not the Micrometer bridge
   }
 
   private Iterable<Tag> getTags(Map<String, String> tags) {
