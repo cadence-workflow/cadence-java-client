@@ -25,13 +25,9 @@ import com.uber.m3.util.Duration;
 /**
  * Helper utilities for dual-emitting metrics during timer to histogram migration.
  *
- * <p>This class provides utilities to support gradual migration from timer metrics to histogram
- * metrics. By default, both timer and histogram metrics are emitted to support gradual
- * dashboard/alert migration without requiring a flag day.
- *
- * <p>Migration path: 1. Use these helpers to emit both timers and histograms (default behavior) 2.
- * Update dashboards/alerts to use histogram metrics 3. In a future release, remove timer emission
- * and use histograms exclusively
+ * <p>This class provides utilities to support the timer to histogram migration. The default is now
+ * histogram-only emission. Users who still need timers can opt in via {@link
+ * MetricEmitMode#EMIT_TIMERS_ONLY} or {@link MetricEmitMode#EMIT_BOTH}.
  *
  * <p>Example usage:
  *
@@ -49,8 +45,8 @@ import com.uber.m3.util.Duration;
  * // ... do work ...
  * sw.stop();
  *
- * // Configure emission mode (optional, typically done at application startup)
- * MetricsEmit.setEmitMode(MetricEmitMode.EMIT_HISTOGRAMS_ONLY);
+ * // Configure emission mode (optional, default is EMIT_HISTOGRAMS_ONLY)
+ * MetricsEmit.setEmitMode(MetricEmitMode.EMIT_BOTH);
  * }</pre>
  */
 public final class MetricsEmit {
@@ -59,18 +55,18 @@ public final class MetricsEmit {
   public enum MetricEmitMode {
     /** Emit only timer metrics (legacy OSS behavior) */
     EMIT_TIMERS_ONLY,
-    /** Emit both timer and histogram metrics (default for migration) */
+    /** Emit both timer and histogram metrics (for migration) */
     EMIT_BOTH,
-    /** Emit only histogram metrics (post-migration) */
+    /** Emit only histogram metrics (default, post-migration) */
     EMIT_HISTOGRAMS_ONLY
   }
 
   /**
-   * Current emission mode. Default is EMIT_BOTH for migration. This should be set during
-   * application initialization (e.g., in static initializer or before starting workers). It should
-   * NOT be changed dynamically after workers have started.
+   * Current emission mode. Default is EMIT_HISTOGRAMS_ONLY (post-migration). This should be set
+   * during application initialization (e.g., in static initializer or before starting workers). It
+   * should NOT be changed dynamically after workers have started.
    */
-  private static volatile MetricEmitMode currentEmitMode = MetricEmitMode.EMIT_BOTH;
+  private static volatile MetricEmitMode currentEmitMode = MetricEmitMode.EMIT_HISTOGRAMS_ONLY;
 
   /**
    * Configures the metric emission strategy. This should be called during application
@@ -82,10 +78,10 @@ public final class MetricsEmit {
    * // To use only timers (legacy behavior)
    * MetricsEmit.setEmitMode(MetricEmitMode.EMIT_TIMERS_ONLY);
    *
-   * // To use both (default, for migration)
+   * // To use both (for migration)
    * MetricsEmit.setEmitMode(MetricEmitMode.EMIT_BOTH);
    *
-   * // To use only histograms (post-migration)
+   * // To use only histograms (default, no need to set)
    * MetricsEmit.setEmitMode(MetricEmitMode.EMIT_HISTOGRAMS_ONLY);
    * }</pre>
    */
