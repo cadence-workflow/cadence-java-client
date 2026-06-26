@@ -97,6 +97,15 @@ public class CadenceClientStatsReporterTest {
     assertEquals(1.0, Metrics.globalRegistry.get(DEFAULT_REPORT_NAME).gauge().value(), 0);
   }
 
+  @Test
+  public void testHistogramDurationSamplesShouldBeNoop() {
+    cadenceClientStatsReporter.reportHistogramDurationSamples(
+        DEFAULT_REPORT_NAME, DEFAULT_REPORT_TAGS, null, Duration.ofSeconds(5), DEFAULT_DURATION, 3);
+
+    // Histogram duration samples are a NOOP - no metrics should be registered
+    assertEquals(0, Metrics.globalRegistry.getMeters().size());
+  }
+
   private void callDefaultCounter() {
     cadenceClientStatsReporter.reportCounter(
         DEFAULT_REPORT_NAME, DEFAULT_REPORT_TAGS, DEFAULT_COUNT);
