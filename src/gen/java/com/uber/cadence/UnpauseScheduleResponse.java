@@ -6,6 +6,4 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class ActiveClusterSelectionPolicy {
-  private ClusterAttribute clusterAttribute;
-}
+public class UnpauseScheduleResponse {}

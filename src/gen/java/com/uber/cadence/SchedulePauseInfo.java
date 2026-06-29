@@ -6,6 +6,8 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class ActiveClusterSelectionPolicy {
-  private ClusterAttribute clusterAttribute;
+public class SchedulePauseInfo {
+  private String reason;
+  private long pausedTimeNano;
+  private String pausedBy;
 }

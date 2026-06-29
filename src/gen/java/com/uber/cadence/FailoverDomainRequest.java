@@ -11,4 +11,5 @@ public class FailoverDomainRequest {
   private String domainActiveClusterName;
   private ActiveClusters activeClusters;
   private String reason;
+  private int failoverTimeoutInSeconds;
 }

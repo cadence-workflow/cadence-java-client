@@ -14,11 +14,9 @@
  */
 package com.uber.cadence.internal.compatibility.proto.mappers;
 
-import static com.uber.cadence.internal.compatibility.MapperTestUtil.assertMissingFields;
 import static com.uber.cadence.internal.compatibility.MapperTestUtil.assertNoMissingFields;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.uber.cadence.Decision;
 import com.uber.cadence.DecisionType;
@@ -126,16 +124,10 @@ public class DecisionMapperTest {
           assertNoMissingFields(decision.getRecordMarkerDecisionAttributes());
           break;
         case ContinueAsNewWorkflowExecution:
-          assertMissingFields(
-              decision.getContinueAsNewWorkflowExecutionDecisionAttributes(),
-              ImmutableSet.of(
-                  "strategy", "stickyRegion", "externalEntityType", "externalEntityKey"));
+          assertNoMissingFields(decision.getContinueAsNewWorkflowExecutionDecisionAttributes());
           break;
         case StartChildWorkflowExecution:
-          assertMissingFields(
-              decision.getStartChildWorkflowExecutionDecisionAttributes(),
-              ImmutableSet.of(
-                  "strategy", "stickyRegion", "externalEntityType", "externalEntityKey"));
+          assertNoMissingFields(decision.getStartChildWorkflowExecutionDecisionAttributes());
           break;
         case SignalExternalWorkflowExecution:
           assertNoMissingFields(decision.getSignalExternalWorkflowExecutionDecisionAttributes());
