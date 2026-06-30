@@ -24,6 +24,7 @@ import com.uber.cadence.RefreshWorkflowTasksRequest;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.client.ActivityCompletionClient;
 import com.uber.cadence.client.BatchRequest;
+import com.uber.cadence.client.ScheduleClient;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowClientInterceptor;
 import com.uber.cadence.client.WorkflowClientOptions;
@@ -201,6 +202,11 @@ public final class WorkflowClientInternal implements WorkflowClient {
       result = i.newActivityCompletionClient(result);
     }
     return result;
+  }
+
+  @Override
+  public ScheduleClient scheduleClient() {
+    throw new UnsupportedOperationException("not implemented");
   }
 
   @Override
