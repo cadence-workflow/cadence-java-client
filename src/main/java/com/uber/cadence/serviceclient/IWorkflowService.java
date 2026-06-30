@@ -816,4 +816,89 @@ public interface IWorkflowService {
   void RefreshWorkflowTasks(
       RefreshWorkflowTasksRequest request, AsyncMethodCallback<Void> resultHandler)
       throws CadenceError;
+
+  /**
+   * Creates a new schedule in the domain.
+   *
+   * @throws BadRequestError if the schedule spec is invalid (e.g. bad cron expression)
+   * @throws WorkflowExecutionAlreadyStartedError if a schedule with the same ID already exists
+   * @throws EntityNotExistsError if the domain does not exist
+   * @throws CadenceError on other server errors
+   */
+  CreateScheduleResponse CreateSchedule(CreateScheduleRequest request)
+      throws BadRequestError, WorkflowExecutionAlreadyStartedError, EntityNotExistsError,
+          ServiceBusyError, DomainNotActiveError, LimitExceededError, CadenceError;
+
+  /**
+   * Returns the full configuration and runtime state of a schedule.
+   *
+   * @throws EntityNotExistsError if the schedule does not exist
+   * @throws CadenceError on other server errors
+   */
+  DescribeScheduleResponse DescribeSchedule(DescribeScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, CadenceError;
+
+  /**
+   * Replaces the spec, action, and policies of an existing schedule.
+   *
+   * <p>The server replaces the entire schedule configuration. Any field not included in the request
+   * is zeroed out — always use describe-first (read-modify-write) pattern.
+   *
+   * @throws EntityNotExistsError if the schedule does not exist
+   * @throws CadenceError on other server errors
+   */
+  void UpdateSchedule(UpdateScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, CadenceError;
+
+  /**
+   * Permanently deletes a schedule. Running workflows triggered by this schedule are not affected.
+   *
+   * @throws EntityNotExistsError if the schedule does not exist
+   * @throws CadenceError on other server errors
+   */
+  void DeleteSchedule(DeleteScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          CadenceError;
+
+  /**
+   * Pauses a schedule. No new runs will be triggered while the schedule is paused.
+   *
+   * @throws EntityNotExistsError if the schedule does not exist
+   * @throws CadenceError on other server errors
+   */
+  void PauseSchedule(PauseScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          CadenceError;
+
+  /**
+   * Resumes a paused schedule. Optionally overrides the catch-up policy for the first pass on
+   * resume.
+   *
+   * @throws EntityNotExistsError if the schedule does not exist
+   * @throws CadenceError on other server errors
+   */
+  void UnpauseSchedule(UnpauseScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          CadenceError;
+
+  /**
+   * Triggers runs for all scheduled times within a historical time range. Backfill runs are subject
+   * to the configured overlap policy.
+   *
+   * @throws EntityNotExistsError if the schedule does not exist
+   * @throws CadenceError on other server errors
+   */
+  void BackfillSchedule(BackfillScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, CadenceError;
+
+  /**
+   * Lists schedules in a domain, paginated.
+   *
+   * @throws EntityNotExistsError if the domain does not exist
+   * @throws CadenceError on other server errors
+   */
+  ListSchedulesResponse ListSchedules(ListSchedulesRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, CadenceError;
 }

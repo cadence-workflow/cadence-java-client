@@ -722,4 +722,45 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public CompletableFuture<Boolean> isHealthy() {
     throw new UnsupportedOperationException("unimplemented");
   }
+
+  @Override
+  public CreateScheduleResponse CreateSchedule(CreateScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public DescribeScheduleResponse DescribeSchedule(DescribeScheduleRequest request)
+      throws CadenceError {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void UpdateSchedule(UpdateScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void DeleteSchedule(DeleteScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void PauseSchedule(PauseScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void UnpauseSchedule(UnpauseScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void BackfillSchedule(BackfillScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public ListSchedulesResponse ListSchedules(ListSchedulesRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("unimplemented");
+  }
 }
