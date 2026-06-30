@@ -18,7 +18,6 @@
 package com.uber.cadence.client;
 
 import com.uber.cadence.BackfillInfo;
-import com.uber.cadence.CadenceError;
 import com.uber.cadence.DescribeScheduleResponse;
 import com.uber.cadence.ScheduleAction;
 import com.uber.cadence.SchedulePolicies;
@@ -35,35 +34,34 @@ public interface ScheduleHandle {
   String getScheduleId();
 
   /** Returns the current full state and configuration of the schedule. */
-  DescribeScheduleResponse describe() throws CadenceError;
+  DescribeScheduleResponse describe();
 
   /**
    * Replaces the schedule configuration atomically. Any field not provided is cleared by the
    * server; call {@link #describe} first to avoid inadvertently losing existing settings.
    */
-  void update(ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies)
-      throws CadenceError;
+  void update(ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies);
 
   /** Permanently deletes this schedule. In-flight workflow runs are not affected. */
-  void delete() throws CadenceError;
+  void delete();
 
   /**
    * Pauses the schedule so no new runs are triggered.
    *
    * @param note reason stored with the pause, visible in {@link #describe}
    */
-  void pause(String note) throws CadenceError;
+  void pause(String note);
 
   /**
    * Resumes a paused schedule.
    *
    * @param note reason stored with the unpause, visible in {@link #describe}
    */
-  void unpause(String note) throws CadenceError;
+  void unpause(String note);
 
   /**
    * Triggers runs for all times in the given historical ranges, subject to the configured overlap
    * policy. Excess runs may be skipped.
    */
-  void backfill(List<BackfillInfo> backfills) throws CadenceError;
+  void backfill(List<BackfillInfo> backfills);
 }
