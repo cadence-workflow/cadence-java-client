@@ -38,9 +38,8 @@ public interface ScheduleHandle {
   DescribeScheduleResponse describe() throws CadenceError;
 
   /**
-   * Replaces the schedule configuration atomically. The server zeroes any field not set in the
-   * request — use {@link #describe} to read the current config before modifying (read-modify-write
-   * pattern).
+   * Replaces the schedule configuration atomically. Any field not included is cleared by the server
+   * — call {@link #describe} first to avoid inadvertently losing existing settings.
    */
   void update(ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies)
       throws CadenceError;
@@ -48,10 +47,18 @@ public interface ScheduleHandle {
   /** Permanently deletes this schedule. In-flight workflow runs are not affected. */
   void delete() throws CadenceError;
 
-  /** Pauses the schedule so no new runs are triggered. */
+  /**
+   * Pauses the schedule so no new runs are triggered.
+   *
+   * @param note reason stored with the pause, visible in {@link #describe}
+   */
   void pause(String note) throws CadenceError;
 
-  /** Resumes a paused schedule. */
+  /**
+   * Resumes a paused schedule.
+   *
+   * @param note reason stored with the unpause, visible in {@link #describe}
+   */
   void unpause(String note) throws CadenceError;
 
   /**
