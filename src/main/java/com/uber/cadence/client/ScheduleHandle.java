@@ -38,8 +38,8 @@ public interface ScheduleHandle {
   DescribeScheduleResponse describe() throws CadenceError;
 
   /**
-   * Replaces the schedule configuration atomically. Any field not included is cleared by the server
-   * — call {@link #describe} first to avoid inadvertently losing existing settings.
+   * Replaces the schedule configuration atomically. Any field not provided is cleared by the
+   * server; call {@link #describe} first to avoid inadvertently losing existing settings.
    */
   void update(ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies)
       throws CadenceError;
