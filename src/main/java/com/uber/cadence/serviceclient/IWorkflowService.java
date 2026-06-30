@@ -842,7 +842,7 @@ public interface IWorkflowService {
    * Replaces the spec, action, and policies of an existing schedule.
    *
    * <p>The server replaces the entire schedule configuration. Any field not included in the request
-   * is zeroed out — always use describe-first (read-modify-write) pattern.
+   * is zeroed out; always call describe first and resubmit the full configuration.
    *
    * @throws EntityNotExistsError if the schedule does not exist
    * @throws CadenceError on other server errors
