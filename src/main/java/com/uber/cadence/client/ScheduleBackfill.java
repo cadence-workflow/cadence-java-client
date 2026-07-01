@@ -21,7 +21,7 @@ import com.uber.cadence.ScheduleOverlapPolicy;
 import java.time.Instant;
 import java.util.Objects;
 
-/** A time range to trigger retroactively when calling {@link ScheduleHandle#backfill}. */
+/** A time range to trigger retroactively when calling {@link ScheduleClient#backfillSchedule}. */
 public final class ScheduleBackfill {
 
   private final Instant startTime;
