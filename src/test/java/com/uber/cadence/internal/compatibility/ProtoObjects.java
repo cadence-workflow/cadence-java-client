@@ -1196,6 +1196,7 @@ public final class ProtoObjects {
           .setDescription("description")
           .setOwnerEmail("ownerEmail")
           .setWorkflowExecutionRetentionPeriod(days(2))
+          .putAllData(DATA)
           .setBadBinaries(
               BadBinaries.newBuilder()
                   .putBinaries(
