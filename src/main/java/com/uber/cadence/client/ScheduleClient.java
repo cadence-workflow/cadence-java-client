@@ -19,9 +19,9 @@ package com.uber.cadence.client;
 
 import com.uber.cadence.CreateScheduleRequest;
 import com.uber.cadence.CreateScheduleResponse;
-import com.uber.cadence.DescribeScheduleResponse;
-import com.uber.cadence.ListSchedulesResponse;
 import com.uber.cadence.UpdateScheduleRequest;
+import com.uber.cadence.client.schedule.ListSchedulesResult;
+import com.uber.cadence.client.schedule.ScheduleDescription;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -56,7 +56,7 @@ public interface ScheduleClient {
    *
    * @param scheduleId the schedule identifier
    */
-  CompletableFuture<DescribeScheduleResponse> describeSchedule(String scheduleId);
+  CompletableFuture<ScheduleDescription> describeSchedule(String scheduleId);
 
   /**
    * Replaces the configuration of an existing schedule. The {@code domain} and {@code scheduleId}
@@ -107,5 +107,5 @@ public interface ScheduleClient {
    * @param nextPageToken continuation token from a previous response, or {@code null} for the first
    *     page
    */
-  CompletableFuture<ListSchedulesResponse> listSchedules(int pageSize, byte[] nextPageToken);
+  CompletableFuture<ListSchedulesResult> listSchedules(int pageSize, byte[] nextPageToken);
 }

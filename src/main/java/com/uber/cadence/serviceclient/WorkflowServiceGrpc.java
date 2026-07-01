@@ -801,6 +801,47 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   }
 
   @Override
+  public CreateScheduleResponse CreateSchedule(CreateScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public DescribeScheduleResponse DescribeSchedule(DescribeScheduleRequest request)
+      throws CadenceError {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public void UpdateSchedule(UpdateScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public void DeleteSchedule(DeleteScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public void PauseSchedule(PauseScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public void UnpauseSchedule(UnpauseScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public void BackfillSchedule(BackfillScheduleRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public ListSchedulesResponse ListSchedules(ListSchedulesRequest request) throws CadenceError {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
   public void RegisterDomain(
       RegisterDomainRequest registerRequest, AsyncMethodCallback<Void> resultHandler)
       throws CadenceError {
