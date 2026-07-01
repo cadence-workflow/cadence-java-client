@@ -222,6 +222,9 @@ public interface WorkflowClient {
    */
   ActivityCompletionClient newActivityCompletionClient();
 
+  /** Returns a client for managing schedules in this domain. */
+  ScheduleClient scheduleClient();
+
   /**
    * Creates BatchRequest that can be used to signal an existing workflow or start a new one if not
    * running. The batch before invocation must contain exactly two operations. One annotated
