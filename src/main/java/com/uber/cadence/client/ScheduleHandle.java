@@ -17,7 +17,6 @@
 
 package com.uber.cadence.client;
 
-import com.uber.cadence.BackfillInfo;
 import com.uber.cadence.DescribeScheduleResponse;
 import com.uber.cadence.ScheduleAction;
 import com.uber.cadence.SchedulePolicies;
@@ -60,8 +59,7 @@ public interface ScheduleHandle {
   void unpause(String note);
 
   /**
-   * Triggers runs for all times in the given historical ranges, subject to the configured overlap
-   * policy. Excess runs may be skipped.
+   * Triggers runs for all times in the given historical ranges. One service call is made per entry.
    */
-  void backfill(List<BackfillInfo> backfills);
+  void backfill(List<ScheduleBackfill> backfills);
 }
