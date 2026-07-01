@@ -17,7 +17,7 @@
 
 package com.uber.cadence.client;
 
-import com.uber.cadence.ScheduleOverlapPolicy;
+import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
@@ -37,7 +37,7 @@ public final class ScheduleBackfill {
   public ScheduleBackfill(ZonedDateTime startTime, ZonedDateTime endTime) {
     this.startTime = Objects.requireNonNull(startTime, "startTime");
     this.endTime = Objects.requireNonNull(endTime, "endTime");
-    this.overlapPolicy = ScheduleOverlapPolicy.INVALID;
+    this.overlapPolicy = null;
   }
 
   /**
