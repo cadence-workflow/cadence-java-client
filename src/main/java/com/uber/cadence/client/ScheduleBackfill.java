@@ -35,7 +35,9 @@ public final class ScheduleBackfill {
    * @param endTime end of the backfill range (inclusive)
    */
   public ScheduleBackfill(ZonedDateTime startTime, ZonedDateTime endTime) {
-    this(startTime, endTime, ScheduleOverlapPolicy.INVALID);
+    this.startTime = Objects.requireNonNull(startTime, "startTime");
+    this.endTime = Objects.requireNonNull(endTime, "endTime");
+    this.overlapPolicy = ScheduleOverlapPolicy.INVALID;
   }
 
   /**
@@ -46,14 +48,9 @@ public final class ScheduleBackfill {
    */
   public ScheduleBackfill(
       ZonedDateTime startTime, ZonedDateTime endTime, ScheduleOverlapPolicy overlapPolicy) {
-    Objects.requireNonNull(overlapPolicy, "overlapPolicy");
-    if (overlapPolicy == ScheduleOverlapPolicy.INVALID) {
-      throw new IllegalArgumentException(
-          "INVALID is not a valid overlap policy; use the two-argument constructor to inherit the schedule's configured policy");
-    }
     this.startTime = Objects.requireNonNull(startTime, "startTime");
     this.endTime = Objects.requireNonNull(endTime, "endTime");
-    this.overlapPolicy = overlapPolicy;
+    this.overlapPolicy = Objects.requireNonNull(overlapPolicy, "overlapPolicy");
   }
 
   public ZonedDateTime getStartTime() {
