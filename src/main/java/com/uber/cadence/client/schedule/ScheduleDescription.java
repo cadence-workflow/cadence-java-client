@@ -14,6 +14,8 @@
  */
 package com.uber.cadence.client.schedule;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,8 +51,12 @@ public final class ScheduleDescription {
     this.policies = policies;
     this.state = state;
     this.info = info;
-    this.memo = memo;
-    this.searchAttributes = searchAttributes;
+    this.memo =
+        memo == null ? Collections.emptyMap() : Collections.unmodifiableMap(new HashMap<>(memo));
+    this.searchAttributes =
+        searchAttributes == null
+            ? Collections.emptyMap()
+            : Collections.unmodifiableMap(new HashMap<>(searchAttributes));
   }
 
   /** The trigger spec (cron, start/end times, jitter). */
@@ -82,12 +88,15 @@ public final class ScheduleDescription {
     return info;
   }
 
-  /** Memo key/value pairs attached to the schedule itself (not to triggered workflows). */
+  /**
+   * Memo key/value pairs attached to the schedule itself (not to triggered workflows). Never null;
+   * empty map when none.
+   */
   public Map<String, Object> getMemo() {
     return memo;
   }
 
-  /** Search attributes attached to the schedule. */
+  /** Search attributes attached to the schedule. Never null; empty map when none. */
   public Map<String, Object> getSearchAttributes() {
     return searchAttributes;
   }

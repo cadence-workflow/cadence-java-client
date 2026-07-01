@@ -65,6 +65,21 @@ public final class ScheduleBackfill {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof ScheduleBackfill)) return false;
+    ScheduleBackfill that = (ScheduleBackfill) o;
+    return Objects.equals(startTime, that.startTime)
+        && Objects.equals(endTime, that.endTime)
+        && overlapPolicy == that.overlapPolicy;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(startTime, endTime, overlapPolicy);
+  }
+
+  @Override
   public String toString() {
     return "ScheduleBackfill{"
         + "startTime="

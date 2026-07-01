@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import com.uber.cadence.client.ScheduleBackfill;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -521,6 +522,53 @@ public class ScheduleTypesTest {
   }
 
   @Test
+  public void scheduleDescription_nullMemoNormalizesToEmpty() {
+    assertNotNull(minimalDescription().getMemo());
+    assertTrue(minimalDescription().getMemo().isEmpty());
+    assertNotNull(minimalDescription().getSearchAttributes());
+    assertTrue(minimalDescription().getSearchAttributes().isEmpty());
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void scheduleDescription_memoIsUnmodifiable() {
+    Map<String, Object> memo = new HashMap<>();
+    memo.put("k", "v");
+    ScheduleDescription desc =
+        new ScheduleDescription(
+            ScheduleSpec.newBuilder().setCronExpression("0 * * * *").build(),
+            ScheduleAction.newBuilder()
+                .setStartWorkflow(minimalStartWorkflowAction().build())
+                .build(),
+            SchedulePolicies.newBuilder().build(),
+            new ScheduleState(false, null, null, null),
+            new ScheduleInfo(
+                Instant.EPOCH, Instant.EPOCH, 0L, Instant.EPOCH, Instant.EPOCH, null, 0L, 0L),
+            memo,
+            null);
+    desc.getMemo().put("extra", "boom");
+  }
+
+  @Test
+  public void scheduleDescription_memoNotAliasedOnConstruct() {
+    Map<String, Object> memo = new HashMap<>();
+    memo.put("k", "v");
+    ScheduleDescription desc =
+        new ScheduleDescription(
+            ScheduleSpec.newBuilder().setCronExpression("0 * * * *").build(),
+            ScheduleAction.newBuilder()
+                .setStartWorkflow(minimalStartWorkflowAction().build())
+                .build(),
+            SchedulePolicies.newBuilder().build(),
+            new ScheduleState(false, null, null, null),
+            new ScheduleInfo(
+                Instant.EPOCH, Instant.EPOCH, 0L, Instant.EPOCH, Instant.EPOCH, null, 0L, 0L),
+            memo,
+            null);
+    memo.put("extra", "boom");
+    assertEquals(1, desc.getMemo().size());
+  }
+
+  @Test
   public void listSchedulesResult_tokenDefensiveCopy() {
     byte[] token = {7, 8, 9};
     ListSchedulesResult result = new ListSchedulesResult(Collections.emptyList(), token);
@@ -612,6 +660,78 @@ public class ScheduleTypesTest {
     assertTrue(s.contains("my-sched"));
     assertTrue(s.contains("MyWf"));
     assertTrue(s.contains("paused=true"));
+  }
+
+  @Test
+  public void scheduleBackfill_twoArgGetters() {
+    Instant start = Instant.ofEpochSecond(100);
+    Instant end = Instant.ofEpochSecond(200);
+    ScheduleBackfill bf = new ScheduleBackfill(start, end);
+
+    assertEquals(start, bf.getStartTime());
+    assertEquals(end, bf.getEndTime());
+    assertNull(bf.getOverlapPolicy());
+  }
+
+  @Test
+  public void scheduleBackfill_threeArgGetters() {
+    Instant start = Instant.ofEpochSecond(100);
+    Instant end = Instant.ofEpochSecond(200);
+    ScheduleBackfill bf = new ScheduleBackfill(start, end, ScheduleOverlapPolicy.BUFFER);
+
+    assertEquals(start, bf.getStartTime());
+    assertEquals(end, bf.getEndTime());
+    assertEquals(ScheduleOverlapPolicy.BUFFER, bf.getOverlapPolicy());
+  }
+
+  @Test
+  public void scheduleBackfill_equals() {
+    Instant start = Instant.ofEpochSecond(100);
+    Instant end = Instant.ofEpochSecond(200);
+    ScheduleBackfill a = new ScheduleBackfill(start, end);
+    ScheduleBackfill b = new ScheduleBackfill(start, end);
+    assertEquals(a, b);
+    assertEquals(a.hashCode(), b.hashCode());
+  }
+
+  @Test
+  public void scheduleBackfill_equalsWithPolicy() {
+    Instant start = Instant.ofEpochSecond(100);
+    Instant end = Instant.ofEpochSecond(200);
+    ScheduleBackfill a = new ScheduleBackfill(start, end, ScheduleOverlapPolicy.SKIP_NEW);
+    ScheduleBackfill b = new ScheduleBackfill(start, end, ScheduleOverlapPolicy.SKIP_NEW);
+    assertEquals(a, b);
+    assertEquals(a.hashCode(), b.hashCode());
+  }
+
+  @Test
+  public void scheduleBackfill_notEqualOnDifferentPolicy() {
+    Instant start = Instant.ofEpochSecond(100);
+    Instant end = Instant.ofEpochSecond(200);
+    assertNotEquals(
+        new ScheduleBackfill(start, end),
+        new ScheduleBackfill(start, end, ScheduleOverlapPolicy.SKIP_NEW));
+  }
+
+  @Test
+  public void scheduleBackfill_notEqualOnDifferentStart() {
+    Instant end = Instant.ofEpochSecond(200);
+    assertNotEquals(
+        new ScheduleBackfill(Instant.ofEpochSecond(100), end),
+        new ScheduleBackfill(Instant.ofEpochSecond(101), end));
+  }
+
+  @Test
+  public void scheduleBackfill_toString() {
+    String s =
+        new ScheduleBackfill(
+                Instant.ofEpochSecond(100),
+                Instant.ofEpochSecond(200),
+                ScheduleOverlapPolicy.BUFFER)
+            .toString();
+    assertTrue(s.contains("startTime="));
+    assertTrue(s.contains("endTime="));
+    assertTrue(s.contains("BUFFER"));
   }
 
   private static ScheduleAction.StartWorkflowAction.Builder minimalStartWorkflowAction() {
