@@ -20,7 +20,6 @@ package com.uber.cadence.client;
 import com.uber.cadence.CreateScheduleRequest;
 import com.uber.cadence.CreateScheduleResponse;
 import com.uber.cadence.DescribeScheduleResponse;
-import com.uber.cadence.ListSchedulesRequest;
 import com.uber.cadence.ListSchedulesResponse;
 import com.uber.cadence.UpdateScheduleRequest;
 import java.util.List;
@@ -43,8 +42,8 @@ import java.util.concurrent.CompletableFuture;
 public interface ScheduleClient {
 
   /**
-   * Creates a new schedule. The {@code domain} and {@code scheduleId} fields of the request are set
-   * automatically; any value provided for them is ignored.
+   * Creates a new schedule. The {@code domain} and {@code scheduleId} fields of the request are
+   * overridden by the client; any value provided for them is ignored.
    *
    * @param scheduleId unique identifier for the schedule within the domain
    * @param request schedule configuration (spec, action, policies, etc.)
@@ -61,8 +60,8 @@ public interface ScheduleClient {
 
   /**
    * Replaces the configuration of an existing schedule. The {@code domain} and {@code scheduleId}
-   * fields of the request are set automatically. Any field not included in the request is cleared
-   * by the server; call {@link #describeSchedule} first to avoid losing existing settings.
+   * fields of the request are overridden by the client. Any field not included in the request is
+   * cleared by the server; call {@link #describeSchedule} first to avoid losing existing settings.
    *
    * @param scheduleId the schedule identifier
    * @param request new configuration (spec, action, policies, etc.)
@@ -102,10 +101,11 @@ public interface ScheduleClient {
   CompletableFuture<Void> backfillSchedule(String scheduleId, List<ScheduleBackfill> backfills);
 
   /**
-   * Lists schedules in the domain, paginated. The {@code domain} field of the request is set
-   * automatically.
+   * Lists schedules in the domain, paginated.
    *
-   * @param request page size and continuation token
+   * @param pageSize maximum number of schedules to return
+   * @param nextPageToken continuation token from a previous response, or {@code null} for the first
+   *     page
    */
-  CompletableFuture<ListSchedulesResponse> listSchedules(ListSchedulesRequest request);
+  CompletableFuture<ListSchedulesResponse> listSchedules(int pageSize, byte[] nextPageToken);
 }
