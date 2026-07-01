@@ -17,10 +17,10 @@ package com.uber.cadence.client.schedule;
 import java.util.Objects;
 
 /**
- * A single entry returned by {@link com.uber.cadence.client.WorkflowClient#listSchedules}.
+ * A single entry returned by {@link com.uber.cadence.client.ScheduleClient#listSchedules}.
  *
  * <p>Contains only the data available from the visibility store. For full detail including policies
- * and runtime info, call {@link com.uber.cadence.client.WorkflowClient#describeSchedule}.
+ * and runtime info, call {@link com.uber.cadence.client.ScheduleClient#describeSchedule}.
  */
 public final class ScheduleListEntry {
 
