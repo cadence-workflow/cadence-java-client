@@ -18,42 +18,94 @@
 package com.uber.cadence.client;
 
 import com.uber.cadence.CreateScheduleRequest;
+import com.uber.cadence.CreateScheduleResponse;
+import com.uber.cadence.DescribeScheduleResponse;
 import com.uber.cadence.ListSchedulesRequest;
 import com.uber.cadence.ListSchedulesResponse;
+import com.uber.cadence.UpdateScheduleRequest;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
- * Client for schedule operations. Obtain via {@link WorkflowClient#scheduleClient()}.
+ * Client for managing schedules within a domain. Obtain via {@link
+ * WorkflowClient#scheduleClient()}.
+ *
+ * <p>All methods return {@link CompletableFuture}. Synchronous callers can block with {@link
+ * CompletableFuture#get()} or {@link CompletableFuture#join()}.
  *
  * <pre>{@code
  * ScheduleClient sc = workflowClient.scheduleClient();
- * ScheduleHandle handle = sc.createSchedule("my-schedule", request);
- * handle.pause("maintenance window");
- * handle.delete();
+ * sc.createSchedule("my-schedule", request).join();
+ * sc.pauseSchedule("my-schedule", "maintenance window").join();
+ * sc.deleteSchedule("my-schedule").join();
  * }</pre>
  */
 public interface ScheduleClient {
 
   /**
-   * Creates a new schedule and returns a handle to it.
+   * Creates a new schedule. The {@code domain} and {@code scheduleId} fields of the request are set
+   * automatically; any value provided for them is ignored.
    *
    * @param scheduleId unique identifier for the schedule within the domain
-   * @param request schedule configuration
-   * @return a handle that can be used to manage the schedule
+   * @param request schedule configuration (spec, action, policies, etc.)
    */
-  ScheduleHandle createSchedule(String scheduleId, CreateScheduleRequest request);
+  CompletableFuture<CreateScheduleResponse> createSchedule(
+      String scheduleId, CreateScheduleRequest request);
 
   /**
-   * Returns a handle to an existing schedule. No server call is made; use {@link
-   * ScheduleHandle#describe()} to verify the schedule exists.
+   * Returns the current configuration and runtime state of a schedule.
    *
    * @param scheduleId the schedule identifier
    */
-  ScheduleHandle getScheduleHandle(String scheduleId);
+  CompletableFuture<DescribeScheduleResponse> describeSchedule(String scheduleId);
 
   /**
-   * Lists schedules in the domain, paginated.
+   * Replaces the configuration of an existing schedule. The {@code domain} and {@code scheduleId}
+   * fields of the request are set automatically. Any field not included in the request is cleared
+   * by the server; call {@link #describeSchedule} first to avoid losing existing settings.
+   *
+   * @param scheduleId the schedule identifier
+   * @param request new configuration (spec, action, policies, etc.)
+   */
+  CompletableFuture<Void> updateSchedule(String scheduleId, UpdateScheduleRequest request);
+
+  /**
+   * Permanently deletes a schedule. In-flight workflow runs triggered by this schedule are not
+   * affected.
+   *
+   * @param scheduleId the schedule identifier
+   */
+  CompletableFuture<Void> deleteSchedule(String scheduleId);
+
+  /**
+   * Pauses a schedule so no new runs are triggered.
+   *
+   * @param scheduleId the schedule identifier
+   * @param reason stored as the pause note, visible in {@link #describeSchedule}
+   */
+  CompletableFuture<Void> pauseSchedule(String scheduleId, String reason);
+
+  /**
+   * Resumes a paused schedule.
+   *
+   * @param scheduleId the schedule identifier
+   * @param reason stored as the unpause note, visible in {@link #describeSchedule}
+   */
+  CompletableFuture<Void> unpauseSchedule(String scheduleId, String reason);
+
+  /**
+   * Triggers runs for all times in the given historical ranges. One service call is made per entry.
+   *
+   * @param scheduleId the schedule identifier
+   * @param backfills time ranges to backfill
+   */
+  CompletableFuture<Void> backfillSchedule(String scheduleId, List<ScheduleBackfill> backfills);
+
+  /**
+   * Lists schedules in the domain, paginated. The {@code domain} field of the request is set
+   * automatically.
    *
    * @param request page size and continuation token
    */
-  ListSchedulesResponse listSchedules(ListSchedulesRequest request);
+  CompletableFuture<ListSchedulesResponse> listSchedules(ListSchedulesRequest request);
 }
