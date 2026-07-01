@@ -22,7 +22,7 @@ import java.util.Objects;
 
 /**
  * Immutable runtime statistics for a schedule returned by {@link
- * com.uber.cadence.client.WorkflowClient#describeSchedule}.
+ * com.uber.cadence.client.ScheduleClient#describeSchedule}.
  */
 public final class ScheduleInfo {
 

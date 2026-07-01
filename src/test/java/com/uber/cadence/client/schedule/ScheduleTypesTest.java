@@ -464,43 +464,6 @@ public class ScheduleTypesTest {
   }
 
   @Test
-  public void scheduleDescription_setters() {
-    ScheduleDescription desc = minimalDescription();
-
-    ScheduleSpec newSpec = ScheduleSpec.newBuilder().setCronExpression("0 9 * * *").build();
-    ScheduleAction newAction =
-        ScheduleAction.newBuilder().setStartWorkflow(minimalStartWorkflowAction().build()).build();
-    SchedulePolicies newPolicies = SchedulePolicies.newBuilder().setPauseOnFailure(true).build();
-
-    desc.setSpec(newSpec);
-    desc.setAction(newAction);
-    desc.setPolicies(newPolicies);
-    desc.setMemo(Collections.singletonMap("m", "v"));
-    desc.setSearchAttributes(Collections.singletonMap("s", "v"));
-
-    assertEquals(newSpec, desc.getSpec());
-    assertEquals(newAction, desc.getAction());
-    assertEquals(newPolicies, desc.getPolicies());
-    assertEquals("v", desc.getMemo().get("m"));
-    assertEquals("v", desc.getSearchAttributes().get("s"));
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void scheduleDescription_setSpec_rejectsNull() {
-    minimalDescription().setSpec(null);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void scheduleDescription_setAction_rejectsNull() {
-    minimalDescription().setAction(null);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void scheduleDescription_setPolicies_rejectsNull() {
-    minimalDescription().setPolicies(null);
-  }
-
-  @Test
   public void scheduleDescription_equals() {
     assertEquals(minimalDescription(), minimalDescription());
     assertEquals(minimalDescription().hashCode(), minimalDescription().hashCode());
@@ -508,16 +471,45 @@ public class ScheduleTypesTest {
 
   @Test
   public void scheduleDescription_notEqualOnDifferentSpec() {
-    ScheduleDescription a = minimalDescription();
-    ScheduleDescription b = minimalDescription();
-    b.setSpec(ScheduleSpec.newBuilder().setCronExpression("0 9 * * *").build());
-    assertNotEquals(a, b);
+    ScheduleAction action =
+        ScheduleAction.newBuilder().setStartWorkflow(minimalStartWorkflowAction().build()).build();
+    SchedulePolicies policies = SchedulePolicies.newBuilder().build();
+    ScheduleState state = new ScheduleState(false, null, null, null);
+    ScheduleInfo info =
+        new ScheduleInfo(
+            Instant.EPOCH, Instant.EPOCH, 0L, Instant.EPOCH, Instant.EPOCH, null, 0L, 0L);
+    assertNotEquals(
+        new ScheduleDescription(
+            ScheduleSpec.newBuilder().setCronExpression("0 * * * *").build(),
+            action,
+            policies,
+            state,
+            info,
+            null,
+            null),
+        new ScheduleDescription(
+            ScheduleSpec.newBuilder().setCronExpression("0 9 * * *").build(),
+            action,
+            policies,
+            state,
+            info,
+            null,
+            null));
   }
 
   @Test
   public void scheduleDescription_toString() {
-    ScheduleDescription desc = minimalDescription();
-    desc.setMemo(Collections.singletonMap("mk", "mv"));
+    ScheduleSpec spec = ScheduleSpec.newBuilder().setCronExpression("0 * * * *").build();
+    ScheduleAction action =
+        ScheduleAction.newBuilder().setStartWorkflow(minimalStartWorkflowAction().build()).build();
+    SchedulePolicies policies = SchedulePolicies.newBuilder().build();
+    ScheduleState state = new ScheduleState(false, null, null, null);
+    ScheduleInfo info =
+        new ScheduleInfo(
+            Instant.EPOCH, Instant.EPOCH, 0L, Instant.EPOCH, Instant.EPOCH, null, 0L, 0L);
+    ScheduleDescription desc =
+        new ScheduleDescription(
+            spec, action, policies, state, info, Collections.singletonMap("mk", "mv"), null);
     String s = desc.toString();
     assertTrue(s.contains("spec="));
     assertTrue(s.contains("action="));

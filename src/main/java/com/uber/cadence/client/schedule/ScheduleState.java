@@ -19,7 +19,7 @@ import java.util.Objects;
 
 /**
  * Immutable snapshot of a schedule's pause state returned by {@link
- * com.uber.cadence.client.WorkflowClient#describeSchedule}.
+ * com.uber.cadence.client.ScheduleClient#describeSchedule}.
  */
 public final class ScheduleState {
 
@@ -40,10 +40,7 @@ public final class ScheduleState {
     return paused;
   }
 
-  /**
-   * Human-readable reason the schedule was paused. Non-null only when {@link #isPaused()} is {@code
-   * true}.
-   */
+  /** The reason provided when the schedule was paused. {@code null} when not paused. */
   public String getPauseReason() {
     return pauseReason;
   }

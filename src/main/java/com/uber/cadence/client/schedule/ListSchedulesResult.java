@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Result of a {@link com.uber.cadence.client.WorkflowClient#listSchedules} call.
+ * Result of a {@link com.uber.cadence.client.ScheduleClient#listSchedules} call.
  *
  * <p>To page through all schedules:
  *

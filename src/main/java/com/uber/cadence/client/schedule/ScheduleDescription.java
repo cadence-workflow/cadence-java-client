@@ -19,34 +19,22 @@ import java.util.Objects;
 
 /**
  * Full description of a schedule as returned by {@link
- * com.uber.cadence.client.WorkflowClient#describeSchedule}.
+ * com.uber.cadence.client.ScheduleClient#describeSchedule}.
  *
- * <p>This object is also the input to the {@code updater} function passed to {@link
- * com.uber.cadence.client.WorkflowClient#updateSchedule}. Mutations applied inside the updater are
- * collected and sent to the server atomically as part of the describe-first read-modify-write
- * cycle.
- *
- * <pre>{@code
- * client.updateSchedule(scheduleId, desc -> {
- *     desc.setSpec(desc.getSpec().toBuilder()
- *         .setCronExpression("0 0,6,12,18 * * *")
- *         .build());
- *     desc.setPolicies(desc.getPolicies().toBuilder()
- *         .setOverlapPolicy(ScheduleOverlapPolicy.SKIP_NEW)
- *         .build());
- *     return desc;
- * });
- * }</pre>
+ * <p>To update a schedule, read the current configuration with {@link
+ * com.uber.cadence.client.ScheduleClient#describeSchedule}, modify the relevant fields in a new
+ * {@link com.uber.cadence.UpdateScheduleRequest}, then submit via {@link
+ * com.uber.cadence.client.ScheduleClient#updateSchedule}.
  */
 public final class ScheduleDescription {
 
-  private ScheduleSpec spec;
-  private ScheduleAction action;
-  private SchedulePolicies policies;
-  private ScheduleState state;
-  private ScheduleInfo info;
-  private Map<String, Object> memo;
-  private Map<String, Object> searchAttributes;
+  private final ScheduleSpec spec;
+  private final ScheduleAction action;
+  private final SchedulePolicies policies;
+  private final ScheduleState state;
+  private final ScheduleInfo info;
+  private final Map<String, Object> memo;
+  private final Map<String, Object> searchAttributes;
 
   public ScheduleDescription(
       ScheduleSpec spec,
@@ -70,29 +58,9 @@ public final class ScheduleDescription {
     return spec;
   }
 
-  /**
-   * Replaces the spec. Call this inside an updater to change when the schedule fires.
-   *
-   * @see com.uber.cadence.client.WorkflowClient#updateSchedule
-   */
-  public ScheduleDescription setSpec(ScheduleSpec spec) {
-    this.spec = Objects.requireNonNull(spec, "spec");
-    return this;
-  }
-
   /** The action executed on each trigger. */
   public ScheduleAction getAction() {
     return action;
-  }
-
-  /**
-   * Replaces the action. Call this inside an updater to change what workflow is started.
-   *
-   * @see com.uber.cadence.client.WorkflowClient#updateSchedule
-   */
-  public ScheduleDescription setAction(ScheduleAction action) {
-    this.action = Objects.requireNonNull(action, "action");
-    return this;
   }
 
   /** Overlap, catch-up, and failure-handling policies. */
@@ -101,18 +69,9 @@ public final class ScheduleDescription {
   }
 
   /**
-   * Replaces the policies. Call this inside an updater to change overlap or catch-up behavior.
-   *
-   * @see com.uber.cadence.client.WorkflowClient#updateSchedule
-   */
-  public ScheduleDescription setPolicies(SchedulePolicies policies) {
-    this.policies = Objects.requireNonNull(policies, "policies");
-    return this;
-  }
-
-  /**
-   * Current pause state. Read-only; use {@link
-   * com.uber.cadence.client.WorkflowClient#pauseSchedule} to pause.
+   * Current pause state. To pause or unpause the schedule, use {@link
+   * com.uber.cadence.client.ScheduleClient#pauseSchedule} or {@link
+   * com.uber.cadence.client.ScheduleClient#unpauseSchedule}.
    */
   public ScheduleState getState() {
     return state;
@@ -128,29 +87,9 @@ public final class ScheduleDescription {
     return memo;
   }
 
-  /**
-   * Replaces the memo on the schedule.
-   *
-   * @see com.uber.cadence.client.WorkflowClient#updateSchedule
-   */
-  public ScheduleDescription setMemo(Map<String, Object> memo) {
-    this.memo = memo;
-    return this;
-  }
-
   /** Search attributes attached to the schedule. */
   public Map<String, Object> getSearchAttributes() {
     return searchAttributes;
-  }
-
-  /**
-   * Replaces the search attributes on the schedule.
-   *
-   * @see com.uber.cadence.client.WorkflowClient#updateSchedule
-   */
-  public ScheduleDescription setSearchAttributes(Map<String, Object> searchAttributes) {
-    this.searchAttributes = searchAttributes;
-    return this;
   }
 
   @Override

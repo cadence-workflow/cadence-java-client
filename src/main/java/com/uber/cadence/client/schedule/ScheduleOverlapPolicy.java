@@ -19,7 +19,7 @@ package com.uber.cadence.client.schedule;
  *
  * <p>Behavior is not retroactive on update: existing runs keep running under the old policy; only
  * new fires observe the updated policy. See {@link
- * com.uber.cadence.client.WorkflowClient#updateSchedule} for detail.
+ * com.uber.cadence.client.ScheduleClient#updateSchedule} for detail.
  */
 public enum ScheduleOverlapPolicy {
   /**

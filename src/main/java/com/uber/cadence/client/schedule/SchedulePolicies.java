@@ -32,7 +32,7 @@ import java.util.Objects;
  *
  * <h3>Overlap policy behavior on update</h3>
  *
- * <p>Policy changes on {@link com.uber.cadence.client.WorkflowClient#updateSchedule} are <em>not
+ * <p>Policy changes on {@link com.uber.cadence.client.ScheduleClient#updateSchedule} are <em>not
  * retroactive</em>:
  *
  * <ul>

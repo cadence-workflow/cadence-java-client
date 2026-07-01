@@ -18,14 +18,14 @@
 package com.uber.cadence.client;
 
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 /** A time range to trigger retroactively when calling {@link ScheduleClient#backfillSchedule}. */
 public final class ScheduleBackfill {
 
-  private final ZonedDateTime startTime;
-  private final ZonedDateTime endTime;
+  private final Instant startTime;
+  private final Instant endTime;
   private final ScheduleOverlapPolicy overlapPolicy;
 
   /**
@@ -34,7 +34,7 @@ public final class ScheduleBackfill {
    * @param startTime start of the backfill range (inclusive)
    * @param endTime end of the backfill range (inclusive)
    */
-  public ScheduleBackfill(ZonedDateTime startTime, ZonedDateTime endTime) {
+  public ScheduleBackfill(Instant startTime, Instant endTime) {
     this.startTime = Objects.requireNonNull(startTime, "startTime");
     this.endTime = Objects.requireNonNull(endTime, "endTime");
     this.overlapPolicy = null;
@@ -46,18 +46,17 @@ public final class ScheduleBackfill {
    * @param overlapPolicy overlap policy for this backfill range; overrides the schedule's
    *     configured policy
    */
-  public ScheduleBackfill(
-      ZonedDateTime startTime, ZonedDateTime endTime, ScheduleOverlapPolicy overlapPolicy) {
+  public ScheduleBackfill(Instant startTime, Instant endTime, ScheduleOverlapPolicy overlapPolicy) {
     this.startTime = Objects.requireNonNull(startTime, "startTime");
     this.endTime = Objects.requireNonNull(endTime, "endTime");
     this.overlapPolicy = Objects.requireNonNull(overlapPolicy, "overlapPolicy");
   }
 
-  public ZonedDateTime getStartTime() {
+  public Instant getStartTime() {
     return startTime;
   }
 
-  public ZonedDateTime getEndTime() {
+  public Instant getEndTime() {
     return endTime;
   }
 
