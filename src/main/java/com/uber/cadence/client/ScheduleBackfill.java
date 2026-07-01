@@ -18,14 +18,14 @@
 package com.uber.cadence.client;
 
 import com.uber.cadence.ScheduleOverlapPolicy;
-import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /** A time range to trigger retroactively when calling {@link ScheduleClient#backfillSchedule}. */
 public final class ScheduleBackfill {
 
-  private final Instant startTime;
-  private final Instant endTime;
+  private final ZonedDateTime startTime;
+  private final ZonedDateTime endTime;
   private final ScheduleOverlapPolicy overlapPolicy;
 
   /**
@@ -34,17 +34,18 @@ public final class ScheduleBackfill {
    * @param overlapPolicy how to handle overlapping runs; use {@link ScheduleOverlapPolicy#INVALID}
    *     to fall back to the schedule's configured policy
    */
-  public ScheduleBackfill(Instant startTime, Instant endTime, ScheduleOverlapPolicy overlapPolicy) {
+  public ScheduleBackfill(
+      ZonedDateTime startTime, ZonedDateTime endTime, ScheduleOverlapPolicy overlapPolicy) {
     this.startTime = Objects.requireNonNull(startTime, "startTime");
     this.endTime = Objects.requireNonNull(endTime, "endTime");
     this.overlapPolicy = Objects.requireNonNull(overlapPolicy, "overlapPolicy");
   }
 
-  public Instant getStartTime() {
+  public ZonedDateTime getStartTime() {
     return startTime;
   }
 
-  public Instant getEndTime() {
+  public ZonedDateTime getEndTime() {
     return endTime;
   }
 
