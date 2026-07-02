@@ -365,7 +365,7 @@ final class ScheduleClientImpl implements ScheduleClient {
       case TERMINATE_PREVIOUS:
         return com.uber.cadence.ScheduleOverlapPolicy.TERMINATE_PREVIOUS;
       default:
-        return com.uber.cadence.ScheduleOverlapPolicy.INVALID;
+        throw new IllegalArgumentException("unknown ScheduleOverlapPolicy: " + p);
     }
   }
 
