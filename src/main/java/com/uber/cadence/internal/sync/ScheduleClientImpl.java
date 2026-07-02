@@ -35,12 +35,10 @@ import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.client.ScheduleBackfill;
 import com.uber.cadence.client.ScheduleClient;
-import com.uber.cadence.client.schedule.ListSchedulesResult;
 import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleDescription;
 import com.uber.cadence.client.schedule.ScheduleInfo;
-import com.uber.cadence.client.schedule.ScheduleListEntry;
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
@@ -180,7 +178,8 @@ final class ScheduleClientImpl implements ScheduleClient {
   }
 
   @Override
-  public CompletableFuture<ListSchedulesResult> listSchedules(int pageSize, byte[] nextPageToken) {
+  public CompletableFuture<ListSchedulesResponse> listSchedules(
+      int pageSize, byte[] nextPageToken) {
     ListSchedulesRequest request =
         new ListSchedulesRequest()
             .setDomain(domain)
@@ -189,8 +188,7 @@ final class ScheduleClientImpl implements ScheduleClient {
     return CompletableFuture.supplyAsync(
         () -> {
           try {
-            ListSchedulesResponse resp = service.ListSchedules(request);
-            return toListSchedulesResult(resp);
+            return service.ListSchedules(request);
           } catch (Exception e) {
             throw new RuntimeException(e);
           }
@@ -295,22 +293,6 @@ final class ScheduleClientImpl implements ScheduleClient {
         backfills,
         t.getMissedRuns(),
         t.getSkippedRuns());
-  }
-
-  private static ListSchedulesResult toListSchedulesResult(ListSchedulesResponse r) {
-    if (r == null) return new ListSchedulesResult(null, null);
-    List<ScheduleListEntry> entries = new ArrayList<>();
-    if (r.getSchedules() != null) {
-      for (com.uber.cadence.ScheduleListEntry e : r.getSchedules()) {
-        entries.add(
-            new ScheduleListEntry(
-                e.getScheduleId(),
-                e.getWorkflowType() != null ? e.getWorkflowType().getName() : null,
-                toScheduleState(e.getState()),
-                e.getCronExpression()));
-      }
-    }
-    return new ListSchedulesResult(entries, r.getNextPageToken());
   }
 
   private static RetryOptions toRetryOptions(com.uber.cadence.RetryPolicy p) {
