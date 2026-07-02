@@ -817,88 +817,43 @@ public interface IWorkflowService {
       RefreshWorkflowTasksRequest request, AsyncMethodCallback<Void> resultHandler)
       throws CadenceError;
 
-  /**
-   * Creates a new schedule in the domain.
-   *
-   * @throws BadRequestError if the schedule spec is invalid (e.g. bad cron expression)
-   * @throws WorkflowExecutionAlreadyStartedError if a schedule with the same ID already exists
-   * @throws EntityNotExistsError if the domain does not exist
-   * @throws CadenceError on other server errors
-   */
-  CreateScheduleResponse CreateSchedule(CreateScheduleRequest request)
-      throws BadRequestError, WorkflowExecutionAlreadyStartedError, EntityNotExistsError,
-          ServiceBusyError, DomainNotActiveError, LimitExceededError, CadenceError;
+  /** Creates a new schedule in the domain. Failures are delivered via the returned future. */
+  CompletableFuture<CreateScheduleResponse> CreateSchedule(CreateScheduleRequest request);
 
   /**
-   * Returns the full configuration and runtime state of a schedule.
-   *
-   * @throws EntityNotExistsError if the schedule does not exist
-   * @throws CadenceError on other server errors
+   * Returns the full configuration and runtime state of a schedule. Failures are delivered via the
+   * returned future.
    */
-  DescribeScheduleResponse DescribeSchedule(DescribeScheduleRequest request)
-      throws BadRequestError, EntityNotExistsError, ServiceBusyError, CadenceError;
+  CompletableFuture<DescribeScheduleResponse> DescribeSchedule(DescribeScheduleRequest request);
 
   /**
    * Replaces the spec, action, and policies of an existing schedule.
    *
    * <p>The server replaces the entire schedule configuration. Any field not included in the request
    * is zeroed out; always call describe first and resubmit the full configuration.
-   *
-   * @throws EntityNotExistsError if the schedule does not exist
-   * @throws CadenceError on other server errors
    */
-  UpdateScheduleResponse UpdateSchedule(UpdateScheduleRequest request)
-      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          LimitExceededError, CadenceError;
+  CompletableFuture<UpdateScheduleResponse> UpdateSchedule(UpdateScheduleRequest request);
 
   /**
    * Permanently deletes a schedule. Running workflows triggered by this schedule are not affected.
-   *
-   * @throws EntityNotExistsError if the schedule does not exist
-   * @throws CadenceError on other server errors
    */
-  DeleteScheduleResponse DeleteSchedule(DeleteScheduleRequest request)
-      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          CadenceError;
+  CompletableFuture<DeleteScheduleResponse> DeleteSchedule(DeleteScheduleRequest request);
 
-  /**
-   * Pauses a schedule. No new runs will be triggered while the schedule is paused.
-   *
-   * @throws EntityNotExistsError if the schedule does not exist
-   * @throws CadenceError on other server errors
-   */
-  PauseScheduleResponse PauseSchedule(PauseScheduleRequest request)
-      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          CadenceError;
+  /** Pauses a schedule. No new runs will be triggered while the schedule is paused. */
+  CompletableFuture<PauseScheduleResponse> PauseSchedule(PauseScheduleRequest request);
 
   /**
    * Resumes a paused schedule. Optionally overrides the catch-up policy for the first pass on
    * resume.
-   *
-   * @throws EntityNotExistsError if the schedule does not exist
-   * @throws CadenceError on other server errors
    */
-  UnpauseScheduleResponse UnpauseSchedule(UnpauseScheduleRequest request)
-      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          CadenceError;
+  CompletableFuture<UnpauseScheduleResponse> UnpauseSchedule(UnpauseScheduleRequest request);
 
   /**
    * Triggers runs for all scheduled times within a historical time range. Backfill runs are subject
    * to the configured overlap policy.
-   *
-   * @throws EntityNotExistsError if the schedule does not exist
-   * @throws CadenceError on other server errors
    */
-  BackfillScheduleResponse BackfillSchedule(BackfillScheduleRequest request)
-      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
-          LimitExceededError, CadenceError;
+  CompletableFuture<BackfillScheduleResponse> BackfillSchedule(BackfillScheduleRequest request);
 
-  /**
-   * Lists schedules in a domain, paginated.
-   *
-   * @throws EntityNotExistsError if the domain does not exist
-   * @throws CadenceError on other server errors
-   */
-  ListSchedulesResponse ListSchedules(ListSchedulesRequest request)
-      throws BadRequestError, EntityNotExistsError, ServiceBusyError, CadenceError;
+  /** Lists schedules in a domain, paginated. */
+  CompletableFuture<ListSchedulesResponse> ListSchedules(ListSchedulesRequest request);
 }

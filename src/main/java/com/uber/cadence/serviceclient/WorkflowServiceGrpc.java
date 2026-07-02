@@ -19,6 +19,7 @@ package com.uber.cadence.serviceclient;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.uber.cadence.*;
 import com.uber.cadence.internal.compatibility.proto.mappers.*;
@@ -801,102 +802,78 @@ public class WorkflowServiceGrpc implements IWorkflowService {
   }
 
   @Override
-  public CreateScheduleResponse CreateSchedule(CreateScheduleRequest request) throws CadenceError {
-    try {
-      return ResponseMapper.createScheduleResponse(
-          grpcServiceStubs
-              .scheduleBlockingStub()
-              .createSchedule(RequestMapper.createScheduleRequest(request)));
-    } catch (Exception e) {
-      throw toServiceClientException(e);
-    }
+  public CompletableFuture<CreateScheduleResponse> CreateSchedule(CreateScheduleRequest request) {
+    return toCompletableFuture(
+        grpcServiceStubs
+            .scheduleFutureStub()
+            .createSchedule(RequestMapper.createScheduleRequest(request)),
+        ResponseMapper::createScheduleResponse);
   }
 
   @Override
-  public DescribeScheduleResponse DescribeSchedule(DescribeScheduleRequest request)
-      throws CadenceError {
-    try {
-      return ResponseMapper.describeScheduleResponse(
-          grpcServiceStubs
-              .scheduleBlockingStub()
-              .describeSchedule(RequestMapper.describeScheduleRequest(request)));
-    } catch (Exception e) {
-      throw toServiceClientException(e);
-    }
+  public CompletableFuture<DescribeScheduleResponse> DescribeSchedule(
+      DescribeScheduleRequest request) {
+    return toCompletableFuture(
+        grpcServiceStubs
+            .scheduleFutureStub()
+            .describeSchedule(RequestMapper.describeScheduleRequest(request)),
+        ResponseMapper::describeScheduleResponse);
   }
 
   @Override
-  public UpdateScheduleResponse UpdateSchedule(UpdateScheduleRequest request) throws CadenceError {
-    try {
-      return ResponseMapper.updateScheduleResponse(
-          grpcServiceStubs
-              .scheduleBlockingStub()
-              .updateSchedule(RequestMapper.updateScheduleRequest(request)));
-    } catch (Exception e) {
-      throw toServiceClientException(e);
-    }
+  public CompletableFuture<UpdateScheduleResponse> UpdateSchedule(UpdateScheduleRequest request) {
+    return toCompletableFuture(
+        grpcServiceStubs
+            .scheduleFutureStub()
+            .updateSchedule(RequestMapper.updateScheduleRequest(request)),
+        ResponseMapper::updateScheduleResponse);
   }
 
   @Override
-  public DeleteScheduleResponse DeleteSchedule(DeleteScheduleRequest request) throws CadenceError {
-    try {
-      return ResponseMapper.deleteScheduleResponse(
-          grpcServiceStubs
-              .scheduleBlockingStub()
-              .deleteSchedule(RequestMapper.deleteScheduleRequest(request)));
-    } catch (Exception e) {
-      throw toServiceClientException(e);
-    }
+  public CompletableFuture<DeleteScheduleResponse> DeleteSchedule(DeleteScheduleRequest request) {
+    return toCompletableFuture(
+        grpcServiceStubs
+            .scheduleFutureStub()
+            .deleteSchedule(RequestMapper.deleteScheduleRequest(request)),
+        ResponseMapper::deleteScheduleResponse);
   }
 
   @Override
-  public PauseScheduleResponse PauseSchedule(PauseScheduleRequest request) throws CadenceError {
-    try {
-      return ResponseMapper.pauseScheduleResponse(
-          grpcServiceStubs
-              .scheduleBlockingStub()
-              .pauseSchedule(RequestMapper.pauseScheduleRequest(request)));
-    } catch (Exception e) {
-      throw toServiceClientException(e);
-    }
+  public CompletableFuture<PauseScheduleResponse> PauseSchedule(PauseScheduleRequest request) {
+    return toCompletableFuture(
+        grpcServiceStubs
+            .scheduleFutureStub()
+            .pauseSchedule(RequestMapper.pauseScheduleRequest(request)),
+        ResponseMapper::pauseScheduleResponse);
   }
 
   @Override
-  public UnpauseScheduleResponse UnpauseSchedule(UnpauseScheduleRequest request)
-      throws CadenceError {
-    try {
-      return ResponseMapper.unpauseScheduleResponse(
-          grpcServiceStubs
-              .scheduleBlockingStub()
-              .unpauseSchedule(RequestMapper.unpauseScheduleRequest(request)));
-    } catch (Exception e) {
-      throw toServiceClientException(e);
-    }
+  public CompletableFuture<UnpauseScheduleResponse> UnpauseSchedule(
+      UnpauseScheduleRequest request) {
+    return toCompletableFuture(
+        grpcServiceStubs
+            .scheduleFutureStub()
+            .unpauseSchedule(RequestMapper.unpauseScheduleRequest(request)),
+        ResponseMapper::unpauseScheduleResponse);
   }
 
   @Override
-  public BackfillScheduleResponse BackfillSchedule(BackfillScheduleRequest request)
-      throws CadenceError {
-    try {
-      return ResponseMapper.backfillScheduleResponse(
-          grpcServiceStubs
-              .scheduleBlockingStub()
-              .backfillSchedule(RequestMapper.backfillScheduleRequest(request)));
-    } catch (Exception e) {
-      throw toServiceClientException(e);
-    }
+  public CompletableFuture<BackfillScheduleResponse> BackfillSchedule(
+      BackfillScheduleRequest request) {
+    return toCompletableFuture(
+        grpcServiceStubs
+            .scheduleFutureStub()
+            .backfillSchedule(RequestMapper.backfillScheduleRequest(request)),
+        ResponseMapper::backfillScheduleResponse);
   }
 
   @Override
-  public ListSchedulesResponse ListSchedules(ListSchedulesRequest request) throws CadenceError {
-    try {
-      return ResponseMapper.listSchedulesResponse(
-          grpcServiceStubs
-              .scheduleBlockingStub()
-              .listSchedules(RequestMapper.listSchedulesRequest(request)));
-    } catch (Exception e) {
-      throw toServiceClientException(e);
-    }
+  public CompletableFuture<ListSchedulesResponse> ListSchedules(ListSchedulesRequest request) {
+    return toCompletableFuture(
+        grpcServiceStubs
+            .scheduleFutureStub()
+            .listSchedules(RequestMapper.listSchedulesRequest(request)),
+        ResponseMapper::listSchedulesResponse);
   }
 
   @Override
@@ -1468,6 +1445,26 @@ public class WorkflowServiceGrpc implements IWorkflowService {
     } else {
       return new CadenceError(t);
     }
+  }
+
+  private <P, T> CompletableFuture<T> toCompletableFuture(
+      ListenableFuture<P> listenableFuture, Function<P, T> mapper) {
+    CompletableFuture<T> future = new CompletableFuture<>();
+    Futures.addCallback(
+        listenableFuture,
+        new FutureCallback<P>() {
+          @Override
+          public void onSuccess(P result) {
+            future.complete(mapper.apply(result));
+          }
+
+          @Override
+          public void onFailure(Throwable t) {
+            future.completeExceptionally(toServiceClientException(t));
+          }
+        },
+        executor);
+    return future;
   }
 
   private <T, R> FutureCallback<R> toFutureCallback(

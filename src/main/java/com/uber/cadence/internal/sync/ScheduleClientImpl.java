@@ -52,19 +52,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 final class ScheduleClientImpl implements ScheduleClient {
-
-  private static final Executor BLOCKING_EXECUTOR =
-      Executors.newCachedThreadPool(
-          r -> {
-            Thread t = new Thread(r, "cadence-schedule-client");
-            t.setDaemon(true);
-            return t;
-          });
 
   private final IWorkflowService service;
   private final String domain;
@@ -79,31 +68,14 @@ final class ScheduleClientImpl implements ScheduleClient {
       String scheduleId, CreateScheduleRequest request) {
     request.setDomain(domain);
     request.setScheduleId(scheduleId);
-    return CompletableFuture.supplyAsync(
-        () -> {
-          try {
-            return service.CreateSchedule(request);
-          } catch (Exception e) {
-            throw new CompletionException(e);
-          }
-        },
-        BLOCKING_EXECUTOR);
+    return service.CreateSchedule(request);
   }
 
   @Override
   public CompletableFuture<ScheduleDescription> describeSchedule(String scheduleId) {
     DescribeScheduleRequest request =
         new DescribeScheduleRequest().setDomain(domain).setScheduleId(scheduleId);
-    return CompletableFuture.supplyAsync(
-        () -> {
-          try {
-            DescribeScheduleResponse resp = service.DescribeSchedule(request);
-            return toScheduleDescription(resp);
-          } catch (Exception e) {
-            throw new CompletionException(e);
-          }
-        },
-        BLOCKING_EXECUTOR);
+    return service.DescribeSchedule(request).thenApply(ScheduleClientImpl::toScheduleDescription);
   }
 
   @Override
@@ -111,45 +83,21 @@ final class ScheduleClientImpl implements ScheduleClient {
       String scheduleId, UpdateScheduleRequest request) {
     request.setDomain(domain);
     request.setScheduleId(scheduleId);
-    return CompletableFuture.supplyAsync(
-        () -> {
-          try {
-            return service.UpdateSchedule(request);
-          } catch (Exception e) {
-            throw new CompletionException(e);
-          }
-        },
-        BLOCKING_EXECUTOR);
+    return service.UpdateSchedule(request);
   }
 
   @Override
   public CompletableFuture<DeleteScheduleResponse> deleteSchedule(String scheduleId) {
     DeleteScheduleRequest request =
         new DeleteScheduleRequest().setDomain(domain).setScheduleId(scheduleId);
-    return CompletableFuture.supplyAsync(
-        () -> {
-          try {
-            return service.DeleteSchedule(request);
-          } catch (Exception e) {
-            throw new CompletionException(e);
-          }
-        },
-        BLOCKING_EXECUTOR);
+    return service.DeleteSchedule(request);
   }
 
   @Override
   public CompletableFuture<PauseScheduleResponse> pauseSchedule(String scheduleId, String reason) {
     PauseScheduleRequest request =
         new PauseScheduleRequest().setDomain(domain).setScheduleId(scheduleId).setReason(reason);
-    return CompletableFuture.supplyAsync(
-        () -> {
-          try {
-            return service.PauseSchedule(request);
-          } catch (Exception e) {
-            throw new CompletionException(e);
-          }
-        },
-        BLOCKING_EXECUTOR);
+    return service.PauseSchedule(request);
   }
 
   @Override
@@ -157,42 +105,34 @@ final class ScheduleClientImpl implements ScheduleClient {
       String scheduleId, String reason) {
     UnpauseScheduleRequest request =
         new UnpauseScheduleRequest().setDomain(domain).setScheduleId(scheduleId).setReason(reason);
-    return CompletableFuture.supplyAsync(
-        () -> {
-          try {
-            return service.UnpauseSchedule(request);
-          } catch (Exception e) {
-            throw new CompletionException(e);
-          }
-        },
-        BLOCKING_EXECUTOR);
+    return service.UnpauseSchedule(request);
   }
 
   @Override
   public CompletableFuture<List<BackfillScheduleResponse>> backfillSchedule(
       String scheduleId, List<ScheduleBackfill> backfills) {
-    return CompletableFuture.supplyAsync(
-        () -> {
-          List<BackfillScheduleResponse> results = new ArrayList<>();
-          for (ScheduleBackfill bf : backfills) {
-            BackfillScheduleRequest request =
-                new BackfillScheduleRequest()
-                    .setDomain(domain)
-                    .setScheduleId(scheduleId)
-                    .setStartTimeNano(bf.getStartTime().toEpochMilli() * 1_000_000L)
-                    .setEndTimeNano(bf.getEndTime().toEpochMilli() * 1_000_000L);
-            if (bf.getOverlapPolicy() != null) {
-              request.setOverlapPolicy(toThriftOverlapPolicy(bf.getOverlapPolicy()));
-            }
-            try {
-              results.add(service.BackfillSchedule(request));
-            } catch (Exception e) {
-              throw new CompletionException(e);
-            }
-          }
-          return results;
-        },
-        BLOCKING_EXECUTOR);
+    List<CompletableFuture<BackfillScheduleResponse>> futures = new ArrayList<>();
+    for (ScheduleBackfill bf : backfills) {
+      BackfillScheduleRequest request =
+          new BackfillScheduleRequest()
+              .setDomain(domain)
+              .setScheduleId(scheduleId)
+              .setStartTimeNano(bf.getStartTime().toEpochMilli() * 1_000_000L)
+              .setEndTimeNano(bf.getEndTime().toEpochMilli() * 1_000_000L);
+      if (bf.getOverlapPolicy() != null) {
+        request.setOverlapPolicy(toThriftOverlapPolicy(bf.getOverlapPolicy()));
+      }
+      futures.add(service.BackfillSchedule(request));
+    }
+    return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+        .thenApply(
+            v -> {
+              List<BackfillScheduleResponse> results = new ArrayList<>();
+              for (CompletableFuture<BackfillScheduleResponse> f : futures) {
+                results.add(f.join());
+              }
+              return results;
+            });
   }
 
   @Override
@@ -203,15 +143,7 @@ final class ScheduleClientImpl implements ScheduleClient {
             .setDomain(domain)
             .setPageSize(pageSize)
             .setNextPageToken(nextPageToken);
-    return CompletableFuture.supplyAsync(
-        () -> {
-          try {
-            return service.ListSchedules(request);
-          } catch (Exception e) {
-            throw new CompletionException(e);
-          }
-        },
-        BLOCKING_EXECUTOR);
+    return service.ListSchedules(request);
   }
 
   private static ScheduleDescription toScheduleDescription(DescribeScheduleResponse r) {

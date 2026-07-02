@@ -481,48 +481,45 @@ public final class TestWorkflowEnvironmentInternal implements TestWorkflowEnviro
     }
 
     @Override
-    public CreateScheduleResponse CreateSchedule(CreateScheduleRequest request)
-        throws CadenceError {
+    public CompletableFuture<CreateScheduleResponse> CreateSchedule(CreateScheduleRequest request) {
       return impl.CreateSchedule(request);
     }
 
     @Override
-    public DescribeScheduleResponse DescribeSchedule(DescribeScheduleRequest request)
-        throws CadenceError {
+    public CompletableFuture<DescribeScheduleResponse> DescribeSchedule(
+        DescribeScheduleRequest request) {
       return impl.DescribeSchedule(request);
     }
 
     @Override
-    public UpdateScheduleResponse UpdateSchedule(UpdateScheduleRequest request)
-        throws CadenceError {
+    public CompletableFuture<UpdateScheduleResponse> UpdateSchedule(UpdateScheduleRequest request) {
       return impl.UpdateSchedule(request);
     }
 
     @Override
-    public DeleteScheduleResponse DeleteSchedule(DeleteScheduleRequest request)
-        throws CadenceError {
+    public CompletableFuture<DeleteScheduleResponse> DeleteSchedule(DeleteScheduleRequest request) {
       return impl.DeleteSchedule(request);
     }
 
     @Override
-    public PauseScheduleResponse PauseSchedule(PauseScheduleRequest request) throws CadenceError {
+    public CompletableFuture<PauseScheduleResponse> PauseSchedule(PauseScheduleRequest request) {
       return impl.PauseSchedule(request);
     }
 
     @Override
-    public UnpauseScheduleResponse UnpauseSchedule(UnpauseScheduleRequest request)
-        throws CadenceError {
+    public CompletableFuture<UnpauseScheduleResponse> UnpauseSchedule(
+        UnpauseScheduleRequest request) {
       return impl.UnpauseSchedule(request);
     }
 
     @Override
-    public BackfillScheduleResponse BackfillSchedule(BackfillScheduleRequest request)
-        throws CadenceError {
+    public CompletableFuture<BackfillScheduleResponse> BackfillSchedule(
+        BackfillScheduleRequest request) {
       return impl.BackfillSchedule(request);
     }
 
     @Override
-    public ListSchedulesResponse ListSchedules(ListSchedulesRequest request) throws CadenceError {
+    public CompletableFuture<ListSchedulesResponse> ListSchedules(ListSchedulesRequest request) {
       return impl.ListSchedules(request);
     }
 

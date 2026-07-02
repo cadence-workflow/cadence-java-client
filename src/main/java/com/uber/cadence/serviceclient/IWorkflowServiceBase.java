@@ -724,45 +724,45 @@ public class IWorkflowServiceBase implements IWorkflowService {
   }
 
   @Override
-  public CreateScheduleResponse CreateSchedule(CreateScheduleRequest request) throws CadenceError {
+  public CompletableFuture<CreateScheduleResponse> CreateSchedule(CreateScheduleRequest request) {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
-  public DescribeScheduleResponse DescribeSchedule(DescribeScheduleRequest request)
-      throws CadenceError {
+  public CompletableFuture<DescribeScheduleResponse> DescribeSchedule(
+      DescribeScheduleRequest request) {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
-  public UpdateScheduleResponse UpdateSchedule(UpdateScheduleRequest request) throws CadenceError {
+  public CompletableFuture<UpdateScheduleResponse> UpdateSchedule(UpdateScheduleRequest request) {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
-  public DeleteScheduleResponse DeleteSchedule(DeleteScheduleRequest request) throws CadenceError {
+  public CompletableFuture<DeleteScheduleResponse> DeleteSchedule(DeleteScheduleRequest request) {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
-  public PauseScheduleResponse PauseSchedule(PauseScheduleRequest request) throws CadenceError {
+  public CompletableFuture<PauseScheduleResponse> PauseSchedule(PauseScheduleRequest request) {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
-  public UnpauseScheduleResponse UnpauseSchedule(UnpauseScheduleRequest request)
-      throws CadenceError {
+  public CompletableFuture<UnpauseScheduleResponse> UnpauseSchedule(
+      UnpauseScheduleRequest request) {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
-  public BackfillScheduleResponse BackfillSchedule(BackfillScheduleRequest request)
-      throws CadenceError {
+  public CompletableFuture<BackfillScheduleResponse> BackfillSchedule(
+      BackfillScheduleRequest request) {
     throw new UnsupportedOperationException("unimplemented");
   }
 
   @Override
-  public ListSchedulesResponse ListSchedules(ListSchedulesRequest request) throws CadenceError {
+  public CompletableFuture<ListSchedulesResponse> ListSchedules(ListSchedulesRequest request) {
     throw new UnsupportedOperationException("unimplemented");
   }
 }
