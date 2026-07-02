@@ -21,11 +21,11 @@ import com.uber.cadence.BackfillScheduleResponse;
 import com.uber.cadence.CreateScheduleRequest;
 import com.uber.cadence.CreateScheduleResponse;
 import com.uber.cadence.DeleteScheduleResponse;
+import com.uber.cadence.ListSchedulesResponse;
 import com.uber.cadence.PauseScheduleResponse;
 import com.uber.cadence.UnpauseScheduleResponse;
 import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
-import com.uber.cadence.client.schedule.ListSchedulesResult;
 import com.uber.cadence.client.schedule.ScheduleDescription;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -114,5 +114,5 @@ public interface ScheduleClient {
    * @param nextPageToken continuation token from a previous response, or {@code null} for the first
    *     page
    */
-  CompletableFuture<ListSchedulesResult> listSchedules(int pageSize, byte[] nextPageToken);
+  CompletableFuture<ListSchedulesResponse> listSchedules(int pageSize, byte[] nextPageToken);
 }
