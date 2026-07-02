@@ -595,28 +595,32 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
     }
 
     @Override
-    public void UpdateSchedule(UpdateScheduleRequest request) throws CadenceError {
-      impl.UpdateSchedule(request);
+    public UpdateScheduleResponse UpdateSchedule(UpdateScheduleRequest request)
+        throws CadenceError {
+      return impl.UpdateSchedule(request);
     }
 
     @Override
-    public void DeleteSchedule(DeleteScheduleRequest request) throws CadenceError {
-      impl.DeleteSchedule(request);
+    public DeleteScheduleResponse DeleteSchedule(DeleteScheduleRequest request)
+        throws CadenceError {
+      return impl.DeleteSchedule(request);
     }
 
     @Override
-    public void PauseSchedule(PauseScheduleRequest request) throws CadenceError {
-      impl.PauseSchedule(request);
+    public PauseScheduleResponse PauseSchedule(PauseScheduleRequest request) throws CadenceError {
+      return impl.PauseSchedule(request);
     }
 
     @Override
-    public void UnpauseSchedule(UnpauseScheduleRequest request) throws CadenceError {
-      impl.UnpauseSchedule(request);
+    public UnpauseScheduleResponse UnpauseSchedule(UnpauseScheduleRequest request)
+        throws CadenceError {
+      return impl.UnpauseSchedule(request);
     }
 
     @Override
-    public void BackfillSchedule(BackfillScheduleRequest request) throws CadenceError {
-      impl.BackfillSchedule(request);
+    public BackfillScheduleResponse BackfillSchedule(BackfillScheduleRequest request)
+        throws CadenceError {
+      return impl.BackfillSchedule(request);
     }
 
     @Override

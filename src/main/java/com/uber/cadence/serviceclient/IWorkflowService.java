@@ -847,7 +847,7 @@ public interface IWorkflowService {
    * @throws EntityNotExistsError if the schedule does not exist
    * @throws CadenceError on other server errors
    */
-  void UpdateSchedule(UpdateScheduleRequest request)
+  UpdateScheduleResponse UpdateSchedule(UpdateScheduleRequest request)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           LimitExceededError, CadenceError;
 
@@ -857,7 +857,7 @@ public interface IWorkflowService {
    * @throws EntityNotExistsError if the schedule does not exist
    * @throws CadenceError on other server errors
    */
-  void DeleteSchedule(DeleteScheduleRequest request)
+  DeleteScheduleResponse DeleteSchedule(DeleteScheduleRequest request)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           CadenceError;
 
@@ -867,7 +867,7 @@ public interface IWorkflowService {
    * @throws EntityNotExistsError if the schedule does not exist
    * @throws CadenceError on other server errors
    */
-  void PauseSchedule(PauseScheduleRequest request)
+  PauseScheduleResponse PauseSchedule(PauseScheduleRequest request)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           CadenceError;
 
@@ -878,7 +878,7 @@ public interface IWorkflowService {
    * @throws EntityNotExistsError if the schedule does not exist
    * @throws CadenceError on other server errors
    */
-  void UnpauseSchedule(UnpauseScheduleRequest request)
+  UnpauseScheduleResponse UnpauseSchedule(UnpauseScheduleRequest request)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           CadenceError;
 
@@ -889,7 +889,7 @@ public interface IWorkflowService {
    * @throws EntityNotExistsError if the schedule does not exist
    * @throws CadenceError on other server errors
    */
-  void BackfillSchedule(BackfillScheduleRequest request)
+  BackfillScheduleResponse BackfillSchedule(BackfillScheduleRequest request)
       throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
           LimitExceededError, CadenceError;
 

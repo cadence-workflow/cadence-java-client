@@ -17,9 +17,14 @@
 
 package com.uber.cadence.client;
 
+import com.uber.cadence.BackfillScheduleResponse;
 import com.uber.cadence.CreateScheduleRequest;
 import com.uber.cadence.CreateScheduleResponse;
+import com.uber.cadence.DeleteScheduleResponse;
+import com.uber.cadence.PauseScheduleResponse;
+import com.uber.cadence.UnpauseScheduleResponse;
 import com.uber.cadence.UpdateScheduleRequest;
+import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.client.schedule.ListSchedulesResult;
 import com.uber.cadence.client.schedule.ScheduleDescription;
 import java.util.List;
@@ -66,7 +71,8 @@ public interface ScheduleClient {
    * @param scheduleId the schedule identifier
    * @param request new configuration (spec, action, policies, etc.)
    */
-  CompletableFuture<Void> updateSchedule(String scheduleId, UpdateScheduleRequest request);
+  CompletableFuture<UpdateScheduleResponse> updateSchedule(
+      String scheduleId, UpdateScheduleRequest request);
 
   /**
    * Permanently deletes a schedule. In-flight workflow runs triggered by this schedule are not
@@ -74,7 +80,7 @@ public interface ScheduleClient {
    *
    * @param scheduleId the schedule identifier
    */
-  CompletableFuture<Void> deleteSchedule(String scheduleId);
+  CompletableFuture<DeleteScheduleResponse> deleteSchedule(String scheduleId);
 
   /**
    * Pauses a schedule so no new runs are triggered.
@@ -82,7 +88,7 @@ public interface ScheduleClient {
    * @param scheduleId the schedule identifier
    * @param reason stored as the pause note, visible in {@link #describeSchedule}
    */
-  CompletableFuture<Void> pauseSchedule(String scheduleId, String reason);
+  CompletableFuture<PauseScheduleResponse> pauseSchedule(String scheduleId, String reason);
 
   /**
    * Resumes a paused schedule.
@@ -90,7 +96,7 @@ public interface ScheduleClient {
    * @param scheduleId the schedule identifier
    * @param reason stored as the unpause note, visible in {@link #describeSchedule}
    */
-  CompletableFuture<Void> unpauseSchedule(String scheduleId, String reason);
+  CompletableFuture<UnpauseScheduleResponse> unpauseSchedule(String scheduleId, String reason);
 
   /**
    * Triggers runs for all times in the given historical ranges. One service call is made per entry.
@@ -98,7 +104,8 @@ public interface ScheduleClient {
    * @param scheduleId the schedule identifier
    * @param backfills time ranges to backfill
    */
-  CompletableFuture<Void> backfillSchedule(String scheduleId, List<ScheduleBackfill> backfills);
+  CompletableFuture<List<BackfillScheduleResponse>> backfillSchedule(
+      String scheduleId, List<ScheduleBackfill> backfills);
 
   /**
    * Lists schedules in the domain, paginated.
