@@ -55,12 +55,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 final class ScheduleClientImpl implements ScheduleClient {
-
-  private static final Logger log = LoggerFactory.getLogger(ScheduleClientImpl.class);
 
   private static final Executor BLOCKING_EXECUTOR =
       Executors.newCachedThreadPool(
@@ -186,11 +182,7 @@ final class ScheduleClientImpl implements ScheduleClient {
                     .setStartTimeNano(bf.getStartTime().toEpochMilli() * 1_000_000L)
                     .setEndTimeNano(bf.getEndTime().toEpochMilli() * 1_000_000L);
             if (bf.getOverlapPolicy() != null) {
-              log.warn(
-                  "ScheduleBackfill.overlapPolicy is not supported by the current server proto"
-                      + " contract and will be ignored for schedule '{}'. The schedule's configured"
-                      + " overlap policy will be used instead.",
-                  scheduleId);
+              request.setOverlapPolicy(toThriftOverlapPolicy(bf.getOverlapPolicy()));
             }
             try {
               results.add(service.BackfillSchedule(request));

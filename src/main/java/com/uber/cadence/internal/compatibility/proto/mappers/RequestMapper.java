@@ -23,6 +23,7 @@ import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.e
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.queryConsistencyLevel;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.queryRejectCondition;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.queryTaskCompletedType;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.scheduleOverlapPolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.taskListType;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.workflowIdReusePolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.arrayToByteString;
@@ -1103,12 +1104,19 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    return com.uber.cadence.api.v1.BackfillScheduleRequest.newBuilder()
-        .setDomain(nullToEmpty(t.getDomain()))
-        .setScheduleId(nullToEmpty(t.getScheduleId()))
-        .setStartTime(unixNanoToTime(t.getStartTimeNano()))
-        .setEndTime(unixNanoToTime(t.getEndTimeNano()))
-        .build();
+    com.uber.cadence.api.v1.BackfillScheduleRequest.Builder b =
+        com.uber.cadence.api.v1.BackfillScheduleRequest.newBuilder()
+            .setDomain(nullToEmpty(t.getDomain()))
+            .setScheduleId(nullToEmpty(t.getScheduleId()))
+            .setStartTime(unixNanoToTime(t.getStartTimeNano()))
+            .setEndTime(unixNanoToTime(t.getEndTimeNano()));
+    if (t.getOverlapPolicy() != null) {
+      b.setOverlapPolicy(scheduleOverlapPolicy(t.getOverlapPolicy()));
+    }
+    if (t.getBackfillId() != null) {
+      b.setBackfillId(t.getBackfillId());
+    }
+    return b.build();
   }
 
   public static com.uber.cadence.api.v1.ListSchedulesRequest listSchedulesRequest(
