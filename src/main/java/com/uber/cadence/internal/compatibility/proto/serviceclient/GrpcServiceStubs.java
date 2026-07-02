@@ -22,6 +22,7 @@ import com.uber.cadence.api.v1.DomainAPIGrpc;
 import com.uber.cadence.api.v1.MetaAPIGrpc;
 import com.uber.cadence.api.v1.MetaAPIGrpc.MetaAPIBlockingStub;
 import com.uber.cadence.api.v1.MetaAPIGrpc.MetaAPIFutureStub;
+import com.uber.cadence.api.v1.ScheduleAPIGrpc;
 import com.uber.cadence.api.v1.VisibilityAPIGrpc;
 import com.uber.cadence.api.v1.VisibilityAPIGrpc.VisibilityAPIBlockingStub;
 import com.uber.cadence.api.v1.VisibilityAPIGrpc.VisibilityAPIFutureStub;
@@ -93,6 +94,8 @@ final class GrpcServiceStubs implements IGrpcServiceStubs {
   private final WorkflowAPIGrpc.WorkflowAPIFutureStub workflowFutureStub;
   private final MetaAPIGrpc.MetaAPIBlockingStub metaBlockingStub;
   private final MetaAPIGrpc.MetaAPIFutureStub metaFutureStub;
+  private final ScheduleAPIGrpc.ScheduleAPIBlockingStub scheduleBlockingStub;
+  private final ScheduleAPIGrpc.ScheduleAPIFutureStub scheduleFutureStub;
 
   GrpcServiceStubs(ClientOptions options) {
     this.options = options;
@@ -146,6 +149,8 @@ final class GrpcServiceStubs implements IGrpcServiceStubs {
     this.workflowFutureStub = WorkflowAPIGrpc.newFutureStub(interceptedChannel);
     this.metaBlockingStub = MetaAPIGrpc.newBlockingStub(interceptedChannel);
     this.metaFutureStub = MetaAPIGrpc.newFutureStub(interceptedChannel);
+    this.scheduleBlockingStub = ScheduleAPIGrpc.newBlockingStub(interceptedChannel);
+    this.scheduleFutureStub = ScheduleAPIGrpc.newFutureStub(interceptedChannel);
   }
 
   private ClientInterceptor newAuthorizationInterceptor(IAuthorizationProvider provider) {
@@ -410,6 +415,16 @@ final class GrpcServiceStubs implements IGrpcServiceStubs {
   @Override
   public WorkflowAPIFutureStub workflowFutureStub() {
     return workflowFutureStub;
+  }
+
+  @Override
+  public ScheduleAPIGrpc.ScheduleAPIBlockingStub scheduleBlockingStub() {
+    return scheduleBlockingStub;
+  }
+
+  @Override
+  public ScheduleAPIGrpc.ScheduleAPIFutureStub scheduleFutureStub() {
+    return scheduleFutureStub;
   }
 
   @Override
