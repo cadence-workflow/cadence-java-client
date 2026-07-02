@@ -23,6 +23,7 @@ import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.e
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.queryConsistencyLevel;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.queryRejectCondition;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.queryTaskCompletedType;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.scheduleCatchUpPolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.scheduleOverlapPolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.taskListType;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.workflowIdReusePolicy;
@@ -1092,11 +1093,15 @@ public class RequestMapper {
     if (t == null) {
       return null;
     }
-    return com.uber.cadence.api.v1.UnpauseScheduleRequest.newBuilder()
-        .setDomain(nullToEmpty(t.getDomain()))
-        .setScheduleId(nullToEmpty(t.getScheduleId()))
-        .setReason(nullToEmpty(t.getReason()))
-        .build();
+    com.uber.cadence.api.v1.UnpauseScheduleRequest.Builder b =
+        com.uber.cadence.api.v1.UnpauseScheduleRequest.newBuilder()
+            .setDomain(nullToEmpty(t.getDomain()))
+            .setScheduleId(nullToEmpty(t.getScheduleId()))
+            .setReason(nullToEmpty(t.getReason()));
+    if (t.getCatchUpPolicy() != null) {
+      b.setCatchUpPolicy(scheduleCatchUpPolicy(t.getCatchUpPolicy()));
+    }
+    return b.build();
   }
 
   public static com.uber.cadence.api.v1.BackfillScheduleRequest backfillScheduleRequest(
