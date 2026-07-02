@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
@@ -87,7 +88,7 @@ final class ScheduleClientImpl implements ScheduleClient {
           try {
             return service.CreateSchedule(request);
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CompletionException(e);
           }
         },
         BLOCKING_EXECUTOR);
@@ -103,7 +104,7 @@ final class ScheduleClientImpl implements ScheduleClient {
             DescribeScheduleResponse resp = service.DescribeSchedule(request);
             return toScheduleDescription(resp);
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CompletionException(e);
           }
         },
         BLOCKING_EXECUTOR);
@@ -119,7 +120,7 @@ final class ScheduleClientImpl implements ScheduleClient {
           try {
             return service.UpdateSchedule(request);
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CompletionException(e);
           }
         },
         BLOCKING_EXECUTOR);
@@ -134,7 +135,7 @@ final class ScheduleClientImpl implements ScheduleClient {
           try {
             return service.DeleteSchedule(request);
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CompletionException(e);
           }
         },
         BLOCKING_EXECUTOR);
@@ -149,7 +150,7 @@ final class ScheduleClientImpl implements ScheduleClient {
           try {
             return service.PauseSchedule(request);
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CompletionException(e);
           }
         },
         BLOCKING_EXECUTOR);
@@ -165,7 +166,7 @@ final class ScheduleClientImpl implements ScheduleClient {
           try {
             return service.UnpauseSchedule(request);
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CompletionException(e);
           }
         },
         BLOCKING_EXECUTOR);
@@ -194,7 +195,7 @@ final class ScheduleClientImpl implements ScheduleClient {
             try {
               results.add(service.BackfillSchedule(request));
             } catch (Exception e) {
-              throw new RuntimeException(e);
+              throw new CompletionException(e);
             }
           }
           return results;
@@ -215,7 +216,7 @@ final class ScheduleClientImpl implements ScheduleClient {
           try {
             return service.ListSchedules(request);
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CompletionException(e);
           }
         },
         BLOCKING_EXECUTOR);
