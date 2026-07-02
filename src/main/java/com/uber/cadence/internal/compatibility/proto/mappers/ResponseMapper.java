@@ -30,12 +30,20 @@ import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.d
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.describeDomainResponseArray;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.header;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.indexedValueTypeMap;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.memo;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.payload;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.pendingActivityInfoArray;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.pendingChildExecutionInfoArray;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.pendingDecisionInfo;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.pollerInfoArray;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.queryRejected;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.scheduleAction;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.scheduleInfo;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.scheduleListEntry;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.schedulePolicies;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.scheduleSpec;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.scheduleState;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.searchAttributes;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.supportedClientVersions;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.taskList;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.taskListPartitionMetadataArray;
@@ -517,5 +525,90 @@ public class ResponseMapper {
             .collect(
                 Collectors.toMap(Map.Entry::getKey, e -> describeTaskListResponse(e.getValue()))));
     return res;
+  }
+
+  public static com.uber.cadence.CreateScheduleResponse createScheduleResponse(
+      com.uber.cadence.api.v1.CreateScheduleResponse t) {
+    if (t == null) {
+      return null;
+    }
+    com.uber.cadence.CreateScheduleResponse res = new com.uber.cadence.CreateScheduleResponse();
+    res.setScheduleId(t.getScheduleId());
+    return res;
+  }
+
+  public static com.uber.cadence.DescribeScheduleResponse describeScheduleResponse(
+      com.uber.cadence.api.v1.DescribeScheduleResponse t) {
+    if (t == null) {
+      return null;
+    }
+    com.uber.cadence.DescribeScheduleResponse res = new com.uber.cadence.DescribeScheduleResponse();
+    res.setSpec(scheduleSpec(t.getSpec()));
+    res.setAction(scheduleAction(t.getAction()));
+    res.setPolicies(schedulePolicies(t.getPolicies()));
+    res.setState(scheduleState(t.getState()));
+    res.setInfo(scheduleInfo(t.getInfo()));
+    res.setMemo(memo(t.getMemo()));
+    res.setSearchAttributes(searchAttributes(t.getSearchAttributes()));
+    return res;
+  }
+
+  public static com.uber.cadence.ListSchedulesResponse listSchedulesResponse(
+      com.uber.cadence.api.v1.ListSchedulesResponse t) {
+    if (t == null) {
+      return null;
+    }
+    com.uber.cadence.ListSchedulesResponse res = new com.uber.cadence.ListSchedulesResponse();
+    if (t.getSchedulesCount() > 0) {
+      java.util.List<com.uber.cadence.ScheduleListEntry> entries = new java.util.ArrayList<>();
+      for (com.uber.cadence.api.v1.ScheduleListEntry e : t.getSchedulesList()) {
+        entries.add(scheduleListEntry(e));
+      }
+      res.setSchedules(entries);
+    }
+    if (t.getNextPageToken() != null && !t.getNextPageToken().isEmpty()) {
+      res.setNextPageToken(byteStringToArray(t.getNextPageToken()));
+    }
+    return res;
+  }
+
+  public static com.uber.cadence.UpdateScheduleResponse updateScheduleResponse(
+      com.uber.cadence.api.v1.UpdateScheduleResponse t) {
+    if (t == null) {
+      return null;
+    }
+    return new com.uber.cadence.UpdateScheduleResponse();
+  }
+
+  public static com.uber.cadence.DeleteScheduleResponse deleteScheduleResponse(
+      com.uber.cadence.api.v1.DeleteScheduleResponse t) {
+    if (t == null) {
+      return null;
+    }
+    return new com.uber.cadence.DeleteScheduleResponse();
+  }
+
+  public static com.uber.cadence.PauseScheduleResponse pauseScheduleResponse(
+      com.uber.cadence.api.v1.PauseScheduleResponse t) {
+    if (t == null) {
+      return null;
+    }
+    return new com.uber.cadence.PauseScheduleResponse();
+  }
+
+  public static com.uber.cadence.UnpauseScheduleResponse unpauseScheduleResponse(
+      com.uber.cadence.api.v1.UnpauseScheduleResponse t) {
+    if (t == null) {
+      return null;
+    }
+    return new com.uber.cadence.UnpauseScheduleResponse();
+  }
+
+  public static com.uber.cadence.BackfillScheduleResponse backfillScheduleResponse(
+      com.uber.cadence.api.v1.BackfillScheduleResponse t) {
+    if (t == null) {
+      return null;
+    }
+    return new com.uber.cadence.BackfillScheduleResponse();
   }
 }

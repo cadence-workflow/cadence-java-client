@@ -30,6 +30,7 @@ import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.days
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.newFieldMask;
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.nullToEmpty;
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.secondsToDuration;
+import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.unixNanoToTime;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.activeClusterSelectionPolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.activeClusters;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.badBinaries;
@@ -39,6 +40,9 @@ import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.h
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.memo;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.payload;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.retryPolicy;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.scheduleAction;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.schedulePolicies;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.scheduleSpec;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.searchAttributes;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.startTimeFilter;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.statusFilter;
@@ -1010,5 +1014,113 @@ public class RequestMapper {
     return RefreshWorkflowTasksRequest.newBuilder()
         .setDomain(request.getDomain() != null ? request.getDomain() : "")
         .build();
+  }
+
+  public static com.uber.cadence.api.v1.CreateScheduleRequest createScheduleRequest(
+      com.uber.cadence.CreateScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    com.uber.cadence.api.v1.CreateScheduleRequest.Builder b =
+        com.uber.cadence.api.v1.CreateScheduleRequest.newBuilder()
+            .setDomain(nullToEmpty(t.getDomain()))
+            .setScheduleId(nullToEmpty(t.getScheduleId()));
+    if (t.getSpec() != null) b.setSpec(scheduleSpec(t.getSpec()));
+    if (t.getAction() != null) b.setAction(scheduleAction(t.getAction()));
+    if (t.getPolicies() != null) b.setPolicies(schedulePolicies(t.getPolicies()));
+    if (t.getMemo() != null) b.setMemo(memo(t.getMemo()));
+    if (t.getSearchAttributes() != null)
+      b.setSearchAttributes(searchAttributes(t.getSearchAttributes()));
+    return b.build();
+  }
+
+  public static com.uber.cadence.api.v1.DescribeScheduleRequest describeScheduleRequest(
+      com.uber.cadence.DescribeScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    return com.uber.cadence.api.v1.DescribeScheduleRequest.newBuilder()
+        .setDomain(nullToEmpty(t.getDomain()))
+        .setScheduleId(nullToEmpty(t.getScheduleId()))
+        .build();
+  }
+
+  public static com.uber.cadence.api.v1.UpdateScheduleRequest updateScheduleRequest(
+      com.uber.cadence.UpdateScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    com.uber.cadence.api.v1.UpdateScheduleRequest.Builder b =
+        com.uber.cadence.api.v1.UpdateScheduleRequest.newBuilder()
+            .setDomain(nullToEmpty(t.getDomain()))
+            .setScheduleId(nullToEmpty(t.getScheduleId()));
+    if (t.getSpec() != null) b.setSpec(scheduleSpec(t.getSpec()));
+    if (t.getAction() != null) b.setAction(scheduleAction(t.getAction()));
+    if (t.getPolicies() != null) b.setPolicies(schedulePolicies(t.getPolicies()));
+    if (t.getSearchAttributes() != null)
+      b.setSearchAttributes(searchAttributes(t.getSearchAttributes()));
+    return b.build();
+  }
+
+  public static com.uber.cadence.api.v1.DeleteScheduleRequest deleteScheduleRequest(
+      com.uber.cadence.DeleteScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    return com.uber.cadence.api.v1.DeleteScheduleRequest.newBuilder()
+        .setDomain(nullToEmpty(t.getDomain()))
+        .setScheduleId(nullToEmpty(t.getScheduleId()))
+        .build();
+  }
+
+  public static com.uber.cadence.api.v1.PauseScheduleRequest pauseScheduleRequest(
+      com.uber.cadence.PauseScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    return com.uber.cadence.api.v1.PauseScheduleRequest.newBuilder()
+        .setDomain(nullToEmpty(t.getDomain()))
+        .setScheduleId(nullToEmpty(t.getScheduleId()))
+        .setReason(nullToEmpty(t.getReason()))
+        .setIdentity(nullToEmpty(t.getIdentity()))
+        .build();
+  }
+
+  public static com.uber.cadence.api.v1.UnpauseScheduleRequest unpauseScheduleRequest(
+      com.uber.cadence.UnpauseScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    return com.uber.cadence.api.v1.UnpauseScheduleRequest.newBuilder()
+        .setDomain(nullToEmpty(t.getDomain()))
+        .setScheduleId(nullToEmpty(t.getScheduleId()))
+        .setReason(nullToEmpty(t.getReason()))
+        .build();
+  }
+
+  public static com.uber.cadence.api.v1.BackfillScheduleRequest backfillScheduleRequest(
+      com.uber.cadence.BackfillScheduleRequest t) {
+    if (t == null) {
+      return null;
+    }
+    return com.uber.cadence.api.v1.BackfillScheduleRequest.newBuilder()
+        .setDomain(nullToEmpty(t.getDomain()))
+        .setScheduleId(nullToEmpty(t.getScheduleId()))
+        .setStartTime(unixNanoToTime(t.getStartTimeNano()))
+        .setEndTime(unixNanoToTime(t.getEndTimeNano()))
+        .build();
+  }
+
+  public static com.uber.cadence.api.v1.ListSchedulesRequest listSchedulesRequest(
+      com.uber.cadence.ListSchedulesRequest t) {
+    if (t == null) {
+      return null;
+    }
+    com.uber.cadence.api.v1.ListSchedulesRequest.Builder b =
+        com.uber.cadence.api.v1.ListSchedulesRequest.newBuilder()
+            .setDomain(nullToEmpty(t.getDomain()))
+            .setPageSize(t.getPageSize());
+    if (t.getNextPageToken() != null) b.setNextPageToken(arrayToByteString(t.getNextPageToken()));
+    return b.build();
   }
 }

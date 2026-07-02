@@ -23,6 +23,8 @@ import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.p
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.pendingActivityState;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.pendingDecisionState;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.queryResultType;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.scheduleCatchUpPolicy;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.scheduleOverlapPolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.taskListKind;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.workflowExecutionCloseStatus;
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.arrayToByteString;
@@ -1087,5 +1089,168 @@ class TypeMapper {
     attr.setScope(t.getScope());
     attr.setName(t.getName());
     return attr;
+  }
+
+  static ScheduleSpec scheduleSpec(com.uber.cadence.ScheduleSpec t) {
+    if (t == null) {
+      return ScheduleSpec.getDefaultInstance();
+    }
+    return ScheduleSpec.newBuilder()
+        .setCronExpression(Helpers.nullToEmpty(t.getCronExpression()))
+        .setStartTime(unixNanoToTime(t.getStartTimeNano()))
+        .setEndTime(unixNanoToTime(t.getEndTimeNano()))
+        .setJitter(secondsToDuration(t.getJitterInSeconds()))
+        .build();
+  }
+
+  static com.uber.cadence.ScheduleSpec scheduleSpec(ScheduleSpec t) {
+    if (t == null || t == ScheduleSpec.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.ScheduleSpec res = new com.uber.cadence.ScheduleSpec();
+    res.setCronExpression(t.getCronExpression());
+    res.setStartTimeNano(timeToUnixNano(t.getStartTime()));
+    res.setEndTimeNano(timeToUnixNano(t.getEndTime()));
+    res.setJitterInSeconds(durationToSeconds(t.getJitter()));
+    return res;
+  }
+
+  static ScheduleAction scheduleAction(com.uber.cadence.ScheduleAction t) {
+    if (t == null || t.getStartWorkflow() == null) {
+      return ScheduleAction.getDefaultInstance();
+    }
+    com.uber.cadence.ScheduleStartWorkflowAction sw = t.getStartWorkflow();
+    ScheduleAction.StartWorkflowAction.Builder swb =
+        ScheduleAction.StartWorkflowAction.newBuilder();
+    if (sw.getWorkflowType() != null) swb.setWorkflowType(workflowType(sw.getWorkflowType()));
+    if (sw.getTaskList() != null) swb.setTaskList(taskList(sw.getTaskList()));
+    if (sw.getInput() != null) swb.setInput(payload(sw.getInput()));
+    swb.setWorkflowIdPrefix(Helpers.nullToEmpty(sw.getWorkflowIdPrefix()));
+    swb.setExecutionStartToCloseTimeout(
+        secondsToDuration(sw.getExecutionStartToCloseTimeoutSeconds()));
+    swb.setTaskStartToCloseTimeout(secondsToDuration(sw.getTaskStartToCloseTimeoutSeconds()));
+    if (sw.getRetryPolicy() != null) swb.setRetryPolicy(retryPolicy(sw.getRetryPolicy()));
+    if (sw.getMemo() != null) swb.setMemo(memo(sw.getMemo()));
+    if (sw.getSearchAttributes() != null)
+      swb.setSearchAttributes(searchAttributes(sw.getSearchAttributes()));
+    return ScheduleAction.newBuilder().setStartWorkflow(swb.build()).build();
+  }
+
+  static com.uber.cadence.ScheduleAction scheduleAction(ScheduleAction t) {
+    if (t == null || !t.hasStartWorkflow()) {
+      return null;
+    }
+    ScheduleAction.StartWorkflowAction proto = t.getStartWorkflow();
+    com.uber.cadence.ScheduleStartWorkflowAction sw =
+        new com.uber.cadence.ScheduleStartWorkflowAction();
+    sw.setWorkflowType(workflowType(proto.getWorkflowType()));
+    sw.setTaskList(taskList(proto.getTaskList()));
+    sw.setInput(payload(proto.getInput()));
+    sw.setWorkflowIdPrefix(proto.getWorkflowIdPrefix());
+    sw.setExecutionStartToCloseTimeoutSeconds(
+        durationToSeconds(proto.getExecutionStartToCloseTimeout()));
+    sw.setTaskStartToCloseTimeoutSeconds(durationToSeconds(proto.getTaskStartToCloseTimeout()));
+    sw.setRetryPolicy(retryPolicy(proto.getRetryPolicy()));
+    sw.setMemo(memo(proto.getMemo()));
+    sw.setSearchAttributes(searchAttributes(proto.getSearchAttributes()));
+    com.uber.cadence.ScheduleAction action = new com.uber.cadence.ScheduleAction();
+    action.setStartWorkflow(sw);
+    return action;
+  }
+
+  static SchedulePolicies schedulePolicies(com.uber.cadence.SchedulePolicies t) {
+    if (t == null) {
+      return SchedulePolicies.getDefaultInstance();
+    }
+    return SchedulePolicies.newBuilder()
+        .setOverlapPolicy(scheduleOverlapPolicy(t.getOverlapPolicy()))
+        .setCatchUpPolicy(scheduleCatchUpPolicy(t.getCatchUpPolicy()))
+        .setCatchUpWindow(secondsToDuration(t.getCatchUpWindowInSeconds()))
+        .setPauseOnFailure(t.isPauseOnFailure())
+        .setBufferLimit(t.getBufferLimit())
+        .setConcurrencyLimit(t.getConcurrencyLimit())
+        .build();
+  }
+
+  static com.uber.cadence.SchedulePolicies schedulePolicies(SchedulePolicies t) {
+    if (t == null || t == SchedulePolicies.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.SchedulePolicies res = new com.uber.cadence.SchedulePolicies();
+    res.setOverlapPolicy(scheduleOverlapPolicy(t.getOverlapPolicy()));
+    res.setCatchUpPolicy(scheduleCatchUpPolicy(t.getCatchUpPolicy()));
+    res.setCatchUpWindowInSeconds(durationToSeconds(t.getCatchUpWindow()));
+    res.setPauseOnFailure(t.getPauseOnFailure());
+    res.setBufferLimit(t.getBufferLimit());
+    res.setConcurrencyLimit(t.getConcurrencyLimit());
+    return res;
+  }
+
+  static com.uber.cadence.SchedulePauseInfo schedulePauseInfo(SchedulePauseInfo t) {
+    if (t == null || t == SchedulePauseInfo.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.SchedulePauseInfo res = new com.uber.cadence.SchedulePauseInfo();
+    res.setReason(t.getReason());
+    res.setPausedTimeNano(timeToUnixNano(t.getPausedAt()));
+    res.setPausedBy(t.getPausedBy());
+    return res;
+  }
+
+  static com.uber.cadence.ScheduleState scheduleState(ScheduleState t) {
+    if (t == null || t == ScheduleState.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.ScheduleState res = new com.uber.cadence.ScheduleState();
+    res.setPaused(t.getPaused());
+    res.setPauseInfo(schedulePauseInfo(t.getPauseInfo()));
+    return res;
+  }
+
+  static com.uber.cadence.BackfillInfo backfillInfo(BackfillInfo t) {
+    if (t == null || t == BackfillInfo.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.BackfillInfo res = new com.uber.cadence.BackfillInfo();
+    res.setBackfillId(t.getBackfillId());
+    res.setStartTimeNano(timeToUnixNano(t.getStartTime()));
+    res.setEndTimeNano(timeToUnixNano(t.getEndTime()));
+    res.setRunsCompleted(t.getRunsCompleted());
+    res.setRunsTotal(t.getRunsTotal());
+    return res;
+  }
+
+  static com.uber.cadence.ScheduleInfo scheduleInfo(ScheduleInfo t) {
+    if (t == null || t == ScheduleInfo.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.ScheduleInfo res = new com.uber.cadence.ScheduleInfo();
+    res.setLastRunTimeNano(timeToUnixNano(t.getLastRunTime()));
+    res.setNextRunTimeNano(timeToUnixNano(t.getNextRunTime()));
+    res.setTotalRuns(t.getTotalRuns());
+    res.setCreateTimeNano(timeToUnixNano(t.getCreateTime()));
+    res.setLastUpdateTimeNano(timeToUnixNano(t.getLastUpdateTime()));
+    if (t.getOngoingBackfillsCount() > 0) {
+      List<com.uber.cadence.BackfillInfo> backfills = new ArrayList<>();
+      for (BackfillInfo b : t.getOngoingBackfillsList()) {
+        backfills.add(backfillInfo(b));
+      }
+      res.setOngoingBackfills(backfills);
+    }
+    res.setMissedRuns(t.getMissedRuns());
+    res.setSkippedRuns(t.getSkippedRuns());
+    return res;
+  }
+
+  static com.uber.cadence.ScheduleListEntry scheduleListEntry(ScheduleListEntry t) {
+    if (t == null || t == ScheduleListEntry.getDefaultInstance()) {
+      return null;
+    }
+    com.uber.cadence.ScheduleListEntry res = new com.uber.cadence.ScheduleListEntry();
+    res.setScheduleId(t.getScheduleId());
+    res.setWorkflowType(workflowType(t.getWorkflowType()));
+    res.setState(scheduleState(t.getState()));
+    res.setCronExpression(t.getCronExpression());
+    return res;
   }
 }
