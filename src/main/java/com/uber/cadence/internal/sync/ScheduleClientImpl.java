@@ -27,12 +27,18 @@ import com.uber.cadence.DescribeScheduleRequest;
 import com.uber.cadence.DescribeScheduleResponse;
 import com.uber.cadence.ListSchedulesRequest;
 import com.uber.cadence.ListSchedulesResponse;
+import com.uber.cadence.Memo;
 import com.uber.cadence.PauseScheduleRequest;
 import com.uber.cadence.PauseScheduleResponse;
+import com.uber.cadence.RetryPolicy;
+import com.uber.cadence.ScheduleStartWorkflowAction;
+import com.uber.cadence.SearchAttributes;
+import com.uber.cadence.TaskList;
 import com.uber.cadence.UnpauseScheduleRequest;
 import com.uber.cadence.UnpauseScheduleResponse;
 import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
+import com.uber.cadence.WorkflowType;
 import com.uber.cadence.client.ScheduleBackfill;
 import com.uber.cadence.client.ScheduleClient;
 import com.uber.cadence.client.schedule.ScheduleAction;
@@ -72,6 +78,17 @@ final class ScheduleClientImpl implements ScheduleClient {
   }
 
   @Override
+  public CompletableFuture<CreateScheduleResponse> createSchedule(
+      String scheduleId, ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies) {
+    CreateScheduleRequest request =
+        new CreateScheduleRequest()
+            .setSpec(toThriftSpec(spec))
+            .setAction(toThriftAction(action))
+            .setPolicies(toThriftPolicies(policies));
+    return createSchedule(scheduleId, request);
+  }
+
+  @Override
   public CompletableFuture<ScheduleDescription> describeSchedule(String scheduleId) {
     DescribeScheduleRequest request =
         new DescribeScheduleRequest().setDomain(domain).setScheduleId(scheduleId);
@@ -84,6 +101,17 @@ final class ScheduleClientImpl implements ScheduleClient {
     request.setDomain(domain);
     request.setScheduleId(scheduleId);
     return service.UpdateSchedule(request);
+  }
+
+  @Override
+  public CompletableFuture<UpdateScheduleResponse> updateSchedule(
+      String scheduleId, ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies) {
+    UpdateScheduleRequest request =
+        new UpdateScheduleRequest()
+            .setSpec(toThriftSpec(spec))
+            .setAction(toThriftAction(action))
+            .setPolicies(toThriftPolicies(policies));
+    return updateSchedule(scheduleId, request);
   }
 
   @Override
@@ -144,6 +172,111 @@ final class ScheduleClientImpl implements ScheduleClient {
             .setPageSize(pageSize)
             .setNextPageToken(nextPageToken);
     return service.ListSchedules(request);
+  }
+
+  private static com.uber.cadence.ScheduleSpec toThriftSpec(ScheduleSpec s) {
+    if (s == null) return null;
+    com.uber.cadence.ScheduleSpec t =
+        new com.uber.cadence.ScheduleSpec().setCronExpression(s.getCronExpression());
+    if (s.getStartTime() != null) {
+      t.setStartTimeNano(s.getStartTime().toEpochMilli() * 1_000_000L);
+    }
+    if (s.getEndTime() != null) {
+      t.setEndTimeNano(s.getEndTime().toEpochMilli() * 1_000_000L);
+    }
+    if (s.getJitter() != null) {
+      t.setJitterInSeconds((int) s.getJitter().getSeconds());
+    }
+    return t;
+  }
+
+  private static com.uber.cadence.ScheduleAction toThriftAction(ScheduleAction a) {
+    if (a == null) return null;
+    return new com.uber.cadence.ScheduleAction()
+        .setStartWorkflow(toThriftStartWorkflow(a.getStartWorkflow()));
+  }
+
+  private static ScheduleStartWorkflowAction toThriftStartWorkflow(
+      ScheduleAction.StartWorkflowAction sw) {
+    if (sw == null) return null;
+    ScheduleStartWorkflowAction t = new ScheduleStartWorkflowAction();
+    if (sw.getWorkflowType() != null) {
+      t.setWorkflowType(new WorkflowType().setName(sw.getWorkflowType()));
+    }
+    if (sw.getTaskList() != null) {
+      t.setTaskList(new TaskList().setName(sw.getTaskList()));
+    }
+    t.setInput(sw.getInput());
+    t.setWorkflowIdPrefix(sw.getWorkflowIdPrefix());
+    if (sw.getExecutionStartToCloseTimeout() != null) {
+      t.setExecutionStartToCloseTimeoutSeconds(
+          (int) sw.getExecutionStartToCloseTimeout().getSeconds());
+    }
+    if (sw.getTaskStartToCloseTimeout() != null) {
+      t.setTaskStartToCloseTimeoutSeconds((int) sw.getTaskStartToCloseTimeout().getSeconds());
+    }
+    if (sw.getRetryOptions() != null) {
+      t.setRetryPolicy(toThriftRetryPolicy(sw.getRetryOptions()));
+    }
+    if (sw.getMemo() != null && !sw.getMemo().isEmpty()) {
+      Map<String, byte[]> fields = new HashMap<>();
+      sw.getMemo().forEach((k, v) -> fields.put(k, (byte[]) v));
+      t.setMemo(new Memo().setFields(fields));
+    }
+    if (sw.getSearchAttributes() != null && !sw.getSearchAttributes().isEmpty()) {
+      Map<String, byte[]> indexedFields = new HashMap<>();
+      sw.getSearchAttributes().forEach((k, v) -> indexedFields.put(k, (byte[]) v));
+      t.setSearchAttributes(new SearchAttributes().setIndexedFields(indexedFields));
+    }
+    return t;
+  }
+
+  private static com.uber.cadence.SchedulePolicies toThriftPolicies(SchedulePolicies p) {
+    if (p == null) return null;
+    com.uber.cadence.SchedulePolicies t =
+        new com.uber.cadence.SchedulePolicies()
+            .setPauseOnFailure(p.isPauseOnFailure())
+            .setBufferLimit(p.getBufferLimit())
+            .setConcurrencyLimit(p.getConcurrencyLimit());
+    if (p.getOverlapPolicy() != null) {
+      t.setOverlapPolicy(toThriftOverlapPolicy(p.getOverlapPolicy()));
+    }
+    if (p.getCatchUpPolicy() != null) {
+      t.setCatchUpPolicy(toThriftCatchUpPolicy(p.getCatchUpPolicy()));
+    }
+    if (p.getCatchUpWindow() != null) {
+      t.setCatchUpWindowInSeconds((int) p.getCatchUpWindow().getSeconds());
+    }
+    return t;
+  }
+
+  private static com.uber.cadence.ScheduleCatchUpPolicy toThriftCatchUpPolicy(
+      ScheduleCatchUpPolicy p) {
+    switch (p) {
+      case SKIP:
+        return com.uber.cadence.ScheduleCatchUpPolicy.SKIP;
+      case ONE:
+        return com.uber.cadence.ScheduleCatchUpPolicy.ONE;
+      case ALL:
+        return com.uber.cadence.ScheduleCatchUpPolicy.ALL;
+      default:
+        throw new IllegalArgumentException("unknown ScheduleCatchUpPolicy: " + p);
+    }
+  }
+
+  private static RetryPolicy toThriftRetryPolicy(RetryOptions r) {
+    RetryPolicy t = new RetryPolicy().setBackoffCoefficient(r.getBackoffCoefficient());
+    if (r.getInitialInterval() != null) {
+      t.setInitialIntervalInSeconds((int) r.getInitialInterval().getSeconds());
+    }
+    if (r.getMaximumInterval() != null) {
+      t.setMaximumIntervalInSeconds((int) r.getMaximumInterval().getSeconds());
+    }
+    if (r.getExpiration() != null) {
+      t.setExpirationIntervalInSeconds((int) r.getExpiration().getSeconds());
+    }
+    t.setMaximumAttempts(r.getMaximumAttempts());
+    return t;
   }
 
   private static ScheduleDescription toScheduleDescription(DescribeScheduleResponse r) {

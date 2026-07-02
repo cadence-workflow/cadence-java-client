@@ -26,7 +26,10 @@ import com.uber.cadence.PauseScheduleResponse;
 import com.uber.cadence.UnpauseScheduleResponse;
 import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
+import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleDescription;
+import com.uber.cadence.client.schedule.SchedulePolicies;
+import com.uber.cadence.client.schedule.ScheduleSpec;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -57,6 +60,20 @@ public interface ScheduleClient {
       String scheduleId, CreateScheduleRequest request);
 
   /**
+   * Creates a new schedule using clean client types. Equivalent to constructing a {@link
+   * com.uber.cadence.CreateScheduleRequest} manually and calling {@link #createSchedule(String,
+   * com.uber.cadence.CreateScheduleRequest)}. Use the raw-request overload if you need to set memo
+   * or search attributes.
+   *
+   * @param scheduleId unique identifier for the schedule within the domain
+   * @param spec when and how often the schedule fires
+   * @param action what to do on each firing (start a workflow)
+   * @param policies overlap, catch-up, and failure-handling policies
+   */
+  CompletableFuture<CreateScheduleResponse> createSchedule(
+      String scheduleId, ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies);
+
+  /**
    * Returns the current configuration and runtime state of a schedule.
    *
    * @param scheduleId the schedule identifier
@@ -73,6 +90,20 @@ public interface ScheduleClient {
    */
   CompletableFuture<UpdateScheduleResponse> updateSchedule(
       String scheduleId, UpdateScheduleRequest request);
+
+  /**
+   * Replaces the configuration of an existing schedule using clean client types. Equivalent to
+   * constructing an {@link com.uber.cadence.UpdateScheduleRequest} manually and calling {@link
+   * #updateSchedule(String, com.uber.cadence.UpdateScheduleRequest)}. Any field not included is
+   * cleared by the server; call {@link #describeSchedule} first to avoid losing existing settings.
+   *
+   * @param scheduleId the schedule identifier
+   * @param spec new schedule spec
+   * @param action new workflow action
+   * @param policies new overlap/catch-up/failure policies
+   */
+  CompletableFuture<UpdateScheduleResponse> updateSchedule(
+      String scheduleId, ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies);
 
   /**
    * Permanently deletes a schedule. In-flight workflow runs triggered by this schedule are not
