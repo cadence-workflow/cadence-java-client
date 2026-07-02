@@ -179,10 +179,12 @@ final class ScheduleClientImpl implements ScheduleClient {
     com.uber.cadence.ScheduleSpec t =
         new com.uber.cadence.ScheduleSpec().setCronExpression(s.getCronExpression());
     if (s.getStartTime() != null) {
-      t.setStartTimeNano(s.getStartTime().toEpochMilli() * 1_000_000L);
+      Instant si = s.getStartTime();
+      t.setStartTimeNano(si.getEpochSecond() * 1_000_000_000L + si.getNano());
     }
     if (s.getEndTime() != null) {
-      t.setEndTimeNano(s.getEndTime().toEpochMilli() * 1_000_000L);
+      Instant ei = s.getEndTime();
+      t.setEndTimeNano(ei.getEpochSecond() * 1_000_000_000L + ei.getNano());
     }
     if (s.getJitter() != null) {
       t.setJitterInSeconds((int) s.getJitter().getSeconds());
@@ -220,12 +222,34 @@ final class ScheduleClientImpl implements ScheduleClient {
     }
     if (sw.getMemo() != null && !sw.getMemo().isEmpty()) {
       Map<String, byte[]> fields = new HashMap<>();
-      sw.getMemo().forEach((k, v) -> fields.put(k, (byte[]) v));
+      sw.getMemo()
+          .forEach(
+              (k, v) -> {
+                if (!(v instanceof byte[])) {
+                  throw new IllegalArgumentException(
+                      "memo value for key '"
+                          + k
+                          + "' must be byte[], got "
+                          + (v == null ? "null" : v.getClass().getName()));
+                }
+                fields.put(k, (byte[]) v);
+              });
       t.setMemo(new Memo().setFields(fields));
     }
     if (sw.getSearchAttributes() != null && !sw.getSearchAttributes().isEmpty()) {
       Map<String, byte[]> indexedFields = new HashMap<>();
-      sw.getSearchAttributes().forEach((k, v) -> indexedFields.put(k, (byte[]) v));
+      sw.getSearchAttributes()
+          .forEach(
+              (k, v) -> {
+                if (!(v instanceof byte[])) {
+                  throw new IllegalArgumentException(
+                      "searchAttributes value for key '"
+                          + k
+                          + "' must be byte[], got "
+                          + (v == null ? "null" : v.getClass().getName()));
+                }
+                indexedFields.put(k, (byte[]) v);
+              });
       t.setSearchAttributes(new SearchAttributes().setIndexedFields(indexedFields));
     }
     return t;
