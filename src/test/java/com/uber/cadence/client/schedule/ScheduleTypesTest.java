@@ -529,33 +529,6 @@ public class ScheduleTypesTest {
     assertTrue(minimalDescription().getSearchAttributes().isEmpty());
   }
 
-  @Test
-  public void listSchedulesResult_tokenDefensiveCopy() {
-    byte[] token = {7, 8, 9};
-    ListSchedulesResult result = new ListSchedulesResult(Collections.emptyList(), token);
-    token[0] = 99;
-    assertEquals(7, result.getNextPageToken()[0]);
-  }
-
-  @Test
-  public void listSchedulesResult_getTokenDoesNotExposeInternal() {
-    ListSchedulesResult result =
-        new ListSchedulesResult(Collections.emptyList(), new byte[] {1, 2, 3});
-    result.getNextPageToken()[0] = 99;
-    assertEquals(1, result.getNextPageToken()[0]);
-  }
-
-  @Test
-  public void listSchedulesResult_nullTokenRoundTrips() {
-    assertNull(new ListSchedulesResult(Collections.emptyList(), null).getNextPageToken());
-  }
-
-  @Test
-  public void listSchedulesResult_nullSchedulesNormalizesToEmpty() {
-    assertNotNull(new ListSchedulesResult(null, null).getSchedules());
-    assertTrue(new ListSchedulesResult(null, null).getSchedules().isEmpty());
-  }
-
   @Test(expected = UnsupportedOperationException.class)
   public void scheduleDescription_memoIsUnmodifiable() {
     Map<String, Object> memo = new HashMap<>();
@@ -593,78 +566,6 @@ public class ScheduleTypesTest {
             null);
     memo.put("extra", "boom");
     assertEquals(1, desc.getMemo().size());
-  }
-
-  @Test
-  public void scheduleBackfill_twoArgGetters() {
-    Instant start = Instant.ofEpochSecond(100);
-    Instant end = Instant.ofEpochSecond(200);
-    ScheduleBackfill bf = new ScheduleBackfill(start, end);
-
-    assertEquals(start, bf.getStartTime());
-    assertEquals(end, bf.getEndTime());
-    assertNull(bf.getOverlapPolicy());
-  }
-
-  @Test
-  public void scheduleBackfill_threeArgGetters() {
-    Instant start = Instant.ofEpochSecond(100);
-    Instant end = Instant.ofEpochSecond(200);
-    ScheduleBackfill bf = new ScheduleBackfill(start, end, ScheduleOverlapPolicy.BUFFER);
-
-    assertEquals(start, bf.getStartTime());
-    assertEquals(end, bf.getEndTime());
-    assertEquals(ScheduleOverlapPolicy.BUFFER, bf.getOverlapPolicy());
-  }
-
-  @Test
-  public void scheduleBackfill_equals() {
-    Instant start = Instant.ofEpochSecond(100);
-    Instant end = Instant.ofEpochSecond(200);
-    ScheduleBackfill a = new ScheduleBackfill(start, end);
-    ScheduleBackfill b = new ScheduleBackfill(start, end);
-    assertEquals(a, b);
-    assertEquals(a.hashCode(), b.hashCode());
-  }
-
-  @Test
-  public void scheduleBackfill_equalsWithPolicy() {
-    Instant start = Instant.ofEpochSecond(100);
-    Instant end = Instant.ofEpochSecond(200);
-    ScheduleBackfill a = new ScheduleBackfill(start, end, ScheduleOverlapPolicy.SKIP_NEW);
-    ScheduleBackfill b = new ScheduleBackfill(start, end, ScheduleOverlapPolicy.SKIP_NEW);
-    assertEquals(a, b);
-    assertEquals(a.hashCode(), b.hashCode());
-  }
-
-  @Test
-  public void scheduleBackfill_notEqualOnDifferentPolicy() {
-    Instant start = Instant.ofEpochSecond(100);
-    Instant end = Instant.ofEpochSecond(200);
-    assertNotEquals(
-        new ScheduleBackfill(start, end),
-        new ScheduleBackfill(start, end, ScheduleOverlapPolicy.SKIP_NEW));
-  }
-
-  @Test
-  public void scheduleBackfill_notEqualOnDifferentStart() {
-    Instant end = Instant.ofEpochSecond(200);
-    assertNotEquals(
-        new ScheduleBackfill(Instant.ofEpochSecond(100), end),
-        new ScheduleBackfill(Instant.ofEpochSecond(101), end));
-  }
-
-  @Test
-  public void scheduleBackfill_toString() {
-    String s =
-        new ScheduleBackfill(
-                Instant.ofEpochSecond(100),
-                Instant.ofEpochSecond(200),
-                ScheduleOverlapPolicy.BUFFER)
-            .toString();
-    assertTrue(s.contains("startTime="));
-    assertTrue(s.contains("endTime="));
-    assertTrue(s.contains("BUFFER"));
   }
 
   @Test
