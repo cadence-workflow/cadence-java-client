@@ -27,6 +27,7 @@ import com.uber.cadence.UnpauseScheduleResponse;
 import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.client.schedule.ScheduleAction;
+import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleDescription;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
@@ -128,6 +129,18 @@ public interface ScheduleClient {
    * @param reason stored as the unpause note, visible in {@link #describeSchedule}
    */
   CompletableFuture<UnpauseScheduleResponse> unpauseSchedule(String scheduleId, String reason);
+
+  /**
+   * Resumes a paused schedule, overriding the catch-up policy for this unpause only. Use this when
+   * you want different catch-up behavior than the schedule's configured default, e.g. skipping all
+   * missed firings after a long pause.
+   *
+   * @param scheduleId the schedule identifier
+   * @param reason stored as the unpause note, visible in {@link #describeSchedule}
+   * @param catchUpPolicy catch-up policy to apply for missed firings on this unpause
+   */
+  CompletableFuture<UnpauseScheduleResponse> unpauseSchedule(
+      String scheduleId, String reason, ScheduleCatchUpPolicy catchUpPolicy);
 
   /**
    * Triggers runs for all times in the given historical ranges. One service call is made per entry.

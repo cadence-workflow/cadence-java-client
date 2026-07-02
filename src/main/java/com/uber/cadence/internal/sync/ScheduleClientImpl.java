@@ -131,8 +131,17 @@ final class ScheduleClientImpl implements ScheduleClient {
   @Override
   public CompletableFuture<UnpauseScheduleResponse> unpauseSchedule(
       String scheduleId, String reason) {
+    return unpauseSchedule(scheduleId, reason, null);
+  }
+
+  @Override
+  public CompletableFuture<UnpauseScheduleResponse> unpauseSchedule(
+      String scheduleId, String reason, ScheduleCatchUpPolicy catchUpPolicy) {
     UnpauseScheduleRequest request =
         new UnpauseScheduleRequest().setDomain(domain).setScheduleId(scheduleId).setReason(reason);
+    if (catchUpPolicy != null) {
+      request.setCatchUpPolicy(toThriftCatchUpPolicy(catchUpPolicy));
+    }
     return service.UnpauseSchedule(request);
   }
 
