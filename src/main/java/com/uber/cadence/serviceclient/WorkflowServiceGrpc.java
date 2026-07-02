@@ -803,77 +803,109 @@ public class WorkflowServiceGrpc implements IWorkflowService {
 
   @Override
   public CompletableFuture<CreateScheduleResponse> CreateSchedule(CreateScheduleRequest request) {
-    return toCompletableFuture(
-        grpcServiceStubs
-            .scheduleFutureStub()
-            .createSchedule(RequestMapper.createScheduleRequest(request)),
-        ResponseMapper::createScheduleResponse);
+    try {
+      return toCompletableFuture(
+          grpcServiceStubs
+              .scheduleFutureStub()
+              .createSchedule(RequestMapper.createScheduleRequest(request)),
+          ResponseMapper::createScheduleResponse);
+    } catch (Exception e) {
+      return failedFuture(e);
+    }
   }
 
   @Override
   public CompletableFuture<DescribeScheduleResponse> DescribeSchedule(
       DescribeScheduleRequest request) {
-    return toCompletableFuture(
-        grpcServiceStubs
-            .scheduleFutureStub()
-            .describeSchedule(RequestMapper.describeScheduleRequest(request)),
-        ResponseMapper::describeScheduleResponse);
+    try {
+      return toCompletableFuture(
+          grpcServiceStubs
+              .scheduleFutureStub()
+              .describeSchedule(RequestMapper.describeScheduleRequest(request)),
+          ResponseMapper::describeScheduleResponse);
+    } catch (Exception e) {
+      return failedFuture(e);
+    }
   }
 
   @Override
   public CompletableFuture<UpdateScheduleResponse> UpdateSchedule(UpdateScheduleRequest request) {
-    return toCompletableFuture(
-        grpcServiceStubs
-            .scheduleFutureStub()
-            .updateSchedule(RequestMapper.updateScheduleRequest(request)),
-        ResponseMapper::updateScheduleResponse);
+    try {
+      return toCompletableFuture(
+          grpcServiceStubs
+              .scheduleFutureStub()
+              .updateSchedule(RequestMapper.updateScheduleRequest(request)),
+          ResponseMapper::updateScheduleResponse);
+    } catch (Exception e) {
+      return failedFuture(e);
+    }
   }
 
   @Override
   public CompletableFuture<DeleteScheduleResponse> DeleteSchedule(DeleteScheduleRequest request) {
-    return toCompletableFuture(
-        grpcServiceStubs
-            .scheduleFutureStub()
-            .deleteSchedule(RequestMapper.deleteScheduleRequest(request)),
-        ResponseMapper::deleteScheduleResponse);
+    try {
+      return toCompletableFuture(
+          grpcServiceStubs
+              .scheduleFutureStub()
+              .deleteSchedule(RequestMapper.deleteScheduleRequest(request)),
+          ResponseMapper::deleteScheduleResponse);
+    } catch (Exception e) {
+      return failedFuture(e);
+    }
   }
 
   @Override
   public CompletableFuture<PauseScheduleResponse> PauseSchedule(PauseScheduleRequest request) {
-    return toCompletableFuture(
-        grpcServiceStubs
-            .scheduleFutureStub()
-            .pauseSchedule(RequestMapper.pauseScheduleRequest(request)),
-        ResponseMapper::pauseScheduleResponse);
+    try {
+      return toCompletableFuture(
+          grpcServiceStubs
+              .scheduleFutureStub()
+              .pauseSchedule(RequestMapper.pauseScheduleRequest(request)),
+          ResponseMapper::pauseScheduleResponse);
+    } catch (Exception e) {
+      return failedFuture(e);
+    }
   }
 
   @Override
   public CompletableFuture<UnpauseScheduleResponse> UnpauseSchedule(
       UnpauseScheduleRequest request) {
-    return toCompletableFuture(
-        grpcServiceStubs
-            .scheduleFutureStub()
-            .unpauseSchedule(RequestMapper.unpauseScheduleRequest(request)),
-        ResponseMapper::unpauseScheduleResponse);
+    try {
+      return toCompletableFuture(
+          grpcServiceStubs
+              .scheduleFutureStub()
+              .unpauseSchedule(RequestMapper.unpauseScheduleRequest(request)),
+          ResponseMapper::unpauseScheduleResponse);
+    } catch (Exception e) {
+      return failedFuture(e);
+    }
   }
 
   @Override
   public CompletableFuture<BackfillScheduleResponse> BackfillSchedule(
       BackfillScheduleRequest request) {
-    return toCompletableFuture(
-        grpcServiceStubs
-            .scheduleFutureStub()
-            .backfillSchedule(RequestMapper.backfillScheduleRequest(request)),
-        ResponseMapper::backfillScheduleResponse);
+    try {
+      return toCompletableFuture(
+          grpcServiceStubs
+              .scheduleFutureStub()
+              .backfillSchedule(RequestMapper.backfillScheduleRequest(request)),
+          ResponseMapper::backfillScheduleResponse);
+    } catch (Exception e) {
+      return failedFuture(e);
+    }
   }
 
   @Override
   public CompletableFuture<ListSchedulesResponse> ListSchedules(ListSchedulesRequest request) {
-    return toCompletableFuture(
-        grpcServiceStubs
-            .scheduleFutureStub()
-            .listSchedules(RequestMapper.listSchedulesRequest(request)),
-        ResponseMapper::listSchedulesResponse);
+    try {
+      return toCompletableFuture(
+          grpcServiceStubs
+              .scheduleFutureStub()
+              .listSchedules(RequestMapper.listSchedulesRequest(request)),
+          ResponseMapper::listSchedulesResponse);
+    } catch (Exception e) {
+      return failedFuture(e);
+    }
   }
 
   @Override
@@ -1464,6 +1496,12 @@ public class WorkflowServiceGrpc implements IWorkflowService {
           }
         },
         executor);
+    return future;
+  }
+
+  private <T> CompletableFuture<T> failedFuture(Exception e) {
+    CompletableFuture<T> future = new CompletableFuture<>();
+    future.completeExceptionally(toServiceClientException(e));
     return future;
   }
 
