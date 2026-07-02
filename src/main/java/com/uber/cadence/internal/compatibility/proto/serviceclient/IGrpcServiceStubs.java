@@ -18,6 +18,7 @@ package com.uber.cadence.internal.compatibility.proto.serviceclient;
 import com.uber.cadence.api.v1.DomainAPIGrpc;
 import com.uber.cadence.api.v1.MetaAPIGrpc.MetaAPIBlockingStub;
 import com.uber.cadence.api.v1.MetaAPIGrpc.MetaAPIFutureStub;
+import com.uber.cadence.api.v1.ScheduleAPIGrpc;
 import com.uber.cadence.api.v1.VisibilityAPIGrpc;
 import com.uber.cadence.api.v1.WorkerAPIGrpc;
 import com.uber.cadence.api.v1.WorkflowAPIGrpc;
@@ -64,6 +65,12 @@ public interface IGrpcServiceStubs {
 
   /** @return Future (asynchronous) stub to workflow service. */
   WorkflowAPIGrpc.WorkflowAPIFutureStub workflowFutureStub();
+
+  /** @return Blocking (synchronous) stub to schedule service. */
+  ScheduleAPIGrpc.ScheduleAPIBlockingStub scheduleBlockingStub();
+
+  /** @return Future (asynchronous) stub to schedule service. */
+  ScheduleAPIGrpc.ScheduleAPIFutureStub scheduleFutureStub();
 
   /** @return Blocking (synchronous) stub to meta service. */
   MetaAPIFutureStub metaFutureStub();

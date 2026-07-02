@@ -802,43 +802,94 @@ public class WorkflowServiceGrpc implements IWorkflowService {
 
   @Override
   public CreateScheduleResponse CreateSchedule(CreateScheduleRequest request) throws CadenceError {
-    throw new UnsupportedOperationException("not implemented");
+    try {
+      return ResponseMapper.createScheduleResponse(
+          grpcServiceStubs
+              .scheduleBlockingStub()
+              .createSchedule(RequestMapper.createScheduleRequest(request)));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
   }
 
   @Override
   public DescribeScheduleResponse DescribeSchedule(DescribeScheduleRequest request)
       throws CadenceError {
-    throw new UnsupportedOperationException("not implemented");
+    try {
+      return ResponseMapper.describeScheduleResponse(
+          grpcServiceStubs
+              .scheduleBlockingStub()
+              .describeSchedule(RequestMapper.describeScheduleRequest(request)));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
   }
 
   @Override
   public void UpdateSchedule(UpdateScheduleRequest request) throws CadenceError {
-    throw new UnsupportedOperationException("not implemented");
+    try {
+      grpcServiceStubs
+          .scheduleBlockingStub()
+          .updateSchedule(RequestMapper.updateScheduleRequest(request));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
   }
 
   @Override
   public void DeleteSchedule(DeleteScheduleRequest request) throws CadenceError {
-    throw new UnsupportedOperationException("not implemented");
+    try {
+      grpcServiceStubs
+          .scheduleBlockingStub()
+          .deleteSchedule(RequestMapper.deleteScheduleRequest(request));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
   }
 
   @Override
   public void PauseSchedule(PauseScheduleRequest request) throws CadenceError {
-    throw new UnsupportedOperationException("not implemented");
+    try {
+      grpcServiceStubs
+          .scheduleBlockingStub()
+          .pauseSchedule(RequestMapper.pauseScheduleRequest(request));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
   }
 
   @Override
   public void UnpauseSchedule(UnpauseScheduleRequest request) throws CadenceError {
-    throw new UnsupportedOperationException("not implemented");
+    try {
+      grpcServiceStubs
+          .scheduleBlockingStub()
+          .unpauseSchedule(RequestMapper.unpauseScheduleRequest(request));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
   }
 
   @Override
   public void BackfillSchedule(BackfillScheduleRequest request) throws CadenceError {
-    throw new UnsupportedOperationException("not implemented");
+    try {
+      grpcServiceStubs
+          .scheduleBlockingStub()
+          .backfillSchedule(RequestMapper.backfillScheduleRequest(request));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
   }
 
   @Override
   public ListSchedulesResponse ListSchedules(ListSchedulesRequest request) throws CadenceError {
-    throw new UnsupportedOperationException("not implemented");
+    try {
+      return ResponseMapper.listSchedulesResponse(
+          grpcServiceStubs
+              .scheduleBlockingStub()
+              .listSchedules(RequestMapper.listSchedulesRequest(request)));
+    } catch (Exception e) {
+      throw toServiceClientException(e);
+    }
   }
 
   @Override

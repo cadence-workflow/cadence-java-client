@@ -206,7 +206,7 @@ public final class WorkflowClientInternal implements WorkflowClient {
 
   @Override
   public ScheduleClient scheduleClient() {
-    throw new UnsupportedOperationException("not implemented");
+    return new ScheduleClientImpl(workflowService, clientOptions.getDomain());
   }
 
   @Override
