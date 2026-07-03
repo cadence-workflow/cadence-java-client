@@ -160,6 +160,8 @@ final class ScheduleClientImpl implements ScheduleClient {
   @Override
   public CompletableFuture<List<BackfillScheduleResponse>> backfillSchedule(
       String scheduleId, List<ScheduleBackfill> backfills) {
+    // Requests are dispatched concurrently; the server handles ordering and overlap-policy
+    // per-backfill. Results are collected in submission order.
     List<CompletableFuture<BackfillScheduleResponse>> futures = new ArrayList<>();
     for (ScheduleBackfill bf : backfills) {
       BackfillScheduleRequest request =
