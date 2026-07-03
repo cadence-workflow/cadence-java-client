@@ -80,12 +80,18 @@ final class ScheduleClientImpl implements ScheduleClient {
   @Override
   public CompletableFuture<CreateScheduleResponse> createSchedule(
       String scheduleId, ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies) {
-    CreateScheduleRequest request =
-        new CreateScheduleRequest()
-            .setSpec(toThriftSpec(spec))
-            .setAction(toThriftAction(action))
-            .setPolicies(toThriftPolicies(policies));
-    return createSchedule(scheduleId, request);
+    try {
+      CreateScheduleRequest request =
+          new CreateScheduleRequest()
+              .setSpec(toThriftSpec(spec))
+              .setAction(toThriftAction(action))
+              .setPolicies(toThriftPolicies(policies));
+      return createSchedule(scheduleId, request);
+    } catch (Exception e) {
+      CompletableFuture<CreateScheduleResponse> f = new CompletableFuture<>();
+      f.completeExceptionally(e);
+      return f;
+    }
   }
 
   @Override
@@ -106,12 +112,18 @@ final class ScheduleClientImpl implements ScheduleClient {
   @Override
   public CompletableFuture<UpdateScheduleResponse> updateSchedule(
       String scheduleId, ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies) {
-    UpdateScheduleRequest request =
-        new UpdateScheduleRequest()
-            .setSpec(toThriftSpec(spec))
-            .setAction(toThriftAction(action))
-            .setPolicies(toThriftPolicies(policies));
-    return updateSchedule(scheduleId, request);
+    try {
+      UpdateScheduleRequest request =
+          new UpdateScheduleRequest()
+              .setSpec(toThriftSpec(spec))
+              .setAction(toThriftAction(action))
+              .setPolicies(toThriftPolicies(policies));
+      return updateSchedule(scheduleId, request);
+    } catch (Exception e) {
+      CompletableFuture<UpdateScheduleResponse> f = new CompletableFuture<>();
+      f.completeExceptionally(e);
+      return f;
+    }
   }
 
   @Override

@@ -38,6 +38,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -53,8 +54,10 @@ public class ScheduleClientImplTest {
   @Before
   public void setUp() throws Exception {
     service = mock(IWorkflowService.class);
-    when(service.CreateSchedule(any())).thenReturn(new CreateScheduleResponse());
-    when(service.UpdateSchedule(any())).thenReturn(new UpdateScheduleResponse());
+    when(service.CreateSchedule(any()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+    when(service.UpdateSchedule(any()))
+        .thenReturn(CompletableFuture.completedFuture(new UpdateScheduleResponse()));
     client = new ScheduleClientImpl(service, DOMAIN);
   }
 
@@ -63,7 +66,8 @@ public class ScheduleClientImplTest {
   @Test
   public void createSchedule_spec_cronExpression() throws Exception {
     ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
-    when(service.CreateSchedule(captor.capture())).thenReturn(new CreateScheduleResponse());
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
 
     client
         .createSchedule(
@@ -79,7 +83,8 @@ public class ScheduleClientImplTest {
   @Test
   public void createSchedule_spec_startEndTime_fullNanoPrecision() throws Exception {
     ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
-    when(service.CreateSchedule(captor.capture())).thenReturn(new CreateScheduleResponse());
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
 
     Instant start = Instant.ofEpochSecond(1_700_000_000L, 123_456_789L);
     Instant end = Instant.ofEpochSecond(1_800_000_000L, 987_654_321L);
@@ -101,7 +106,8 @@ public class ScheduleClientImplTest {
   @Test
   public void createSchedule_spec_nullStartEnd_leaveZero() throws Exception {
     ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
-    when(service.CreateSchedule(captor.capture())).thenReturn(new CreateScheduleResponse());
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
 
     client
         .createSchedule(
@@ -119,7 +125,8 @@ public class ScheduleClientImplTest {
   @Test
   public void createSchedule_spec_jitter() throws Exception {
     ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
-    when(service.CreateSchedule(captor.capture())).thenReturn(new CreateScheduleResponse());
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
 
     client
         .createSchedule(
@@ -137,7 +144,8 @@ public class ScheduleClientImplTest {
   @Test
   public void createSchedule_action_workflowTypeAndTaskList() throws Exception {
     ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
-    when(service.CreateSchedule(captor.capture())).thenReturn(new CreateScheduleResponse());
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
 
     client
         .createSchedule(
@@ -162,7 +170,8 @@ public class ScheduleClientImplTest {
   @Test
   public void createSchedule_action_timeouts() throws Exception {
     ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
-    when(service.CreateSchedule(captor.capture())).thenReturn(new CreateScheduleResponse());
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
 
     client
         .createSchedule(
@@ -189,7 +198,8 @@ public class ScheduleClientImplTest {
   @Test
   public void createSchedule_action_retryPolicy() throws Exception {
     ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
-    when(service.CreateSchedule(captor.capture())).thenReturn(new CreateScheduleResponse());
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
 
     RetryOptions retry =
         new RetryOptions.Builder()
@@ -228,7 +238,8 @@ public class ScheduleClientImplTest {
   @Test
   public void createSchedule_action_memo() throws Exception {
     ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
-    when(service.CreateSchedule(captor.capture())).thenReturn(new CreateScheduleResponse());
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
 
     byte[] value = "hello".getBytes();
     Map<String, Object> memo = new HashMap<>();
@@ -279,7 +290,8 @@ public class ScheduleClientImplTest {
   @Test
   public void createSchedule_policies_overlapAndCatchUp() throws Exception {
     ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
-    when(service.CreateSchedule(captor.capture())).thenReturn(new CreateScheduleResponse());
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
 
     client
         .createSchedule(
@@ -310,7 +322,8 @@ public class ScheduleClientImplTest {
   @Test
   public void updateSchedule_cleanTypeOverload_setsFields() throws Exception {
     ArgumentCaptor<UpdateScheduleRequest> captor = forClass(UpdateScheduleRequest.class);
-    when(service.UpdateSchedule(captor.capture())).thenReturn(new UpdateScheduleResponse());
+    when(service.UpdateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new UpdateScheduleResponse()));
 
     client
         .updateSchedule(
@@ -335,7 +348,8 @@ public class ScheduleClientImplTest {
   @Test
   public void createSchedule_nullSpec_sendsNullSpec() throws Exception {
     ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
-    when(service.CreateSchedule(captor.capture())).thenReturn(new CreateScheduleResponse());
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
 
     client.createSchedule(SCHEDULE_ID, null, minimalAction(), null).join();
 
