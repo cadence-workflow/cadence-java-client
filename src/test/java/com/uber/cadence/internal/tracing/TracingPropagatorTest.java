@@ -19,10 +19,15 @@ package com.uber.cadence.internal.tracing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableMap;
 import com.uber.cadence.Header;
 import com.uber.cadence.PollForActivityTaskResponse;
+import com.uber.cadence.WorkflowExecutionStartedEventAttributes;
+import com.uber.cadence.WorkflowType;
+import com.uber.cadence.internal.replay.DecisionContext;
 import io.opentracing.Span;
 import io.opentracing.mock.MockSpan;
 import io.opentracing.mock.MockTracer;
@@ -30,6 +35,8 @@ import java.util.List;
 import org.junit.Test;
 
 public class TracingPropagatorTest {
+
+  private static final String CADENCE_IS_CRON = "cadenceIsCron";
 
   private final MockTracer mockTracer = new MockTracer();
   private final TracingPropagator propagator = new TracingPropagator(mockTracer);
@@ -57,5 +64,35 @@ public class TracingPropagatorTest {
       assertEquals("200", from.getContext().toSpanId());
       assertEquals("follows_from", from.getReferenceType());
     }
+  }
+
+  @Test
+  public void testSpanForExecuteWorkflow_withCronSchedule_setsIsCronTagTrue() {
+    Span span = propagator.spanForExecuteWorkflow(newDecisionContext("0 * * * *"));
+    span.finish();
+
+    MockSpan mockSpan = mockTracer.finishedSpans().get(0);
+    assertEquals(Boolean.TRUE, mockSpan.tags().get(CADENCE_IS_CRON));
+  }
+
+  @Test
+  public void testSpanForExecuteWorkflow_withoutCronSchedule_setsIsCronTagFalse() {
+    Span span = propagator.spanForExecuteWorkflow(newDecisionContext(""));
+    span.finish();
+
+    MockSpan mockSpan = mockTracer.finishedSpans().get(0);
+    assertEquals(Boolean.FALSE, mockSpan.tags().get(CADENCE_IS_CRON));
+  }
+
+  private static DecisionContext newDecisionContext(String cronSchedule) {
+    WorkflowExecutionStartedEventAttributes attributes =
+        new WorkflowExecutionStartedEventAttributes().setCronSchedule(cronSchedule);
+
+    DecisionContext context = mock(DecisionContext.class);
+    when(context.getWorkflowExecutionStartedEventAttributes()).thenReturn(attributes);
+    when(context.getWorkflowType()).thenReturn(new WorkflowType().setName("TestWorkflow"));
+    when(context.getWorkflowId()).thenReturn("workflow-id");
+    when(context.getRunId()).thenReturn("run-id");
+    return context;
   }
 }
