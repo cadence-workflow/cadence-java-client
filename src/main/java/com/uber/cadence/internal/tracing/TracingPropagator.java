@@ -46,6 +46,7 @@ public class TracingPropagator {
   private static final String TAG_WORKFLOW_TYPE = "cadenceWorkflowType";
   private static final String TAG_WORKFLOW_RUN_ID = "cadenceRunID";
   private static final String TAG_ACTIVITY_TYPE = "cadenceActivityType";
+  private static final String TAG_IS_CRON = "cadenceIsCron";
 
   private final Tracer tracer;
 
@@ -71,6 +72,7 @@ public class TracingPropagator {
         .withTag(TAG_WORKFLOW_TYPE, context.getWorkflowType().getName())
         .withTag(TAG_WORKFLOW_ID, context.getWorkflowId())
         .withTag(TAG_WORKFLOW_RUN_ID, context.getRunId())
+        .withTag(TAG_IS_CRON, attributes.getCronSchedule() != "")
         .start();
   }
 

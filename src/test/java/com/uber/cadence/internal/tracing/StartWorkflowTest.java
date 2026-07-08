@@ -140,6 +140,18 @@ public class StartWorkflowTest {
     }
   }
 
+  public interface CronWorkflow {
+    @WorkflowMethod(executionStartToCloseTimeoutSeconds = 120, taskList = TASK_LIST)
+    String execute();
+  }
+
+  public static class CronWorkflowImpl implements CronWorkflow {
+    @Override
+    public String execute() {
+      return "done";
+    }
+  }
+
   private static final boolean useDockerService = TestEnvironment.isUseDockerService();
   private static final Logger logger = LoggerFactory.getLogger(StartWorkflowTest.class);
   private static final String DOMAIN = "test-domain";
@@ -315,6 +327,94 @@ public class StartWorkflowTest {
             IGrpcServiceStubs.newInstance(
                 ClientOptions.newBuilder().setPort(7833).setTracer(null).build()));
     testSignalWithStartWorkflowHelper(service, mockTracer, false);
+  }
+
+  @Test
+  public void testCronWorkflowSetsIsCronSpanTagGRPC() {
+    Assume.assumeTrue(useDockerService);
+    MockTracer mockTracer = new MockTracer();
+    IWorkflowService service =
+        new Thrift2ProtoAdapter(
+            IGrpcServiceStubs.newInstance(
+                ClientOptions.newBuilder().setTracer(mockTracer).setPort(7833).build()));
+    testCronWorkflowHelper(service, mockTracer);
+  }
+
+  private void testCronWorkflowHelper(IWorkflowService service, MockTracer mockTracer) {
+    try {
+      service.RegisterDomain(new RegisterDomainRequest().setName(DOMAIN));
+    } catch (DomainAlreadyExistsError e) {
+      logger.info("domain already registered");
+    } catch (Exception e) {
+      fail("fail to register domain: " + e);
+    }
+
+    WorkflowClient client =
+        WorkflowClient.newInstance(
+            service, WorkflowClientOptions.newBuilder().setDomain(DOMAIN).build());
+
+    WorkerFactory workerFactory =
+        WorkerFactory.newInstance(client, WorkerFactoryOptions.newBuilder().build());
+    Worker worker = workerFactory.newWorker(TASK_LIST, WorkerOptions.newBuilder().build());
+    worker.registerWorkflowImplementationTypes(CronWorkflowImpl.class);
+    workerFactory.start();
+
+    Span rootSpan = mockTracer.buildSpan("Test Started").start();
+    mockTracer.activateSpan(rootSpan);
+
+    WorkflowStub wf =
+        client.newUntypedWorkflowStub(
+            "CronWorkflow::execute",
+            new WorkflowOptions.Builder()
+                .setExecutionStartToCloseTimeout(Duration.ofMinutes(2))
+                .setTaskList(TASK_LIST)
+                .setCronSchedule("* * * * *")
+                .build());
+    try {
+      wf.start();
+
+      // Cron's minimum interval is 1 minute, so wait for the first scheduled run to execute and
+      // produce a finished cadence-ExecuteWorkflow span.
+      MockSpan executeWorkflowSpan = awaitExecuteWorkflowSpan(mockTracer, Duration.ofSeconds(150));
+      assertNotNull("cadence-ExecuteWorkflow span not found", executeWorkflowSpan);
+      assertEquals(
+          "cadenceIsCron tag should be true for cron workflows",
+          Boolean.TRUE,
+          executeWorkflowSpan.tags().get("cadenceIsCron"));
+    } catch (Exception e) {
+      fail("workflow failure: " + e);
+    } finally {
+      try {
+        wf.cancel();
+      } catch (Exception ignored) {
+        // best effort: stop further cron runs
+      }
+      rootSpan.finish();
+      workerFactory.shutdown();
+    }
+  }
+
+  private MockSpan awaitExecuteWorkflowSpan(MockTracer mockTracer, Duration timeout) {
+    long deadline = System.currentTimeMillis() + timeout.toMillis();
+    while (System.currentTimeMillis() < deadline) {
+      MockSpan span =
+          mockTracer
+              .finishedSpans()
+              .stream()
+              .filter(s -> s.operationName().equals("cadence-ExecuteWorkflow"))
+              .findFirst()
+              .orElse(null);
+      if (span != null) {
+        return span;
+      }
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        break;
+      }
+    }
+    return null;
   }
 
   private void testStartWorkflowHelper(
