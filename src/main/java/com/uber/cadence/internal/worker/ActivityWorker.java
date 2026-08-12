@@ -25,6 +25,7 @@ import com.uber.cadence.RespondActivityTaskFailedRequest;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.internal.common.RpcRetryer;
+import com.uber.cadence.internal.context.ContextThreadLocal;
 import com.uber.cadence.internal.logging.LoggerTag;
 import com.uber.cadence.internal.metrics.HistogramBuckets;
 import com.uber.cadence.internal.metrics.MetricsEmit;
@@ -147,7 +148,14 @@ public class ActivityWorker extends SuspendableWorkerBase {
       MDC.put(LoggerTag.RUN_ID, task.getWorkflowExecution().getRunId());
       MDC.put(LoggerTag.ATTEMPT, String.valueOf(task.getAttempt()));
 
-      propagateContext(task);
+      ContextThreadLocal.runWithContext(
+          options.getContextPropagators(),
+          deserializeContext(task),
+          () -> handleWithContext(task, metricsScope));
+    }
+
+    private void handleWithContext(PollForActivityTaskResponse task, Scope metricsScope)
+        throws TException {
       Span span = spanFactory.spanForExecuteActivity(task);
       try (io.opentracing.Scope scope = tracer.activateSpan(span)) {
         MetricsEmit.DualStopwatch sw =
@@ -188,18 +196,17 @@ public class ActivityWorker extends SuspendableWorkerBase {
         MDC.remove(LoggerTag.WORKFLOW_ID);
         MDC.remove(LoggerTag.RUN_ID);
         MDC.remove(LoggerTag.ATTEMPT);
-        unsetCurrentContext();
       }
     }
 
-    void propagateContext(PollForActivityTaskResponse response) {
+    private Map<String, Object> deserializeContext(PollForActivityTaskResponse response) {
       if (options.getContextPropagators() == null || options.getContextPropagators().isEmpty()) {
-        return;
+        return new HashMap<>();
       }
 
       Header headers = response.getHeader();
       if (headers == null) {
-        return;
+        return new HashMap<>();
       }
 
       Map<String, byte[]> headerData = new HashMap<>();
@@ -210,15 +217,11 @@ public class ActivityWorker extends SuspendableWorkerBase {
                 headerData.put(k, org.apache.thrift.TBaseHelper.byteBufferToByteArray(v));
               });
 
+      Map<String, Object> contextData = new HashMap<>();
       for (ContextPropagator propagator : options.getContextPropagators()) {
-        propagator.setCurrentContext(propagator.deserializeContext(headerData));
+        contextData.put(propagator.getName(), propagator.deserializeContext(headerData));
       }
-    }
-
-    void unsetCurrentContext() {
-      for (ContextPropagator propagator : options.getContextPropagators()) {
-        propagator.unsetCurrentContext();
-      }
+      return contextData;
     }
 
     @Override
