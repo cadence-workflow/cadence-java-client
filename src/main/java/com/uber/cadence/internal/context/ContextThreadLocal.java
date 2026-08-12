@@ -18,6 +18,7 @@
 package com.uber.cadence.internal.context;
 
 import com.uber.cadence.context.ContextPropagator;
+import com.uber.cadence.context.ContextPropagator.ContextRunnable;
 import com.uber.cadence.workflow.WorkflowThreadLocal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,20 +58,38 @@ public class ContextThreadLocal {
     return contextData;
   }
 
-  public static void propagateContextToCurrentThread(Map<String, Object> contextData) {
-    if (contextData == null || contextData.isEmpty()) {
-      return;
-    }
-    for (ContextPropagator propagator : contextPropagators.get()) {
-      if (contextData.containsKey(propagator.getName())) {
-        propagator.setCurrentContext(contextData.get(propagator.getName()));
-      }
-    }
+  public static void runWithContext(Map<String, Object> contextData, ContextRunnable task)
+      throws Exception {
+    runWithContext(contextPropagators.get(), contextData, task);
   }
 
-  public static void unsetCurrentContext() {
-    for (ContextPropagator propagator : contextPropagators.get()) {
-      propagator.unsetCurrentContext();
+  /**
+   * Executes {@code task} inside every applicable propagator context.
+   *
+   * <p>Propagators are composed in configuration order, so the first propagator is the outermost
+   * context and cleanup occurs in reverse order. Legacy propagators retain their existing set/unset
+   * behavior through {@link ContextPropagator#runWithContext(Object, ContextRunnable)}.
+   */
+  public static void runWithContext(
+      List<ContextPropagator> propagators, Map<String, Object> contextData, ContextRunnable task)
+      throws Exception {
+    if (propagators == null
+        || propagators.isEmpty()
+        || contextData == null
+        || contextData.isEmpty()) {
+      task.run();
+      return;
     }
+
+    ContextRunnable invocation = task;
+    for (int i = propagators.size() - 1; i >= 0; i--) {
+      ContextPropagator propagator = propagators.get(i);
+      if (contextData.containsKey(propagator.getName())) {
+        Object context = contextData.get(propagator.getName());
+        ContextRunnable next = invocation;
+        invocation = () -> propagator.runWithContext(context, next);
+      }
+    }
+    invocation.run();
   }
 }

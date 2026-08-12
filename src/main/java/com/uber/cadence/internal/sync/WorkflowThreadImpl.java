@@ -88,15 +88,13 @@ class WorkflowThreadImpl implements WorkflowThread {
       MDC.put(LoggerTag.TASK_LIST, decisionContext.getTaskList());
       MDC.put(LoggerTag.DOMAIN, decisionContext.getDomain());
 
-      // Repopulate the context(s)
       ContextThreadLocal.setContextPropagators(this.contextPropagators);
-      ContextThreadLocal.propagateContextToCurrentThread(this.propagatedContexts);
 
       try {
         // initialYield blocks thread until the first runUntilBlocked is called.
         // Otherwise r starts executing without control of the sync.
         threadContext.initialYield();
-        cancellationScope.run();
+        ContextThreadLocal.runWithContext(this.propagatedContexts, cancellationScope::run);
       } catch (DestroyWorkflowThreadError e) {
         if (!threadContext.isDestroyRequested()) {
           threadContext.setUnhandledException(e);
@@ -132,7 +130,6 @@ class WorkflowThreadImpl implements WorkflowThread {
         }
         threadContext.setUnhandledException(e);
       } finally {
-        ContextThreadLocal.unsetCurrentContext();
         DeterministicRunnerImpl.setCurrentThreadInternal(null);
         threadContext.setStatus(Status.DONE);
         thread.setName(originalName);

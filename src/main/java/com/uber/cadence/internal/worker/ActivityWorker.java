@@ -20,6 +20,7 @@ package com.uber.cadence.internal.worker;
 import com.uber.cadence.*;
 import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.internal.common.RpcRetryer;
+import com.uber.cadence.internal.context.ContextThreadLocal;
 import com.uber.cadence.internal.logging.LoggerTag;
 import com.uber.cadence.internal.metrics.HistogramBuckets;
 import com.uber.cadence.internal.metrics.MetricsEmit;
@@ -142,7 +143,15 @@ public class ActivityWorker extends SuspendableWorkerBase {
       MDC.put(LoggerTag.RUN_ID, response.getWorkflowExecution().getRunId());
       MDC.put(LoggerTag.ATTEMPT, String.valueOf(response.getAttempt()));
 
-      propagateContext(response);
+      ContextThreadLocal.runWithContext(
+          options.getContextPropagators(),
+          deserializeContext(response),
+          () -> handleWithContext(task, response, metricsScope));
+    }
+
+    private void handleWithContext(
+        ActivityTask task, PollForActivityTaskResponse response, Scope metricsScope)
+        throws CadenceError {
       Span span = spanFactory.spanForExecuteActivity(response);
       ActivityTaskHandler.Result handlerResponse = null;
       try (io.opentracing.Scope scope = tracer.activateSpan(span)) {
@@ -186,7 +195,6 @@ public class ActivityWorker extends SuspendableWorkerBase {
         MDC.remove(LoggerTag.WORKFLOW_ID);
         MDC.remove(LoggerTag.RUN_ID);
         MDC.remove(LoggerTag.ATTEMPT);
-        unsetCurrentContext();
         // Apply completion handle if task has been completed synchronously or is async and manual
         // completion hasn't been requested.
         if (handlerResponse != null && !handlerResponse.isManualCompletion()) {
@@ -195,33 +203,24 @@ public class ActivityWorker extends SuspendableWorkerBase {
       }
     }
 
-    void propagateContext(PollForActivityTaskResponse response) {
+    private Map<String, Object> deserializeContext(PollForActivityTaskResponse response) {
       if (options.getContextPropagators() == null || options.getContextPropagators().isEmpty()) {
-        return;
+        return new HashMap<>();
       }
 
       Header headers = response.getHeader();
       if (headers == null) {
-        return;
+        return new HashMap<>();
       }
 
       Map<String, byte[]> headerData = new HashMap<>();
-      headers
-          .getFields()
-          .forEach(
-              (k, v) -> {
-                headerData.put(k, v);
-              });
+      headers.getFields().forEach((k, v) -> headerData.put(k, v));
 
+      Map<String, Object> contextData = new HashMap<>();
       for (ContextPropagator propagator : options.getContextPropagators()) {
-        propagator.setCurrentContext(propagator.deserializeContext(headerData));
+        contextData.put(propagator.getName(), propagator.deserializeContext(headerData));
       }
-    }
-
-    void unsetCurrentContext() {
-      for (ContextPropagator propagator : options.getContextPropagators()) {
-        propagator.unsetCurrentContext();
-      }
+      return contextData;
     }
 
     @Override

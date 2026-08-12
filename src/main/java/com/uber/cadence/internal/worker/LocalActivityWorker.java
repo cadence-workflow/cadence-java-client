@@ -24,6 +24,7 @@ import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.common.RetryOptions;
 import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.internal.common.LocalActivityMarkerData;
+import com.uber.cadence.internal.context.ContextThreadLocal;
 import com.uber.cadence.internal.metrics.HistogramBuckets;
 import com.uber.cadence.internal.metrics.MetricsEmit;
 import com.uber.cadence.internal.metrics.MetricsTag;
@@ -36,9 +37,9 @@ import com.uber.m3.util.ImmutableMap;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.LongSupplier;
@@ -132,8 +133,13 @@ public final class LocalActivityWorker extends SuspendableWorkerBase {
 
     @Override
     public void handle(Task task) throws Exception {
-      propagateContext(task.params);
+      ContextThreadLocal.runWithContext(
+          options.getContextPropagators(),
+          deserializeContext(task.params),
+          () -> handleWithContext(task));
+    }
 
+    private void handleWithContext(Task task) throws InterruptedException {
       // start and activate span for local activities
       Span span = spanFactory.spanForExecuteLocalActivity(task);
       try (io.opentracing.Scope scope = tracer.activateSpan(span)) {
@@ -171,7 +177,6 @@ public final class LocalActivityWorker extends SuspendableWorkerBase {
         task.eventConsumer.accept(event);
       } finally {
         span.finish();
-        unsetCurrentContext();
       }
     }
 
@@ -240,24 +245,20 @@ public final class LocalActivityWorker extends SuspendableWorkerBase {
     }
   }
 
-  private void propagateContext(ExecuteLocalActivityParameters params) {
+  private Map<String, Object> deserializeContext(ExecuteLocalActivityParameters params) {
     if (options.getContextPropagators() == null || options.getContextPropagators().isEmpty()) {
-      return;
+      return Collections.emptyMap();
     }
 
-    Optional.ofNullable(params.getContext())
-        .filter(context -> !context.isEmpty())
-        .ifPresent(this::restoreContext);
-  }
+    Map<String, byte[]> context = params.getContext();
+    if (context == null || context.isEmpty()) {
+      return Collections.emptyMap();
+    }
 
-  private void unsetCurrentContext() {
-    options.getContextPropagators().forEach(ContextPropagator::unsetCurrentContext);
-  }
-
-  private void restoreContext(Map<String, byte[]> context) {
-    options
-        .getContextPropagators()
-        .forEach(
-            propagator -> propagator.setCurrentContext(propagator.deserializeContext(context)));
+    Map<String, Object> contextData = new java.util.HashMap<>();
+    for (ContextPropagator propagator : options.getContextPropagators()) {
+      contextData.put(propagator.getName(), propagator.deserializeContext(context));
+    }
+    return contextData;
   }
 }

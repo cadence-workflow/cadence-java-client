@@ -139,4 +139,27 @@ public interface ContextPropagator {
 
   /** Unsets the current context. This is called when the context is no longer needed */
   void unsetCurrentContext();
+
+  /** A context task that may throw a checked exception. */
+  @FunctionalInterface
+  interface ContextRunnable {
+    void run() throws Exception;
+  }
+
+  /**
+   * Executes {@code task} with {@code context} installed as the current context.
+   *
+   * <p>The default implementation preserves the legacy imperative context lifecycle. Propagators
+   * that use lexical context, such as Java Scoped Values, should override this method and execute
+   * {@code task} inside their lexical binding rather than implementing {@link #setCurrentContext}
+   * and {@link #unsetCurrentContext}.
+   */
+  default void runWithContext(Object context, ContextRunnable task) throws Exception {
+    setCurrentContext(context);
+    try {
+      task.run();
+    } finally {
+      unsetCurrentContext();
+    }
+  }
 }
