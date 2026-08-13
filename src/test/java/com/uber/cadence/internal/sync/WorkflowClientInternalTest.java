@@ -116,18 +116,9 @@ public class WorkflowClientInternalTest {
     stub.enqueueStart("input");
 
     StartWorkflowExecutionAsyncRequest request = requestFuture.getNow(null).getStartRequest();
-    MockSpan mockSpan =
-        fakeService
-            .getTracer()
-            .finishedSpans()
-            .stream()
-            .filter(span -> "cadence-StartWorkflowExecutionAsync".equals(span.operationName()))
-            .findFirst()
-            .orElseThrow(
-                () ->
-                    new AssertionError(
-                        "No span found for StartWorkflowExecutionAsync:"
-                            + fakeService.getTracer().finishedSpans()));
+    // TChannel emits its own client span for the RPC in addition to the one the client creates
+    fakeService.awaitSpan("WorkflowService::StartWorkflowExecutionAsync");
+    MockSpan mockSpan = fakeService.awaitSpan("cadence-StartWorkflowExecutionAsync");
     assertEquals(
         mockSpan.context().toTraceId(),
         Charsets.UTF_8
@@ -279,21 +270,9 @@ public class WorkflowClientInternalTest {
 
     SignalWithStartWorkflowExecutionRequest request =
         requestFuture.getNow(null).getSignalWithStartRequest().getRequest();
-    assertEquals(2, fakeService.getTracer().finishedSpans().size());
-    MockSpan mockSpan =
-        fakeService
-            .getTracer()
-            .finishedSpans()
-            .stream()
-            .filter(
-                span ->
-                    "cadence-SignalWithStartWorkflowExecutionAsync".equals(span.operationName()))
-            .findFirst()
-            .orElseThrow(
-                () ->
-                    new AssertionError(
-                        "No span found for SignalWithStartWorkflowExecutionAsync:"
-                            + fakeService.getTracer().finishedSpans()));
+    // TChannel emits its own client span for the RPC in addition to the one the client creates
+    fakeService.awaitSpan("WorkflowService::SignalWithStartWorkflowExecutionAsync");
+    MockSpan mockSpan = fakeService.awaitSpan("cadence-SignalWithStartWorkflowExecutionAsync");
     assertEquals(
         mockSpan.context().toTraceId(),
         Charsets.UTF_8.decode(request.getHeader().getFields().get("traceid")).toString());
