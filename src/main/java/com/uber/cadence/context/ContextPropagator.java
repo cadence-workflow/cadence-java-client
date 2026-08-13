@@ -153,6 +153,15 @@ public interface ContextPropagator {
    * that use lexical context, such as Java Scoped Values, should override this method and execute
    * {@code task} inside their lexical binding rather than implementing {@link #setCurrentContext}
    * and {@link #unsetCurrentContext}.
+   *
+   * <p><b>Contract:</b> implementations must let any exception thrown by {@code task} propagate to
+   * the caller unchanged. Only wrap the call to {@code task.run()} in {@code try}/{@code finally}
+   * for cleanup (as the default implementation does) -- never in a {@code try}/{@code catch} that
+   * suppresses or replaces the exception. Cadence relies on exceptions thrown by the wrapped task
+   * (including workflow cancellation and thread-destruction signals) reaching the caller in order
+   * to function correctly; a propagator that swallows them causes {@link
+   * com.uber.cadence.internal.context.ContextThreadLocal} to throw an internal error rather than
+   * silently continue as if {@code task} had succeeded.
    */
   default void runWithContext(Object context, ContextRunnable task) throws Exception {
     setCurrentContext(context);

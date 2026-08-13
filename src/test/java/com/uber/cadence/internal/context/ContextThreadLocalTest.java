@@ -89,6 +89,30 @@ public class ContextThreadLocalTest {
     assertEquals(Arrays.asList("context:set:value", "task", "context:unset"), events);
   }
 
+  @Test
+  public void runWithContextThrowsWhenPropagatorSwallowsTaskException() {
+    List<String> events = new ArrayList<>();
+    ContextPropagator swallowing = new SwallowingPropagator("swallowing", events);
+    IllegalStateException taskFailure = new IllegalStateException("failure");
+
+    try {
+      ContextThreadLocal.runWithContext(
+          Collections.singletonList(swallowing),
+          Collections.<String, Object>singletonMap("swallowing", "value"),
+          () -> {
+            events.add("task");
+            throw taskFailure;
+          });
+      fail("expected ContextPropagatorSwallowedExceptionError");
+    } catch (ContextPropagatorSwallowedExceptionError e) {
+      assertEquals(taskFailure, e.getCause());
+    } catch (Exception e) {
+      fail("expected ContextPropagatorSwallowedExceptionError, got " + e);
+    }
+
+    assertEquals(Arrays.asList("task", "swallowing:caught"), events);
+  }
+
   private static Map<String, Object> context(
       final String firstName,
       final Object firstValue,
@@ -152,6 +176,22 @@ public class ContextThreadLocalTest {
         task.run();
       } finally {
         events.add(name + ":close");
+      }
+    }
+  }
+
+  private static final class SwallowingPropagator extends RecordingPropagator {
+    SwallowingPropagator(final String name, final List<String> events) {
+      super(name, events);
+    }
+
+    @Override
+    public void runWithContext(final Object context, final ContextRunnable task) throws Exception {
+      try {
+        task.run();
+      } catch (Exception e) {
+        // Deliberately violates the ContextPropagator#runWithContext contract for testing.
+        events.add(name + ":caught");
       }
     }
   }
