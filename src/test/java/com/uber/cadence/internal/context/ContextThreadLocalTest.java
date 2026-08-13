@@ -118,6 +118,7 @@ public class ContextThreadLocalTest {
     List<String> events = new ArrayList<>();
     ContextPropagator retrying = new RetryingPropagator("retrying", events);
     int[] attempt = {0};
+    IllegalStateException firstAttemptFailure = new IllegalStateException("first attempt fails");
 
     try {
       ContextThreadLocal.runWithContext(
@@ -127,12 +128,12 @@ public class ContextThreadLocalTest {
             attempt[0]++;
             events.add("task:attempt:" + attempt[0]);
             if (attempt[0] == 1) {
-              throw new IllegalStateException("first attempt fails");
+              throw firstAttemptFailure;
             }
           });
       fail("expected ContextPropagatorContractViolationError");
     } catch (ContextPropagatorContractViolationError e) {
-      assertEquals(null, e.getCause());
+      assertEquals(firstAttemptFailure, e.getCause());
     } catch (Exception e) {
       fail("expected ContextPropagatorContractViolationError, got " + e);
     }

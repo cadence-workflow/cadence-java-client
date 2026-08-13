@@ -47,7 +47,7 @@ public final class ContextPropagatorContractViolationError extends Error {
   }
 
   static ContextPropagatorContractViolationError unexpectedInvocationCount(
-      List<ContextPropagator> appliedPropagators, int invocationCount) {
+      List<ContextPropagator> appliedPropagators, int invocationCount, Throwable lastThrown) {
     return new ContextPropagatorContractViolationError(
         "A ContextPropagator invoked the task it wraps "
             + invocationCount
@@ -56,7 +56,7 @@ public final class ContextPropagatorContractViolationError extends Error {
             + "task after catching an exception from it. One of these configured propagators "
             + "must be fixed: "
             + propagatorNames(appliedPropagators),
-        null);
+        lastThrown);
   }
 
   private static String propagatorNames(List<ContextPropagator> propagators) {

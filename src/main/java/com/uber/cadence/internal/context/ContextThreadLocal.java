@@ -117,7 +117,7 @@ public class ContextThreadLocal {
 
     if (invocationCount.get() != 1) {
       throw ContextPropagatorContractViolationError.unexpectedInvocationCount(
-          applied, invocationCount.get());
+          applied, invocationCount.get(), thrown.get());
     }
     Throwable swallowed = thrown.get();
     if (swallowed != null) {
