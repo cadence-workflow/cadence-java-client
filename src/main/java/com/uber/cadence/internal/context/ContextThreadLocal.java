@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -72,11 +73,12 @@ public class ContextThreadLocal {
    * behavior through {@link ContextPropagator#runWithContext(Object, ContextRunnable)}.
    *
    * <p>Every {@link ContextPropagator#runWithContext(Object, ContextRunnable)} implementation in
-   * the chain is required to propagate any exception thrown by the {@code task} it is given, rather
-   * than catching and suppressing it. This method verifies that contract: if {@code task} throws
-   * but no exception escapes the composed propagator chain, one of the configured propagators
-   * swallowed it, and {@link ContextPropagatorSwallowedExceptionError} is thrown instead of
-   * silently continuing as if {@code task} had succeeded.
+   * the chain is required to call {@code task.run()} exactly once and propagate any exception it
+   * throws, rather than skipping the call, retrying it, or catching and suppressing the exception.
+   * This method verifies that contract: if {@code task} is invoked a number of times other than
+   * exactly one, or if it throws but no exception escapes the composed propagator chain, a {@link
+   * ContextPropagatorContractViolationError} is thrown instead of silently continuing as if {@code
+   * task} had succeeded normally.
    */
   public static void runWithContext(
       List<ContextPropagator> propagators, Map<String, Object> contextData, ContextRunnable task)
@@ -90,9 +92,11 @@ public class ContextThreadLocal {
     }
 
     List<ContextPropagator> applied = new ArrayList<>();
+    AtomicInteger invocationCount = new AtomicInteger();
     AtomicReference<Throwable> thrown = new AtomicReference<>();
     ContextRunnable invocation =
         () -> {
+          invocationCount.incrementAndGet();
           try {
             task.run();
           } catch (Throwable t) {
@@ -111,9 +115,13 @@ public class ContextThreadLocal {
     }
     invocation.run();
 
+    if (invocationCount.get() != 1) {
+      throw ContextPropagatorContractViolationError.unexpectedInvocationCount(
+          applied, invocationCount.get());
+    }
     Throwable swallowed = thrown.get();
     if (swallowed != null) {
-      throw new ContextPropagatorSwallowedExceptionError(applied, swallowed);
+      throw ContextPropagatorContractViolationError.swallowedException(applied, swallowed);
     }
   }
 }
