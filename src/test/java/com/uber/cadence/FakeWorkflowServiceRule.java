@@ -8,8 +8,12 @@ import com.uber.tchannel.api.TChannel;
 import com.uber.tchannel.api.handlers.ThriftRequestHandler;
 import com.uber.tchannel.messages.ThriftRequest;
 import com.uber.tchannel.messages.ThriftResponse;
+import io.opentracing.mock.MockSpan;
 import io.opentracing.mock.MockTracer;
+import java.time.Duration;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,6 +26,8 @@ import org.junit.rules.ExternalResource;
  * particularly with TChannel being difficult to mock.
  */
 public class FakeWorkflowServiceRule extends ExternalResource {
+
+  private static final Duration SPAN_TIMEOUT = Duration.ofSeconds(5);
 
   private final Map<String, StubbedEndpoint> stubbedEndpoints = new ConcurrentHashMap<>();
   private final MockTracer tracer = new MockTracer();
@@ -87,6 +93,32 @@ public class FakeWorkflowServiceRule extends ExternalResource {
 
   public MockTracer getTracer() {
     return tracer;
+  }
+
+  /**
+   * Returns the first finished span with the given operation name, waiting for it to appear.
+   * TChannel finishes its client span from a response callback which may run after the calling
+   * thread has been unblocked, so spans are not guaranteed to be visible once the call returns.
+   */
+  public MockSpan awaitSpan(String operationName) {
+    long deadline = System.nanoTime() + SPAN_TIMEOUT.toNanos();
+    while (true) {
+      List<MockSpan> spans = tracer.finishedSpans();
+      Optional<MockSpan> span =
+          spans.stream().filter(s -> operationName.equals(s.operationName())).findFirst();
+      if (span.isPresent()) {
+        return span.get();
+      }
+      if (System.nanoTime() - deadline >= 0) {
+        throw new AssertionError("No span found for " + operationName + ", got: " + spans);
+      }
+      try {
+        Thread.sleep(10);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new AssertionError("Interrupted waiting for span " + operationName, e);
+      }
+    }
   }
 
   public <V> CompletableFuture<V> stubSuccess(
