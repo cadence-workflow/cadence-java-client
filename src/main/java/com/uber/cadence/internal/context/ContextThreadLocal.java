@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 /** This class holds the current set of context propagators */
@@ -69,6 +70,13 @@ public class ContextThreadLocal {
    * <p>Propagators are composed in configuration order, so the first propagator is the outermost
    * context and cleanup occurs in reverse order. Legacy propagators retain their existing set/unset
    * behavior through {@link ContextPropagator#runWithContext(Object, ContextRunnable)}.
+   *
+   * <p>Every {@link ContextPropagator#runWithContext(Object, ContextRunnable)} implementation in
+   * the chain is required to propagate any exception thrown by the {@code task} it is given, rather
+   * than catching and suppressing it. This method verifies that contract: if {@code task} throws
+   * but no exception escapes the composed propagator chain, one of the configured propagators
+   * swallowed it, and {@link ContextPropagatorSwallowedExceptionError} is thrown instead of
+   * silently continuing as if {@code task} had succeeded.
    */
   public static void runWithContext(
       List<ContextPropagator> propagators, Map<String, Object> contextData, ContextRunnable task)
@@ -81,15 +89,31 @@ public class ContextThreadLocal {
       return;
     }
 
-    ContextRunnable invocation = task;
+    List<ContextPropagator> applied = new ArrayList<>();
+    AtomicReference<Throwable> thrown = new AtomicReference<>();
+    ContextRunnable invocation =
+        () -> {
+          try {
+            task.run();
+          } catch (Throwable t) {
+            thrown.set(t);
+            throw t;
+          }
+        };
     for (int i = propagators.size() - 1; i >= 0; i--) {
       ContextPropagator propagator = propagators.get(i);
       if (contextData.containsKey(propagator.getName())) {
+        applied.add(0, propagator);
         Object context = contextData.get(propagator.getName());
         ContextRunnable next = invocation;
         invocation = () -> propagator.runWithContext(context, next);
       }
     }
     invocation.run();
+
+    Throwable swallowed = thrown.get();
+    if (swallowed != null) {
+      throw new ContextPropagatorSwallowedExceptionError(applied, swallowed);
+    }
   }
 }
