@@ -103,14 +103,41 @@ public class ContextThreadLocalTest {
             events.add("task");
             throw taskFailure;
           });
-      fail("expected ContextPropagatorSwallowedExceptionError");
-    } catch (ContextPropagatorSwallowedExceptionError e) {
+      fail("expected ContextPropagatorContractViolationError");
+    } catch (ContextPropagatorContractViolationError e) {
       assertEquals(taskFailure, e.getCause());
     } catch (Exception e) {
-      fail("expected ContextPropagatorSwallowedExceptionError, got " + e);
+      fail("expected ContextPropagatorContractViolationError, got " + e);
     }
 
     assertEquals(Arrays.asList("task", "swallowing:caught"), events);
+  }
+
+  @Test
+  public void runWithContextThrowsWhenPropagatorRetriesTaskAfterCatchingException() {
+    List<String> events = new ArrayList<>();
+    ContextPropagator retrying = new RetryingPropagator("retrying", events);
+    int[] attempt = {0};
+
+    try {
+      ContextThreadLocal.runWithContext(
+          Collections.singletonList(retrying),
+          Collections.<String, Object>singletonMap("retrying", "value"),
+          () -> {
+            attempt[0]++;
+            events.add("task:attempt:" + attempt[0]);
+            if (attempt[0] == 1) {
+              throw new IllegalStateException("first attempt fails");
+            }
+          });
+      fail("expected ContextPropagatorContractViolationError");
+    } catch (ContextPropagatorContractViolationError e) {
+      assertEquals(null, e.getCause());
+    } catch (Exception e) {
+      fail("expected ContextPropagatorContractViolationError, got " + e);
+    }
+
+    assertEquals(Arrays.asList("task:attempt:1", "retrying:retrying", "task:attempt:2"), events);
   }
 
   private static Map<String, Object> context(
@@ -192,6 +219,24 @@ public class ContextThreadLocalTest {
       } catch (Exception e) {
         // Deliberately violates the ContextPropagator#runWithContext contract for testing.
         events.add(name + ":caught");
+      }
+    }
+  }
+
+  private static final class RetryingPropagator extends RecordingPropagator {
+    RetryingPropagator(final String name, final List<String> events) {
+      super(name, events);
+    }
+
+    @Override
+    public void runWithContext(final Object context, final ContextRunnable task) throws Exception {
+      try {
+        task.run();
+      } catch (Exception e) {
+        // Deliberately violates the ContextPropagator#runWithContext contract for testing: a
+        // propagator must call task.run() exactly once, never retry it after catching a failure.
+        events.add(name + ":retrying");
+        task.run();
       }
     }
   }
