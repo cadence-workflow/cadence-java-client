@@ -18,11 +18,14 @@
 package com.uber.cadence.internal.context;
 
 import com.uber.cadence.context.ContextPropagator;
+import com.uber.cadence.context.ContextPropagator.ContextRunnable;
 import com.uber.cadence.workflow.WorkflowThreadLocal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 /** This class holds the current set of context propagators */
@@ -57,20 +60,68 @@ public class ContextThreadLocal {
     return contextData;
   }
 
-  public static void propagateContextToCurrentThread(Map<String, Object> contextData) {
-    if (contextData == null || contextData.isEmpty()) {
-      return;
-    }
-    for (ContextPropagator propagator : contextPropagators.get()) {
-      if (contextData.containsKey(propagator.getName())) {
-        propagator.setCurrentContext(contextData.get(propagator.getName()));
-      }
-    }
+  public static void runWithContext(Map<String, Object> contextData, ContextRunnable task)
+      throws Exception {
+    runWithContext(contextPropagators.get(), contextData, task);
   }
 
-  public static void unsetCurrentContext() {
-    for (ContextPropagator propagator : contextPropagators.get()) {
-      propagator.unsetCurrentContext();
+  /**
+   * Executes {@code task} inside every applicable propagator context.
+   *
+   * <p>Propagators are composed in configuration order, so the first propagator is the outermost
+   * context and cleanup occurs in reverse order. Legacy propagators retain their existing set/unset
+   * behavior through {@link ContextPropagator#runWithContext(Object, ContextRunnable)}.
+   *
+   * <p>Every {@link ContextPropagator#runWithContext(Object, ContextRunnable)} implementation in
+   * the chain is required to call {@code task.run()} exactly once and propagate any exception it
+   * throws, rather than skipping the call, retrying it, or catching and suppressing the exception.
+   * This method verifies that contract: if {@code task} is invoked a number of times other than
+   * exactly one, or if it throws but no exception escapes the composed propagator chain, a {@link
+   * ContextPropagatorContractViolationError} is thrown instead of silently continuing as if {@code
+   * task} had succeeded normally.
+   */
+  public static void runWithContext(
+      List<ContextPropagator> propagators, Map<String, Object> contextData, ContextRunnable task)
+      throws Exception {
+    if (propagators == null
+        || propagators.isEmpty()
+        || contextData == null
+        || contextData.isEmpty()) {
+      task.run();
+      return;
+    }
+
+    List<ContextPropagator> applied = new ArrayList<>();
+    AtomicInteger invocationCount = new AtomicInteger();
+    AtomicReference<Throwable> thrown = new AtomicReference<>();
+    ContextRunnable invocation =
+        () -> {
+          invocationCount.incrementAndGet();
+          try {
+            task.run();
+          } catch (Throwable t) {
+            thrown.set(t);
+            throw t;
+          }
+        };
+    for (int i = propagators.size() - 1; i >= 0; i--) {
+      ContextPropagator propagator = propagators.get(i);
+      if (contextData.containsKey(propagator.getName())) {
+        applied.add(0, propagator);
+        Object context = contextData.get(propagator.getName());
+        ContextRunnable next = invocation;
+        invocation = () -> propagator.runWithContext(context, next);
+      }
+    }
+    invocation.run();
+
+    if (invocationCount.get() != 1) {
+      throw ContextPropagatorContractViolationError.unexpectedInvocationCount(
+          applied, invocationCount.get(), thrown.get());
+    }
+    Throwable swallowed = thrown.get();
+    if (swallowed != null) {
+      throw ContextPropagatorContractViolationError.swallowedException(applied, swallowed);
     }
   }
 }
