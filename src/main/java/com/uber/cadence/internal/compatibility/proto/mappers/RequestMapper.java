@@ -811,7 +811,7 @@ public class RequestMapper {
         fields.add(DomainUpdateOwnerEmailField);
       }
       if (updatedInfo.getData() != null) {
-        updatedInfo.setData(updatedInfo.getData());
+        request.putAllData(updatedInfo.getData());
         fields.add(DomainUpdateDataField);
       }
     }
