@@ -279,6 +279,11 @@ public class WorkflowClientInternalTest {
 
     SignalWithStartWorkflowExecutionRequest request =
         requestFuture.getNow(null).getSignalWithStartRequest().getRequest();
+    // TChannel finishes its own outbound span (in addition to the "cadence-..." span created
+    // explicitly by WorkflowServiceTChannel) from a future completion callback that can run on an
+    // I/O thread, so it may not yet be visible to this thread immediately after
+    // enqueueSignalWithStart() returns. Poll briefly instead of asserting immediately.
+    awaitFinishedSpansCount(2, Duration.ofSeconds(2));
     assertEquals(2, fakeService.getTracer().finishedSpans().size());
     MockSpan mockSpan =
         fakeService
@@ -557,5 +562,24 @@ public class WorkflowClientInternalTest {
     String secondRequestId = secondAttempt.getNow(null).getCancelRequest().getRequestId();
     assertNotNull("first request must have a request id", firstRequestId);
     assertEquals(firstRequestId, secondRequestId);
+  }
+
+  /**
+   * Polls until {@code fakeService}'s tracer has finished at least {@code expectedCount} spans, or
+   * {@code timeout} elapses. TChannel finishes its own per-request span from a future completion
+   * callback that isn't guaranteed to run before the blocking RPC call returns to the caller, so
+   * span-count assertions must tolerate a short delay rather than checking immediately.
+   */
+  private static void awaitFinishedSpansCount(int expectedCount, Duration timeout) {
+    long deadline = System.nanoTime() + timeout.toNanos();
+    while (fakeService.getTracer().finishedSpans().size() < expectedCount
+        && System.nanoTime() < deadline) {
+      try {
+        Thread.sleep(10);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return;
+      }
+    }
   }
 }
