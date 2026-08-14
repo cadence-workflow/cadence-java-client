@@ -48,6 +48,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,6 +147,11 @@ public class StartWorkflowTest {
   private static final Duration SPAN_TIMEOUT = Duration.ofSeconds(30);
 
   @Test
+  @Ignore(
+      "TChannel sends the span context in $tracing$-prefixed application headers. A server running "
+          + "yarpc 1.84.1 or newer only strips them when it has a tracer of its own, and otherwise "
+          + "forwards them to history and matching over gRPC, which rejects the keys and fails the "
+          + "request. See the tracer comment in WorkflowServiceTChannel.")
   public void testStartWorkflowTchannel() {
     Assume.assumeTrue(useDockerService);
     MockTracer mockTracer = new MockTracer();
@@ -251,6 +257,7 @@ public class StartWorkflowTest {
   }
 
   @Test
+  @Ignore("Skipped for the same reason as testStartWorkflowTchannel")
   public void testSignalWithStartWorkflowTchannel() {
     Assume.assumeTrue(useDockerService);
     MockTracer mockTracer = new MockTracer();
