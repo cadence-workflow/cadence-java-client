@@ -22,12 +22,11 @@ import static com.uber.cadence.internal.metrics.MetricsTagValue.REQUEST_TYPE_NOR
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.uber.cadence.*;
 import com.uber.cadence.WorkflowService.GetWorkflowExecutionHistory_result;
 import com.uber.cadence.internal.Version;
 import com.uber.cadence.internal.common.CheckedExceptionWrapper;
+import com.uber.cadence.internal.common.FeatureFlagsHeader;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
@@ -157,10 +156,8 @@ public class WorkflowServiceTChannel implements IWorkflowService {
     }
 
     if (options.getFeatureFlags() != null) {
-      GsonBuilder gsonBuilder = new GsonBuilder();
-      Gson gson = gsonBuilder.create();
-      String serialized = gson.toJson(options.getFeatureFlags());
-      builder.put("cadence-client-feature-flags", serialized);
+      builder.put(
+          "cadence-client-feature-flags", FeatureFlagsHeader.serialize(options.getFeatureFlags()));
     }
 
     if (!Strings.isNullOrEmpty(options.getIsolationGroup())) {
