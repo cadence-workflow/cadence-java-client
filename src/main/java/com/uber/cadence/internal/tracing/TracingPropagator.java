@@ -71,7 +71,9 @@ public class TracingPropagator {
         .withTag(TAG_WORKFLOW_TYPE, context.getWorkflowType().getName())
         .withTag(TAG_WORKFLOW_ID, context.getWorkflowId())
         .withTag(TAG_WORKFLOW_RUN_ID, context.getRunId())
-        .withTag(TAG_IS_CRON, attributes.getCronSchedule() != "")
+        .withTag(
+            TAG_IS_CRON,
+            attributes.getCronSchedule() != null && !attributes.getCronSchedule().isEmpty())
         .start();
   }
 
