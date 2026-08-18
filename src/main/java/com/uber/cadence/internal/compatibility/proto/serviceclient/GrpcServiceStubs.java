@@ -16,8 +16,6 @@
 package com.uber.cadence.internal.compatibility.proto.serviceclient;
 
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.uber.cadence.api.v1.DomainAPIGrpc;
 import com.uber.cadence.api.v1.MetaAPIGrpc;
 import com.uber.cadence.api.v1.MetaAPIGrpc.MetaAPIBlockingStub;
@@ -32,6 +30,7 @@ import com.uber.cadence.api.v1.WorkflowAPIGrpc;
 import com.uber.cadence.api.v1.WorkflowAPIGrpc.WorkflowAPIBlockingStub;
 import com.uber.cadence.api.v1.WorkflowAPIGrpc.WorkflowAPIFutureStub;
 import com.uber.cadence.internal.Version;
+import com.uber.cadence.internal.common.FeatureFlagsHeader;
 import com.uber.cadence.serviceclient.ClientOptions;
 import com.uber.cadence.serviceclient.auth.IAuthorizationProvider;
 import io.grpc.*;
@@ -114,10 +113,8 @@ final class GrpcServiceStubs implements IGrpcServiceStubs {
       headers.put(ISOLATION_GROUP_HEADER_KEY, options.getIsolationGroup());
     }
     if (options.getFeatureFlags() != null) {
-      GsonBuilder gsonBuilder = new GsonBuilder();
-      Gson gson = gsonBuilder.create();
-      String serialized = gson.toJson(options.getFeatureFlags());
-      headers.put(CLIENT_FEATURE_FLAGS_HEADER_KEY, serialized);
+      headers.put(
+          CLIENT_FEATURE_FLAGS_HEADER_KEY, FeatureFlagsHeader.serialize(options.getFeatureFlags()));
     }
     mergeHeaders(headers, options.getHeaders());
 

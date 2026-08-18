@@ -48,6 +48,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,8 +144,14 @@ public class StartWorkflowTest {
   private static final Logger logger = LoggerFactory.getLogger(StartWorkflowTest.class);
   private static final String DOMAIN = "test-domain";
   private static final String TASK_LIST = "test-tasklist";
+  private static final Duration SPAN_TIMEOUT = Duration.ofSeconds(30);
 
   @Test
+  @Ignore(
+      "TChannel sends the span context in $tracing$-prefixed application headers. A server running "
+          + "yarpc 1.84.1 or newer only strips them when it has a tracer of its own, and otherwise "
+          + "forwards them to history and matching over gRPC, which rejects the keys and fails the "
+          + "request. See the tracer comment in WorkflowServiceTChannel.")
   public void testStartWorkflowTchannel() {
     Assume.assumeTrue(useDockerService);
     MockTracer mockTracer = new MockTracer();
@@ -195,9 +202,10 @@ public class StartWorkflowTest {
     worker.registerWorkflowImplementationTypes(TestWorkflowImpl.class, DoubleWorkflowImpl.class);
     workerFactory.start();
 
+    int workflowCount = 100;
     List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < workflowCount; i++) {
       int finalI = i;
       futures.add(
           CompletableFuture.runAsync(
@@ -217,7 +225,12 @@ public class StartWorkflowTest {
       // test debug log
       StringBuilder sb = new StringBuilder();
 
-      List<MockSpan> spans = mockTracer.finishedSpans();
+      Map<String, Long> expectedSpans = new HashMap<>();
+      // each workflow runs an activity plus a child workflow which runs a local activity
+      expectedSpans.put("cadence-ExecuteWorkflow", 2L * workflowCount);
+      expectedSpans.put("cadence-ExecuteActivity", (long) workflowCount);
+      expectedSpans.put("cadence-ExecuteLocalActivity", (long) workflowCount);
+      List<MockSpan> spans = awaitSpans(mockTracer, expectedSpans);
       spans.forEach(
           span -> {
             sb.append(span.toString()).append("\n");
@@ -244,6 +257,7 @@ public class StartWorkflowTest {
   }
 
   @Test
+  @Ignore("Skipped for the same reason as testStartWorkflowTchannel")
   public void testSignalWithStartWorkflowTchannel() {
     Assume.assumeTrue(useDockerService);
     MockTracer mockTracer = new MockTracer();
@@ -337,7 +351,16 @@ public class StartWorkflowTest {
       throw new AssertionError("workflow failure", e);
     } finally {
       rootSpan.finish();
-      List<MockSpan> spans = mockTracer.finishedSpans();
+      List<MockSpan> spans =
+          shouldPropagate
+              ? awaitSpans(
+                  mockTracer,
+                  "cadence-StartWorkflowExecution",
+                  "cadence-ExecuteWorkflow",
+                  "cadence-ExecuteWorkflow",
+                  "cadence-ExecuteActivity",
+                  "cadence-ExecuteLocalActivity")
+              : mockTracer.finishedSpans();
       spans.sort(
           (o1, o2) -> {
             if (o1.startMicros() < o2.startMicros()) {
@@ -431,7 +454,16 @@ public class StartWorkflowTest {
       throw new AssertionError("Workflow failure", e);
     } finally {
       rootSpan.finish();
-      List<MockSpan> spans = mockTracer.finishedSpans();
+      List<MockSpan> spans =
+          shouldPropagate
+              ? awaitSpans(
+                  mockTracer,
+                  "cadence-SignalWithStartWorkflowExecution",
+                  "cadence-ExecuteWorkflow",
+                  "cadence-ExecuteWorkflow",
+                  "cadence-ExecuteActivity",
+                  "cadence-ExecuteLocalActivity")
+              : mockTracer.finishedSpans();
       spans.sort(
           (o1, o2) -> {
             if (o1.startMicros() < o2.startMicros()) {
@@ -479,6 +511,49 @@ public class StartWorkflowTest {
         assertSpanReferences(spanExecuteLocalActivity, "follows_from", spanExecuteChildWF);
       }
       workerFactory.shutdown();
+    }
+  }
+
+  /**
+   * Returns the finished spans once every expected operation name is present, a repeated name
+   * requiring that many spans. Worker side spans are finished on worker threads after the client
+   * has already received the workflow result, so they aren't guaranteed to be visible as soon as
+   * the call returns.
+   */
+  private List<MockSpan> awaitSpans(MockTracer tracer, String... expectedOperationNames) {
+    return awaitSpans(
+        tracer,
+        Arrays.stream(expectedOperationNames)
+            .collect(Collectors.groupingBy(name -> name, Collectors.counting())));
+  }
+
+  private List<MockSpan> awaitSpans(MockTracer tracer, Map<String, Long> expectedOperationCounts) {
+    long deadline = System.nanoTime() + SPAN_TIMEOUT.toNanos();
+    while (true) {
+      List<MockSpan> spans = tracer.finishedSpans();
+      Map<String, Long> actual =
+          spans
+              .stream()
+              .collect(Collectors.groupingBy(span -> span.operationName(), Collectors.counting()));
+      boolean complete =
+          expectedOperationCounts
+              .entrySet()
+              .stream()
+              .allMatch(
+                  expected -> actual.getOrDefault(expected.getKey(), 0L) >= expected.getValue());
+      if (complete) {
+        return spans;
+      }
+      if (System.nanoTime() - deadline >= 0) {
+        throw new AssertionError(
+            "Timed out waiting for spans " + expectedOperationCounts + ", got: " + actual);
+      }
+      try {
+        Thread.sleep(10);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new AssertionError("Interrupted waiting for spans " + expectedOperationCounts, e);
+      }
     }
   }
 
