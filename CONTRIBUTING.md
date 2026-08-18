@@ -45,56 +45,109 @@ Overcommit adds some requirements to your commit messages. At Uber, we follow th
 commit messages. Read it, follow it, learn it, love it.
 
 
-##  Build & Publish & Test locally
-Build with:
+## Versioning
+
+The project version is derived automatically from git tags via `git describe --tags` (leading `v` is stripped). You do **not** edit a hard-coded version in `build.gradle`.
+
+Examples:
+
+| Git state | Published version |
+| --- | --- |
+| Exact tag `v3.13.3` | `3.13.3` |
+| 2 commits after `v3.13.3` at `36ed6879` | `3.13.3-2-g36ed6879` |
+
+Check the current version (printed during Gradle configuration):
+
+```bash
+./gradlew printVersion
+# or: git describe --tags
+```
+
+Maven coordinates:
+
+```text
+com.uber.cadence:cadence-client:<version>
+```
+
+## Build
 
 ```bash
 ./gradlew build
 ```
 
-To test locally, you can publish to [MavenLocal](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:case-for-maven-local)
+## Test locally against Maven Local
 
-1. Change `build.gradle`:
-Comment out the first section in `publications` ( line 160 to line 191 in [this commit](https://github.com/cadence-workflow/cadence-java-client/blob/c9ec6786aa9f866b0310292ea3ee5df63adc8799/build.gradle#L160))
+Publish the current git-describe version to [Maven Local](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:case-for-maven-local):
 
-2. Change the [version](https://github.com/cadence-workflow/cadence-java-client/blob/c9ec6786aa9f866b0310292ea3ee5df63adc8799/build.gradle#L43) to add a `local` suffix. E.g.
-```
-version = '3.3.0'
-````
-to
-```
-version = '3.3.0-local'
-```
-Then run the command
 ```bash
 ./gradlew publishToMavenLocal
 ```
-Now you have the local cadence-java-client in your machine using veriosn `3.3.0-local`
 
-3. To test with Cadence Java Samples, [change](https://github.com/cadence-workflow/cadence-java-samples/blob/master/build.gradle#L32) `mavenCentral()` to `mavenLocal()`
-and also change the [version](https://github.com/cadence-workflow/cadence-java-samples/blob/a79d8d6e5860cf9986bf549fc1f96badecb09f8f/build.gradle#L38) with your suffix.
+Artifacts land under:
 
-Then `./gradlew build` and refer to the sample repo for how to run the code(it needs to run with a [Cadence server](https://github.com/cadence-workflow/cadence)).
+```text
+~/.m2/repository/com/uber/cadence/cadence-client/<version>/
+  cadence-client-<version>.jar
+  cadence-client-<version>-sources.jar
+  cadence-client-<version>-javadoc.jar
+```
 
-:warning: If you run into problem with `version.properties` [creation task](https://github.com/cadence-workflow/cadence-java-client/blob/c9ec6786aa9f866b0310292ea3ee5df63adc8799/build.gradle#L109), you can comment the task out. It's okay for local testing.
-The property file is being used by [Version class](https://github.com/cadence-workflow/cadence-java-client/blob/master/src/main/java/com/uber/cadence/internal/Version.java#L39)to report the library version for logging/metrics.
+To consume it from another project (for example [cadence-java-samples](https://github.com/cadence-workflow/cadence-java-samples)):
+
+1. Prefer `mavenLocal()` over `mavenCentral()` (or list `mavenLocal()` first).
+2. Set the dependency version to the printed git-describe version, e.g. `3.13.3-2-g36ed6879`.
+3. Build/run that project. Samples need a running [Cadence server](https://github.com/cadence-workflow/cadence).
+
+:warning: `createProperties` writes `version.properties` used by [`Version`](src/main/java/com/uber/cadence/internal/Version.java) for logging/metrics. If that task fails during local testing, you can temporarily disable it; for real releases leave it enabled.
 
 ## Unit & Integration Test
 
-Then run all the tests with:
+Run all tests:
 
 ```bash
 ./gradlew test
 ```
 
-The test by default will run with TestEnvironment without Cadence service. If you want to run with Cadence serivce:
+By default tests use the in-process TestEnvironment (no Cadence service). To run against a Cadence service in Docker:
+
 ```bash
 USE_DOCKER_SERVICE=true ./gradlew test
 ```
-And sometimes it's important to test the non-sticky mode
+
+Non-sticky mode:
+
 ```bash
 STICKY_OFF=true USE_DOCKER_SERVICE=true ./gradlew test
 ```
 
-Also, if there is any Github Actions test failure that you cannot reproduce locally,
-follow [github action docker-compose](./docker/github_actions/README.md) instructions to run the tests.
+If a GitHub Actions failure is hard to reproduce locally, follow [github action docker-compose](./docker/github_actions/README.md).
+
+## Release to Maven Central
+
+Releases are published by the [Release to Maven Central](.github/workflows/release.yml) GitHub Action. Version still comes from git tags.
+
+1. Ensure release notes / `CHANGELOG.md` are updated and the release commit is on the intended branch.
+2. Create and push an annotated (or lightweight) version tag matching `v*`, for example:
+
+```bash
+git tag v3.13.4
+git push origin v3.13.4
+```
+
+3. Pushing `v*` triggers the workflow, which *already* runs:
+
+```bash
+./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+```
+
+   using OSSRH and GPG signing secrets configured in the repo.
+
+4. Alternatively, run the workflow manually via **Actions → Release to Maven Central → Run workflow** (`workflow_dispatch`). The published version is still whatever `git describe --tags` resolves to for the checked-out ref—so for a clean release, run it from (or after checking out) the release tag.
+
+5. After Sonatype processing completes, verify the artifact on Maven Central:
+
+```text
+com.uber.cadence:cadence-client:<version>
+```
+
+Maintainers only: local/manual publish to Sonatype requires `ossrhUsername` / `ossrhPassword` and signing properties (`signing.keyId`, `signing.key` / local keyring, `signing.password`) as used by `build.gradle`. Prefer the GitHub Action for official releases.
