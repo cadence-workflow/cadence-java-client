@@ -14,4 +14,5 @@ public class CreateScheduleRequest {
   private SchedulePolicies policies;
   private Memo memo;
   private SearchAttributes searchAttributes;
+  private ScheduleState state;
 }
