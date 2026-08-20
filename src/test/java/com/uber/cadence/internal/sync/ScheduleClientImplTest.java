@@ -402,6 +402,44 @@ public class ScheduleClientImplTest {
     assertNull(captor.getValue().getState());
   }
 
+  @Test
+  public void createSchedule_initialState_pausedWithReasonOnly() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    client
+        .createSchedule(
+            SCHEDULE_ID,
+            null,
+            minimalAction(),
+            null,
+            new ScheduleInitialState(true, "reason", null))
+        .join();
+
+    CreateScheduleRequest req = captor.getValue();
+    assertNotNull(req.getState().getPauseInfo());
+    assertEquals("reason", req.getState().getPauseInfo().getReason());
+    assertNull(req.getState().getPauseInfo().getPausedBy());
+  }
+
+  @Test
+  public void createSchedule_initialState_pausedWithPausedByOnly() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    client
+        .createSchedule(
+            SCHEDULE_ID, null, minimalAction(), null, new ScheduleInitialState(true, null, "ci"))
+        .join();
+
+    CreateScheduleRequest req = captor.getValue();
+    assertNotNull(req.getState().getPauseInfo());
+    assertNull(req.getState().getPauseInfo().getReason());
+    assertEquals("ci", req.getState().getPauseInfo().getPausedBy());
+  }
+
   // --- null handling ---
 
   @Test
