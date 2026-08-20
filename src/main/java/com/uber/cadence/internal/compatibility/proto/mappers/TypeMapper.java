@@ -1197,6 +1197,16 @@ class TypeMapper {
     return res;
   }
 
+  static SchedulePauseInfo schedulePauseInfo(com.uber.cadence.SchedulePauseInfo t) {
+    if (t == null) {
+      return SchedulePauseInfo.getDefaultInstance();
+    }
+    return SchedulePauseInfo.newBuilder()
+        .setReason(Helpers.nullToEmpty(t.getReason()))
+        .setPausedBy(Helpers.nullToEmpty(t.getPausedBy()))
+        .build();
+  }
+
   static com.uber.cadence.ScheduleState scheduleState(ScheduleState t) {
     if (t == null || t == ScheduleState.getDefaultInstance()) {
       return null;
@@ -1205,6 +1215,15 @@ class TypeMapper {
     res.setPaused(t.getPaused());
     res.setPauseInfo(schedulePauseInfo(t.getPauseInfo()));
     return res;
+  }
+
+  static ScheduleState scheduleState(com.uber.cadence.ScheduleState t) {
+    if (t == null) {
+      return ScheduleState.getDefaultInstance();
+    }
+    ScheduleState.Builder b = ScheduleState.newBuilder().setPaused(t.isPaused());
+    if (t.getPauseInfo() != null) b.setPauseInfo(schedulePauseInfo(t.getPauseInfo()));
+    return b.build();
   }
 
   static com.uber.cadence.BackfillInfo backfillInfo(BackfillInfo t) {

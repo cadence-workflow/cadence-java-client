@@ -18,6 +18,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -438,6 +439,28 @@ public class ScheduleClientImplTest {
     assertNotNull(req.getState().getPauseInfo());
     assertNull(req.getState().getPauseInfo().getReason());
     assertEquals("ci", req.getState().getPauseInfo().getPausedBy());
+  }
+
+  @Test
+  public void createScheduleRequest_stateSerializesToProto() {
+    com.uber.cadence.SchedulePauseInfo pi = new com.uber.cadence.SchedulePauseInfo();
+    pi.setReason("deploying");
+    pi.setPausedBy("ci-bot");
+    com.uber.cadence.ScheduleState thriftState =
+        new com.uber.cadence.ScheduleState().setPaused(true).setPauseInfo(pi);
+    com.uber.cadence.CreateScheduleRequest thrift =
+        new com.uber.cadence.CreateScheduleRequest()
+            .setDomain(DOMAIN)
+            .setScheduleId(SCHEDULE_ID)
+            .setState(thriftState);
+
+    com.uber.cadence.api.v1.CreateScheduleRequest proto =
+        com.uber.cadence.internal.compatibility.proto.mappers.RequestMapper.createScheduleRequest(
+            thrift);
+
+    assertTrue(proto.getState().getPaused());
+    assertEquals("deploying", proto.getState().getPauseInfo().getReason());
+    assertEquals("ci-bot", proto.getState().getPauseInfo().getPausedBy());
   }
 
   // --- null handling ---

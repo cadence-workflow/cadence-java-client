@@ -45,6 +45,7 @@ import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.r
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.scheduleAction;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.schedulePolicies;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.scheduleSpec;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.scheduleState;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.searchAttributes;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.startTimeFilter;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.statusFilter;
@@ -1033,6 +1034,7 @@ public class RequestMapper {
     if (t.getMemo() != null) b.setMemo(memo(t.getMemo()));
     if (t.getSearchAttributes() != null)
       b.setSearchAttributes(searchAttributes(t.getSearchAttributes()));
+    if (t.getState() != null) b.setState(scheduleState(t.getState()));
     return b.build();
   }
 
