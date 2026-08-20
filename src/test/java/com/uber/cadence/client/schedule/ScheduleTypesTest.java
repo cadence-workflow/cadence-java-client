@@ -308,6 +308,48 @@ public class ScheduleTypesTest {
   }
 
   @Test
+  public void scheduleInitialState_getters() {
+    ScheduleInitialState s = new ScheduleInitialState(true, "deploying", "ci-bot");
+    assertTrue(s.isPaused());
+    assertEquals("deploying", s.getPauseReason());
+    assertEquals("ci-bot", s.getPausedBy());
+  }
+
+  @Test
+  public void scheduleInitialState_equals() {
+    ScheduleInitialState a = new ScheduleInitialState(true, "reason", "user");
+    ScheduleInitialState b = new ScheduleInitialState(true, "reason", "user");
+    assertEquals(a, b);
+    assertEquals(a.hashCode(), b.hashCode());
+  }
+
+  @Test
+  public void scheduleInitialState_notEqualOnDifferentPaused() {
+    assertNotEquals(
+        new ScheduleInitialState(true, null, null), new ScheduleInitialState(false, null, null));
+  }
+
+  @Test
+  public void scheduleInitialState_notEqualOnDifferentReason() {
+    assertNotEquals(
+        new ScheduleInitialState(true, "a", null), new ScheduleInitialState(true, "b", null));
+  }
+
+  @Test
+  public void scheduleInitialState_notEqualOnDifferentPausedBy() {
+    assertNotEquals(
+        new ScheduleInitialState(true, null, "x"), new ScheduleInitialState(true, null, "y"));
+  }
+
+  @Test
+  public void scheduleInitialState_toString() {
+    String s = new ScheduleInitialState(true, "deploy", "ci").toString();
+    assertTrue(s.contains("paused=true"));
+    assertTrue(s.contains("deploy"));
+    assertTrue(s.contains("ci"));
+  }
+
+  @Test
   public void scheduleState_getters() {
     Instant pausedAt = Instant.ofEpochSecond(500);
     ScheduleState state = new ScheduleState(true, "maintenance", pausedAt, "ops-team");
