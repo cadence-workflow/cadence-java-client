@@ -29,6 +29,7 @@ import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
+import com.uber.cadence.client.schedule.ScheduleInitialState;
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
@@ -341,6 +342,64 @@ public class ScheduleClientImplTest {
     assertEquals("0 * * * *", req.getSpec().getCronExpression());
     assertEquals(
         com.uber.cadence.ScheduleOverlapPolicy.CONCURRENT, req.getPolicies().getOverlapPolicy());
+  }
+
+  // --- initialState ---
+
+  @Test
+  public void createSchedule_initialState_pausedWithReasonAndPausedBy() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    ScheduleInitialState initialState = new ScheduleInitialState(true, "deploying", "ci-bot");
+    client.createSchedule(SCHEDULE_ID, null, minimalAction(), null, initialState).join();
+
+    CreateScheduleRequest req = captor.getValue();
+    assertNotNull(req.getState());
+    assertEquals(true, req.getState().isPaused());
+    assertNotNull(req.getState().getPauseInfo());
+    assertEquals("deploying", req.getState().getPauseInfo().getReason());
+    assertEquals("ci-bot", req.getState().getPauseInfo().getPausedBy());
+  }
+
+  @Test
+  public void createSchedule_initialState_pausedNoPauseInfo() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    client
+        .createSchedule(
+            SCHEDULE_ID, null, minimalAction(), null, new ScheduleInitialState(true, null, null))
+        .join();
+
+    CreateScheduleRequest req = captor.getValue();
+    assertNotNull(req.getState());
+    assertEquals(true, req.getState().isPaused());
+    assertNull(req.getState().getPauseInfo());
+  }
+
+  @Test
+  public void createSchedule_initialState_null_sendsNoState() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    client.createSchedule(SCHEDULE_ID, null, minimalAction(), null, null).join();
+
+    assertNull(captor.getValue().getState());
+  }
+
+  @Test
+  public void createSchedule_fourArg_sendsNoState() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    client.createSchedule(SCHEDULE_ID, null, minimalAction(), null).join();
+
+    assertNull(captor.getValue().getState());
   }
 
   // --- null handling ---
