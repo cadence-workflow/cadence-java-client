@@ -53,6 +53,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -121,7 +122,7 @@ class DeterministicRunnerImpl implements DeterministicRunner {
    * Used to check for failedPromises that contain an error, but never where accessed. It is to
    * avoid failure swallowing by failedPromises which is very hard to troubleshoot.
    */
-  private Set<Promise> failedPromises = new HashSet<>();
+  private Set<Promise> failedPromises = ConcurrentHashMap.newKeySet();
 
   private boolean exitRequested;
   private Object exitValue;
