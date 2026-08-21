@@ -29,6 +29,7 @@ import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleDescription;
+import com.uber.cadence.client.schedule.ScheduleInitialState;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
 import java.util.List;
@@ -73,6 +74,25 @@ public interface ScheduleClient {
    */
   CompletableFuture<CreateScheduleResponse> createSchedule(
       String scheduleId, ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies);
+
+  /**
+   * Creates a new schedule in a specific initial state using clean client types. Pass a {@link
+   * ScheduleInitialState} with {@code paused = true} to start the schedule already paused, avoiding
+   * a subsequent {@link #pauseSchedule} call.
+   *
+   * @param scheduleId unique identifier for the schedule within the domain
+   * @param spec when and how often the schedule fires
+   * @param action what to do on each firing (start a workflow)
+   * @param policies overlap, catch-up, and failure-handling policies
+   * @param initialState optional initial pause state; {@code null} behaves like the four-arg
+   *     overload
+   */
+  CompletableFuture<CreateScheduleResponse> createSchedule(
+      String scheduleId,
+      ScheduleSpec spec,
+      ScheduleAction action,
+      SchedulePolicies policies,
+      ScheduleInitialState initialState);
 
   /**
    * Returns the current configuration and runtime state of a schedule.

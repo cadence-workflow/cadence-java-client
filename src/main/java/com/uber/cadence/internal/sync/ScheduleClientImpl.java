@@ -45,6 +45,7 @@ import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleDescription;
 import com.uber.cadence.client.schedule.ScheduleInfo;
+import com.uber.cadence.client.schedule.ScheduleInitialState;
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
@@ -80,12 +81,25 @@ final class ScheduleClientImpl implements ScheduleClient {
   @Override
   public CompletableFuture<CreateScheduleResponse> createSchedule(
       String scheduleId, ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies) {
+    return createSchedule(scheduleId, spec, action, policies, null);
+  }
+
+  @Override
+  public CompletableFuture<CreateScheduleResponse> createSchedule(
+      String scheduleId,
+      ScheduleSpec spec,
+      ScheduleAction action,
+      SchedulePolicies policies,
+      ScheduleInitialState initialState) {
     try {
       CreateScheduleRequest request =
           new CreateScheduleRequest()
               .setSpec(toThriftSpec(spec))
               .setAction(toThriftAction(action))
               .setPolicies(toThriftPolicies(policies));
+      if (initialState != null) {
+        request.setState(toThriftInitialState(initialState));
+      }
       return createSchedule(scheduleId, request);
     } catch (Exception e) {
       CompletableFuture<CreateScheduleResponse> f = new CompletableFuture<>();
@@ -293,6 +307,17 @@ final class ScheduleClientImpl implements ScheduleClient {
     }
     if (p.getCatchUpWindow() != null) {
       t.setCatchUpWindowInSeconds((int) p.getCatchUpWindow().getSeconds());
+    }
+    return t;
+  }
+
+  private static com.uber.cadence.ScheduleState toThriftInitialState(ScheduleInitialState s) {
+    com.uber.cadence.ScheduleState t = new com.uber.cadence.ScheduleState().setPaused(s.isPaused());
+    if (s.isPaused() && (s.getPauseReason() != null || s.getPausedBy() != null)) {
+      com.uber.cadence.SchedulePauseInfo pi = new com.uber.cadence.SchedulePauseInfo();
+      if (s.getPauseReason() != null) pi.setReason(s.getPauseReason());
+      if (s.getPausedBy() != null) pi.setPausedBy(s.getPausedBy());
+      t.setPauseInfo(pi);
     }
     return t;
   }
