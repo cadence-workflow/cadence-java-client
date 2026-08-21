@@ -18,6 +18,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -29,6 +30,7 @@ import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
+import com.uber.cadence.client.schedule.ScheduleInitialState;
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
@@ -341,6 +343,124 @@ public class ScheduleClientImplTest {
     assertEquals("0 * * * *", req.getSpec().getCronExpression());
     assertEquals(
         com.uber.cadence.ScheduleOverlapPolicy.CONCURRENT, req.getPolicies().getOverlapPolicy());
+  }
+
+  // --- initialState ---
+
+  @Test
+  public void createSchedule_initialState_pausedWithReasonAndPausedBy() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    ScheduleInitialState initialState = new ScheduleInitialState(true, "deploying", "ci-bot");
+    client.createSchedule(SCHEDULE_ID, null, minimalAction(), null, initialState).join();
+
+    CreateScheduleRequest req = captor.getValue();
+    assertNotNull(req.getState());
+    assertEquals(true, req.getState().isPaused());
+    assertNotNull(req.getState().getPauseInfo());
+    assertEquals("deploying", req.getState().getPauseInfo().getReason());
+    assertEquals("ci-bot", req.getState().getPauseInfo().getPausedBy());
+  }
+
+  @Test
+  public void createSchedule_initialState_pausedNoPauseInfo() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    client
+        .createSchedule(
+            SCHEDULE_ID, null, minimalAction(), null, new ScheduleInitialState(true, null, null))
+        .join();
+
+    CreateScheduleRequest req = captor.getValue();
+    assertNotNull(req.getState());
+    assertEquals(true, req.getState().isPaused());
+    assertNull(req.getState().getPauseInfo());
+  }
+
+  @Test
+  public void createSchedule_initialState_null_sendsNoState() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    client.createSchedule(SCHEDULE_ID, null, minimalAction(), null, null).join();
+
+    assertNull(captor.getValue().getState());
+  }
+
+  @Test
+  public void createSchedule_fourArg_sendsNoState() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    client.createSchedule(SCHEDULE_ID, null, minimalAction(), null).join();
+
+    assertNull(captor.getValue().getState());
+  }
+
+  @Test
+  public void createSchedule_initialState_pausedWithReasonOnly() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    client
+        .createSchedule(
+            SCHEDULE_ID,
+            null,
+            minimalAction(),
+            null,
+            new ScheduleInitialState(true, "reason", null))
+        .join();
+
+    CreateScheduleRequest req = captor.getValue();
+    assertNotNull(req.getState().getPauseInfo());
+    assertEquals("reason", req.getState().getPauseInfo().getReason());
+    assertNull(req.getState().getPauseInfo().getPausedBy());
+  }
+
+  @Test
+  public void createSchedule_initialState_pausedWithPausedByOnly() throws Exception {
+    ArgumentCaptor<CreateScheduleRequest> captor = forClass(CreateScheduleRequest.class);
+    when(service.CreateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
+
+    client
+        .createSchedule(
+            SCHEDULE_ID, null, minimalAction(), null, new ScheduleInitialState(true, null, "ci"))
+        .join();
+
+    CreateScheduleRequest req = captor.getValue();
+    assertNotNull(req.getState().getPauseInfo());
+    assertNull(req.getState().getPauseInfo().getReason());
+    assertEquals("ci", req.getState().getPauseInfo().getPausedBy());
+  }
+
+  @Test
+  public void createScheduleRequest_stateSerializesToProto() {
+    com.uber.cadence.SchedulePauseInfo pi = new com.uber.cadence.SchedulePauseInfo();
+    pi.setReason("deploying");
+    pi.setPausedBy("ci-bot");
+    com.uber.cadence.ScheduleState thriftState =
+        new com.uber.cadence.ScheduleState().setPaused(true).setPauseInfo(pi);
+    com.uber.cadence.CreateScheduleRequest thrift =
+        new com.uber.cadence.CreateScheduleRequest()
+            .setDomain(DOMAIN)
+            .setScheduleId(SCHEDULE_ID)
+            .setState(thriftState);
+
+    com.uber.cadence.api.v1.CreateScheduleRequest proto =
+        com.uber.cadence.internal.compatibility.proto.mappers.RequestMapper.createScheduleRequest(
+            thrift);
+
+    assertTrue(proto.getState().getPaused());
+    assertEquals("deploying", proto.getState().getPauseInfo().getReason());
+    assertEquals("ci-bot", proto.getState().getPauseInfo().getPausedBy());
   }
 
   // --- null handling ---
