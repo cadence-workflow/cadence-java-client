@@ -17,7 +17,11 @@ package com.uber.cadence.internal.common;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 
+import com.uber.cadence.ActiveClusterSelectionPolicy;
+import com.uber.cadence.ClusterAttribute;
 import com.uber.cadence.WorkflowType;
+import com.uber.cadence.client.WorkflowOptions;
+import java.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -64,7 +68,8 @@ public class StartWorkflowExecutionParametersTest {
             + "maximumAttempts=0, "
             + "nonRetriableErrorReasons=null, expirationIntervalInSeconds=0}, "
             + "cronSchedule='* * * * *', "
-            + "memo='null', searchAttributes='null, context='null, delayStart='null'}";
+            + "memo='null', searchAttributes='null, context='null, delayStart='null', "
+            + "activeClusterSelectionPolicy='null'}";
 
     assertEquals(expectedString, params1.toString());
   }
@@ -124,5 +129,23 @@ public class StartWorkflowExecutionParametersTest {
         params1.getRetryParameters().getExpirationIntervalInSeconds(),
         copy.getRetryParameters().getExpirationIntervalInSeconds());
     assertEquals(params1.getCronSchedule(), copy.getCronSchedule());
+  }
+
+  @Test
+  public void testFromWorkflowOptionsCopiesActiveClusterSelectionPolicy() {
+    ActiveClusterSelectionPolicy policy =
+        new ActiveClusterSelectionPolicy()
+            .setClusterAttribute(new ClusterAttribute().setScope("location").setName("lisbon"));
+    WorkflowOptions options =
+        new WorkflowOptions.Builder()
+            .setTaskList("taskList")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
+            .setActiveClusterSelectionPolicy(policy)
+            .build();
+
+    StartWorkflowExecutionParameters parameters =
+        StartWorkflowExecutionParameters.fromWorkflowOptions(options);
+
+    assertEquals(policy, parameters.getActiveClusterSelectionPolicy());
   }
 }

@@ -17,6 +17,7 @@
 
 package com.uber.cadence.internal.common;
 
+import com.uber.cadence.ActiveClusterSelectionPolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.client.WorkflowOptions;
@@ -55,6 +56,8 @@ public final class StartWorkflowExecutionParameters {
   private Map<String, byte[]> context;
 
   private Duration delayStart;
+
+  private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
 
   /**
    * Returns the value of the WorkflowId property for this object.
@@ -317,6 +320,15 @@ public final class StartWorkflowExecutionParameters {
     return delayStart;
   }
 
+  public ActiveClusterSelectionPolicy getActiveClusterSelectionPolicy() {
+    return activeClusterSelectionPolicy;
+  }
+
+  public void setActiveClusterSelectionPolicy(
+      ActiveClusterSelectionPolicy activeClusterSelectionPolicy) {
+    this.activeClusterSelectionPolicy = activeClusterSelectionPolicy;
+  }
+
   public StartWorkflowExecutionParameters withRetryParameters(RetryParameters retryParameters) {
     this.retryParameters = retryParameters;
     return this;
@@ -352,6 +364,7 @@ public final class StartWorkflowExecutionParameters {
     if (options.getCronSchedule() != null) {
       parameters.setCronSchedule(options.getCronSchedule());
     }
+    parameters.setActiveClusterSelectionPolicy(options.getActiveClusterSelectionPolicy());
     return parameters;
   }
 
@@ -396,6 +409,9 @@ public final class StartWorkflowExecutionParameters {
         + ", delayStart='"
         + delayStart
         + '\''
+        + ", activeClusterSelectionPolicy='"
+        + activeClusterSelectionPolicy
+        + '\''
         + '}';
   }
 
@@ -416,7 +432,8 @@ public final class StartWorkflowExecutionParameters {
         && Objects.equals(memo, that.memo)
         && Objects.equals(searchAttributes, that.searchAttributes)
         && Objects.equals(context, that.context)
-        && Objects.equals(delayStart, that.delayStart);
+        && Objects.equals(delayStart, that.delayStart)
+        && Objects.equals(activeClusterSelectionPolicy, that.activeClusterSelectionPolicy);
   }
 
   @Override
@@ -434,7 +451,8 @@ public final class StartWorkflowExecutionParameters {
             memo,
             searchAttributes,
             context,
-            delayStart);
+            delayStart,
+            activeClusterSelectionPolicy);
     result = 31 * result + Arrays.hashCode(input);
     return result;
   }
@@ -456,6 +474,7 @@ public final class StartWorkflowExecutionParameters {
     result.setSearchAttributes(searchAttributes);
     result.setContext(context);
     result.setDelayStart(delayStart);
+    result.setActiveClusterSelectionPolicy(activeClusterSelectionPolicy);
     return result;
   }
 }

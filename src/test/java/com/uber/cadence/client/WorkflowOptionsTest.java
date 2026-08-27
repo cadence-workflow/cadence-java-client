@@ -17,6 +17,8 @@
 
 package com.uber.cadence.client;
 
+import com.uber.cadence.ActiveClusterSelectionPolicy;
+import com.uber.cadence.ClusterAttribute;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.common.CronSchedule;
 import com.uber.cadence.common.MethodRetry;
@@ -190,6 +192,30 @@ public class WorkflowOptionsTest {
     }
 
     Assert.fail("invalid cron schedule not caught");
+  }
+
+  @Test
+  public void testActiveClusterSelectionPolicyRoundTrip() throws NoSuchMethodException {
+    ActiveClusterSelectionPolicy policy =
+        new ActiveClusterSelectionPolicy()
+            .setClusterAttribute(new ClusterAttribute().setScope("location").setName("lisbon"));
+    WorkflowOptions o =
+        new WorkflowOptions.Builder()
+            .setTaskList("foo")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(321))
+            .setActiveClusterSelectionPolicy(policy)
+            .build();
+    Assert.assertEquals(policy, o.getActiveClusterSelectionPolicy());
+    // copy-constructor keeps it
+    Assert.assertEquals(
+        policy, new WorkflowOptions.Builder(o).build().getActiveClusterSelectionPolicy());
+    // merge with an empty annotation keeps it
+    WorkflowMethod a =
+        WorkflowOptionsTest.class
+            .getMethod("defaultWorkflowOptions")
+            .getAnnotation(WorkflowMethod.class);
+    Assert.assertEquals(
+        policy, WorkflowOptions.merge(a, null, null, o).getActiveClusterSelectionPolicy());
   }
 
   private Map<String, Object> getTestMemo() {

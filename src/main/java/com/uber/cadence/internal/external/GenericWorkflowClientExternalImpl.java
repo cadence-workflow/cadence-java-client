@@ -261,6 +261,9 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     if (startParameters.getDelayStart() != null) {
       request.setDelayStartSeconds((int) startParameters.getDelayStart().getSeconds());
     }
+    if (startParameters.getActiveClusterSelectionPolicy() != null) {
+      request.setActiveClusterSelectionPolicy(startParameters.getActiveClusterSelectionPolicy());
+    }
 
     return request;
   }
@@ -486,6 +489,9 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     }
     if (startParameters.getDelayStart() != null) {
       request.setDelayStartSeconds((int) startParameters.getDelayStart().getSeconds());
+    }
+    if (startParameters.getActiveClusterSelectionPolicy() != null) {
+      request.setActiveClusterSelectionPolicy(startParameters.getActiveClusterSelectionPolicy());
     }
     return request;
   }

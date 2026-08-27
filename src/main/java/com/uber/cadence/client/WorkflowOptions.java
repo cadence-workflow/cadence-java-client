@@ -25,6 +25,7 @@ import com.cronutils.model.definition.CronDefinition;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
 import com.google.common.base.Strings;
+import com.uber.cadence.ActiveClusterSelectionPolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.common.CronSchedule;
 import com.uber.cadence.common.MethodRetry;
@@ -67,6 +68,7 @@ public final class WorkflowOptions {
         .setSearchAttributes(o.getSearchAttributes())
         .setContextPropagators(o.getContextPropagators())
         .setDelayStart(o.delayStart)
+        .setActiveClusterSelectionPolicy(o.activeClusterSelectionPolicy)
         .validateBuildWithDefaults();
   }
 
@@ -94,6 +96,8 @@ public final class WorkflowOptions {
 
     private Duration delayStart;
 
+    private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
+
     public Builder() {}
 
     public Builder(WorkflowOptions o) {
@@ -111,6 +115,7 @@ public final class WorkflowOptions {
       this.searchAttributes = o.searchAttributes;
       this.contextPropagators = o.contextPropagators;
       this.delayStart = o.delayStart;
+      this.activeClusterSelectionPolicy = o.activeClusterSelectionPolicy;
     }
 
     /**
@@ -223,6 +228,18 @@ public final class WorkflowOptions {
       return this;
     }
 
+    /**
+     * Sets the active cluster selection policy for an active-active domain. The cluster attribute
+     * is a scope/name pair, for example scope {@code "location"} and name {@code "lisbon"}. The
+     * workflow follows that attribute's failover behavior as configured on the domain. This option
+     * is only meaningful for active-active domains.
+     */
+    public Builder setActiveClusterSelectionPolicy(
+        ActiveClusterSelectionPolicy activeClusterSelectionPolicy) {
+      this.activeClusterSelectionPolicy = activeClusterSelectionPolicy;
+      return this;
+    }
+
     public WorkflowOptions build() {
       return new WorkflowOptions(
           workflowId,
@@ -235,7 +252,8 @@ public final class WorkflowOptions {
           memo,
           searchAttributes,
           contextPropagators,
-          delayStart);
+          delayStart,
+          activeClusterSelectionPolicy);
     }
 
     /**
@@ -290,7 +308,8 @@ public final class WorkflowOptions {
           memo,
           searchAttributes,
           contextPropagators,
-          delayStart);
+          delayStart,
+          activeClusterSelectionPolicy);
     }
   }
 
@@ -316,6 +335,8 @@ public final class WorkflowOptions {
 
   private Duration delayStart;
 
+  private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
+
   private WorkflowOptions(
       String workflowId,
       WorkflowIdReusePolicy workflowIdReusePolicy,
@@ -327,7 +348,8 @@ public final class WorkflowOptions {
       Map<String, Object> memo,
       Map<String, Object> searchAttributes,
       List<ContextPropagator> contextPropagators,
-      Duration delayStart) {
+      Duration delayStart,
+      ActiveClusterSelectionPolicy activeClusterSelectionPolicy) {
     this.workflowId = workflowId;
     this.workflowIdReusePolicy = workflowIdReusePolicy;
     this.executionStartToCloseTimeout = executionStartToCloseTimeout;
@@ -339,6 +361,7 @@ public final class WorkflowOptions {
     this.searchAttributes = searchAttributes;
     this.contextPropagators = contextPropagators;
     this.delayStart = delayStart;
+    this.activeClusterSelectionPolicy = activeClusterSelectionPolicy;
   }
 
   public String getWorkflowId() {
@@ -385,6 +408,10 @@ public final class WorkflowOptions {
     return delayStart;
   }
 
+  public ActiveClusterSelectionPolicy getActiveClusterSelectionPolicy() {
+    return activeClusterSelectionPolicy;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -400,7 +427,8 @@ public final class WorkflowOptions {
         && Objects.equals(memo, that.memo)
         && Objects.equals(searchAttributes, that.searchAttributes)
         && Objects.equals(contextPropagators, that.contextPropagators)
-        && Objects.equals(delayStart, that.delayStart);
+        && Objects.equals(delayStart, that.delayStart)
+        && Objects.equals(activeClusterSelectionPolicy, that.activeClusterSelectionPolicy);
   }
 
   @Override
@@ -416,7 +444,8 @@ public final class WorkflowOptions {
         memo,
         searchAttributes,
         contextPropagators,
-        delayStart);
+        delayStart,
+        activeClusterSelectionPolicy);
   }
 
   @Override
@@ -449,6 +478,9 @@ public final class WorkflowOptions {
         + '\''
         + ", delayStart='"
         + delayStart
+        + '\''
+        + ", activeClusterSelectionPolicy='"
+        + activeClusterSelectionPolicy
         + '\''
         + '}';
   }
