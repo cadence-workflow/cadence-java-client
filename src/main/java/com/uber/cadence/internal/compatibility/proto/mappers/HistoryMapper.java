@@ -19,6 +19,7 @@ import static com.uber.cadence.EventType.*;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.cancelExternalWorkflowExecutionFailedCause;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.childWorkflowExecutionFailedCause;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.continueAsNewInitiator;
+import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.cronOverlapPolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.decisionTaskFailedCause;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.decisionTaskTimedOutCause;
 import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.parentClosePolicy;
@@ -28,6 +29,7 @@ import static com.uber.cadence.internal.compatibility.proto.mappers.EnumMapper.w
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.byteStringToArray;
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.durationToSeconds;
 import static com.uber.cadence.internal.compatibility.proto.mappers.Helpers.timeToUnixNano;
+import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.activeClusterSelectionPolicy;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.activityType;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.externalInitiatedId;
 import static com.uber.cadence.internal.compatibility.proto.mappers.TypeMapper.externalWorkflowExecution;
@@ -1090,6 +1092,9 @@ class HistoryMapper {
     res.setSearchAttributes(searchAttributes(t.getSearchAttributes()));
     res.setPrevAutoResetPoints(resetPoints(t.getPrevAutoResetPoints()));
     res.setHeader(header(t.getHeader()));
+    res.setActiveClusterSelectionPolicy(
+        activeClusterSelectionPolicy(t.getActiveClusterSelectionPolicy()));
+    res.setCronOverlapPolicy(cronOverlapPolicy(t.getCronOverlapPolicy()));
     return res;
   }
 
