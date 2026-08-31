@@ -28,7 +28,15 @@ public final class ScheduleInitialState {
   private final String pauseReason;
   private final String pausedBy;
 
+  /**
+   * @throws IllegalArgumentException if {@code pauseReason} or {@code pausedBy} is non-null but
+   *     {@code paused} is {@code false} — those fields are only meaningful when paused.
+   */
   public ScheduleInitialState(boolean paused, String pauseReason, String pausedBy) {
+    if (!paused && (pauseReason != null || pausedBy != null)) {
+      throw new IllegalArgumentException(
+          "pauseReason and pausedBy are only meaningful when paused=true");
+    }
     this.paused = paused;
     this.pauseReason = pauseReason;
     this.pausedBy = pausedBy;
@@ -39,18 +47,12 @@ public final class ScheduleInitialState {
     return paused;
   }
 
-  /**
-   * Human-readable reason for the initial pause. May be {@code null} when {@link #isPaused()} is
-   * {@code false}.
-   */
+  /** Human-readable reason for the initial pause. Only set when {@link #isPaused()} is true. */
   public String getPauseReason() {
     return pauseReason;
   }
 
-  /**
-   * Identity of the actor initiating the pause. May be {@code null} when {@link #isPaused()} is
-   * {@code false}.
-   */
+  /** Identity of the actor initiating the pause. Only set when {@link #isPaused()} is true. */
   public String getPausedBy() {
     return pausedBy;
   }

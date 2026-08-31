@@ -341,6 +341,16 @@ public class ScheduleTypesTest {
         new ScheduleInitialState(true, null, "x"), new ScheduleInitialState(true, null, "y"));
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void scheduleInitialState_rejectsPauseReasonWhenNotPaused() {
+    new ScheduleInitialState(false, "reason", null);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void scheduleInitialState_rejectsPausedByWhenNotPaused() {
+    new ScheduleInitialState(false, null, "user");
+  }
+
   @Test
   public void scheduleInitialState_toString() {
     String s = new ScheduleInitialState(true, "deploy", "ci").toString();
