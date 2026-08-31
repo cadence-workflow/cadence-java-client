@@ -85,6 +85,19 @@ public final class ThriftObjects {
       new ResetPoints().setPoints(Collections.singletonList(RESET_POINT_INFO));
   public static final ClusterReplicationConfiguration CLUSTER_REPLICATION_CONFIGURATION =
       new ClusterReplicationConfiguration().setClusterName("cluster");
+  public static final ActiveClusterInfo ACTIVE_CLUSTER_INFO =
+      new ActiveClusterInfo().setActiveClusterName("activeCluster").setFailoverVersion(1);
+  public static final ClusterAttributeScope CLUSTER_ATTRIBUTE_SCOPE =
+      new ClusterAttributeScope()
+          .setClusterAttributes(ImmutableMap.of("region", ACTIVE_CLUSTER_INFO));
+  public static final ActiveClusters ACTIVE_CLUSTERS =
+      new ActiveClusters()
+          .setActiveClustersByClusterAttribute(ImmutableMap.of("region", CLUSTER_ATTRIBUTE_SCOPE));
+  public static final ClusterAttribute CLUSTER_ATTRIBUTE =
+      new ClusterAttribute().setScope("scope").setName("region");
+  public static final ActiveClusterSelectionPolicy ACTIVE_CLUSTER_SELECTION_POLICY =
+      new ActiveClusterSelectionPolicy().setClusterAttribute(CLUSTER_ATTRIBUTE);
+  public static final CronOverlapPolicy CRON_OVERLAP_POLICY = CronOverlapPolicy.SKIPPED;
   public static final PollerInfo POLLER_INFO =
       new PollerInfo().setIdentity("identity").setLastAccessTime(1).setRatePerSecond(2.0);
   public static final TaskIDBlock TASK_ID_BLOCK = new TaskIDBlock().setStartID(1).setEndID(2);
@@ -194,7 +207,8 @@ public final class ThriftObjects {
   public static final DomainReplicationConfiguration DOMAIN_REPLICATION_CONFIGURATION =
       new DomainReplicationConfiguration()
           .setActiveClusterName("activeCluster")
-          .setClusters(ImmutableList.of(CLUSTER_REPLICATION_CONFIGURATION));
+          .setClusters(ImmutableList.of(CLUSTER_REPLICATION_CONFIGURATION))
+          .setActiveClusters(ACTIVE_CLUSTERS);
 
   public static Decision DECISION_SCHEDULE_ACTIVITY_TASK =
       new Decision()
@@ -276,7 +290,9 @@ public final class ThriftObjects {
                   .setMemo(MEMO)
                   .setSearchAttributes(SEARCH_ATTRIBUTES)
                   .setRetryPolicy(RETRY_POLICY)
-                  .setCronSchedule("cron"));
+                  .setCronSchedule("cron")
+                  .setCronOverlapPolicy(CRON_OVERLAP_POLICY)
+                  .setActiveClusterSelectionPolicy(ACTIVE_CLUSTER_SELECTION_POLICY));
   public static Decision DECISION_START_CHILD_WORKFLOW_EXECUTION =
       new Decision()
           .setDecisionType(DecisionType.StartChildWorkflowExecution)
@@ -296,7 +312,9 @@ public final class ThriftObjects {
                   .setCronSchedule("cron")
                   .setControl(utf8("control"))
                   .setParentClosePolicy(ParentClosePolicy.ABANDON)
-                  .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.AllowDuplicate));
+                  .setWorkflowIdReusePolicy(WorkflowIdReusePolicy.AllowDuplicate)
+                  .setCronOverlapPolicy(CRON_OVERLAP_POLICY)
+                  .setActiveClusterSelectionPolicy(ACTIVE_CLUSTER_SELECTION_POLICY));
   public static Decision DECISION_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION =
       new Decision()
           .setDecisionType(DecisionType.SignalExternalWorkflowExecution)
@@ -883,7 +901,9 @@ public final class ThriftObjects {
           .setHeader(HEADER)
           .setJitterStartSeconds(0)
           .setDelayStartSeconds(3)
-          .setFirstRunAtTimestamp(123456789L);
+          .setFirstRunAtTimestamp(123456789L)
+          .setCronOverlapPolicy(CRON_OVERLAP_POLICY)
+          .setActiveClusterSelectionPolicy(ACTIVE_CLUSTER_SELECTION_POLICY);
   public static final com.uber.cadence.SignalWithStartWorkflowExecutionRequest
       SIGNAL_WITH_START_WORKFLOW_EXECUTION =
           new SignalWithStartWorkflowExecutionRequest()
@@ -907,7 +927,9 @@ public final class ThriftObjects {
               .setHeader(HEADER)
               .setDelayStartSeconds(3)
               .setJitterStartSeconds(0)
-              .setFirstRunAtTimestamp(123456789L);
+              .setFirstRunAtTimestamp(123456789L)
+              .setCronOverlapPolicy(CRON_OVERLAP_POLICY)
+              .setActiveClusterSelectionPolicy(ACTIVE_CLUSTER_SELECTION_POLICY);
 
   public static final StartWorkflowExecutionAsyncRequest START_WORKFLOW_EXECUTION_ASYNC_REQUEST =
       new StartWorkflowExecutionAsyncRequest().setRequest(START_WORKFLOW_EXECUTION);
@@ -1009,7 +1031,8 @@ public final class ThriftObjects {
           .setHistoryArchivalStatus(ArchivalStatus.ENABLED)
           .setHistoryArchivalURI("historyArchivalUri")
           .setVisibilityArchivalStatus(ArchivalStatus.DISABLED)
-          .setVisibilityArchivalURI("visibilityArchivalUri");
+          .setVisibilityArchivalURI("visibilityArchivalUri")
+          .setActiveClusters(ACTIVE_CLUSTERS);
 
   public static final UpdateDomainRequest UPDATE_DOMAIN_REQUEST =
       new UpdateDomainRequest()

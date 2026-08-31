@@ -16,11 +16,13 @@
 package com.uber.cadence.internal.compatibility.proto;
 
 import static com.uber.cadence.internal.compatibility.proto.EnumMapper.continueAsNewInitiator;
+import static com.uber.cadence.internal.compatibility.proto.EnumMapper.cronOverlapPolicy;
 import static com.uber.cadence.internal.compatibility.proto.EnumMapper.parentClosePolicy;
 import static com.uber.cadence.internal.compatibility.proto.EnumMapper.workflowIdReusePolicy;
 import static com.uber.cadence.internal.compatibility.proto.Helpers.arrayToByteString;
 import static com.uber.cadence.internal.compatibility.proto.Helpers.longToInt;
 import static com.uber.cadence.internal.compatibility.proto.Helpers.secondsToDuration;
+import static com.uber.cadence.internal.compatibility.proto.TypeMapper.activeClusterSelectionPolicy;
 import static com.uber.cadence.internal.compatibility.proto.TypeMapper.activityType;
 import static com.uber.cadence.internal.compatibility.proto.TypeMapper.failure;
 import static com.uber.cadence.internal.compatibility.proto.TypeMapper.header;
@@ -210,6 +212,13 @@ class DecisionMapper {
           if (attr.getCronSchedule() != null) {
             builder.setCronSchedule(attr.getCronSchedule());
           }
+          if (attr.getCronOverlapPolicy() != null) {
+            builder.setCronOverlapPolicy(cronOverlapPolicy(attr.getCronOverlapPolicy()));
+          }
+          if (attr.getActiveClusterSelectionPolicy() != null) {
+            builder.setActiveClusterSelectionPolicy(
+                activeClusterSelectionPolicy(attr.getActiveClusterSelectionPolicy()));
+          }
           decision.setContinueAsNewWorkflowExecutionDecisionAttributes(builder);
         }
         break;
@@ -245,6 +254,13 @@ class DecisionMapper {
           }
           if (attr.getCronSchedule() != null) {
             builder.setCronSchedule(attr.getCronSchedule());
+          }
+          if (attr.getCronOverlapPolicy() != null) {
+            builder.setCronOverlapPolicy(cronOverlapPolicy(attr.getCronOverlapPolicy()));
+          }
+          if (attr.getActiveClusterSelectionPolicy() != null) {
+            builder.setActiveClusterSelectionPolicy(
+                activeClusterSelectionPolicy(attr.getActiveClusterSelectionPolicy()));
           }
           decision.setStartChildWorkflowExecutionDecisionAttributes(builder);
         }

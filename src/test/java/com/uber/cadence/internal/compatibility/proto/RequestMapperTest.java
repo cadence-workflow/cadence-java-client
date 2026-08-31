@@ -165,15 +165,11 @@ public class RequestMapperTest<
         testCase(
             ThriftObjects.START_WORKFLOW_EXECUTION,
             ProtoObjects.START_WORKFLOW_EXECUTION,
-            RequestMapper::startWorkflowExecutionRequest,
-            "activeClusterSelectionPolicy", // aa: not wired yet
-            "cronOverlapPolicy"), // aa: not wired yet
+            RequestMapper::startWorkflowExecutionRequest),
         testCase(
             ThriftObjects.SIGNAL_WITH_START_WORKFLOW_EXECUTION,
             ProtoObjects.SIGNAL_WITH_START_WORKFLOW_EXECUTION,
-            RequestMapper::signalWithStartWorkflowExecutionRequest,
-            "activeClusterSelectionPolicy", // aa: not wired yet
-            "cronOverlapPolicy"), // aa: not wired yet
+            RequestMapper::signalWithStartWorkflowExecutionRequest),
         testCase(
             ThriftObjects.START_WORKFLOW_EXECUTION_ASYNC_REQUEST,
             ProtoObjects.START_WORKFLOW_EXECUTION_ASYNC_REQUEST,
@@ -242,8 +238,7 @@ public class RequestMapperTest<
             ProtoObjects.REGISTER_DOMAIN_REQUEST,
             RequestMapper::registerDomainRequest,
             "emitMetric", // Thrift has this field but proto doens't have it
-            "activeClusters", // aa: not wired yet
-            "activeClustersByRegion"), // aa: not wired yet
+            "activeClustersByRegion"), // thrift-only field, no proto counterpart
         testCase(
             ThriftObjects.UPDATE_DOMAIN_REQUEST,
             ProtoObjects.UPDATE_DOMAIN_REQUEST,

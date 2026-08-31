@@ -24,9 +24,14 @@ import static com.uber.cadence.internal.compatibility.proto.Helpers.secondsToDur
 import static com.uber.cadence.internal.compatibility.proto.Helpers.unixNanoToTime;
 
 import com.google.common.base.Strings;
+import com.uber.cadence.api.v1.ActiveClusterInfo;
+import com.uber.cadence.api.v1.ActiveClusterSelectionPolicy;
+import com.uber.cadence.api.v1.ActiveClusters;
 import com.uber.cadence.api.v1.ActivityType;
 import com.uber.cadence.api.v1.BadBinaries;
 import com.uber.cadence.api.v1.BadBinaryInfo;
+import com.uber.cadence.api.v1.ClusterAttribute;
+import com.uber.cadence.api.v1.ClusterAttributeScope;
 import com.uber.cadence.api.v1.ClusterReplicationConfiguration;
 import com.uber.cadence.api.v1.Failure;
 import com.uber.cadence.api.v1.Header;
@@ -367,5 +372,67 @@ class TypeMapper {
       v.put(key, workflowQueryResult(t.get(key)));
     }
     return v;
+  }
+
+  static ActiveClusters activeClusters(com.uber.cadence.ActiveClusters t) {
+    if (t == null) {
+      return ActiveClusters.newBuilder().build();
+    }
+    Map<String, ClusterAttributeScope> clusterAttributeScopes = new HashMap<>();
+    if (t.getActiveClustersByClusterAttribute() != null) {
+      for (Map.Entry<String, com.uber.cadence.ClusterAttributeScope> entry :
+          t.getActiveClustersByClusterAttribute().entrySet()) {
+        clusterAttributeScopes.put(entry.getKey(), clusterAttributeScope(entry.getValue()));
+      }
+    }
+    return ActiveClusters.newBuilder()
+        .putAllActiveClustersByClusterAttribute(clusterAttributeScopes)
+        .build();
+  }
+
+  static ClusterAttributeScope clusterAttributeScope(com.uber.cadence.ClusterAttributeScope t) {
+    if (t == null) {
+      return ClusterAttributeScope.newBuilder().build();
+    }
+    Map<String, ActiveClusterInfo> clusterAttributes = new HashMap<>();
+    if (t.getClusterAttributes() != null) {
+      for (Map.Entry<String, com.uber.cadence.ActiveClusterInfo> entry :
+          t.getClusterAttributes().entrySet()) {
+        clusterAttributes.put(entry.getKey(), activeClusterInfo(entry.getValue()));
+      }
+    }
+    return ClusterAttributeScope.newBuilder().putAllClusterAttributes(clusterAttributes).build();
+  }
+
+  static ActiveClusterInfo activeClusterInfo(com.uber.cadence.ActiveClusterInfo t) {
+    if (t == null) {
+      return ActiveClusterInfo.newBuilder().build();
+    }
+    return ActiveClusterInfo.newBuilder()
+        .setActiveClusterName(Helpers.nullToEmpty(t.getActiveClusterName()))
+        .setFailoverVersion(t.getFailoverVersion())
+        .build();
+  }
+
+  static ActiveClusterSelectionPolicy activeClusterSelectionPolicy(
+      com.uber.cadence.ActiveClusterSelectionPolicy t) {
+    if (t == null) {
+      return ActiveClusterSelectionPolicy.newBuilder().build();
+    }
+    ActiveClusterSelectionPolicy.Builder builder = ActiveClusterSelectionPolicy.newBuilder();
+    if (t.getClusterAttribute() != null) {
+      builder.setClusterAttribute(clusterAttribute(t.getClusterAttribute()));
+    }
+    return builder.build();
+  }
+
+  static ClusterAttribute clusterAttribute(com.uber.cadence.ClusterAttribute t) {
+    if (t == null) {
+      return ClusterAttribute.newBuilder().build();
+    }
+    return ClusterAttribute.newBuilder()
+        .setScope(Helpers.nullToEmpty(t.getScope()))
+        .setName(Helpers.nullToEmpty(t.getName()))
+        .build();
   }
 }
