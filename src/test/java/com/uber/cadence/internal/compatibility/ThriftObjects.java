@@ -368,7 +368,9 @@ public final class ThriftObjects {
               .setMemo(MEMO)
               .setSearchAttributes(SEARCH_ATTRIBUTES)
               .setPrevAutoResetPoints(RESET_POINTS)
-              .setHeader(HEADER);
+              .setHeader(HEADER)
+              .setActiveClusterSelectionPolicy(ACTIVE_CLUSTER_SELECTION_POLICY)
+              .setCronOverlapPolicy(CRON_OVERLAP_POLICY);
 
   public static final WorkflowExecutionCompletedEventAttributes
       WORKFLOW_EXECUTION_COMPLETED_EVENT_ATTRIBUTES =

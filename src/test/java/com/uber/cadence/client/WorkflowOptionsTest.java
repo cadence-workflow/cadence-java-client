@@ -17,6 +17,8 @@
 
 package com.uber.cadence.client;
 
+import com.uber.cadence.ActiveClusterSelectionPolicy;
+import com.uber.cadence.ClusterAttribute;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.common.CronSchedule;
 import com.uber.cadence.common.MethodRetry;
@@ -190,6 +192,73 @@ public class WorkflowOptionsTest {
     }
 
     Assert.fail("invalid cron schedule not caught");
+  }
+
+  private static ActiveClusterSelectionPolicy testPolicy() {
+    return new ActiveClusterSelectionPolicy()
+        .setClusterAttribute(new ClusterAttribute().setScope("location").setName("lisbon"));
+  }
+
+  private static WorkflowOptions.Builder optionsWithPolicy(ActiveClusterSelectionPolicy policy) {
+    return new WorkflowOptions.Builder()
+        .setTaskList("foo")
+        .setExecutionStartToCloseTimeout(Duration.ofSeconds(321))
+        .setActiveClusterSelectionPolicy(policy);
+  }
+
+  @Test
+  public void testActiveClusterSelectionPolicySetOnBuilder() {
+    ActiveClusterSelectionPolicy policy = testPolicy();
+    Assert.assertEquals(
+        policy, optionsWithPolicy(policy).build().getActiveClusterSelectionPolicy());
+  }
+
+  @Test
+  public void testActiveClusterSelectionPolicyDefaultsToNull() {
+    Assert.assertNull(new WorkflowOptions.Builder().build().getActiveClusterSelectionPolicy());
+    Assert.assertNull(
+        optionsWithPolicy(null).validateBuildWithDefaults().getActiveClusterSelectionPolicy());
+  }
+
+  @Test
+  public void testActiveClusterSelectionPolicyKeptByCopyConstructor() {
+    ActiveClusterSelectionPolicy policy = testPolicy();
+    WorkflowOptions o = optionsWithPolicy(policy).build();
+    Assert.assertEquals(
+        policy, new WorkflowOptions.Builder(o).build().getActiveClusterSelectionPolicy());
+  }
+
+  @Test
+  public void testActiveClusterSelectionPolicyKeptByMergeWithAnnotation()
+      throws NoSuchMethodException {
+    ActiveClusterSelectionPolicy policy = testPolicy();
+    WorkflowMethod a =
+        WorkflowOptionsTest.class
+            .getMethod("defaultWorkflowOptions")
+            .getAnnotation(WorkflowMethod.class);
+    Assert.assertEquals(
+        policy,
+        WorkflowOptions.merge(a, null, null, optionsWithPolicy(policy).build())
+            .getActiveClusterSelectionPolicy());
+  }
+
+  @Test
+  public void testActiveClusterSelectionPolicyKeptByMergeWithoutAnnotation() {
+    ActiveClusterSelectionPolicy policy = testPolicy();
+    Assert.assertEquals(
+        policy,
+        WorkflowOptions.merge(null, null, null, optionsWithPolicy(policy).build())
+            .getActiveClusterSelectionPolicy());
+  }
+
+  @Test
+  public void testActiveClusterSelectionPolicyConsideredByEqualsAndHashCode() {
+    WorkflowOptions withPolicy = optionsWithPolicy(testPolicy()).build();
+    WorkflowOptions samePolicy = optionsWithPolicy(testPolicy()).build();
+    WorkflowOptions withoutPolicy = optionsWithPolicy(null).build();
+    Assert.assertEquals(withPolicy, samePolicy);
+    Assert.assertEquals(withPolicy.hashCode(), samePolicy.hashCode());
+    Assert.assertNotEquals(withPolicy, withoutPolicy);
   }
 
   private Map<String, Object> getTestMemo() {
