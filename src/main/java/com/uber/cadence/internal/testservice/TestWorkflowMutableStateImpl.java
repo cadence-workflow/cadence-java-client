@@ -113,6 +113,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -369,7 +370,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
             return;
           }
           if (decision == null) {
-            throw new EntityNotExistsError("No outstanding decision");
+            throw new EntityNotExistsError("No outstanding decision", Collections.emptyList());
           }
           decision.action(StateMachines.Action.COMPLETE, ctx, request, 0);
           for (Decision d : decisions) {
@@ -658,7 +659,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
   private StateMachine<SignalExternalData> getSignal(String signalId) throws EntityNotExistsError {
     StateMachine<SignalExternalData> signal = externalSignals.get(signalId);
     if (signal == null) {
-      throw new EntityNotExistsError("unknown signalId: " + signalId);
+      throw new EntityNotExistsError("unknown signalId: " + signalId, Collections.emptyList());
     }
     return signal;
   }
@@ -1366,7 +1367,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
             StateMachine<ActivityTaskData> activity = getActivity(activityId);
             if (timeoutType == TimeoutType.SCHEDULE_TO_START
                 && activity.getState() != StateMachines.State.INITIATED) {
-              throw new EntityNotExistsError("Not in INITIATED");
+              throw new EntityNotExistsError("Not in INITIATED", Collections.emptyList());
             }
             if (timeoutType == TimeoutType.HEARTBEAT) {
               // Deal with timers which are never cancelled
@@ -1374,7 +1375,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
                   TimeUnit.SECONDS.toMillis(
                       activity.getData().scheduledEvent.getHeartbeatTimeoutSeconds());
               if (clock.getAsLong() - activity.getData().lastHeartbeatTime < heartbeatTimeout) {
-                throw new EntityNotExistsError("Not heartbeat timeout");
+                throw new EntityNotExistsError("Not heartbeat timeout", Collections.emptyList());
               }
             }
             activity.action(StateMachines.Action.TIME_OUT, ctx, timeoutType, 0);
@@ -1542,7 +1543,8 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
       throws EntityNotExistsError {
     CompletableFuture<QueryWorkflowResponse> result = queries.get(queryId.getQueryId());
     if (result == null) {
-      throw new EntityNotExistsError("Unknown query id: " + queryId.getQueryId());
+      throw new EntityNotExistsError(
+          "Unknown query id: " + queryId.getQueryId(), Collections.emptyList());
     }
     if (completeRequest.getCompletedType() == QueryTaskCompletedType.COMPLETED) {
       QueryWorkflowResponse response =
@@ -1594,7 +1596,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
       throws EntityNotExistsError {
     StateMachine<ActivityTaskData> activity = activities.get(activityId);
     if (activity == null) {
-      throw new EntityNotExistsError("unknown activityId: " + activityId);
+      throw new EntityNotExistsError("unknown activityId: " + activityId, Collections.emptyList());
     }
     return activity;
   }

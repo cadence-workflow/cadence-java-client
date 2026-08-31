@@ -91,7 +91,8 @@ public class ResponseMapperTest<
         testCase(
             ProtoObjects.DESCRIBE_TASK_LIST_RESPONSE,
             ThriftObjects.DESCRIBE_TASK_LIST_RESPONSE,
-            ResponseMapper::describeTaskListResponse),
+            ResponseMapper::describeTaskListResponse,
+            "taskList"), // new IDL field on response, not wired yet
         testCase(
             ProtoObjects.DESCRIBE_WORKFLOW_EXECUTION_RESPONSE,
             ThriftObjects.DESCRIBE_WORKFLOW_EXECUTION_RESPONSE,

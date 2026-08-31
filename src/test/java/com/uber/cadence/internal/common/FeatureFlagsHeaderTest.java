@@ -29,7 +29,7 @@ public class FeatureFlagsHeaderTest {
   @Test
   public void testSerializeEnabledFlag() {
     assertEquals(
-        "{\"WorkflowExecutionAlreadyCompletedErrorEnabled\":true}",
+        "{\"WorkflowExecutionAlreadyCompletedErrorEnabled\":true,\"AutoForwardingEnabled\":false}",
         FeatureFlagsHeader.serialize(
             new FeatureFlags().setWorkflowExecutionAlreadyCompletedErrorEnabled(true)));
   }
@@ -37,7 +37,7 @@ public class FeatureFlagsHeaderTest {
   @Test
   public void testSerializeUnsetFlags() {
     assertEquals(
-        "{\"WorkflowExecutionAlreadyCompletedErrorEnabled\":false}",
+        "{\"WorkflowExecutionAlreadyCompletedErrorEnabled\":false,\"AutoForwardingEnabled\":false}",
         FeatureFlagsHeader.serialize(new FeatureFlags()));
   }
 }

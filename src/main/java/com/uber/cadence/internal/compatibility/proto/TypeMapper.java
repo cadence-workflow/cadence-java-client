@@ -146,6 +146,9 @@ class TypeMapper {
     if (t.getKind() != null) {
       builder.setKind(taskListKind(t.getKind()));
     }
+    if (t.getBaseName() != null) {
+      builder.setBaseName(t.getBaseName());
+    }
     return builder.build();
   }
 

@@ -31,7 +31,11 @@ public final class ProtoObjects {
   public static final ActivityType ACTIVITY_TYPE =
       ActivityType.newBuilder().setName("activityName").build();
   public static final TaskList TASK_LIST =
-      TaskList.newBuilder().setName("taskList").setKind(TaskListKind.TASK_LIST_KIND_NORMAL).build();
+      TaskList.newBuilder()
+          .setName("taskList")
+          .setKind(TaskListKind.TASK_LIST_KIND_NORMAL)
+          .setBaseName("baseName")
+          .build();
   public static final TaskListMetadata TASK_LIST_METADATA =
       TaskListMetadata.newBuilder()
           .setMaxTasksPerSecond(DoubleValue.newBuilder().setValue(10.0).build())

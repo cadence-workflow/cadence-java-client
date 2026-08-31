@@ -719,4 +719,152 @@ public class IWorkflowServiceBase implements IWorkflowService {
   public CompletableFuture<Boolean> isHealthy() {
     throw new UnsupportedOperationException("unimplemented");
   }
+
+  @Override
+  public CreateScheduleResponse CreateSchedule(CreateScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, AccessDeniedError, TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void CreateSchedule(CreateScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public DescribeScheduleResponse DescribeSchedule(DescribeScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, QueryFailedError,
+          LimitExceededError, AccessDeniedError, TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void DescribeSchedule(DescribeScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public UpdateScheduleResponse UpdateSchedule(UpdateScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void UpdateSchedule(UpdateScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public DeleteScheduleResponse DeleteSchedule(DeleteScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void DeleteSchedule(DeleteScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public PauseScheduleResponse PauseSchedule(PauseScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void PauseSchedule(PauseScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public UnpauseScheduleResponse UnpauseSchedule(UnpauseScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void UnpauseSchedule(UnpauseScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public BackfillScheduleResponse BackfillSchedule(BackfillScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void BackfillSchedule(BackfillScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public ListSchedulesResponse ListSchedules(ListSchedulesRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void ListSchedules(ListSchedulesRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public ListFailoverHistoryResponse ListFailoverHistory(ListFailoverHistoryRequest listRequest)
+      throws BadRequestError, ServiceBusyError, ClientVersionNotSupportedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void ListFailoverHistory(
+      ListFailoverHistoryRequest listRequest, AsyncMethodCallback resultHandler) throws TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void DeleteDomain(DeleteDomainRequest deleteRequest)
+      throws BadRequestError, ServiceBusyError, ClientVersionNotSupportedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void DeleteDomain(DeleteDomainRequest deleteRequest, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public FailoverDomainResponse FailoverDomain(FailoverDomainRequest failoverRequest)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          ClientVersionNotSupportedError, AccessDeniedError, TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
+
+  @Override
+  public void FailoverDomain(
+      FailoverDomainRequest failoverRequest, AsyncMethodCallback resultHandler) throws TException {
+    throw new UnsupportedOperationException("unimplemented");
+  }
 }

@@ -39,6 +39,7 @@ import com.uber.cadence.internal.common.WorkflowExecutionUtils;
 import com.uber.cadence.internal.testservice.RequestContext.Timer;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +87,8 @@ class TestWorkflowStoreImpl implements TestWorkflowStore {
         if (completed) {
           throw new EntityNotExistsError(
               "Attempt to add an event after a completion event: "
-                  + WorkflowExecutionUtils.prettyPrintHistoryEvent(event));
+                  + WorkflowExecutionUtils.prettyPrintHistoryEvent(event),
+              Collections.emptyList());
         }
         event.setEventId(history.size() + 1L);
         // It can be set in StateMachines.startActivityTask
@@ -377,7 +379,8 @@ class TestWorkflowStoreImpl implements TestWorkflowStore {
       throw new EntityNotExistsError(
           String.format(
               "Workflow execution result not found.  " + "WorkflowId: %s, RunId: %s",
-              execution.getWorkflowId(), execution.getRunId()));
+              execution.getWorkflowId(), execution.getRunId()),
+          Collections.emptyList());
     }
     return result;
   }

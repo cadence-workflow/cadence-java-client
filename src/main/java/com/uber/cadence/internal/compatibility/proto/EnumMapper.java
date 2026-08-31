@@ -69,6 +69,8 @@ public final class EnumMapper {
         return TaskListKind.TASK_LIST_KIND_NORMAL;
       case STICKY:
         return TaskListKind.TASK_LIST_KIND_STICKY;
+      case EPHEMERAL:
+        return TaskListKind.TASK_LIST_KIND_EPHEMERAL;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
