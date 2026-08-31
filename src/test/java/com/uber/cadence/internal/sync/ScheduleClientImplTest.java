@@ -16,6 +16,7 @@ package com.uber.cadence.internal.sync;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -439,6 +440,18 @@ public class ScheduleClientImplTest {
     assertNotNull(req.getState().getPauseInfo());
     assertNull(req.getState().getPauseInfo().getReason());
     assertEquals("ci", req.getState().getPauseInfo().getPausedBy());
+  }
+
+  @Test
+  public void createScheduleRequest_nullState_producesNoStateInProto() {
+    com.uber.cadence.CreateScheduleRequest thrift =
+        new com.uber.cadence.CreateScheduleRequest().setDomain(DOMAIN).setScheduleId(SCHEDULE_ID);
+
+    com.uber.cadence.api.v1.CreateScheduleRequest proto =
+        com.uber.cadence.internal.compatibility.proto.mappers.RequestMapper.createScheduleRequest(
+            thrift);
+
+    assertFalse(proto.hasState());
   }
 
   @Test
