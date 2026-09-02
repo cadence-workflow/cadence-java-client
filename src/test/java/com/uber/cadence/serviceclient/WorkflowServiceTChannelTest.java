@@ -28,6 +28,7 @@ import com.uber.tchannel.messages.ThriftResponse;
 import com.uber.tchannel.messages.generated.HealthStatus;
 import com.uber.tchannel.messages.generated.Meta;
 import java.util.Arrays;
+import java.util.Collections;
 import org.apache.thrift.TException;
 import org.apache.thrift.async.AsyncMethodCallback;
 import org.junit.Before;
@@ -225,7 +226,7 @@ public class WorkflowServiceTChannelTest {
               ResponseCode.Error,
               new WorkflowService.DescribeDomain_result()
                   .setSuccess(new DescribeDomainResponse())
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -279,7 +280,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.ListDomains_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null,
             },
@@ -344,7 +345,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.ResetWorkflowExecution_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -415,7 +416,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.TerminateWorkflowExecution_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -507,7 +508,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.ListOpenWorkflowExecutions_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -581,7 +582,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.ListClosedWorkflowExecutions_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -648,7 +649,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.ListWorkflowExecutions_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -714,7 +715,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.ListArchivedWorkflowExecutions_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -782,7 +783,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.ScanWorkflowExecutions_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -847,7 +848,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.CountWorkflowExecutions_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -1007,7 +1008,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.ResetStickyTaskList_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -1107,7 +1108,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.QueryWorkflow_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -1164,7 +1165,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.DescribeWorkflowExecution_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -1346,7 +1347,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.ListTaskListPartitions_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -1401,7 +1402,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.UpdateDomain_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -1467,7 +1468,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.GetWorkflowExecutionHistory_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -1581,7 +1582,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.StartWorkflowExecutionAsync_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -1702,7 +1703,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.StartWorkflowExecution_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -1784,7 +1785,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.GetTaskListsByDomain_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -1862,7 +1863,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.DeprecateDomain_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -1964,7 +1965,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.PollForDecisionTask_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2022,7 +2023,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RespondDecisionTaskCompleted_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2110,7 +2111,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.PollForActivityTask_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2188,7 +2189,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RecordActivityTaskHeartbeat_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2278,7 +2279,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RecordActivityTaskHeartbeatByID_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2364,7 +2365,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RespondActivityTaskCompleted_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2454,7 +2455,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RespondActivityTaskCompletedByID_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2539,7 +2540,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RespondActivityTaskFailed_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2628,7 +2629,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RespondActivityTaskFailedByID_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2713,7 +2714,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RespondActivityTaskCanceled_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2809,7 +2810,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RespondActivityTaskCanceledByID_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2899,7 +2900,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RequestCancelWorkflowExecution_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -2984,7 +2985,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.SignalWorkflowExecution_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -3082,7 +3083,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.SignalWithStartWorkflowExecution_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -3158,7 +3159,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RefreshWorkflowTasks_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -3227,7 +3228,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.SignalWithStartWorkflowExecutionAsync_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },
@@ -3299,7 +3300,7 @@ public class WorkflowServiceTChannelTest {
             {
               ResponseCode.Error,
               new WorkflowService.RespondDecisionTaskFailed_result()
-                  .setEntityNotExistError(new EntityNotExistsError("")),
+                  .setEntityNotExistError(new EntityNotExistsError("", Collections.emptyList())),
               EntityNotExistsError.class,
               null
             },

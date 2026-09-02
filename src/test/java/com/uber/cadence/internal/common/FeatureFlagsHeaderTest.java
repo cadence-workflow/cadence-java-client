@@ -24,20 +24,29 @@ import org.junit.Test;
 
 public class FeatureFlagsHeaderTest {
 
-  // The server rejects the whole header when it carries a field the IDL doesn't define, so these
-  // assertions are on the exact wire format rather than on the parsed flags.
+  // The server rejects the whole header when it carries a field name its proto unmarshaller
+  // doesn't know, so these assertions are on the exact wire format rather than on the parsed
+  // flags. The names come from the api.v1.FeatureFlags proto message: field 1 pins json_name to
+  // the Thrift spelling, field 2 uses the derived lowerCamel name.
   @Test
   public void testSerializeEnabledFlag() {
     assertEquals(
-        "{\"WorkflowExecutionAlreadyCompletedErrorEnabled\":true}",
+        "{\"WorkflowExecutionAlreadyCompletedErrorEnabled\":true,\"autoforwardingEnabled\":false}",
         FeatureFlagsHeader.serialize(
             new FeatureFlags().setWorkflowExecutionAlreadyCompletedErrorEnabled(true)));
   }
 
   @Test
+  public void testSerializeAutoForwardingEnabled() {
+    assertEquals(
+        "{\"WorkflowExecutionAlreadyCompletedErrorEnabled\":false,\"autoforwardingEnabled\":true}",
+        FeatureFlagsHeader.serialize(new FeatureFlags().setAutoForwardingEnabled(true)));
+  }
+
+  @Test
   public void testSerializeUnsetFlags() {
     assertEquals(
-        "{\"WorkflowExecutionAlreadyCompletedErrorEnabled\":false}",
+        "{\"WorkflowExecutionAlreadyCompletedErrorEnabled\":false,\"autoforwardingEnabled\":false}",
         FeatureFlagsHeader.serialize(new FeatureFlags()));
   }
 }

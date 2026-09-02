@@ -1035,5 +1035,155 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
     public void close() {
       impl.close();
     }
+
+    @Override
+    public CreateScheduleResponse CreateSchedule(CreateScheduleRequest request)
+        throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+            LimitExceededError, AccessDeniedError, TException {
+      return impl.CreateSchedule(request);
+    }
+
+    @Override
+    public void CreateSchedule(CreateScheduleRequest request, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.CreateSchedule(request, resultHandler);
+    }
+
+    @Override
+    public DescribeScheduleResponse DescribeSchedule(DescribeScheduleRequest request)
+        throws BadRequestError, EntityNotExistsError, ServiceBusyError, QueryFailedError,
+            LimitExceededError, AccessDeniedError, TException {
+      return impl.DescribeSchedule(request);
+    }
+
+    @Override
+    public void DescribeSchedule(DescribeScheduleRequest request, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.DescribeSchedule(request, resultHandler);
+    }
+
+    @Override
+    public UpdateScheduleResponse UpdateSchedule(UpdateScheduleRequest request)
+        throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+            LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+            TException {
+      return impl.UpdateSchedule(request);
+    }
+
+    @Override
+    public void UpdateSchedule(UpdateScheduleRequest request, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.UpdateSchedule(request, resultHandler);
+    }
+
+    @Override
+    public DeleteScheduleResponse DeleteSchedule(DeleteScheduleRequest request)
+        throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+            LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+            TException {
+      return impl.DeleteSchedule(request);
+    }
+
+    @Override
+    public void DeleteSchedule(DeleteScheduleRequest request, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.DeleteSchedule(request, resultHandler);
+    }
+
+    @Override
+    public PauseScheduleResponse PauseSchedule(PauseScheduleRequest request)
+        throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+            LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+            TException {
+      return impl.PauseSchedule(request);
+    }
+
+    @Override
+    public void PauseSchedule(PauseScheduleRequest request, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.PauseSchedule(request, resultHandler);
+    }
+
+    @Override
+    public UnpauseScheduleResponse UnpauseSchedule(UnpauseScheduleRequest request)
+        throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+            LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+            TException {
+      return impl.UnpauseSchedule(request);
+    }
+
+    @Override
+    public void UnpauseSchedule(UnpauseScheduleRequest request, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.UnpauseSchedule(request, resultHandler);
+    }
+
+    @Override
+    public BackfillScheduleResponse BackfillSchedule(BackfillScheduleRequest request)
+        throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+            LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+            TException {
+      return impl.BackfillSchedule(request);
+    }
+
+    @Override
+    public void BackfillSchedule(BackfillScheduleRequest request, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.BackfillSchedule(request, resultHandler);
+    }
+
+    @Override
+    public ListSchedulesResponse ListSchedules(ListSchedulesRequest request)
+        throws BadRequestError, EntityNotExistsError, ServiceBusyError, AccessDeniedError,
+            TException {
+      return impl.ListSchedules(request);
+    }
+
+    @Override
+    public void ListSchedules(ListSchedulesRequest request, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.ListSchedules(request, resultHandler);
+    }
+
+    @Override
+    public ListFailoverHistoryResponse ListFailoverHistory(ListFailoverHistoryRequest listRequest)
+        throws BadRequestError, ServiceBusyError, ClientVersionNotSupportedError, AccessDeniedError,
+            TException {
+      return impl.ListFailoverHistory(listRequest);
+    }
+
+    @Override
+    public void ListFailoverHistory(
+        ListFailoverHistoryRequest listRequest, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.ListFailoverHistory(listRequest, resultHandler);
+    }
+
+    @Override
+    public void DeleteDomain(DeleteDomainRequest deleteRequest)
+        throws BadRequestError, ServiceBusyError, ClientVersionNotSupportedError, AccessDeniedError,
+            TException {
+      impl.DeleteDomain(deleteRequest);
+    }
+
+    @Override
+    public void DeleteDomain(DeleteDomainRequest deleteRequest, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.DeleteDomain(deleteRequest, resultHandler);
+    }
+
+    @Override
+    public FailoverDomainResponse FailoverDomain(FailoverDomainRequest failoverRequest)
+        throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+            ClientVersionNotSupportedError, AccessDeniedError, TException {
+      return impl.FailoverDomain(failoverRequest);
+    }
+
+    @Override
+    public void FailoverDomain(
+        FailoverDomainRequest failoverRequest, AsyncMethodCallback resultHandler)
+        throws TException {
+      impl.FailoverDomain(failoverRequest, resultHandler);
+    }
   }
 }

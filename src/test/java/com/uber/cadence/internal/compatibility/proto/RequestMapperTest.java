@@ -129,11 +129,15 @@ public class RequestMapperTest<
         testCase(
             ThriftObjects.RESPOND_ACTIVITY_TASK_FAILED_BY_ID_REQUEST,
             ProtoObjects.RESPOND_ACTIVITY_TASK_FAILED_BY_ID_REQUEST,
-            RequestMapper::respondActivityTaskFailedByIdRequest),
+            RequestMapper::respondActivityTaskFailedByIdRequest,
+            "heartbeatDetails", // new IDL field, not wired yet
+            "failureOptions"), // new IDL field, not wired yet
         testCase(
             ThriftObjects.RESPOND_ACTIVITY_TASK_FAILED_REQUEST,
             ProtoObjects.RESPOND_ACTIVITY_TASK_FAILED_REQUEST,
-            RequestMapper::respondActivityTaskFailedRequest),
+            RequestMapper::respondActivityTaskFailedRequest,
+            "heartbeatDetails", // new IDL field, not wired yet
+            "failureOptions"), // new IDL field, not wired yet
         testCase(
             ThriftObjects.RESPOND_DECISION_TASK_COMPLETED_REQUEST,
             ProtoObjects.RESPOND_DECISION_TASK_COMPLETED_REQUEST,
@@ -161,11 +165,15 @@ public class RequestMapperTest<
         testCase(
             ThriftObjects.START_WORKFLOW_EXECUTION,
             ProtoObjects.START_WORKFLOW_EXECUTION,
-            RequestMapper::startWorkflowExecutionRequest),
+            RequestMapper::startWorkflowExecutionRequest,
+            "activeClusterSelectionPolicy", // aa: not wired yet
+            "cronOverlapPolicy"), // aa: not wired yet
         testCase(
             ThriftObjects.SIGNAL_WITH_START_WORKFLOW_EXECUTION,
             ProtoObjects.SIGNAL_WITH_START_WORKFLOW_EXECUTION,
-            RequestMapper::signalWithStartWorkflowExecutionRequest),
+            RequestMapper::signalWithStartWorkflowExecutionRequest,
+            "activeClusterSelectionPolicy", // aa: not wired yet
+            "cronOverlapPolicy"), // aa: not wired yet
         testCase(
             ThriftObjects.START_WORKFLOW_EXECUTION_ASYNC_REQUEST,
             ProtoObjects.START_WORKFLOW_EXECUTION_ASYNC_REQUEST,
@@ -233,7 +241,9 @@ public class RequestMapperTest<
             ThriftObjects.REGISTER_DOMAIN_REQUEST,
             ProtoObjects.REGISTER_DOMAIN_REQUEST,
             RequestMapper::registerDomainRequest,
-            "emitMetric"), // Thrift has this field but proto doens't have it
+            "emitMetric", // Thrift has this field but proto doens't have it
+            "activeClusters", // aa: not wired yet
+            "activeClustersByRegion"), // aa: not wired yet
         testCase(
             ThriftObjects.UPDATE_DOMAIN_REQUEST,
             ProtoObjects.UPDATE_DOMAIN_REQUEST,

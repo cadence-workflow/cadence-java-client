@@ -18,15 +18,25 @@ package com.uber.cadence.internal.compatibility;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.uber.cadence.AccessDeniedError;
+import com.uber.cadence.BackfillScheduleRequest;
+import com.uber.cadence.BackfillScheduleResponse;
 import com.uber.cadence.BadRequestError;
 import com.uber.cadence.CancellationAlreadyRequestedError;
 import com.uber.cadence.ClientVersionNotSupportedError;
 import com.uber.cadence.ClusterInfo;
 import com.uber.cadence.CountWorkflowExecutionsRequest;
 import com.uber.cadence.CountWorkflowExecutionsResponse;
+import com.uber.cadence.CreateScheduleRequest;
+import com.uber.cadence.CreateScheduleResponse;
+import com.uber.cadence.DeleteDomainRequest;
+import com.uber.cadence.DeleteScheduleRequest;
+import com.uber.cadence.DeleteScheduleResponse;
 import com.uber.cadence.DeprecateDomainRequest;
 import com.uber.cadence.DescribeDomainRequest;
 import com.uber.cadence.DescribeDomainResponse;
+import com.uber.cadence.DescribeScheduleRequest;
+import com.uber.cadence.DescribeScheduleResponse;
 import com.uber.cadence.DescribeTaskListRequest;
 import com.uber.cadence.DescribeTaskListResponse;
 import com.uber.cadence.DescribeWorkflowExecutionRequest;
@@ -36,6 +46,8 @@ import com.uber.cadence.DiagnoseWorkflowExecutionResponse;
 import com.uber.cadence.DomainAlreadyExistsError;
 import com.uber.cadence.DomainNotActiveError;
 import com.uber.cadence.EntityNotExistsError;
+import com.uber.cadence.FailoverDomainRequest;
+import com.uber.cadence.FailoverDomainResponse;
 import com.uber.cadence.GetSearchAttributesResponse;
 import com.uber.cadence.GetTaskListsByDomainRequest;
 import com.uber.cadence.GetTaskListsByDomainResponse;
@@ -49,12 +61,18 @@ import com.uber.cadence.ListClosedWorkflowExecutionsRequest;
 import com.uber.cadence.ListClosedWorkflowExecutionsResponse;
 import com.uber.cadence.ListDomainsRequest;
 import com.uber.cadence.ListDomainsResponse;
+import com.uber.cadence.ListFailoverHistoryRequest;
+import com.uber.cadence.ListFailoverHistoryResponse;
 import com.uber.cadence.ListOpenWorkflowExecutionsRequest;
 import com.uber.cadence.ListOpenWorkflowExecutionsResponse;
+import com.uber.cadence.ListSchedulesRequest;
+import com.uber.cadence.ListSchedulesResponse;
 import com.uber.cadence.ListTaskListPartitionsRequest;
 import com.uber.cadence.ListTaskListPartitionsResponse;
 import com.uber.cadence.ListWorkflowExecutionsRequest;
 import com.uber.cadence.ListWorkflowExecutionsResponse;
+import com.uber.cadence.PauseScheduleRequest;
+import com.uber.cadence.PauseScheduleResponse;
 import com.uber.cadence.PollForActivityTaskRequest;
 import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.PollForDecisionTaskRequest;
@@ -94,8 +112,12 @@ import com.uber.cadence.StartWorkflowExecutionAsyncResponse;
 import com.uber.cadence.StartWorkflowExecutionRequest;
 import com.uber.cadence.StartWorkflowExecutionResponse;
 import com.uber.cadence.TerminateWorkflowExecutionRequest;
+import com.uber.cadence.UnpauseScheduleRequest;
+import com.uber.cadence.UnpauseScheduleResponse;
 import com.uber.cadence.UpdateDomainRequest;
 import com.uber.cadence.UpdateDomainResponse;
+import com.uber.cadence.UpdateScheduleRequest;
+import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.WorkflowExecutionAlreadyCompletedError;
 import com.uber.cadence.WorkflowExecutionAlreadyStartedError;
 import com.uber.cadence.api.v1.GetSearchAttributesRequest;
@@ -1309,6 +1331,154 @@ public class Thrift2ProtoAdapter implements IWorkflowService {
       AsyncMethodCallback resultHandler,
       Long timeoutInMillis)
       throws TException {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public CreateScheduleResponse CreateSchedule(CreateScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, AccessDeniedError, TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public void CreateSchedule(CreateScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public DescribeScheduleResponse DescribeSchedule(DescribeScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, QueryFailedError,
+          LimitExceededError, AccessDeniedError, TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public void DescribeSchedule(DescribeScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public UpdateScheduleResponse UpdateSchedule(UpdateScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public void UpdateSchedule(UpdateScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public DeleteScheduleResponse DeleteSchedule(DeleteScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public void DeleteSchedule(DeleteScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public PauseScheduleResponse PauseSchedule(PauseScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public void PauseSchedule(PauseScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public UnpauseScheduleResponse UnpauseSchedule(UnpauseScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public void UnpauseSchedule(UnpauseScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public BackfillScheduleResponse BackfillSchedule(BackfillScheduleRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          LimitExceededError, WorkflowExecutionAlreadyCompletedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public void BackfillSchedule(BackfillScheduleRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public ListSchedulesResponse ListSchedules(ListSchedulesRequest request)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public void ListSchedules(ListSchedulesRequest request, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("Schedules are not supported by the v3 client");
+  }
+
+  @Override
+  public ListFailoverHistoryResponse ListFailoverHistory(ListFailoverHistoryRequest listRequest)
+      throws BadRequestError, ServiceBusyError, ClientVersionNotSupportedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public void ListFailoverHistory(
+      ListFailoverHistoryRequest listRequest, AsyncMethodCallback resultHandler) throws TException {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public void DeleteDomain(DeleteDomainRequest deleteRequest)
+      throws BadRequestError, ServiceBusyError, ClientVersionNotSupportedError, AccessDeniedError,
+          TException {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public void DeleteDomain(DeleteDomainRequest deleteRequest, AsyncMethodCallback resultHandler)
+      throws TException {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public FailoverDomainResponse FailoverDomain(FailoverDomainRequest failoverRequest)
+      throws BadRequestError, EntityNotExistsError, ServiceBusyError, DomainNotActiveError,
+          ClientVersionNotSupportedError, AccessDeniedError, TException {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public void FailoverDomain(
+      FailoverDomainRequest failoverRequest, AsyncMethodCallback resultHandler) throws TException {
     throw new UnsupportedOperationException("not implemented");
   }
 

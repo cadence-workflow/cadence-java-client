@@ -159,7 +159,9 @@ public class HistoryMapperEventTest<
           ThriftObjects.WORKFLOW_EXECUTION_STARTED_EVENT_ATTRIBUTES,
           "firstScheduledTimeNano",
           "partitionConfig",
-          "requestId"),
+          "requestId",
+          "activeClusterSelectionPolicy", // aa: not wired yet
+          "cronOverlapPolicy"), // aa: not wired yet
       testCase(
           EventType.WorkflowExecutionCompleted,
           ProtoObjects.WORKFLOW_EXECUTION_COMPLETED_EVENT_ATTRIBUTES,
@@ -201,7 +203,8 @@ public class HistoryMapperEventTest<
       testCase(
           EventType.ActivityTaskStarted,
           ProtoObjects.ACTIVITY_TASK_STARTED_EVENT_ATTRIBUTES,
-          ThriftObjects.ACTIVITY_TASK_STARTED_EVENT_ATTRIBUTES),
+          ThriftObjects.ACTIVITY_TASK_STARTED_EVENT_ATTRIBUTES,
+          "lastFailureOptions"), // new IDL field, not wired yet
       testCase(
           EventType.ActivityTaskCompleted,
           ProtoObjects.ACTIVITY_TASK_COMPLETED_EVENT_ATTRIBUTES,
@@ -209,11 +212,13 @@ public class HistoryMapperEventTest<
       testCase(
           EventType.ActivityTaskFailed,
           ProtoObjects.ACTIVITY_TASK_FAILED_EVENT_ATTRIBUTES,
-          ThriftObjects.ACTIVITY_TASK_FAILED_EVENT_ATTRIBUTES),
+          ThriftObjects.ACTIVITY_TASK_FAILED_EVENT_ATTRIBUTES,
+          "failureOptions"), // new IDL field, not wired yet
       testCase(
           EventType.ActivityTaskTimedOut,
           ProtoObjects.ACTIVITY_TASK_TIMED_OUT_EVENT_ATTRIBUTES,
-          ThriftObjects.ACTIVITY_TASK_TIMED_OUT_EVENT_ATTRIBUTES),
+          ThriftObjects.ACTIVITY_TASK_TIMED_OUT_EVENT_ATTRIBUTES,
+          "lastFailureOptions"), // new IDL field, not wired yet
       testCase(
           EventType.ActivityTaskCancelRequested,
           ProtoObjects.ACTIVITY_TASK_CANCEL_REQUESTED_EVENT_ATTRIBUTES,
@@ -279,11 +284,15 @@ public class HistoryMapperEventTest<
       testCase(
           EventType.WorkflowExecutionContinuedAsNew,
           ProtoObjects.WORKFLOW_EXECUTION_CONTINUED_AS_NEW_EVENT_ATTRIBUTES,
-          ThriftObjects.WORKFLOW_EXECUTION_CONTINUED_AS_NEW_EVENT_ATTRIBUTES),
+          ThriftObjects.WORKFLOW_EXECUTION_CONTINUED_AS_NEW_EVENT_ATTRIBUTES,
+          "activeClusterSelectionPolicy", // aa: not wired yet
+          "cronOverlapPolicy"), // aa: not wired yet
       testCase(
           EventType.StartChildWorkflowExecutionInitiated,
           ProtoObjects.START_CHILD_WORKFLOW_EXECUTION_INITIATED_EVENT_ATTRIBUTES,
-          ThriftObjects.START_CHILD_WORKFLOW_EXECUTION_INITIATED_EVENT_ATTRIBUTES),
+          ThriftObjects.START_CHILD_WORKFLOW_EXECUTION_INITIATED_EVENT_ATTRIBUTES,
+          "activeClusterSelectionPolicy", // aa: not wired yet
+          "cronOverlapPolicy"), // aa: not wired yet
       testCase(
           EventType.StartChildWorkflowExecutionFailed,
           ProtoObjects.START_CHILD_WORKFLOW_EXECUTION_FAILED_EVENT_ATTRIBUTES,

@@ -149,6 +149,7 @@ class TypeMapper {
     TaskList taskList = new TaskList();
     taskList.setName(t.getName());
     taskList.setKind(taskListKind(t.getKind()));
+    taskList.setBaseName(t.getBaseName());
     return taskList;
   }
 

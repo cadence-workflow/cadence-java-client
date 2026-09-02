@@ -31,7 +31,8 @@ public final class ThriftObjects {
   public static final TaskList TASK_LIST =
       new com.uber.cadence.TaskList()
           .setName("taskList")
-          .setKind(com.uber.cadence.TaskListKind.NORMAL);
+          .setKind(com.uber.cadence.TaskListKind.NORMAL)
+          .setBaseName("baseName");
   public static final TaskListMetadata TASK_LIST_METADATA =
       new TaskListMetadata().setMaxTasksPerSecond(10);
   public static final RetryPolicy RETRY_POLICY =

@@ -17,26 +17,33 @@
 
 package com.uber.cadence.internal.common;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 import com.uber.cadence.FeatureFlags;
-import java.lang.reflect.Modifier;
 
 /** Serializes {@link FeatureFlags} into the value of the cadence-client-feature-flags header. */
 public final class FeatureFlagsHeader {
 
   // The server deserializes this header with a protobuf JSON unmarshaller that fails on any field
-  // it doesn't know, and silently falls back to all flags disabled when it does. Thrift declares
-  // the IDL fields public and keeps its own bookkeeping, such as __isset_bitfield, private, so
-  // excluding private fields leaves exactly the fields the server expects. Field names are sent as
-  // Thrift declares them because the proto IDL pins json_name to those names.
-  private static final Gson GSON =
-      new GsonBuilder()
-          .excludeFieldsWithModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.TRANSIENT)
-          .create();
+  // it doesn't know, and silently falls back to all flags disabled when it does. The accepted
+  // field names are therefore defined by the api.v1.FeatureFlags proto message (including its
+  // json_name pins), not by the Thrift struct's field names. Serializing through the generated
+  // proto message with JsonFormat keeps the header aligned with that contract by construction.
+  private static final JsonFormat.Printer PRINTER =
+      JsonFormat.printer().includingDefaultValueFields().omittingInsignificantWhitespace();
 
   public static String serialize(FeatureFlags featureFlags) {
-    return GSON.toJson(featureFlags);
+    com.uber.cadence.api.v1.FeatureFlags proto =
+        com.uber.cadence.api.v1.FeatureFlags.newBuilder()
+            .setWorkflowExecutionAlreadyCompletedErrorEnabled(
+                featureFlags.isWorkflowExecutionAlreadyCompletedErrorEnabled())
+            .setAutoforwardingEnabled(featureFlags.isAutoForwardingEnabled())
+            .build();
+    try {
+      return PRINTER.print(proto);
+    } catch (InvalidProtocolBufferException e) {
+      throw new IllegalStateException("failed to serialize feature flags header", e);
+    }
   }
 
   private FeatureFlagsHeader() {}
