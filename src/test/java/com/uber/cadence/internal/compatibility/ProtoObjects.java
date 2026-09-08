@@ -441,6 +441,8 @@ public final class ProtoObjects {
               .setSearchAttributes(SEARCH_ATTRIBUTES)
               .setPrevAutoResetPoints(RESET_POINTS)
               .setHeader(HEADER)
+              .setActiveClusterSelectionPolicy(ACTIVE_CLUSTER_SELECTION_POLICY)
+              .setCronOverlapPolicy(CRON_OVERLAP_POLICY)
               .build();
 
   public static final WorkflowExecutionCompletedEventAttributes

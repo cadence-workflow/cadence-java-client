@@ -554,6 +554,7 @@ class StateMachines {
     a.setMemo(request.getMemo());
     a.setSearchAttributes((request.getSearchAttributes()));
     a.setHeader(request.getHeader());
+    a.setActiveClusterSelectionPolicy(request.getActiveClusterSelectionPolicy());
     Optional<TestWorkflowMutableState> parent = ctx.getWorkflowMutableState().getParent();
     if (parent.isPresent()) {
       ExecutionId parentExecutionId = parent.get().getExecutionId();

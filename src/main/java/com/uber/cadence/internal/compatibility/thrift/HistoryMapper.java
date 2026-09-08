@@ -60,6 +60,7 @@ import static com.uber.cadence.EventType.WorkflowExecutionTimedOut;
 import static com.uber.cadence.internal.compatibility.thrift.EnumMapper.cancelExternalWorkflowExecutionFailedCause;
 import static com.uber.cadence.internal.compatibility.thrift.EnumMapper.childWorkflowExecutionFailedCause;
 import static com.uber.cadence.internal.compatibility.thrift.EnumMapper.continueAsNewInitiator;
+import static com.uber.cadence.internal.compatibility.thrift.EnumMapper.cronOverlapPolicy;
 import static com.uber.cadence.internal.compatibility.thrift.EnumMapper.decisionTaskFailedCause;
 import static com.uber.cadence.internal.compatibility.thrift.EnumMapper.decisionTaskTimedOutCause;
 import static com.uber.cadence.internal.compatibility.thrift.EnumMapper.parentClosePolicy;
@@ -69,6 +70,7 @@ import static com.uber.cadence.internal.compatibility.thrift.EnumMapper.workflow
 import static com.uber.cadence.internal.compatibility.thrift.Helpers.byteStringToArray;
 import static com.uber.cadence.internal.compatibility.thrift.Helpers.durationToSeconds;
 import static com.uber.cadence.internal.compatibility.thrift.Helpers.timeToUnixNano;
+import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.activeClusterSelectionPolicy;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.activityType;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.externalInitiatedId;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.externalWorkflowExecution;
@@ -1147,6 +1149,9 @@ class HistoryMapper {
     res.setSearchAttributes(searchAttributes(t.getSearchAttributes()));
     res.setPrevAutoResetPoints(resetPoints(t.getPrevAutoResetPoints()));
     res.setHeader(header(t.getHeader()));
+    res.setActiveClusterSelectionPolicy(
+        activeClusterSelectionPolicy(t.getActiveClusterSelectionPolicy()));
+    res.setCronOverlapPolicy(cronOverlapPolicy(t.getCronOverlapPolicy()));
     return res;
   }
 

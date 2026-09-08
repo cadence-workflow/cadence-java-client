@@ -30,8 +30,10 @@ import static org.junit.Assume.assumeTrue;
 
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import com.uber.cadence.ActiveClusterSelectionPolicy;
 import com.uber.cadence.BadRequestError;
 import com.uber.cadence.CancellationAlreadyRequestedError;
+import com.uber.cadence.ClusterAttribute;
 import com.uber.cadence.DomainAlreadyExistsError;
 import com.uber.cadence.DomainNotActiveError;
 import com.uber.cadence.EntityNotExistsError;
@@ -1415,6 +1417,29 @@ public class WorkflowTest {
     String memoRetrieved =
         JsonDataConverter.getInstance().fromData(memoBytes, String.class, String.class);
     assertEquals(testMemoValue, memoRetrieved);
+  }
+
+  @Test
+  @RequiresTestService
+  public void testStartWithActiveClusterSelectionPolicy() {
+    ActiveClusterSelectionPolicy policy =
+        new ActiveClusterSelectionPolicy()
+            .setClusterAttribute(new ClusterAttribute().setScope("location").setName("lisbon"));
+
+    startWorkerFor(TestMultiargsWorkflowsImpl.class);
+    WorkflowOptions workflowOptions =
+        newWorkflowOptionsBuilder(taskList).setActiveClusterSelectionPolicy(policy).build();
+    TestMultiargsWorkflowsFunc stubF =
+        workflowClient.newWorkflowStub(TestMultiargsWorkflowsFunc.class, workflowOptions);
+    WorkflowExecution executionF = WorkflowClient.start(stubF::func);
+
+    GetWorkflowExecutionHistoryResponse historyResp =
+        WorkflowExecutionUtils.getHistoryPage(
+            new byte[] {}, workflowClient.getService(), DOMAIN, executionF);
+    HistoryEvent startEvent = historyResp.getHistory().getEvents().get(0);
+    assertEquals(
+        policy,
+        startEvent.getWorkflowExecutionStartedEventAttributes().getActiveClusterSelectionPolicy());
   }
 
   @Test

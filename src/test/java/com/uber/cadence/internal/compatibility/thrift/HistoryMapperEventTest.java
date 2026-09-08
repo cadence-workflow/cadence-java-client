@@ -159,9 +159,7 @@ public class HistoryMapperEventTest<
           ThriftObjects.WORKFLOW_EXECUTION_STARTED_EVENT_ATTRIBUTES,
           "firstScheduledTimeNano",
           "partitionConfig",
-          "requestId",
-          "activeClusterSelectionPolicy", // aa: not wired yet
-          "cronOverlapPolicy"), // aa: not wired yet
+          "requestId"),
       testCase(
           EventType.WorkflowExecutionCompleted,
           ProtoObjects.WORKFLOW_EXECUTION_COMPLETED_EVENT_ATTRIBUTES,
