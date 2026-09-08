@@ -21,6 +21,7 @@ import com.uber.cadence.ArchivalStatus;
 import com.uber.cadence.CancelExternalWorkflowExecutionFailedCause;
 import com.uber.cadence.ChildWorkflowExecutionFailedCause;
 import com.uber.cadence.ContinueAsNewInitiator;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.DecisionTaskFailedCause;
 import com.uber.cadence.DecisionTaskTimedOutCause;
 import com.uber.cadence.DomainStatus;
@@ -342,6 +343,18 @@ public final class EnumMapper {
         return null;
       case CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_RUNNING:
         return ChildWorkflowExecutionFailedCause.WORKFLOW_ALREADY_RUNNING;
+    }
+    throw new IllegalArgumentException("unexpected enum value");
+  }
+
+  public static CronOverlapPolicy cronOverlapPolicy(com.uber.cadence.api.v1.CronOverlapPolicy t) {
+    switch (t) {
+      case CRON_OVERLAP_POLICY_INVALID:
+        return null;
+      case CRON_OVERLAP_POLICY_SKIPPED:
+        return CronOverlapPolicy.SKIPPED;
+      case CRON_OVERLAP_POLICY_BUFFER_ONE:
+        return CronOverlapPolicy.BUFFERONE;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }

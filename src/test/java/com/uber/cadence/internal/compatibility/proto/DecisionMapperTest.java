@@ -125,16 +125,10 @@ public class DecisionMapperTest {
           break;
         case ContinueAsNewWorkflowExecution:
           assertMissingFields(
-              decision.continueAsNewWorkflowExecutionDecisionAttributes,
-              "jitterStartSeconds",
-              "activeClusterSelectionPolicy", // aa: not wired yet
-              "cronOverlapPolicy"); // aa: not wired yet
+              decision.continueAsNewWorkflowExecutionDecisionAttributes, "jitterStartSeconds");
           break;
         case StartChildWorkflowExecution:
-          assertMissingFields(
-              decision.startChildWorkflowExecutionDecisionAttributes,
-              "activeClusterSelectionPolicy", // aa: not wired yet
-              "cronOverlapPolicy"); // aa: not wired yet
+          assertNoMissingFields(decision.startChildWorkflowExecutionDecisionAttributes);
           break;
         case SignalExternalWorkflowExecution:
           assertNoMissingFields(decision.signalExternalWorkflowExecutionDecisionAttributes);

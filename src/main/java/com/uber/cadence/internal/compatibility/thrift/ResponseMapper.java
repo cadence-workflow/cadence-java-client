@@ -23,6 +23,7 @@ import static com.uber.cadence.internal.compatibility.thrift.Helpers.durationToS
 import static com.uber.cadence.internal.compatibility.thrift.Helpers.timeToUnixNano;
 import static com.uber.cadence.internal.compatibility.thrift.Helpers.toInt64Value;
 import static com.uber.cadence.internal.compatibility.thrift.HistoryMapper.history;
+import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.activeClusters;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.activityLocalDispatchInfoMap;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.activityType;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.autoConfigHint;
@@ -381,6 +382,7 @@ public class ResponseMapper {
     replicationConfiguration.setActiveClusterName(t.getDomain().getActiveClusterName());
     replicationConfiguration.setClusters(
         clusterReplicationConfigurationArray(t.getDomain().getClustersList()));
+    replicationConfiguration.setActiveClusters(activeClusters(t.getDomain().getActiveClusters()));
 
     response.setFailoverVersion(t.getDomain().getFailoverVersion());
     response.setIsGlobalDomain(t.getDomain().getIsGlobalDomain());
@@ -452,6 +454,8 @@ public class ResponseMapper {
     domainReplicationConfiguration.setActiveClusterName(t.getDomain().getActiveClusterName());
     domainReplicationConfiguration.setClusters(
         clusterReplicationConfigurationArray(t.getDomain().getClustersList()));
+    domainReplicationConfiguration.setActiveClusters(
+        activeClusters(t.getDomain().getActiveClusters()));
     updateDomainResponse.setFailoverVersion(t.getDomain().getFailoverVersion());
     updateDomainResponse.setIsGlobalDomain(t.getDomain().getIsGlobalDomain());
     return updateDomainResponse;

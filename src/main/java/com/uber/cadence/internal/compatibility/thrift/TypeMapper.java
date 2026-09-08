@@ -29,11 +29,16 @@ import static com.uber.cadence.internal.compatibility.thrift.Helpers.durationToD
 import static com.uber.cadence.internal.compatibility.thrift.Helpers.durationToSeconds;
 import static com.uber.cadence.internal.compatibility.thrift.Helpers.timeToUnixNano;
 
+import com.uber.cadence.ActiveClusterInfo;
+import com.uber.cadence.ActiveClusterSelectionPolicy;
+import com.uber.cadence.ActiveClusters;
 import com.uber.cadence.ActivityLocalDispatchInfo;
 import com.uber.cadence.ActivityType;
 import com.uber.cadence.AutoConfigHint;
 import com.uber.cadence.BadBinaries;
 import com.uber.cadence.BadBinaryInfo;
+import com.uber.cadence.ClusterAttribute;
+import com.uber.cadence.ClusterAttributeScope;
 import com.uber.cadence.ClusterReplicationConfiguration;
 import com.uber.cadence.DataBlob;
 import com.uber.cadence.DescribeDomainResponse;
@@ -525,6 +530,7 @@ class TypeMapper {
     domainReplicationConfiguration.setActiveClusterName(t.getActiveClusterName());
     domainReplicationConfiguration.setClusters(
         clusterReplicationConfigurationArray(t.getClustersList()));
+    domainReplicationConfiguration.setActiveClusters(activeClusters(t.getActiveClusters()));
     res.setFailoverVersion(t.getFailoverVersion());
     res.setIsGlobalDomain(t.getIsGlobalDomain());
 
@@ -697,5 +703,71 @@ class TypeMapper {
     autoConfigHint.setEnableAutoConfig(t.getEnableAutoConfig());
     autoConfigHint.setPollerWaitTimeInMs(t.getPollerWaitTimeInMs());
     return autoConfigHint;
+  }
+
+  static ActiveClusters activeClusters(com.uber.cadence.api.v1.ActiveClusters t) {
+    if (t == null || t == com.uber.cadence.api.v1.ActiveClusters.getDefaultInstance()) {
+      return null;
+    }
+    ActiveClusters activeClusters = new ActiveClusters();
+    Map<String, ClusterAttributeScope> clusterAttributeScopes = new HashMap<>();
+    if (t.getActiveClustersByClusterAttributeMap() != null) {
+      for (Map.Entry<String, com.uber.cadence.api.v1.ClusterAttributeScope> entry :
+          t.getActiveClustersByClusterAttributeMap().entrySet()) {
+        clusterAttributeScopes.put(entry.getKey(), clusterAttributeScope(entry.getValue()));
+      }
+    }
+    activeClusters.setActiveClustersByClusterAttribute(clusterAttributeScopes);
+    return activeClusters;
+  }
+
+  static ClusterAttributeScope clusterAttributeScope(
+      com.uber.cadence.api.v1.ClusterAttributeScope t) {
+    if (t == null || t == com.uber.cadence.api.v1.ClusterAttributeScope.getDefaultInstance()) {
+      return null;
+    }
+    ClusterAttributeScope scope = new ClusterAttributeScope();
+    Map<String, ActiveClusterInfo> clusterAttributes = new HashMap<>();
+    if (t.getClusterAttributesMap() != null) {
+      for (Map.Entry<String, com.uber.cadence.api.v1.ActiveClusterInfo> entry :
+          t.getClusterAttributesMap().entrySet()) {
+        clusterAttributes.put(entry.getKey(), activeClusterInfo(entry.getValue()));
+      }
+    }
+    scope.setClusterAttributes(clusterAttributes);
+    return scope;
+  }
+
+  static ActiveClusterInfo activeClusterInfo(com.uber.cadence.api.v1.ActiveClusterInfo t) {
+    if (t == null || t == com.uber.cadence.api.v1.ActiveClusterInfo.getDefaultInstance()) {
+      return null;
+    }
+    ActiveClusterInfo info = new ActiveClusterInfo();
+    info.setActiveClusterName(t.getActiveClusterName());
+    info.setFailoverVersion(t.getFailoverVersion());
+    return info;
+  }
+
+  static ActiveClusterSelectionPolicy activeClusterSelectionPolicy(
+      com.uber.cadence.api.v1.ActiveClusterSelectionPolicy t) {
+    if (t == null
+        || t == com.uber.cadence.api.v1.ActiveClusterSelectionPolicy.getDefaultInstance()) {
+      return null;
+    }
+    ActiveClusterSelectionPolicy policy = new ActiveClusterSelectionPolicy();
+    if (t.hasClusterAttribute()) {
+      policy.setClusterAttribute(clusterAttribute(t.getClusterAttribute()));
+    }
+    return policy;
+  }
+
+  static ClusterAttribute clusterAttribute(com.uber.cadence.api.v1.ClusterAttribute t) {
+    if (t == null || t == com.uber.cadence.api.v1.ClusterAttribute.getDefaultInstance()) {
+      return null;
+    }
+    ClusterAttribute attr = new ClusterAttribute();
+    attr.setScope(t.getScope());
+    attr.setName(t.getName());
+    return attr;
   }
 }

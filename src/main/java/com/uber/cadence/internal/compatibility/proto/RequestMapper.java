@@ -17,6 +17,7 @@ package com.uber.cadence.internal.compatibility.proto;
 
 import static com.uber.cadence.internal.compatibility.proto.DecisionMapper.decisionArray;
 import static com.uber.cadence.internal.compatibility.proto.EnumMapper.archivalStatus;
+import static com.uber.cadence.internal.compatibility.proto.EnumMapper.cronOverlapPolicy;
 import static com.uber.cadence.internal.compatibility.proto.EnumMapper.decisionTaskFailedCause;
 import static com.uber.cadence.internal.compatibility.proto.EnumMapper.eventFilterType;
 import static com.uber.cadence.internal.compatibility.proto.EnumMapper.queryConsistencyLevel;
@@ -30,6 +31,8 @@ import static com.uber.cadence.internal.compatibility.proto.Helpers.newFieldMask
 import static com.uber.cadence.internal.compatibility.proto.Helpers.nullToEmpty;
 import static com.uber.cadence.internal.compatibility.proto.Helpers.secondsToDuration;
 import static com.uber.cadence.internal.compatibility.proto.Helpers.unixNanoToTime;
+import static com.uber.cadence.internal.compatibility.proto.TypeMapper.activeClusterSelectionPolicy;
+import static com.uber.cadence.internal.compatibility.proto.TypeMapper.activeClusters;
 import static com.uber.cadence.internal.compatibility.proto.TypeMapper.badBinaries;
 import static com.uber.cadence.internal.compatibility.proto.TypeMapper.clusterReplicationConfigurationArray;
 import static com.uber.cadence.internal.compatibility.proto.TypeMapper.failure;
@@ -113,6 +116,7 @@ public class RequestMapper {
   private static final String DomainUpdateVisibilityArchivalURIField = "visibility_archival_uri";
   private static final String DomainUpdateActiveClusterNameField = "active_cluster_name";
   private static final String DomainUpdateClustersField = "clusters";
+  private static final String DomainUpdateActiveClustersField = "active_clusters";
   private static final String DomainUpdateDeleteBadBinaryField = "delete_bad_binary";
   private static final String DomainUpdateFailoverTimeoutField = "failover_timeout";
 
@@ -533,6 +537,13 @@ public class RequestMapper {
     if (t.getCronSchedule() != null) {
       builder.setCronSchedule(t.getCronSchedule());
     }
+    if (t.getCronOverlapPolicy() != null) {
+      builder.setCronOverlapPolicy(cronOverlapPolicy(t.getCronOverlapPolicy()));
+    }
+    if (t.getActiveClusterSelectionPolicy() != null) {
+      builder.setActiveClusterSelectionPolicy(
+          activeClusterSelectionPolicy(t.getActiveClusterSelectionPolicy()));
+    }
     if (t.getDelayStartSeconds() > 0) {
       builder.setDelayStart(secondsToDuration(t.getDelayStartSeconds()));
     }
@@ -630,6 +641,13 @@ public class RequestMapper {
     }
     if (t.getCronSchedule() != null) {
       builder.setCronSchedule(t.getCronSchedule());
+    }
+    if (t.getCronOverlapPolicy() != null) {
+      builder.setCronOverlapPolicy(cronOverlapPolicy(t.getCronOverlapPolicy()));
+    }
+    if (t.getActiveClusterSelectionPolicy() != null) {
+      builder.setActiveClusterSelectionPolicy(
+          activeClusterSelectionPolicy(t.getActiveClusterSelectionPolicy()));
     }
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
@@ -861,6 +879,9 @@ public class RequestMapper {
     if (t.getName() != null) {
       builder.setName(t.getName());
     }
+    if (t.getActiveClusters() != null) {
+      builder.setActiveClusters(activeClusters(t.getActiveClusters()));
+    }
     return builder.build();
   }
 
@@ -933,6 +954,10 @@ public class RequestMapper {
         builder.addAllClusters(
             clusterReplicationConfigurationArray(replicationConfiguration.getClusters()));
         fields.add(DomainUpdateClustersField);
+      }
+      if (replicationConfiguration.getActiveClusters() != null) {
+        builder.setActiveClusters(activeClusters(replicationConfiguration.getActiveClusters()));
+        fields.add(DomainUpdateActiveClustersField);
       }
     }
     if (t.getDeleteBadBinary() != null) {

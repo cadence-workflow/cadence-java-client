@@ -45,6 +45,7 @@ import static com.uber.cadence.api.v1.QueryResultType.QUERY_RESULT_TYPE_INVALID;
 
 import com.uber.cadence.api.v1.ArchivalStatus;
 import com.uber.cadence.api.v1.ContinueAsNewInitiator;
+import com.uber.cadence.api.v1.CronOverlapPolicy;
 import com.uber.cadence.api.v1.DecisionTaskFailedCause;
 import com.uber.cadence.api.v1.EventFilterType;
 import com.uber.cadence.api.v1.ParentClosePolicy;
@@ -290,6 +291,19 @@ public final class EnumMapper {
         return QUERY_RESULT_TYPE_ANSWERED;
       case FAILED:
         return QUERY_RESULT_TYPE_FAILED;
+    }
+    throw new IllegalArgumentException("unexpected enum value");
+  }
+
+  public static CronOverlapPolicy cronOverlapPolicy(com.uber.cadence.CronOverlapPolicy t) {
+    if (t == null) {
+      return CronOverlapPolicy.CRON_OVERLAP_POLICY_INVALID;
+    }
+    switch (t) {
+      case SKIPPED:
+        return CronOverlapPolicy.CRON_OVERLAP_POLICY_SKIPPED;
+      case BUFFERONE:
+        return CronOverlapPolicy.CRON_OVERLAP_POLICY_BUFFER_ONE;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }
