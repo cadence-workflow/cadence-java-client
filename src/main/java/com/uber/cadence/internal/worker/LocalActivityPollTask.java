@@ -43,9 +43,13 @@ final class LocalActivityPollTask
   @Override
   public Boolean apply(LocalActivityWorker.Task task, Duration maxWaitAllowed) {
     try {
-      pendingTasks.offer(task, maxWaitAllowed.toMillis(), TimeUnit.MILLISECONDS);
-      return true;
+      // offer returns false when the queue is still full after maxWaitAllowed elapses.
+      // Propagate that instead of dropping the task: the caller relies on a false return
+      // to force a new decision task, otherwise the workflow would wait for a local
+      // activity completion that never arrives.
+      return pendingTasks.offer(task, maxWaitAllowed.toMillis(), TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       return false;
     }
   }
