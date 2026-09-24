@@ -10,6 +10,11 @@ services:
           memory: 12000M
     ports:
       - "9042:9042"
+    healthcheck:
+      test: ["CMD", "cqlsh", "-u", "cassandra", "-p", "cassandra", "-e", "describe keyspaces"]
+      interval: 15s
+      timeout: 30s
+      retries: 10
 
   statsd:
     image: hopsoft/graphite-statsd
@@ -40,8 +45,10 @@ services:
       - "CASSANDRA_SEEDS=cassandra"
       - "STATSD_ENDPOINT=statsd:8125"
     depends_on:
-      - cassandra
-      - statsd
+      cassandra:
+        condition: service_healthy
+      statsd:
+        condition: service_started
 
   unit-test-docker-sticky-off:
     build:
