@@ -47,7 +47,12 @@ public final class ScheduleListEntry {
     return workflowType;
   }
 
-  /** Current pause state of the schedule. */
+  /**
+   * Pause state as seen by the list endpoint. Only {@link ScheduleState#isPaused()} is set; {@code
+   * pauseReason}, {@code pausedAt}, and {@code pausedBy} are always {@code null} here because the
+   * visibility store only records the paused/active boolean. Call {@link
+   * com.uber.cadence.client.ScheduleClient#describeSchedule} for full pause details.
+   */
   public ScheduleState getState() {
     return state;
   }
