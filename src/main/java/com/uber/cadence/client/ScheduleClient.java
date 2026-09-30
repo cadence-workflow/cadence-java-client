@@ -131,8 +131,8 @@ public interface ScheduleClient {
    * Updates a schedule using a callback. The SDK fetches the current configuration with {@link
    * #describeSchedule}, passes the result to {@code updater}, and submits only the fields that the
    * callback replaced (by reference identity). Only {@code spec}, {@code action}, and {@code
-   * policies} are forwarded; {@code state}, {@code info}, {@code memo}, and {@code searchAttributes}
-   * in the returned description are ignored.
+   * policies} are forwarded; {@code state}, {@code info}, {@code memo}, and {@code
+   * searchAttributes} in the returned description are ignored.
    *
    * <p>This is a read-then-write operation, not an atomic transaction. Concurrent updates to the
    * same schedule are last-write-wins; there is no conflict detection.

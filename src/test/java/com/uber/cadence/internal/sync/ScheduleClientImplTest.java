@@ -32,7 +32,6 @@ import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
-import com.uber.cadence.client.schedule.ScheduleDescription;
 import com.uber.cadence.client.schedule.ScheduleInitialState;
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import com.uber.cadence.client.schedule.SchedulePolicies;
@@ -504,8 +503,7 @@ public class ScheduleClientImplTest {
 
     ScheduleSpec newSpec = ScheduleSpec.newBuilder().setCronExpression("0 9 * * 1-5").build();
     client
-        .updateSchedule(
-            SCHEDULE_ID, current -> current.toBuilder().setSpec(newSpec).build())
+        .updateSchedule(SCHEDULE_ID, current -> current.toBuilder().setSpec(newSpec).build())
         .join();
 
     UpdateScheduleRequest req = captor.getValue();
@@ -557,8 +555,7 @@ public class ScheduleClientImplTest {
     com.uber.cadence.ScheduleAction action =
         new com.uber.cadence.ScheduleAction().setStartWorkflow(swa);
     com.uber.cadence.SchedulePolicies policies = new com.uber.cadence.SchedulePolicies();
-    com.uber.cadence.ScheduleState state =
-        new com.uber.cadence.ScheduleState().setPaused(false);
+    com.uber.cadence.ScheduleState state = new com.uber.cadence.ScheduleState().setPaused(false);
     com.uber.cadence.ScheduleInfo info = new com.uber.cadence.ScheduleInfo();
     return new DescribeScheduleResponse()
         .setSpec(spec)
