@@ -28,7 +28,7 @@ import java.util.Objects;
  * <pre>{@code
  * byte[] token = null;
  * do {
- *     ListSchedulesResult result = client.listSchedules(100, token);
+ *     ListSchedulesResult result = client.listSchedules(100, token).join();
  *     for (ScheduleListEntry entry : result.getSchedules()) {
  *         System.out.println(entry.getScheduleId());
  *     }
