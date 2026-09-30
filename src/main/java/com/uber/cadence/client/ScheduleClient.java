@@ -129,10 +129,13 @@ public interface ScheduleClient {
 
   /**
    * Updates a schedule using a callback. The SDK fetches the current configuration with {@link
-   * #describeSchedule}, passes the result to {@code updater}, then submits the returned description
-   * as the new schedule configuration. Only {@code spec}, {@code action}, and {@code policies} from
-   * the returned description are applied; {@code state} and {@code info} are read-only and ignored
-   * by the server.
+   * #describeSchedule}, passes the result to {@code updater}, and submits only the fields that the
+   * callback replaced (by reference identity). Only {@code spec}, {@code action}, and {@code
+   * policies} are forwarded; {@code state}, {@code info}, {@code memo}, and {@code searchAttributes}
+   * in the returned description are ignored.
+   *
+   * <p>This is a read-then-write operation, not an atomic transaction. Concurrent updates to the
+   * same schedule are last-write-wins; there is no conflict detection.
    *
    * <p>Use {@link com.uber.cadence.client.schedule.ScheduleDescription#toBuilder()} to create a
    * modified copy:
@@ -149,8 +152,7 @@ public interface ScheduleClient {
    * @param updater callback that receives the current description and returns the desired new state
    */
   CompletableFuture<UpdateScheduleResponse> updateSchedule(
-      String scheduleId,
-      Function<ScheduleDescription, ScheduleDescription> updater);
+      String scheduleId, Function<ScheduleDescription, ScheduleDescription> updater);
 
   /**
    * Permanently deletes a schedule. In-flight workflow runs triggered by this schedule are not

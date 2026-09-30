@@ -33,17 +33,14 @@ import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleDescription;
-import com.uber.cadence.client.schedule.ScheduleInfo;
 import com.uber.cadence.client.schedule.ScheduleInitialState;
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
-import com.uber.cadence.client.schedule.ScheduleState;
 import com.uber.cadence.common.RetryOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -518,25 +515,22 @@ public class ScheduleClientImplTest {
   }
 
   @Test
-  public void updateSchedule_callback_preservesUnchangedAction() throws Exception {
+  public void updateSchedule_callback_onlyChangedFieldsSentToServer() throws Exception {
     ArgumentCaptor<UpdateScheduleRequest> captor = forClass(UpdateScheduleRequest.class);
     when(service.UpdateSchedule(captor.capture()))
         .thenReturn(CompletableFuture.completedFuture(new UpdateScheduleResponse()));
 
+    SchedulePolicies newPolicies =
+        SchedulePolicies.newBuilder().setOverlapPolicy(ScheduleOverlapPolicy.BUFFER).build();
     client
         .updateSchedule(
-            SCHEDULE_ID,
-            current ->
-                current.toBuilder()
-                    .setPolicies(
-                        SchedulePolicies.newBuilder()
-                            .setOverlapPolicy(ScheduleOverlapPolicy.BUFFER)
-                            .build())
-                    .build())
+            SCHEDULE_ID, current -> current.toBuilder().setPolicies(newPolicies).build())
         .join();
 
     UpdateScheduleRequest req = captor.getValue();
-    assertEquals("wf", req.getAction().getStartWorkflow().getWorkflowType().getName());
+    // spec and action were not replaced by the callback, so they are not re-serialized
+    assertNull(req.getSpec());
+    assertNull(req.getAction());
     assertEquals(
         com.uber.cadence.ScheduleOverlapPolicy.BUFFER, req.getPolicies().getOverlapPolicy());
   }

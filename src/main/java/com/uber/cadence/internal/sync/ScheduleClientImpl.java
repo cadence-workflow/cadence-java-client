@@ -148,8 +148,14 @@ final class ScheduleClientImpl implements ScheduleClient {
         .thenCompose(
             current -> {
               ScheduleDescription updated = updater.apply(current);
+              // Use reference identity to skip re-serializing fields the callback didn't touch.
+              // The describe->client->thrift round-trip is lossy (e.g. nonRetriableErrorReasons),
+              // so only re-serialize what actually changed.
               return updateSchedule(
-                  scheduleId, updated.getSpec(), updated.getAction(), updated.getPolicies());
+                  scheduleId,
+                  updated.getSpec() != current.getSpec() ? updated.getSpec() : null,
+                  updated.getAction() != current.getAction() ? updated.getAction() : null,
+                  updated.getPolicies() != current.getPolicies() ? updated.getPolicies() : null);
             });
   }
 

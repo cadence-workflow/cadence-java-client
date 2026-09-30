@@ -25,8 +25,8 @@ import java.util.Objects;
  *
  * <p>Use the callback overload of {@link
  * com.uber.cadence.client.ScheduleClient#updateSchedule(String, java.util.function.Function)} to
- * update a schedule atomically: the SDK fetches the current description, passes it to your
- * callback, and submits the returned description. Use {@link #toBuilder()} to create a modified
+ * update a schedule: the SDK fetches the current description, passes it to your callback, and
+ * submits only the fields the callback replaced. Use {@link #toBuilder()} to create a modified
  * copy:
  *
  * <pre>{@code
