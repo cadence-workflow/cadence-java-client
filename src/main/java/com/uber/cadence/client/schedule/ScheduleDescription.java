@@ -23,10 +23,19 @@ import java.util.Objects;
  * Full description of a schedule as returned by {@link
  * com.uber.cadence.client.ScheduleClient#describeSchedule}.
  *
- * <p>To update a schedule, read the current configuration with {@link
- * com.uber.cadence.client.ScheduleClient#describeSchedule}, modify the relevant fields in a new
- * {@link com.uber.cadence.UpdateScheduleRequest}, then submit via {@link
- * com.uber.cadence.client.ScheduleClient#updateSchedule}.
+ * <p>Use the callback overload of {@link
+ * com.uber.cadence.client.ScheduleClient#updateSchedule(String, java.util.function.Function)} to
+ * update a schedule atomically: the SDK fetches the current description, passes it to your
+ * callback, and submits the returned description. Use {@link #toBuilder()} to create a modified
+ * copy:
+ *
+ * <pre>{@code
+ * client.updateSchedule("my-schedule", current ->
+ *     current.toBuilder()
+ *         .setSpec(ScheduleSpec.newBuilder().setCronExpression("0 9 * * 1-5").build())
+ *         .build()
+ * ).join();
+ * }</pre>
  */
 public final class ScheduleDescription {
 
@@ -138,5 +147,70 @@ public final class ScheduleDescription {
         + ", searchAttributes="
         + searchAttributes
         + '}';
+  }
+
+  /** Returns a builder pre-populated with all fields from this description. */
+  public Builder toBuilder() {
+    return new Builder(this);
+  }
+
+  public static final class Builder {
+
+    private ScheduleSpec spec;
+    private ScheduleAction action;
+    private SchedulePolicies policies;
+    private ScheduleState state;
+    private ScheduleInfo info;
+    private Map<String, Object> memo;
+    private Map<String, Object> searchAttributes;
+
+    private Builder(ScheduleDescription src) {
+      this.spec = src.spec;
+      this.action = src.action;
+      this.policies = src.policies;
+      this.state = src.state;
+      this.info = src.info;
+      this.memo = src.memo;
+      this.searchAttributes = src.searchAttributes;
+    }
+
+    public Builder setSpec(ScheduleSpec spec) {
+      this.spec = spec;
+      return this;
+    }
+
+    public Builder setAction(ScheduleAction action) {
+      this.action = action;
+      return this;
+    }
+
+    public Builder setPolicies(SchedulePolicies policies) {
+      this.policies = policies;
+      return this;
+    }
+
+    public Builder setState(ScheduleState state) {
+      this.state = state;
+      return this;
+    }
+
+    public Builder setInfo(ScheduleInfo info) {
+      this.info = info;
+      return this;
+    }
+
+    public Builder setMemo(Map<String, Object> memo) {
+      this.memo = memo;
+      return this;
+    }
+
+    public Builder setSearchAttributes(Map<String, Object> searchAttributes) {
+      this.searchAttributes = searchAttributes;
+      return this;
+    }
+
+    public ScheduleDescription build() {
+      return new ScheduleDescription(spec, action, policies, state, info, memo, searchAttributes);
+    }
   }
 }

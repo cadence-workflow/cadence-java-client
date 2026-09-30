@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 final class ScheduleClientImpl implements ScheduleClient {
 
@@ -138,6 +139,18 @@ final class ScheduleClientImpl implements ScheduleClient {
       f.completeExceptionally(e);
       return f;
     }
+  }
+
+  @Override
+  public CompletableFuture<UpdateScheduleResponse> updateSchedule(
+      String scheduleId, Function<ScheduleDescription, ScheduleDescription> updater) {
+    return describeSchedule(scheduleId)
+        .thenCompose(
+            current -> {
+              ScheduleDescription updated = updater.apply(current);
+              return updateSchedule(
+                  scheduleId, updated.getSpec(), updated.getAction(), updated.getPolicies());
+            });
   }
 
   @Override

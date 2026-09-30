@@ -574,6 +574,48 @@ public class ScheduleTypesTest {
   }
 
   @Test
+  public void scheduleDescription_toBuilder_roundTrip() {
+    ScheduleDescription original = minimalDescription();
+    assertEquals(original, original.toBuilder().build());
+  }
+
+  @Test
+  public void scheduleDescription_toBuilder_replacesSpec() {
+    ScheduleDescription original = minimalDescription();
+    ScheduleSpec newSpec = ScheduleSpec.newBuilder().setCronExpression("0 9 * * 1-5").build();
+    ScheduleDescription updated = original.toBuilder().setSpec(newSpec).build();
+    assertEquals(newSpec, updated.getSpec());
+    assertEquals(original.getAction(), updated.getAction());
+    assertEquals(original.getPolicies(), updated.getPolicies());
+  }
+
+  @Test
+  public void scheduleDescription_toBuilder_replacesAction() {
+    ScheduleDescription original = minimalDescription();
+    ScheduleAction newAction =
+        ScheduleAction.newBuilder()
+            .setStartWorkflow(
+                ScheduleAction.StartWorkflowAction.newBuilder()
+                    .setWorkflowType("OtherWf")
+                    .setTaskList("other-tl")
+                    .build())
+            .build();
+    ScheduleDescription updated = original.toBuilder().setAction(newAction).build();
+    assertEquals(newAction, updated.getAction());
+    assertEquals(original.getSpec(), updated.getSpec());
+  }
+
+  @Test
+  public void scheduleDescription_toBuilder_replacesPolicies() {
+    ScheduleDescription original = minimalDescription();
+    SchedulePolicies newPolicies =
+        SchedulePolicies.newBuilder().setOverlapPolicy(ScheduleOverlapPolicy.BUFFER).build();
+    ScheduleDescription updated = original.toBuilder().setPolicies(newPolicies).build();
+    assertEquals(newPolicies, updated.getPolicies());
+    assertEquals(original.getSpec(), updated.getSpec());
+  }
+
+  @Test
   public void scheduleDescription_nullMemoNormalizesToEmpty() {
     assertNotNull(minimalDescription().getMemo());
     assertTrue(minimalDescription().getMemo().isEmpty());
