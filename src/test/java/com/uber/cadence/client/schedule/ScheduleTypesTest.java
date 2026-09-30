@@ -742,6 +742,15 @@ public class ScheduleTypesTest {
   }
 
   @Test
+  public void listSchedulesResult_notEqualOnDifferentSchedules() {
+    ScheduleState state = new ScheduleState(false, null, null, null);
+    ScheduleListEntry entry = new ScheduleListEntry("id", "wf", state, null);
+    assertNotEquals(
+        new ListSchedulesResult(Arrays.asList(entry), null),
+        new ListSchedulesResult(Collections.emptyList(), null));
+  }
+
+  @Test
   public void listSchedulesResult_toString() {
     assertTrue(
         new ListSchedulesResult(Collections.emptyList(), new byte[] {5})
@@ -775,6 +784,29 @@ public class ScheduleTypesTest {
     assertNotEquals(
         new ScheduleListEntry("id-1", "wf", state, null),
         new ScheduleListEntry("id-2", "wf", state, null));
+  }
+
+  @Test
+  public void scheduleListEntry_notEqualOnDifferentWorkflowType() {
+    ScheduleState state = new ScheduleState(false, null, null, null);
+    assertNotEquals(
+        new ScheduleListEntry("id", "WfA", state, null),
+        new ScheduleListEntry("id", "WfB", state, null));
+  }
+
+  @Test
+  public void scheduleListEntry_notEqualOnDifferentState() {
+    assertNotEquals(
+        new ScheduleListEntry("id", "wf", new ScheduleState(true, "r", null, null), null),
+        new ScheduleListEntry("id", "wf", new ScheduleState(false, null, null, null), null));
+  }
+
+  @Test
+  public void scheduleListEntry_notEqualOnDifferentCronExpression() {
+    ScheduleState state = new ScheduleState(false, null, null, null);
+    assertNotEquals(
+        new ScheduleListEntry("id", "wf", state, "0 6 * * *"),
+        new ScheduleListEntry("id", "wf", state, "0 9 * * *"));
   }
 
   @Test
