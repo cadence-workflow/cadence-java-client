@@ -16,7 +16,9 @@ package com.uber.cadence.internal.sync;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -241,10 +243,9 @@ public class ScheduleListIteratorTest {
         new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
     try {
       it.hasNext();
+      fail("expected RuntimeException");
     } catch (RuntimeException e) {
-      assertTrue(
-          "RuntimeException cause must be re-thrown directly, not double-wrapped",
-          e == cause || e.getCause() == cause);
+      assertSame("RuntimeException cause must be re-thrown directly, not double-wrapped", cause, e);
     }
   }
 
@@ -259,8 +260,9 @@ public class ScheduleListIteratorTest {
         new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
     try {
       it.hasNext();
+      fail("expected RuntimeException");
     } catch (RuntimeException e) {
-      assertEquals(checked, e.getCause());
+      assertSame(checked, e.getCause());
     }
   }
 }

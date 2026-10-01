@@ -42,8 +42,10 @@ import java.util.stream.Stream;
  * Client for managing schedules within a domain. Obtain via {@link
  * WorkflowClient#scheduleClient()}.
  *
- * <p>All methods return {@link CompletableFuture}. Synchronous callers can block with {@link
- * CompletableFuture#get()} or {@link CompletableFuture#join()}.
+ * <p>All methods except {@link #listSchedules()} and {@link #listSchedules(int)} return {@link
+ * CompletableFuture}. Synchronous callers can block with {@link CompletableFuture#get()} or {@link
+ * CompletableFuture#join()}. The streaming {@code listSchedules} overloads fetch pages
+ * synchronously as the stream is consumed and throw failures directly as {@link RuntimeException}.
  *
  * <pre>{@code
  * ScheduleClient sc = workflowClient.scheduleClient();
