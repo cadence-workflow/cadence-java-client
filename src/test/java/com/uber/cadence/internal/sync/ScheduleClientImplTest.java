@@ -570,6 +570,19 @@ public class ScheduleClientImplTest {
   }
 
   @Test
+  public void listSchedules_noArg_usesDefaultPageSize() {
+    ArgumentCaptor<ListSchedulesRequest> captor = forClass(ListSchedulesRequest.class);
+    when(service.ListSchedules(captor.capture()))
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                new ListSchedulesResponse().setSchedules(Collections.emptyList())));
+
+    client.listSchedules().count();
+
+    assertEquals(ScheduleListIterator.DEFAULT_PAGE_SIZE, captor.getValue().getPageSize());
+  }
+
+  @Test
   public void listSchedules_withPageSize_passesPageSizeToRequest() {
     ArgumentCaptor<ListSchedulesRequest> captor = forClass(ListSchedulesRequest.class);
     when(service.ListSchedules(captor.capture()))

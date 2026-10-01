@@ -28,7 +28,6 @@ import com.uber.cadence.ListSchedulesRequest;
 import com.uber.cadence.ListSchedulesResponse;
 import com.uber.cadence.client.schedule.ScheduleListEntry;
 import com.uber.cadence.serviceclient.IWorkflowService;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -202,7 +201,7 @@ public class ScheduleListIteratorTest {
                     .setNextPageToken(new byte[] {2})))
         .thenReturn(
             CompletableFuture.completedFuture(
-                new ListSchedulesResponse().setSchedules(Arrays.asList(e2))));
+                new ListSchedulesResponse().setSchedules(Collections.singletonList(e2))));
 
     Iterator<ScheduleListEntry> it =
         new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
@@ -219,5 +218,49 @@ public class ScheduleListIteratorTest {
                 new ListSchedulesResponse().setSchedules(Collections.emptyList())));
 
     new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE).next();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void constructor_zeroPageSize_throws() {
+    new ScheduleListIterator(service, DOMAIN, 0);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void constructor_negativePageSize_throws() {
+    new ScheduleListIterator(service, DOMAIN, -1);
+  }
+
+  @Test
+  public void fetchNextPage_runtimeExceptionPassedThroughDirectly() {
+    RuntimeException cause = new RuntimeException("service down");
+    CompletableFuture<ListSchedulesResponse> failed = new CompletableFuture<>();
+    failed.completeExceptionally(cause);
+    when(service.ListSchedules(any())).thenReturn(failed);
+
+    Iterator<ScheduleListEntry> it =
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
+    try {
+      it.hasNext();
+    } catch (RuntimeException e) {
+      assertTrue(
+          "RuntimeException cause must be re-thrown directly, not double-wrapped",
+          e == cause || e.getCause() == cause);
+    }
+  }
+
+  @Test
+  public void fetchNextPage_checkedExceptionWrappedInRuntimeException() {
+    Exception checked = new Exception("checked");
+    CompletableFuture<ListSchedulesResponse> failed = new CompletableFuture<>();
+    failed.completeExceptionally(checked);
+    when(service.ListSchedules(any())).thenReturn(failed);
+
+    Iterator<ScheduleListEntry> it =
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
+    try {
+      it.hasNext();
+    } catch (RuntimeException e) {
+      assertEquals(checked, e.getCause());
+    }
   }
 }

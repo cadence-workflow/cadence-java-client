@@ -245,7 +245,7 @@ final class ScheduleClientImpl implements ScheduleClient {
     return StreamSupport.stream(
         Spliterators.spliteratorUnknownSize(
             new ScheduleListIterator(service, domain, pageSize),
-            Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE),
+            Spliterator.ORDERED | Spliterator.NONNULL),
         false);
   }
 

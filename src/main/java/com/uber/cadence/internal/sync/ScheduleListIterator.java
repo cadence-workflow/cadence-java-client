@@ -42,6 +42,9 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
   private boolean exhausted = false;
 
   ScheduleListIterator(IWorkflowService service, String domain, int pageSize) {
+    if (pageSize <= 0) {
+      throw new IllegalArgumentException("pageSize must be > 0, got " + pageSize);
+    }
     this.service = service;
     this.domain = domain;
     this.pageSize = pageSize;
