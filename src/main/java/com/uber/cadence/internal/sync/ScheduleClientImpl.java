@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 final class ScheduleClientImpl implements ScheduleClient {
 
@@ -138,6 +139,24 @@ final class ScheduleClientImpl implements ScheduleClient {
       f.completeExceptionally(e);
       return f;
     }
+  }
+
+  @Override
+  public CompletableFuture<UpdateScheduleResponse> updateSchedule(
+      String scheduleId, Function<ScheduleDescription, ScheduleDescription> updater) {
+    return describeSchedule(scheduleId)
+        .thenCompose(
+            current -> {
+              ScheduleDescription updated = updater.apply(current);
+              // Use reference identity to skip re-serializing fields the callback didn't touch.
+              // The describe->client->thrift round-trip is lossy (e.g. nonRetriableErrorReasons),
+              // so only re-serialize what actually changed.
+              return updateSchedule(
+                  scheduleId,
+                  updated.getSpec() != current.getSpec() ? updated.getSpec() : null,
+                  updated.getAction() != current.getAction() ? updated.getAction() : null,
+                  updated.getPolicies() != current.getPolicies() ? updated.getPolicies() : null);
+            });
   }
 
   @Override

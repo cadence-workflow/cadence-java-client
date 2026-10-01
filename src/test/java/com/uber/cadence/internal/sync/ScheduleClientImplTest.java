@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.uber.cadence.CreateScheduleRequest;
 import com.uber.cadence.CreateScheduleResponse;
+import com.uber.cadence.DescribeScheduleResponse;
 import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.client.schedule.ScheduleAction;
@@ -61,6 +62,8 @@ public class ScheduleClientImplTest {
         .thenReturn(CompletableFuture.completedFuture(new CreateScheduleResponse()));
     when(service.UpdateSchedule(any()))
         .thenReturn(CompletableFuture.completedFuture(new UpdateScheduleResponse()));
+    when(service.DescribeSchedule(any()))
+        .thenReturn(CompletableFuture.completedFuture(minimalDescribeResponse()));
     client = new ScheduleClientImpl(service, DOMAIN);
   }
 
@@ -490,6 +493,60 @@ public class ScheduleClientImplTest {
     assertNull(captor.getValue().getPolicies());
   }
 
+  // --- updateSchedule callback ---
+
+  @Test
+  public void updateSchedule_callback_describesAndSubmitsUpdatedSpec() throws Exception {
+    ArgumentCaptor<UpdateScheduleRequest> captor = forClass(UpdateScheduleRequest.class);
+    when(service.UpdateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new UpdateScheduleResponse()));
+
+    ScheduleSpec newSpec = ScheduleSpec.newBuilder().setCronExpression("0 9 * * 1-5").build();
+    client
+        .updateSchedule(SCHEDULE_ID, current -> current.toBuilder().setSpec(newSpec).build())
+        .join();
+
+    UpdateScheduleRequest req = captor.getValue();
+    assertEquals(DOMAIN, req.getDomain());
+    assertEquals(SCHEDULE_ID, req.getScheduleId());
+    assertEquals("0 9 * * 1-5", req.getSpec().getCronExpression());
+  }
+
+  @Test
+  public void updateSchedule_callback_onlyChangedFieldsSentToServer() throws Exception {
+    ArgumentCaptor<UpdateScheduleRequest> captor = forClass(UpdateScheduleRequest.class);
+    when(service.UpdateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new UpdateScheduleResponse()));
+
+    SchedulePolicies newPolicies =
+        SchedulePolicies.newBuilder().setOverlapPolicy(ScheduleOverlapPolicy.BUFFER).build();
+    client
+        .updateSchedule(
+            SCHEDULE_ID, current -> current.toBuilder().setPolicies(newPolicies).build())
+        .join();
+
+    UpdateScheduleRequest req = captor.getValue();
+    // spec and action were not replaced by the callback, so they are not re-serialized
+    assertNull(req.getSpec());
+    assertNull(req.getAction());
+    assertEquals(
+        com.uber.cadence.ScheduleOverlapPolicy.BUFFER, req.getPolicies().getOverlapPolicy());
+  }
+
+  @Test
+  public void updateSchedule_callback_noChanges_sendsNullFields() throws Exception {
+    ArgumentCaptor<UpdateScheduleRequest> captor = forClass(UpdateScheduleRequest.class);
+    when(service.UpdateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new UpdateScheduleResponse()));
+
+    client.updateSchedule(SCHEDULE_ID, current -> current).join();
+
+    UpdateScheduleRequest req = captor.getValue();
+    assertNull(req.getSpec());
+    assertNull(req.getAction());
+    assertNull(req.getPolicies());
+  }
+
   // --- helpers ---
 
   private static ScheduleAction minimalAction() {
@@ -500,5 +557,25 @@ public class ScheduleClientImplTest {
                 .setTaskList("tl")
                 .build())
         .build();
+  }
+
+  private static DescribeScheduleResponse minimalDescribeResponse() {
+    com.uber.cadence.ScheduleSpec spec =
+        new com.uber.cadence.ScheduleSpec().setCronExpression("0 * * * *");
+    com.uber.cadence.ScheduleStartWorkflowAction swa =
+        new com.uber.cadence.ScheduleStartWorkflowAction()
+            .setWorkflowType(new com.uber.cadence.WorkflowType().setName("wf"))
+            .setTaskList(new com.uber.cadence.TaskList().setName("tl"));
+    com.uber.cadence.ScheduleAction action =
+        new com.uber.cadence.ScheduleAction().setStartWorkflow(swa);
+    com.uber.cadence.SchedulePolicies policies = new com.uber.cadence.SchedulePolicies();
+    com.uber.cadence.ScheduleState state = new com.uber.cadence.ScheduleState().setPaused(false);
+    com.uber.cadence.ScheduleInfo info = new com.uber.cadence.ScheduleInfo();
+    return new DescribeScheduleResponse()
+        .setSpec(spec)
+        .setAction(action)
+        .setPolicies(policies)
+        .setState(state)
+        .setInfo(info);
   }
 }

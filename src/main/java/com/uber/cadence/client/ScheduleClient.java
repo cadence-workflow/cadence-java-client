@@ -34,6 +34,7 @@ import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * Client for managing schedules within a domain. Obtain via {@link
@@ -125,6 +126,33 @@ public interface ScheduleClient {
    */
   CompletableFuture<UpdateScheduleResponse> updateSchedule(
       String scheduleId, ScheduleSpec spec, ScheduleAction action, SchedulePolicies policies);
+
+  /**
+   * Updates a schedule using a callback. The SDK fetches the current configuration with {@link
+   * #describeSchedule}, passes the result to {@code updater}, and submits only the fields that the
+   * callback replaced (by reference identity). Only {@code spec}, {@code action}, and {@code
+   * policies} are forwarded; {@code state}, {@code info}, {@code memo}, and {@code
+   * searchAttributes} in the returned description are ignored.
+   *
+   * <p>This is a read-then-write operation, not an atomic transaction. Concurrent updates to the
+   * same schedule are last-write-wins; there is no conflict detection.
+   *
+   * <p>Use {@link com.uber.cadence.client.schedule.ScheduleDescription#toBuilder()} to create a
+   * modified copy:
+   *
+   * <pre>{@code
+   * client.updateSchedule("my-schedule", current ->
+   *     current.toBuilder()
+   *         .setSpec(ScheduleSpec.newBuilder().setCronExpression("0 9 * * 1-5").build())
+   *         .build()
+   * ).join();
+   * }</pre>
+   *
+   * @param scheduleId the schedule identifier
+   * @param updater callback that receives the current description and returns the desired new state
+   */
+  CompletableFuture<UpdateScheduleResponse> updateSchedule(
+      String scheduleId, Function<ScheduleDescription, ScheduleDescription> updater);
 
   /**
    * Permanently deletes a schedule. In-flight workflow runs triggered by this schedule are not
