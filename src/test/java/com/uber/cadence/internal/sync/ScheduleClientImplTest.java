@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.uber.cadence.CreateScheduleRequest;
 import com.uber.cadence.CreateScheduleResponse;
+import com.uber.cadence.ListSchedulesRequest;
 import com.uber.cadence.ListSchedulesResponse;
 import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
@@ -42,6 +43,8 @@ import com.uber.cadence.common.RetryOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -505,7 +508,7 @@ public class ScheduleClientImplTest {
             .setCronExpression("0 9 * * 1-5");
     ListSchedulesResponse response =
         new ListSchedulesResponse()
-            .setSchedules(java.util.Arrays.asList(thrift))
+            .setSchedules(Arrays.asList(thrift))
             .setNextPageToken(new byte[] {1, 2, 3});
     when(service.ListSchedules(any())).thenReturn(CompletableFuture.completedFuture(response));
 
@@ -536,7 +539,7 @@ public class ScheduleClientImplTest {
   public void listSchedules_emptyToken_normalizesToNull() throws Exception {
     ListSchedulesResponse response =
         new ListSchedulesResponse()
-            .setSchedules(java.util.Collections.emptyList())
+            .setSchedules(Collections.emptyList())
             .setNextPageToken(new byte[0]);
     when(service.ListSchedules(any())).thenReturn(CompletableFuture.completedFuture(response));
 
@@ -550,9 +553,23 @@ public class ScheduleClientImplTest {
     when(service.ListSchedules(any()))
         .thenReturn(
             CompletableFuture.completedFuture(
-                new ListSchedulesResponse().setSchedules(java.util.Arrays.asList(thrift))));
+                new ListSchedulesResponse().setSchedules(Arrays.asList(thrift))));
 
     assertFalse(client.listSchedules(10, null).join().getSchedules().get(0).isPaused());
+  }
+
+  @Test
+  public void listSchedules_passesPageSizeTokenAndDomainToService() throws Exception {
+    ArgumentCaptor<ListSchedulesRequest> captor = forClass(ListSchedulesRequest.class);
+    when(service.ListSchedules(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new ListSchedulesResponse()));
+    byte[] token = {5, 6};
+
+    client.listSchedules(42, token).join();
+
+    assertEquals(DOMAIN, captor.getValue().getDomain());
+    assertEquals(42, captor.getValue().getPageSize());
+    assertArrayEquals(token, captor.getValue().getNextPageToken());
   }
 
   // --- helpers ---
