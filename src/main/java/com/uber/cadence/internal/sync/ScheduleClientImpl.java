@@ -59,8 +59,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 final class ScheduleClientImpl implements ScheduleClient {
 
@@ -232,8 +236,17 @@ final class ScheduleClientImpl implements ScheduleClient {
   }
 
   @Override
-  public Iterable<ScheduleListEntry> listSchedules() {
-    return () -> new ScheduleListIterator(service, domain);
+  public Stream<ScheduleListEntry> listSchedules() {
+    return listSchedules(ScheduleListIterator.DEFAULT_PAGE_SIZE);
+  }
+
+  @Override
+  public Stream<ScheduleListEntry> listSchedules(int pageSize) {
+    return StreamSupport.stream(
+        Spliterators.spliteratorUnknownSize(
+            new ScheduleListIterator(service, domain, pageSize),
+            Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE),
+        false);
   }
 
   private static com.uber.cadence.ScheduleSpec toThriftSpec(ScheduleSpec s) {

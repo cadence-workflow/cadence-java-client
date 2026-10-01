@@ -61,7 +61,8 @@ public class ScheduleListIteratorTest {
             CompletableFuture.completedFuture(
                 new ListSchedulesResponse().setSchedules(Collections.singletonList(thrift))));
 
-    Iterator<ScheduleListEntry> it = new ScheduleListIterator(service, DOMAIN);
+    Iterator<ScheduleListEntry> it =
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
 
     assertTrue(it.hasNext());
     ScheduleListEntry entry = it.next();
@@ -89,7 +90,8 @@ public class ScheduleListIteratorTest {
             CompletableFuture.completedFuture(
                 new ListSchedulesResponse().setSchedules(Collections.singletonList(e2))));
 
-    Iterator<ScheduleListEntry> it = new ScheduleListIterator(service, DOMAIN);
+    Iterator<ScheduleListEntry> it =
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
 
     assertEquals("s1", it.next().getScheduleId());
     assertEquals("s2", it.next().getScheduleId());
@@ -108,7 +110,8 @@ public class ScheduleListIteratorTest {
                             new com.uber.cadence.ScheduleListEntry().setScheduleId("s1")))
                     .setNextPageToken(new byte[0])));
 
-    Iterator<ScheduleListEntry> it = new ScheduleListIterator(service, DOMAIN);
+    Iterator<ScheduleListEntry> it =
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
     it.next();
     assertFalse(it.hasNext());
     verify(service, times(1)).ListSchedules(any());
@@ -121,7 +124,9 @@ public class ScheduleListIteratorTest {
             CompletableFuture.completedFuture(
                 new ListSchedulesResponse().setSchedules(Collections.emptyList())));
 
-    assertFalse(new ScheduleListIterator(service, DOMAIN).hasNext());
+    assertFalse(
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE)
+            .hasNext());
   }
 
   @Test
@@ -140,7 +145,8 @@ public class ScheduleListIteratorTest {
             CompletableFuture.completedFuture(
                 new ListSchedulesResponse().setSchedules(Collections.emptyList())));
 
-    Iterator<ScheduleListEntry> it = new ScheduleListIterator(service, DOMAIN);
+    Iterator<ScheduleListEntry> it =
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
     it.next();
     it.hasNext();
 
@@ -154,7 +160,9 @@ public class ScheduleListIteratorTest {
         .thenReturn(
             CompletableFuture.completedFuture(new ListSchedulesResponse().setSchedules(null)));
 
-    assertFalse(new ScheduleListIterator(service, DOMAIN).hasNext());
+    assertFalse(
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE)
+            .hasNext());
   }
 
   @Test
@@ -169,7 +177,10 @@ public class ScheduleListIteratorTest {
                                 .setScheduleId("s")
                                 .setState(null)))));
 
-    assertFalse(new ScheduleListIterator(service, DOMAIN).next().isPaused());
+    assertFalse(
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE)
+            .next()
+            .isPaused());
   }
 
   @Test
@@ -193,7 +204,8 @@ public class ScheduleListIteratorTest {
             CompletableFuture.completedFuture(
                 new ListSchedulesResponse().setSchedules(Arrays.asList(e2))));
 
-    Iterator<ScheduleListEntry> it = new ScheduleListIterator(service, DOMAIN);
+    Iterator<ScheduleListEntry> it =
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
     assertEquals("s1", it.next().getScheduleId());
     assertEquals("s2", it.next().getScheduleId());
     assertFalse(it.hasNext());
@@ -206,30 +218,6 @@ public class ScheduleListIteratorTest {
             CompletableFuture.completedFuture(
                 new ListSchedulesResponse().setSchedules(Collections.emptyList())));
 
-    new ScheduleListIterator(service, DOMAIN).next();
-  }
-
-  @Test
-  public void listSchedules_iterable_canIterateTwice() {
-    com.uber.cadence.ScheduleListEntry e =
-        new com.uber.cadence.ScheduleListEntry().setScheduleId("s1");
-    when(service.ListSchedules(any()))
-        .thenReturn(
-            CompletableFuture.completedFuture(
-                new ListSchedulesResponse().setSchedules(Collections.singletonList(e))))
-        .thenReturn(
-            CompletableFuture.completedFuture(
-                new ListSchedulesResponse().setSchedules(Collections.singletonList(e))));
-
-    ScheduleClientImpl client = new ScheduleClientImpl(service, DOMAIN);
-    Iterable<ScheduleListEntry> iterable = client.listSchedules();
-
-    int count1 = 0;
-    for (ScheduleListEntry ignored : iterable) count1++;
-    int count2 = 0;
-    for (ScheduleListEntry ignored : iterable) count2++;
-
-    assertEquals(1, count1);
-    assertEquals(1, count2);
+    new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE).next();
   }
 }

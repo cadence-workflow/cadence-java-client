@@ -26,22 +26,25 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutionException;
 
 final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
 
-  private static final int PAGE_SIZE = 1000;
+  static final int DEFAULT_PAGE_SIZE = 100;
 
   private final IWorkflowService service;
   private final String domain;
+  private final int pageSize;
 
   private List<ScheduleListEntry> buffer = Collections.emptyList();
   private int index = 0;
   private byte[] nextPageToken = null;
   private boolean exhausted = false;
 
-  ScheduleListIterator(IWorkflowService service, String domain) {
+  ScheduleListIterator(IWorkflowService service, String domain, int pageSize) {
     this.service = service;
     this.domain = domain;
+    this.pageSize = pageSize;
   }
 
   @Override
@@ -61,13 +64,24 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
   }
 
   private void fetchNextPage() {
-    ListSchedulesResponse response =
-        service.ListSchedules(
-                new ListSchedulesRequest()
-                    .setDomain(domain)
-                    .setPageSize(PAGE_SIZE)
-                    .setNextPageToken(nextPageToken))
-            .join();
+    ListSchedulesResponse response;
+    try {
+      response =
+          service.ListSchedules(
+                  new ListSchedulesRequest()
+                      .setDomain(domain)
+                      .setPageSize(pageSize)
+                      .setNextPageToken(nextPageToken))
+              .get();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new RuntimeException(e);
+    } catch (ExecutionException e) {
+      Throwable cause = e.getCause();
+      throw cause instanceof RuntimeException
+          ? (RuntimeException) cause
+          : new RuntimeException(cause);
+    }
 
     List<ScheduleListEntry> page = new ArrayList<>();
     if (response.getSchedules() != null) {

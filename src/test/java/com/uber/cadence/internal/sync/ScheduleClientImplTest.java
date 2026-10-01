@@ -28,11 +28,14 @@ import static org.mockito.Mockito.when;
 import com.uber.cadence.CreateScheduleRequest;
 import com.uber.cadence.CreateScheduleResponse;
 import com.uber.cadence.DescribeScheduleResponse;
+import com.uber.cadence.ListSchedulesRequest;
+import com.uber.cadence.ListSchedulesResponse;
 import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleInitialState;
+import com.uber.cadence.client.schedule.ScheduleListEntry;
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
@@ -40,6 +43,7 @@ import com.uber.cadence.common.RetryOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -545,6 +549,57 @@ public class ScheduleClientImplTest {
     assertNull(req.getSpec());
     assertNull(req.getAction());
     assertNull(req.getPolicies());
+  }
+
+  // --- listSchedules (stream) ---
+
+  @Test
+  public void listSchedules_eachCallReturnsIndependentStream() {
+    com.uber.cadence.ScheduleListEntry e =
+        new com.uber.cadence.ScheduleListEntry().setScheduleId("s1");
+    when(service.ListSchedules(any()))
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                new ListSchedulesResponse().setSchedules(Collections.singletonList(e))))
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                new ListSchedulesResponse().setSchedules(Collections.singletonList(e))));
+
+    assertEquals(1, client.listSchedules().count());
+    assertEquals(1, client.listSchedules().count());
+  }
+
+  @Test
+  public void listSchedules_withPageSize_passesPageSizeToRequest() {
+    ArgumentCaptor<ListSchedulesRequest> captor = forClass(ListSchedulesRequest.class);
+    when(service.ListSchedules(captor.capture()))
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                new ListSchedulesResponse().setSchedules(Collections.emptyList())));
+
+    client.listSchedules(42).count();
+
+    assertEquals(42, captor.getValue().getPageSize());
+  }
+
+  @Test
+  public void listSchedules_stream_mapsEntriesToClientTypes() {
+    com.uber.cadence.ScheduleListEntry thrift =
+        new com.uber.cadence.ScheduleListEntry()
+            .setScheduleId("sched-1")
+            .setWorkflowType(new com.uber.cadence.WorkflowType().setName("MyWf"))
+            .setState(new com.uber.cadence.ScheduleState().setPaused(true))
+            .setCronExpression("0 9 * * 1-5");
+    when(service.ListSchedules(any()))
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                new ListSchedulesResponse().setSchedules(Collections.singletonList(thrift))));
+
+    ScheduleListEntry entry = client.listSchedules().findFirst().orElseThrow(AssertionError::new);
+    assertEquals("sched-1", entry.getScheduleId());
+    assertEquals("MyWf", entry.getWorkflowType());
+    assertTrue(entry.isPaused());
+    assertEquals("0 9 * * 1-5", entry.getCronExpression());
   }
 
   // --- helpers ---
