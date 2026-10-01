@@ -533,6 +533,20 @@ public class ScheduleClientImplTest {
         com.uber.cadence.ScheduleOverlapPolicy.BUFFER, req.getPolicies().getOverlapPolicy());
   }
 
+  @Test
+  public void updateSchedule_callback_noChanges_sendsNullFields() throws Exception {
+    ArgumentCaptor<UpdateScheduleRequest> captor = forClass(UpdateScheduleRequest.class);
+    when(service.UpdateSchedule(captor.capture()))
+        .thenReturn(CompletableFuture.completedFuture(new UpdateScheduleResponse()));
+
+    client.updateSchedule(SCHEDULE_ID, current -> current).join();
+
+    UpdateScheduleRequest req = captor.getValue();
+    assertNull(req.getSpec());
+    assertNull(req.getAction());
+    assertNull(req.getPolicies());
+  }
+
   // --- helpers ---
 
   private static ScheduleAction minimalAction() {

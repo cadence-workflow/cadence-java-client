@@ -616,6 +616,30 @@ public class ScheduleTypesTest {
   }
 
   @Test
+  public void scheduleDescription_toBuilder_replacesStateInfoMemoSearchAttributes() {
+    ScheduleDescription original = minimalDescription();
+    ScheduleState newState = new ScheduleState(true, "paused", null, null);
+    ScheduleInfo newInfo = new ScheduleInfo(null, null, 5L, null, null, null, 0L, 0L);
+    Map<String, Object> newMemo = Collections.singletonMap("k", new byte[] {1});
+    Map<String, Object> newSA = Collections.singletonMap("env", new byte[] {2});
+
+    ScheduleDescription updated =
+        original
+            .toBuilder()
+            .setState(newState)
+            .setInfo(newInfo)
+            .setMemo(newMemo)
+            .setSearchAttributes(newSA)
+            .build();
+
+    assertEquals(newState, updated.getState());
+    assertEquals(newInfo, updated.getInfo());
+    assertEquals(newMemo, updated.getMemo());
+    assertEquals(newSA, updated.getSearchAttributes());
+    assertEquals(original.getSpec(), updated.getSpec());
+  }
+
+  @Test
   public void scheduleDescription_nullMemoNormalizesToEmpty() {
     assertNotNull(minimalDescription().getMemo());
     assertTrue(minimalDescription().getMemo().isEmpty());
