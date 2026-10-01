@@ -19,21 +19,22 @@ import java.util.Objects;
 /**
  * A single entry returned by {@link com.uber.cadence.client.ScheduleClient#listSchedules}.
  *
- * <p>Contains only the data available from the visibility store. For full detail including policies
- * and runtime info, call {@link com.uber.cadence.client.ScheduleClient#describeSchedule}.
+ * <p>Contains only the data available from the visibility store. For full detail including
+ * policies, runtime info, and pause details (reason, timestamp, who paused), call {@link
+ * com.uber.cadence.client.ScheduleClient#describeSchedule}.
  */
 public final class ScheduleListEntry {
 
   private final String scheduleId;
   private final String workflowType;
-  private final ScheduleState state;
+  private final boolean paused;
   private final String cronExpression;
 
   public ScheduleListEntry(
-      String scheduleId, String workflowType, ScheduleState state, String cronExpression) {
+      String scheduleId, String workflowType, boolean paused, String cronExpression) {
     this.scheduleId = scheduleId;
     this.workflowType = workflowType;
-    this.state = state;
+    this.paused = paused;
     this.cronExpression = cronExpression;
   }
 
@@ -48,13 +49,12 @@ public final class ScheduleListEntry {
   }
 
   /**
-   * Pause state as seen by the list endpoint. Only {@link ScheduleState#isPaused()} is set; {@code
-   * pauseReason}, {@code pausedAt}, and {@code pausedBy} are always {@code null} here because the
-   * visibility store only records the paused/active boolean. Call {@link
-   * com.uber.cadence.client.ScheduleClient#describeSchedule} for full pause details.
+   * Whether the schedule is currently paused. This is the only pause field available from the list
+   * endpoint; the visibility store does not record pause reason, timestamp, or who paused. Call
+   * {@link com.uber.cadence.client.ScheduleClient#describeSchedule} for full pause details.
    */
-  public ScheduleState getState() {
-    return state;
+  public boolean isPaused() {
+    return paused;
   }
 
   /** Cron expression configured in the spec. */
@@ -67,15 +67,15 @@ public final class ScheduleListEntry {
     if (this == o) return true;
     if (!(o instanceof ScheduleListEntry)) return false;
     ScheduleListEntry that = (ScheduleListEntry) o;
-    return Objects.equals(scheduleId, that.scheduleId)
+    return paused == that.paused
+        && Objects.equals(scheduleId, that.scheduleId)
         && Objects.equals(workflowType, that.workflowType)
-        && Objects.equals(state, that.state)
         && Objects.equals(cronExpression, that.cronExpression);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(scheduleId, workflowType, state, cronExpression);
+    return Objects.hash(scheduleId, workflowType, paused, cronExpression);
   }
 
   @Override
@@ -88,7 +88,7 @@ public final class ScheduleListEntry {
         + "', cronExpression='"
         + cronExpression
         + "', paused="
-        + (state != null && state.isPaused())
+        + paused
         + '}';
   }
 }

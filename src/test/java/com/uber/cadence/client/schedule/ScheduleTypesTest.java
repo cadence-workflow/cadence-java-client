@@ -721,8 +721,7 @@ public class ScheduleTypesTest {
 
   @Test(expected = UnsupportedOperationException.class)
   public void listSchedulesResult_schedulesIsUnmodifiable() {
-    ScheduleState state = new ScheduleState(false, null, null, null);
-    ScheduleListEntry entry = new ScheduleListEntry("id", "wf", state, null);
+    ScheduleListEntry entry = new ScheduleListEntry("id", "wf", false, null);
     new ListSchedulesResult(Arrays.asList(entry), null).getSchedules().add(entry);
   }
 
@@ -743,8 +742,7 @@ public class ScheduleTypesTest {
 
   @Test
   public void listSchedulesResult_notEqualOnDifferentSchedules() {
-    ScheduleState state = new ScheduleState(false, null, null, null);
-    ScheduleListEntry entry = new ScheduleListEntry("id", "wf", state, null);
+    ScheduleListEntry entry = new ScheduleListEntry("id", "wf", false, null);
     assertNotEquals(
         new ListSchedulesResult(Arrays.asList(entry), null),
         new ListSchedulesResult(Collections.emptyList(), null));
@@ -760,59 +758,53 @@ public class ScheduleTypesTest {
 
   @Test
   public void scheduleListEntry_getters() {
-    ScheduleState state = new ScheduleState(true, "paused", null, null);
-    ScheduleListEntry entry = new ScheduleListEntry("sched-1", "MyWf", state, "0 6 * * *");
+    ScheduleListEntry entry = new ScheduleListEntry("sched-1", "MyWf", true, "0 6 * * *");
 
     assertEquals("sched-1", entry.getScheduleId());
     assertEquals("MyWf", entry.getWorkflowType());
-    assertEquals(state, entry.getState());
+    assertTrue(entry.isPaused());
     assertEquals("0 6 * * *", entry.getCronExpression());
   }
 
   @Test
   public void scheduleListEntry_equals() {
-    ScheduleState state = new ScheduleState(false, null, null, null);
-    ScheduleListEntry a = new ScheduleListEntry("id", "wf", state, "0 6 * * *");
-    ScheduleListEntry b = new ScheduleListEntry("id", "wf", state, "0 6 * * *");
+    ScheduleListEntry a = new ScheduleListEntry("id", "wf", false, "0 6 * * *");
+    ScheduleListEntry b = new ScheduleListEntry("id", "wf", false, "0 6 * * *");
     assertEquals(a, b);
     assertEquals(a.hashCode(), b.hashCode());
   }
 
   @Test
   public void scheduleListEntry_notEqualOnDifferentId() {
-    ScheduleState state = new ScheduleState(false, null, null, null);
     assertNotEquals(
-        new ScheduleListEntry("id-1", "wf", state, null),
-        new ScheduleListEntry("id-2", "wf", state, null));
+        new ScheduleListEntry("id-1", "wf", false, null),
+        new ScheduleListEntry("id-2", "wf", false, null));
   }
 
   @Test
   public void scheduleListEntry_notEqualOnDifferentWorkflowType() {
-    ScheduleState state = new ScheduleState(false, null, null, null);
     assertNotEquals(
-        new ScheduleListEntry("id", "WfA", state, null),
-        new ScheduleListEntry("id", "WfB", state, null));
+        new ScheduleListEntry("id", "WfA", false, null),
+        new ScheduleListEntry("id", "WfB", false, null));
   }
 
   @Test
-  public void scheduleListEntry_notEqualOnDifferentState() {
+  public void scheduleListEntry_notEqualOnDifferentPausedState() {
     assertNotEquals(
-        new ScheduleListEntry("id", "wf", new ScheduleState(true, "r", null, null), null),
-        new ScheduleListEntry("id", "wf", new ScheduleState(false, null, null, null), null));
+        new ScheduleListEntry("id", "wf", true, null),
+        new ScheduleListEntry("id", "wf", false, null));
   }
 
   @Test
   public void scheduleListEntry_notEqualOnDifferentCronExpression() {
-    ScheduleState state = new ScheduleState(false, null, null, null);
     assertNotEquals(
-        new ScheduleListEntry("id", "wf", state, "0 6 * * *"),
-        new ScheduleListEntry("id", "wf", state, "0 9 * * *"));
+        new ScheduleListEntry("id", "wf", false, "0 6 * * *"),
+        new ScheduleListEntry("id", "wf", false, "0 9 * * *"));
   }
 
   @Test
   public void scheduleListEntry_toString() {
-    ScheduleState state = new ScheduleState(true, "paused", null, null);
-    String s = new ScheduleListEntry("my-sched", "MyWf", state, "0 6 * * *").toString();
+    String s = new ScheduleListEntry("my-sched", "MyWf", true, "0 6 * * *").toString();
     assertTrue(s.contains("my-sched"));
     assertTrue(s.contains("MyWf"));
     assertTrue(s.contains("paused=true"));
