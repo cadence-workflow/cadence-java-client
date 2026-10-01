@@ -50,7 +50,8 @@ public final class ListSchedulesResult {
         schedules == null
             ? Collections.emptyList()
             : Collections.unmodifiableList(new ArrayList<>(schedules));
-    this.nextPageToken = nextPageToken == null ? null : nextPageToken.clone();
+    this.nextPageToken =
+        (nextPageToken == null || nextPageToken.length == 0) ? null : nextPageToken.clone();
   }
 
   /** Schedules in this page. May be empty on the last page. */

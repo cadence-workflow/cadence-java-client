@@ -222,8 +222,7 @@ final class ScheduleClientImpl implements ScheduleClient {
             new ScheduleListEntry(e.getScheduleId(), workflowType, paused, e.getCronExpression()));
       }
     }
-    byte[] token = r.getNextPageToken();
-    return new ListSchedulesResult(entries, token != null && token.length > 0 ? token : null);
+    return new ListSchedulesResult(entries, r.getNextPageToken());
   }
 
   private static com.uber.cadence.ScheduleSpec toThriftSpec(ScheduleSpec s) {
