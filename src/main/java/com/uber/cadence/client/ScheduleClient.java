@@ -30,6 +30,7 @@ import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleDescription;
 import com.uber.cadence.client.schedule.ScheduleInitialState;
+import com.uber.cadence.client.schedule.ScheduleListEntry;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
 import java.util.List;
@@ -207,4 +208,17 @@ public interface ScheduleClient {
    *     page
    */
   CompletableFuture<ListSchedulesResponse> listSchedules(int pageSize, byte[] nextPageToken);
+
+  /**
+   * Returns an {@link Iterable} over all schedules in the domain, fetching pages lazily.
+   *
+   * <pre>{@code
+   * for (ScheduleListEntry entry : client.listSchedules()) {
+   *   System.out.println(entry.getScheduleId());
+   * }
+   * }</pre>
+   *
+   * <p>Each page is fetched synchronously on demand. The iterator is not thread-safe.
+   */
+  Iterable<ScheduleListEntry> listSchedules();
 }

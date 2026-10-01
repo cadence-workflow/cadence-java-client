@@ -46,6 +46,7 @@ import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleDescription;
 import com.uber.cadence.client.schedule.ScheduleInfo;
 import com.uber.cadence.client.schedule.ScheduleInitialState;
+import com.uber.cadence.client.schedule.ScheduleListEntry;
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
@@ -228,6 +229,11 @@ final class ScheduleClientImpl implements ScheduleClient {
             .setPageSize(pageSize)
             .setNextPageToken(nextPageToken);
     return service.ListSchedules(request);
+  }
+
+  @Override
+  public Iterable<ScheduleListEntry> listSchedules() {
+    return () -> new ScheduleListIterator(service, domain);
   }
 
   private static com.uber.cadence.ScheduleSpec toThriftSpec(ScheduleSpec s) {
