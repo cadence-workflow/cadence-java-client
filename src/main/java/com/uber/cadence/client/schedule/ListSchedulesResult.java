@@ -35,10 +35,6 @@ import java.util.Objects;
  *     token = result.getNextPageToken();
  * } while (token != null);
  * }</pre>
- *
- * <p>The token returned by {@link #getNextPageToken()} is {@code null} when there are no more
- * pages. The {@link com.uber.cadence.client.ScheduleClient} implementation normalizes empty tokens
- * from the server to {@code null}, so a simple {@code token != null} check is sufficient.
  */
 public final class ListSchedulesResult {
 
