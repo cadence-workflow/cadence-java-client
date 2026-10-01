@@ -577,7 +577,7 @@ public class ScheduleClientImplTest {
             CompletableFuture.completedFuture(
                 new ListSchedulesResponse().setSchedules(Collections.emptyList())));
 
-    client.listSchedules().count();
+    client.listSchedules().forEach(e -> {});
 
     assertEquals(ScheduleListIterator.DEFAULT_PAGE_SIZE, captor.getValue().getPageSize());
   }
@@ -590,7 +590,7 @@ public class ScheduleClientImplTest {
             CompletableFuture.completedFuture(
                 new ListSchedulesResponse().setSchedules(Collections.emptyList())));
 
-    client.listSchedules(42).count();
+    client.listSchedules(42).forEach(e -> {});
 
     assertEquals(42, captor.getValue().getPageSize());
   }
