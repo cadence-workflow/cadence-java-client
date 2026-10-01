@@ -21,11 +21,11 @@ import com.uber.cadence.BackfillScheduleResponse;
 import com.uber.cadence.CreateScheduleRequest;
 import com.uber.cadence.CreateScheduleResponse;
 import com.uber.cadence.DeleteScheduleResponse;
-import com.uber.cadence.ListSchedulesResponse;
 import com.uber.cadence.PauseScheduleResponse;
 import com.uber.cadence.UnpauseScheduleResponse;
 import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
+import com.uber.cadence.client.schedule.ListSchedulesResult;
 import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleDescription;
@@ -174,9 +174,22 @@ public interface ScheduleClient {
   /**
    * Lists schedules in the domain, paginated.
    *
-   * @param pageSize maximum number of schedules to return
+   * <p>Each entry contains only the data available from the visibility store ({@link
+   * com.uber.cadence.client.schedule.ScheduleListEntry#isPaused()}, workflow type, cron
+   * expression). For full detail call {@link #describeSchedule}.
+   *
+   * <pre>{@code
+   * byte[] token = null;
+   * do {
+   *   ListSchedulesResult page = client.listSchedules(100, token).join();
+   *   for (ScheduleListEntry entry : page.getSchedules()) { ... }
+   *   token = page.getNextPageToken();
+   * } while (token != null);
+   * }</pre>
+   *
+   * @param pageSize maximum number of schedules to return per page
    * @param nextPageToken continuation token from a previous response, or {@code null} for the first
    *     page
    */
-  CompletableFuture<ListSchedulesResponse> listSchedules(int pageSize, byte[] nextPageToken);
+  CompletableFuture<ListSchedulesResult> listSchedules(int pageSize, byte[] nextPageToken);
 }

@@ -27,11 +27,14 @@ import static org.mockito.Mockito.when;
 
 import com.uber.cadence.CreateScheduleRequest;
 import com.uber.cadence.CreateScheduleResponse;
+import com.uber.cadence.ListSchedulesResponse;
 import com.uber.cadence.UpdateScheduleRequest;
 import com.uber.cadence.UpdateScheduleResponse;
+import com.uber.cadence.client.schedule.ListSchedulesResult;
 import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleInitialState;
+import com.uber.cadence.client.schedule.ScheduleListEntry;
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
@@ -488,6 +491,68 @@ public class ScheduleClientImplTest {
 
     assertNull(captor.getValue().getSpec());
     assertNull(captor.getValue().getPolicies());
+  }
+
+  // --- listSchedules ---
+
+  @Test
+  public void listSchedules_mapsEntriesToClientTypes() throws Exception {
+    com.uber.cadence.ScheduleListEntry thrift =
+        new com.uber.cadence.ScheduleListEntry()
+            .setScheduleId("sched-1")
+            .setWorkflowType(new com.uber.cadence.WorkflowType().setName("MyWf"))
+            .setState(new com.uber.cadence.ScheduleState().setPaused(true))
+            .setCronExpression("0 9 * * 1-5");
+    ListSchedulesResponse response =
+        new ListSchedulesResponse()
+            .setSchedules(java.util.Arrays.asList(thrift))
+            .setNextPageToken(new byte[] {1, 2, 3});
+    when(service.ListSchedules(any())).thenReturn(CompletableFuture.completedFuture(response));
+
+    ListSchedulesResult result = client.listSchedules(10, null).join();
+
+    assertEquals(1, result.getSchedules().size());
+    ScheduleListEntry entry = result.getSchedules().get(0);
+    assertEquals("sched-1", entry.getScheduleId());
+    assertEquals("MyWf", entry.getWorkflowType());
+    assertTrue(entry.isPaused());
+    assertEquals("0 9 * * 1-5", entry.getCronExpression());
+    assertArrayEquals(new byte[] {1, 2, 3}, result.getNextPageToken());
+  }
+
+  @Test
+  public void listSchedules_nullSchedulesList_returnsEmpty() throws Exception {
+    when(service.ListSchedules(any()))
+        .thenReturn(
+            CompletableFuture.completedFuture(new ListSchedulesResponse().setSchedules(null)));
+
+    ListSchedulesResult result = client.listSchedules(10, null).join();
+
+    assertNotNull(result.getSchedules());
+    assertTrue(result.getSchedules().isEmpty());
+  }
+
+  @Test
+  public void listSchedules_emptyToken_normalizesToNull() throws Exception {
+    ListSchedulesResponse response =
+        new ListSchedulesResponse()
+            .setSchedules(java.util.Collections.emptyList())
+            .setNextPageToken(new byte[0]);
+    when(service.ListSchedules(any())).thenReturn(CompletableFuture.completedFuture(response));
+
+    assertNull(client.listSchedules(10, null).join().getNextPageToken());
+  }
+
+  @Test
+  public void listSchedules_nullState_notPaused() throws Exception {
+    com.uber.cadence.ScheduleListEntry thrift =
+        new com.uber.cadence.ScheduleListEntry().setScheduleId("s").setState(null);
+    when(service.ListSchedules(any()))
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                new ListSchedulesResponse().setSchedules(java.util.Arrays.asList(thrift))));
+
+    assertFalse(client.listSchedules(10, null).join().getSchedules().get(0).isPaused());
   }
 
   // --- helpers ---

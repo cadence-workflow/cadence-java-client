@@ -41,11 +41,13 @@ import com.uber.cadence.UpdateScheduleResponse;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.client.ScheduleBackfill;
 import com.uber.cadence.client.ScheduleClient;
+import com.uber.cadence.client.schedule.ListSchedulesResult;
 import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleDescription;
 import com.uber.cadence.client.schedule.ScheduleInfo;
 import com.uber.cadence.client.schedule.ScheduleInitialState;
+import com.uber.cadence.client.schedule.ScheduleListEntry;
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
@@ -201,14 +203,27 @@ final class ScheduleClientImpl implements ScheduleClient {
   }
 
   @Override
-  public CompletableFuture<ListSchedulesResponse> listSchedules(
-      int pageSize, byte[] nextPageToken) {
+  public CompletableFuture<ListSchedulesResult> listSchedules(int pageSize, byte[] nextPageToken) {
     ListSchedulesRequest request =
         new ListSchedulesRequest()
             .setDomain(domain)
             .setPageSize(pageSize)
             .setNextPageToken(nextPageToken);
-    return service.ListSchedules(request);
+    return service.ListSchedules(request).thenApply(ScheduleClientImpl::toListSchedulesResult);
+  }
+
+  private static ListSchedulesResult toListSchedulesResult(ListSchedulesResponse r) {
+    List<ScheduleListEntry> entries = new ArrayList<>();
+    if (r.getSchedules() != null) {
+      for (com.uber.cadence.ScheduleListEntry e : r.getSchedules()) {
+        String workflowType = e.getWorkflowType() != null ? e.getWorkflowType().getName() : null;
+        boolean paused = e.getState() != null && e.getState().isPaused();
+        entries.add(
+            new ScheduleListEntry(e.getScheduleId(), workflowType, paused, e.getCronExpression()));
+      }
+    }
+    byte[] token = r.getNextPageToken();
+    return new ListSchedulesResult(entries, token != null && token.length > 0 ? token : null);
   }
 
   private static com.uber.cadence.ScheduleSpec toThriftSpec(ScheduleSpec s) {
