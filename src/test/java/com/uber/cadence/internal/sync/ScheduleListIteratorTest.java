@@ -49,6 +49,23 @@ public class ScheduleListIteratorTest {
     service = mock(IWorkflowService.class);
   }
 
+  // --- eager prefetch ---
+
+  @Test
+  public void constructor_prefetchesFirstPageEagerly() {
+    when(service.ListSchedules(any()))
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                new ListSchedulesResponse().setSchedules(Collections.emptyList())));
+
+    new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
+
+    // First RPC must fire at construction time, before any hasNext()/next() call.
+    verify(service, times(1)).ListSchedules(any());
+  }
+
+  // --- basic iteration ---
+
   @Test
   public void singlePage_returnsAllEntries() {
     com.uber.cadence.ScheduleListEntry thrift =
@@ -222,6 +239,8 @@ public class ScheduleListIteratorTest {
     new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE).next();
   }
 
+  // --- pageSize validation ---
+
   @Test(expected = IllegalArgumentException.class)
   public void constructor_zeroPageSize_throws() {
     new ScheduleListIterator(service, DOMAIN, 0);
@@ -231,6 +250,8 @@ public class ScheduleListIteratorTest {
   public void constructor_negativePageSize_throws() {
     new ScheduleListIterator(service, DOMAIN, -1);
   }
+
+  // --- exception propagation ---
 
   @Test
   public void fetchNextPage_runtimeExceptionPassedThroughDirectly() {

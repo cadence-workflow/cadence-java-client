@@ -26,8 +26,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Eager-fetching iterator for schedule list pagination. The next page RPC is kicked off immediately
+ * after the current page's token is received, so the wait at each page boundary is minimised to the
+ * time remaining in the in-flight request rather than the full round-trip.
+ */
 final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
 
   static final int DEFAULT_PAGE_SIZE = 100;
@@ -36,10 +42,10 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
   private final String domain;
   private final int pageSize;
 
-  private List<ScheduleListEntry> buffer = Collections.emptyList();
+  private List<ScheduleListEntry> activeBuffer = Collections.emptyList();
   private int index = 0;
-  private byte[] nextPageToken = null;
-  private boolean exhausted = false;
+  // null means no further pages exist; non-null means a page is in flight or ready.
+  private CompletableFuture<ListSchedulesResponse> nextPageFuture;
 
   ScheduleListIterator(IWorkflowService service, String domain, int pageSize) {
     if (pageSize <= 0) {
@@ -48,14 +54,16 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
     this.service = service;
     this.domain = domain;
     this.pageSize = pageSize;
+    this.nextPageFuture = fetch(null);
   }
 
   @Override
   public boolean hasNext() {
-    while (index >= buffer.size() && !exhausted) {
-      fetchNextPage();
+    if (index < activeBuffer.size()) {
+      return true;
     }
-    return index < buffer.size();
+    advance();
+    return index < activeBuffer.size();
   }
 
   @Override
@@ -63,19 +71,39 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
     if (!hasNext()) {
       throw new NoSuchElementException();
     }
-    return buffer.get(index++);
+    return activeBuffer.get(index++);
   }
 
-  private void fetchNextPage() {
-    ListSchedulesResponse response;
+  private void advance() {
+    if (nextPageFuture == null) {
+      return;
+    }
+
+    ListSchedulesResponse response = get(nextPageFuture);
+    byte[] token = response.getNextPageToken();
+    byte[] normalizedToken = (token != null && token.length > 0) ? token : null;
+    // Kick off the next page immediately before processing this one.
+    nextPageFuture = normalizedToken != null ? fetch(normalizedToken) : null;
+
+    List<ScheduleListEntry> page = toEntries(response);
+    if (page.isEmpty() && nextPageFuture != null) {
+      // Empty middle page with a continuation token is a server-side anomaly; skip it.
+      advance();
+      return;
+    }
+
+    activeBuffer = page;
+    index = 0;
+  }
+
+  private CompletableFuture<ListSchedulesResponse> fetch(byte[] token) {
+    return service.ListSchedules(
+        new ListSchedulesRequest().setDomain(domain).setPageSize(pageSize).setNextPageToken(token));
+  }
+
+  private static ListSchedulesResponse get(CompletableFuture<ListSchedulesResponse> future) {
     try {
-      response =
-          service.ListSchedules(
-                  new ListSchedulesRequest()
-                      .setDomain(domain)
-                      .setPageSize(pageSize)
-                      .setNextPageToken(nextPageToken))
-              .get();
+      return future.get();
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new RuntimeException(e);
@@ -85,23 +113,20 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
           ? (RuntimeException) cause
           : new RuntimeException(cause);
     }
+  }
 
-    List<ScheduleListEntry> page = new ArrayList<>();
-    if (response.getSchedules() != null) {
-      for (com.uber.cadence.ScheduleListEntry e : response.getSchedules()) {
-        String workflowType = e.getWorkflowType() != null ? e.getWorkflowType().getName() : null;
-        boolean paused = e.getState() != null && e.getState().isPaused();
-        page.add(
-            new ScheduleListEntry(e.getScheduleId(), workflowType, paused, e.getCronExpression()));
-      }
+  private static List<ScheduleListEntry> toEntries(ListSchedulesResponse response) {
+    List<com.uber.cadence.ScheduleListEntry> raw = response.getSchedules();
+    if (raw == null) {
+      return Collections.emptyList();
     }
-    buffer = page;
-    index = 0;
-
-    byte[] token = response.getNextPageToken();
-    nextPageToken = (token != null && token.length > 0) ? token : null;
-    if (nextPageToken == null) {
-      exhausted = true;
+    List<ScheduleListEntry> result = new ArrayList<>(raw.size());
+    for (com.uber.cadence.ScheduleListEntry e : raw) {
+      String workflowType = e.getWorkflowType() != null ? e.getWorkflowType().getName() : null;
+      boolean paused = e.getState() != null && e.getState().isPaused();
+      result.add(
+          new ScheduleListEntry(e.getScheduleId(), workflowType, paused, e.getCronExpression()));
     }
+    return result;
   }
 }
