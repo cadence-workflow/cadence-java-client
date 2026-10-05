@@ -30,18 +30,22 @@ import com.uber.cadence.client.schedule.ScheduleAction;
 import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleDescription;
 import com.uber.cadence.client.schedule.ScheduleInitialState;
+import com.uber.cadence.client.schedule.ScheduleListEntry;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Client for managing schedules within a domain. Obtain via {@link
  * WorkflowClient#scheduleClient()}.
  *
- * <p>All methods return {@link CompletableFuture}. Synchronous callers can block with {@link
- * CompletableFuture#get()} or {@link CompletableFuture#join()}.
+ * <p>All methods except {@link #listSchedules()} and {@link #listSchedules(int)} return {@link
+ * CompletableFuture}. Synchronous callers can block with {@link CompletableFuture#get()} or {@link
+ * CompletableFuture#join()}. The streaming {@code listSchedules} overloads fetch pages
+ * synchronously as the stream is consumed and throw failures directly as {@link RuntimeException}.
  *
  * <pre>{@code
  * ScheduleClient sc = workflowClient.scheduleClient();
@@ -207,4 +211,25 @@ public interface ScheduleClient {
    *     page
    */
   CompletableFuture<ListSchedulesResponse> listSchedules(int pageSize, byte[] nextPageToken);
+
+  /**
+   * Returns a lazy {@link Stream} over all schedules in the domain using the default page size.
+   *
+   * <pre>{@code
+   * client.listSchedules()
+   *     .filter(e -> e.isPaused())
+   *     .forEach(e -> System.out.println(e.getScheduleId()));
+   * }</pre>
+   *
+   * <p>Pages are fetched synchronously on demand. The stream is sequential and not thread-safe.
+   * Each call returns an independent stream starting from the first page.
+   */
+  Stream<ScheduleListEntry> listSchedules();
+
+  /**
+   * Returns a lazy {@link Stream} over all schedules in the domain with a custom page size.
+   *
+   * @param pageSize number of schedules to fetch per RPC call
+   */
+  Stream<ScheduleListEntry> listSchedules(int pageSize);
 }

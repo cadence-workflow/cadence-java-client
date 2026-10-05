@@ -46,6 +46,7 @@ import com.uber.cadence.client.schedule.ScheduleCatchUpPolicy;
 import com.uber.cadence.client.schedule.ScheduleDescription;
 import com.uber.cadence.client.schedule.ScheduleInfo;
 import com.uber.cadence.client.schedule.ScheduleInitialState;
+import com.uber.cadence.client.schedule.ScheduleListEntry;
 import com.uber.cadence.client.schedule.ScheduleOverlapPolicy;
 import com.uber.cadence.client.schedule.SchedulePolicies;
 import com.uber.cadence.client.schedule.ScheduleSpec;
@@ -58,8 +59,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 final class ScheduleClientImpl implements ScheduleClient {
 
@@ -228,6 +233,20 @@ final class ScheduleClientImpl implements ScheduleClient {
             .setPageSize(pageSize)
             .setNextPageToken(nextPageToken);
     return service.ListSchedules(request);
+  }
+
+  @Override
+  public Stream<ScheduleListEntry> listSchedules() {
+    return listSchedules(ScheduleListIterator.DEFAULT_PAGE_SIZE);
+  }
+
+  @Override
+  public Stream<ScheduleListEntry> listSchedules(int pageSize) {
+    return StreamSupport.stream(
+        Spliterators.spliteratorUnknownSize(
+            new ScheduleListIterator(service, domain, pageSize),
+            Spliterator.ORDERED | Spliterator.NONNULL),
+        false);
   }
 
   private static com.uber.cadence.ScheduleSpec toThriftSpec(ScheduleSpec s) {
