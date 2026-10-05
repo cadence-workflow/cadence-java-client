@@ -17,6 +17,7 @@
 
 package com.uber.cadence.internal.sync;
 
+import static com.uber.cadence.internal.common.InternalUtils.getWorkflowAnnotation;
 import static com.uber.cadence.internal.common.InternalUtils.getWorkflowMethod;
 import static com.uber.cadence.internal.common.InternalUtils.getWorkflowType;
 
@@ -114,7 +115,7 @@ class WorkflowInvocationHandler implements InvocationHandler, Supplier<WorkflowS
       WorkflowExecution execution,
       WorkflowClientInterceptor[] interceptors) {
     Method workflowMethod = getWorkflowMethod(workflowInterface);
-    WorkflowMethod annotation = workflowMethod.getAnnotation(WorkflowMethod.class);
+    WorkflowMethod annotation = getWorkflowAnnotation(workflowMethod, WorkflowMethod.class).get();
     String workflowType = getWorkflowType(workflowMethod, annotation);
 
     WorkflowStub stub =
@@ -134,7 +135,7 @@ class WorkflowInvocationHandler implements InvocationHandler, Supplier<WorkflowS
     Method workflowMethod = getWorkflowMethod(workflowInterface);
     MethodRetry methodRetry = workflowMethod.getAnnotation(MethodRetry.class);
     CronSchedule cronSchedule = workflowMethod.getAnnotation(CronSchedule.class);
-    WorkflowMethod annotation = workflowMethod.getAnnotation(WorkflowMethod.class);
+    WorkflowMethod annotation = getWorkflowAnnotation(workflowMethod, WorkflowMethod.class).get();
     String workflowType = getWorkflowType(workflowMethod, annotation);
     WorkflowOptions mergedOptions =
         WorkflowOptions.merge(annotation, methodRetry, cronSchedule, options);
@@ -189,23 +190,6 @@ class WorkflowInvocationHandler implements InvocationHandler, Supplier<WorkflowS
     }
   }
 
-  static void checkAnnotations(
-      Method method,
-      WorkflowMethod workflowMethod,
-      QueryMethod queryMethod,
-      SignalMethod signalMethod) {
-    int count =
-        (workflowMethod == null ? 0 : 1)
-            + (queryMethod == null ? 0 : 1)
-            + (signalMethod == null ? 0 : 1);
-    if (count > 1) {
-      throw new IllegalArgumentException(
-          method
-              + " must contain at most one annotation "
-              + "from @WorkflowMethod, @QueryMethod or @SignalMethod");
-    }
-  }
-
   private static class StartWorkflowInvocationHandler implements SpecificInvocationHandler {
 
     private Object result;
@@ -217,8 +201,7 @@ class WorkflowInvocationHandler implements InvocationHandler, Supplier<WorkflowS
 
     @Override
     public void invoke(WorkflowStub untyped, Method method, Object[] args) {
-      WorkflowMethod workflowMethod = method.getAnnotation(WorkflowMethod.class);
-      if (workflowMethod == null) {
+      if (!getWorkflowAnnotation(method, WorkflowMethod.class).isPresent()) {
         throw new IllegalArgumentException(
             "WorkflowClient.start can be called only on a method annotated with @WorkflowMethod");
       }
@@ -243,8 +226,7 @@ class WorkflowInvocationHandler implements InvocationHandler, Supplier<WorkflowS
 
     @Override
     public void invoke(WorkflowStub untyped, Method method, Object[] args) throws Throwable {
-      WorkflowMethod workflowMethod = method.getAnnotation(WorkflowMethod.class);
-      if (workflowMethod == null) {
+      if (!getWorkflowAnnotation(method, WorkflowMethod.class).isPresent()) {
         throw new IllegalArgumentException(
             "WorkflowClient.enqueueStart can be called only on a method annotated with @WorkflowMethod");
       }
@@ -268,16 +250,15 @@ class WorkflowInvocationHandler implements InvocationHandler, Supplier<WorkflowS
 
     @Override
     public void invoke(WorkflowStub untyped, Method method, Object[] args) {
-      WorkflowMethod workflowMethod = method.getAnnotation(WorkflowMethod.class);
-      QueryMethod queryMethod = method.getAnnotation(QueryMethod.class);
-      SignalMethod signalMethod = method.getAnnotation(SignalMethod.class);
-      checkAnnotations(method, workflowMethod, queryMethod, signalMethod);
-      if (workflowMethod != null) {
+      Optional<WorkflowMethod> workflowMethod = getWorkflowAnnotation(method, WorkflowMethod.class);
+      Optional<QueryMethod> queryMethod = getWorkflowAnnotation(method, QueryMethod.class);
+      Optional<SignalMethod> signalMethod = getWorkflowAnnotation(method, SignalMethod.class);
+      if (workflowMethod.isPresent()) {
         result = startWorkflow(untyped, method, args);
-      } else if (queryMethod != null) {
-        result = queryWorkflow(untyped, method, queryMethod, args);
-      } else if (signalMethod != null) {
-        signalWorkflow(untyped, method, signalMethod, args);
+      } else if (queryMethod.isPresent()) {
+        result = queryWorkflow(untyped, method, queryMethod.get(), args);
+      } else if (signalMethod.isPresent()) {
+        signalWorkflow(untyped, method, signalMethod.get(), args);
         result = null;
       } else {
         throw new IllegalArgumentException(
@@ -337,8 +318,7 @@ class WorkflowInvocationHandler implements InvocationHandler, Supplier<WorkflowS
 
     @Override
     public void invoke(WorkflowStub untyped, Method method, Object[] args) {
-      WorkflowMethod workflowMethod = method.getAnnotation(WorkflowMethod.class);
-      if (workflowMethod == null) {
+      if (!getWorkflowAnnotation(method, WorkflowMethod.class).isPresent()) {
         throw new IllegalArgumentException(
             "WorkflowClient.execute can be called only on a method annotated with @WorkflowMethod");
       }
@@ -369,18 +349,17 @@ class WorkflowInvocationHandler implements InvocationHandler, Supplier<WorkflowS
 
     @Override
     public void invoke(WorkflowStub untyped, Method method, Object[] args) throws Throwable {
-      QueryMethod queryMethod = method.getAnnotation(QueryMethod.class);
-      SignalMethod signalMethod = method.getAnnotation(SignalMethod.class);
-      WorkflowMethod workflowMethod = method.getAnnotation(WorkflowMethod.class);
-      checkAnnotations(method, workflowMethod, queryMethod, signalMethod);
-      if (queryMethod != null) {
+      Optional<QueryMethod> queryMethod = getWorkflowAnnotation(method, QueryMethod.class);
+      Optional<SignalMethod> signalMethod = getWorkflowAnnotation(method, SignalMethod.class);
+      Optional<WorkflowMethod> workflowMethod = getWorkflowAnnotation(method, WorkflowMethod.class);
+      if (queryMethod.isPresent()) {
         throw new IllegalArgumentException(
             "SignalWithStart batch doesn't accept methods annotated with @QueryMethod");
       }
-      if (workflowMethod != null) {
+      if (workflowMethod.isPresent()) {
         batch.start(untyped, args);
-      } else if (signalMethod != null) {
-        String signalName = nameFromMethodAndAnnotation(method, signalMethod.name());
+      } else if (signalMethod.isPresent()) {
+        String signalName = nameFromMethodAndAnnotation(method, signalMethod.get().name());
         batch.signal(untyped, signalName, args);
       } else {
         throw new IllegalArgumentException(

@@ -33,8 +33,6 @@ import com.uber.cadence.internal.worker.SuspendableWorker;
 import com.uber.cadence.internal.worker.WorkflowWorker;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.worker.ExecutorWrapper;
-import com.uber.cadence.worker.WorkflowImplementationOptions;
-import com.uber.cadence.workflow.Functions.Func;
 import com.uber.cadence.workflow.WorkflowInterceptor;
 import java.lang.reflect.Type;
 import java.time.Duration;
@@ -133,27 +131,12 @@ public class SyncWorkflowWorker
             stickyTaskListName);
   }
 
-  public void setWorkflowImplementationTypes(
-      WorkflowImplementationOptions options, Class<?>[] workflowImplementationTypes) {
-    factory.setWorkflowImplementationTypes(options, workflowImplementationTypes);
-  }
-
-  public <R> void addWorkflowImplementationFactory(
-      WorkflowImplementationOptions options, Class<R> clazz, Func<R> factory) {
-    this.factory.addWorkflowImplementationFactory(options, clazz, factory);
-  }
-
-  public <R> void addWorkflowImplementationFactory(Class<R> clazz, Func<R> factory) {
-    this.factory.addWorkflowImplementationFactory(clazz, factory);
-  }
-
-  public void setLocalActivitiesImplementation(Object... activitiesImplementation) {
-    this.laTaskHandler.setLocalActivitiesImplementation(activitiesImplementation);
-  }
-
-  public void setActivitiesImplementationToDispatchLocally(Object... activitiesImplementation) {
-    if (this.ldaTaskHandler != null) {
-      this.ldaTaskHandler.setActivitiesImplementation(activitiesImplementation);
+  /** Sets the workflow and activity implementations used by this worker. */
+  public void setRegistry(RegistryInternal registry) {
+    factory.setRegistry(registry);
+    laTaskHandler.setRegistry(registry);
+    if (ldaTaskHandler != null) {
+      ldaTaskHandler.setRegistry(registry);
     }
   }
 

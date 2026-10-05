@@ -18,35 +18,25 @@
 package com.uber.cadence.internal.sync;
 
 import static com.uber.cadence.internal.errors.ErrorType.UNKNOWN_WORKFLOW_TYPE;
-import static com.uber.cadence.worker.NonDeterministicWorkflowPolicy.FailWorkflow;
 
-import com.google.common.reflect.TypeToken;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.converter.DataConverterException;
 import com.uber.cadence.internal.common.CheckedExceptionWrapper;
-import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.replay.DeciderCache;
 import com.uber.cadence.internal.replay.ReplayWorkflow;
 import com.uber.cadence.internal.replay.ReplayWorkflowFactory;
 import com.uber.cadence.internal.worker.WorkflowExecutionException;
 import com.uber.cadence.testing.SimulatedTimeoutException;
-import com.uber.cadence.worker.WorkflowImplementationOptions;
-import com.uber.cadence.workflow.Functions;
 import com.uber.cadence.workflow.Functions.Func;
-import com.uber.cadence.workflow.QueryMethod;
-import com.uber.cadence.workflow.SignalMethod;
 import com.uber.cadence.workflow.Workflow;
 import com.uber.cadence.workflow.WorkflowInfo;
 import com.uber.cadence.workflow.WorkflowInterceptor;
-import com.uber.cadence.workflow.WorkflowMethod;
 import io.opentracing.Tracer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,15 +57,7 @@ final class POJOWorkflowImplementationFactory implements ReplayWorkflowFactory {
   private DataConverter dataConverter;
   private List<ContextPropagator> contextPropagators;
 
-  /** Key: workflow type name, Value: function that creates SyncWorkflowDefinition instance. */
-  private final Map<String, Functions.Func<SyncWorkflowDefinition>> workflowDefinitions =
-      Collections.synchronizedMap(new HashMap<>());
-
-  private Map<String, WorkflowImplementationOptions> implementationOptions =
-      Collections.synchronizedMap(new HashMap<>());
-
-  private final Map<Class<?>, Functions.Func<?>> workflowImplementationFactories =
-      Collections.synchronizedMap(new HashMap<>());
+  private volatile RegistryInternal registry = RegistryInternal.EMPTY;
 
   private final ExecutorService threadPool;
   private DeciderCache cache;
@@ -95,114 +77,23 @@ final class POJOWorkflowImplementationFactory implements ReplayWorkflowFactory {
     this.tracer = tracer;
   }
 
-  void setWorkflowImplementationTypes(
-      WorkflowImplementationOptions options, Class<?>[] workflowImplementationTypes) {
-    workflowDefinitions.clear();
-    for (Class<?> type : workflowImplementationTypes) {
-      addWorkflowImplementationType(options, type);
-    }
+  void setRegistry(RegistryInternal registry) {
+    this.registry = Objects.requireNonNull(registry);
   }
 
-  <R> void addWorkflowImplementationFactory(Class<R> clazz, Functions.Func<R> factory) {
-    WorkflowImplementationOptions unitTestingOptions =
-        new WorkflowImplementationOptions.Builder()
-            .setNonDeterministicWorkflowPolicy(FailWorkflow)
-            .build();
-    addWorkflowImplementationFactory(unitTestingOptions, clazz, factory);
-  }
-
-  <R> void addWorkflowImplementationFactory(
-      WorkflowImplementationOptions options, Class<R> clazz, Functions.Func<R> factory) {
-    workflowImplementationFactories.put(clazz, factory);
-    addWorkflowImplementationType(options, clazz);
-  }
-
-  private void addWorkflowImplementationType(
-      WorkflowImplementationOptions options, Class<?> workflowImplementationClass) {
-    TypeToken<?>.TypeSet interfaces =
-        TypeToken.of(workflowImplementationClass).getTypes().interfaces();
-    if (interfaces.isEmpty()) {
-      throw new IllegalArgumentException("Workflow must implement at least one interface");
-    }
-    boolean hasWorkflowMethod = false;
-    for (TypeToken<?> i : interfaces) {
-      Map<String, Method> signalHandlers = new HashMap<>();
-      for (Method method : i.getRawType().getMethods()) {
-        WorkflowMethod workflowMethod = method.getAnnotation(WorkflowMethod.class);
-        QueryMethod queryMethod = method.getAnnotation(QueryMethod.class);
-        SignalMethod signalMethod = method.getAnnotation(SignalMethod.class);
-        int count =
-            (workflowMethod == null ? 0 : 1)
-                + (queryMethod == null ? 0 : 1)
-                + (signalMethod == null ? 0 : 1);
-        if (count > 1) {
-          throw new IllegalArgumentException(
-              method
-                  + " must contain at most one annotation "
-                  + "from @WorkflowMethod, @QueryMethod or @SignalMethod");
-        }
-        if (workflowMethod != null) {
-          Functions.Func<SyncWorkflowDefinition> factory =
-              () ->
-                  new POJOWorkflowImplementation(
-                      method, workflowImplementationClass, signalHandlers);
-
-          String workflowName = workflowMethod.name();
-          if (workflowName.isEmpty()) {
-            workflowName = InternalUtils.getSimpleName(method);
-          }
-          if (workflowDefinitions.containsKey(workflowName)) {
-            throw new IllegalStateException(
-                workflowName + " workflow type is already registered with the worker");
-          }
-          workflowDefinitions.put(workflowName, factory);
-          implementationOptions.put(workflowName, options);
-          hasWorkflowMethod = true;
-        }
-        if (signalMethod != null) {
-          if (method.getReturnType() != Void.TYPE) {
-            throw new IllegalArgumentException(
-                "Method annotated with @SignalMethod " + "must have void return type: " + method);
-          }
-          String signalName = signalMethod.name();
-          if (signalName.isEmpty()) {
-            signalName = InternalUtils.getSimpleName(method);
-          }
-          signalHandlers.put(signalName, method);
-        }
-        if (queryMethod != null) {
-          if (method.getReturnType() == Void.TYPE) {
-            throw new IllegalArgumentException(
-                "Method annotated with @QueryMethod " + "cannot have void return type: " + method);
-          }
-        }
-      }
-    }
-    if (!hasWorkflowMethod) {
-      throw new IllegalArgumentException(
-          "Workflow implementation doesn't implement any interface "
-              + "with a workflow method annotated with @WorkflowMethod: "
-              + workflowImplementationClass);
-    }
-  }
-
-  private SyncWorkflowDefinition getWorkflowDefinition(WorkflowType workflowType) {
-    Functions.Func<SyncWorkflowDefinition> factory =
-        workflowDefinitions.get(workflowType.getName());
-    if (factory == null) {
+  private WorkflowRegistration getWorkflowRegistration(
+      RegistryInternal registry, WorkflowType workflowType) {
+    WorkflowRegistration registration = registry.getWorkflow(workflowType.getName());
+    if (registration == null) {
       // throw Error to abort decision, not fail the workflow
       throw new Error(
           UNKNOWN_WORKFLOW_TYPE
               + " \""
               + workflowType.getName()
               + "\". Known types are "
-              + workflowDefinitions.keySet());
+              + registry.getWorkflowTypes());
     }
-    try {
-      return factory.apply();
-    } catch (Exception e) {
-      throw new Error(e);
-    }
+    return registration;
   }
 
   public void setDataConverter(DataConverter dataConverter) {
@@ -211,11 +102,10 @@ final class POJOWorkflowImplementationFactory implements ReplayWorkflowFactory {
 
   @Override
   public ReplayWorkflow getWorkflow(WorkflowType workflowType) {
-    SyncWorkflowDefinition workflow = getWorkflowDefinition(workflowType);
-    WorkflowImplementationOptions options = implementationOptions.get(workflowType.getName());
+    WorkflowRegistration registration = getWorkflowRegistration(registry, workflowType);
     return new SyncWorkflow(
-        workflow,
-        options,
+        new POJOWorkflowImplementation(registration),
+        registration.getOptions(),
         dataConverter,
         threadPool,
         interceptorFactory,
@@ -226,7 +116,7 @@ final class POJOWorkflowImplementationFactory implements ReplayWorkflowFactory {
 
   @Override
   public boolean isAnyTypeSupported() {
-    return !workflowDefinitions.isEmpty();
+    return registry.hasWorkflows();
   }
 
   private class POJOWorkflowImplementation implements SyncWorkflowDefinition {
@@ -234,13 +124,14 @@ final class POJOWorkflowImplementationFactory implements ReplayWorkflowFactory {
     private final Method workflowMethod;
     private final Class<?> workflowImplementationClass;
     private final Map<String, Method> signalHandlers;
+    private final Func<?> instanceFactory;
     private Object workflow;
 
-    POJOWorkflowImplementation(
-        Method method, Class<?> workflowImplementationClass, Map<String, Method> signalHandlers) {
-      this.workflowMethod = method;
-      this.workflowImplementationClass = workflowImplementationClass;
-      this.signalHandlers = signalHandlers;
+    POJOWorkflowImplementation(WorkflowRegistration registration) {
+      this.workflowMethod = registration.getWorkflowMethod();
+      this.workflowImplementationClass = registration.getImplementationClass();
+      this.signalHandlers = registration.getSignalHandlers();
+      this.instanceFactory = registration.getInstanceFactory();
     }
 
     @Override
@@ -283,9 +174,8 @@ final class POJOWorkflowImplementationFactory implements ReplayWorkflowFactory {
 
     private void newInstance() {
       if (workflow == null) {
-        Func<?> factory = workflowImplementationFactories.get(workflowImplementationClass);
-        if (factory != null) {
-          workflow = factory.apply();
+        if (instanceFactory != null) {
+          workflow = instanceFactory.apply();
         } else {
           try {
             workflow = workflowImplementationClass.getDeclaredConstructor().newInstance();
@@ -388,7 +278,7 @@ final class POJOWorkflowImplementationFactory implements ReplayWorkflowFactory {
   public String toString() {
     return "POJOWorkflowImplementationFactory{"
         + "registeredWorkflowTypes="
-        + workflowDefinitions.keySet()
+        + registry.getWorkflowTypes()
         + '}';
   }
 }

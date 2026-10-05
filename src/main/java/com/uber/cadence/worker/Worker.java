@@ -27,6 +27,7 @@ import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.replay.DeciderCache;
+import com.uber.cadence.internal.sync.RegistryInternal;
 import com.uber.cadence.internal.sync.SyncActivityWorker;
 import com.uber.cadence.internal.sync.SyncWorkflowWorker;
 import com.uber.cadence.internal.worker.SingleWorkerOptions;
@@ -55,6 +56,8 @@ public final class Worker implements Suspendable {
   private final SyncWorkflowWorker workflowWorker;
   private final SyncActivityWorker activityWorker;
   private final AtomicBoolean started = new AtomicBoolean();
+  // Registration methods replace the registry. They are setup code and not called concurrently.
+  private volatile RegistryInternal registry;
 
   /**
    * Creates worker that connects to an instance of the Cadence Service.
@@ -145,6 +148,8 @@ public final class Worker implements Suspendable {
             stickyTaskListName,
             stickyDecisionScheduleToStartTimeout,
             threadPoolExecutor);
+
+    applyRegistry(RegistryInternal.EMPTY);
   }
 
   SyncWorkflowWorker getWorkflowWorker() {
@@ -167,7 +172,7 @@ public final class Worker implements Suspendable {
         !started.get(),
         "registerWorkflowImplementationTypes is not allowed after worker has started");
 
-    workflowWorker.setWorkflowImplementationTypes(
+    registerWorkflowImplementationTypes(
         new WorkflowImplementationOptions.Builder().build(), workflowImplementationClasses);
   }
 
@@ -188,7 +193,10 @@ public final class Worker implements Suspendable {
         !started.get(),
         "registerWorkflowImplementationTypes is not allowed after worker has started");
 
-    workflowWorker.setWorkflowImplementationTypes(options, workflowImplementationClasses);
+    applyRegistry(
+        registry
+            .withoutWorkflows()
+            .withWorkflowImplementationTypes(options, workflowImplementationClasses));
   }
 
   /**
@@ -205,7 +213,7 @@ public final class Worker implements Suspendable {
    */
   public <R> void addWorkflowImplementationFactory(
       WorkflowImplementationOptions options, Class<R> workflowInterface, Func<R> factory) {
-    workflowWorker.addWorkflowImplementationFactory(options, workflowInterface, factory);
+    applyRegistry(registry.withWorkflowImplementationFactory(options, workflowInterface, factory));
   }
 
   /**
@@ -231,7 +239,7 @@ public final class Worker implements Suspendable {
    */
   @VisibleForTesting
   public <R> void addWorkflowImplementationFactory(Class<R> workflowInterface, Func<R> factory) {
-    workflowWorker.addWorkflowImplementationFactory(workflowInterface, factory);
+    applyRegistry(registry.withWorkflowImplementationFactory(workflowInterface, factory));
   }
 
   /**
@@ -249,12 +257,24 @@ public final class Worker implements Suspendable {
         !started.get(),
         "registerActivitiesImplementations is not allowed after worker has started");
 
-    if (activityWorker != null) {
-      activityWorker.setActivitiesImplementation(activityImplementations);
-      workflowWorker.setActivitiesImplementationToDispatchLocally(activityImplementations);
-    }
+    applyRegistry(
+        registry.withoutActivities().withActivityImplementations(activityImplementations));
+  }
 
-    workflowWorker.setLocalActivitiesImplementation(activityImplementations);
+  /**
+   * Replaces all workflows and activities registered with the worker with the ones of the given
+   * registry. Like the other registration methods, it must not be called concurrently with them.
+   */
+  public void setRegistry(Registry registry) {
+    Preconditions.checkState(!started.get(), "setRegistry is not allowed after worker has started");
+    Objects.requireNonNull(registry);
+    applyRegistry(registry.getRegistryInternal());
+  }
+
+  private void applyRegistry(RegistryInternal registry) {
+    this.registry = registry;
+    workflowWorker.setRegistry(registry);
+    activityWorker.setRegistry(registry);
   }
 
   void start() {
