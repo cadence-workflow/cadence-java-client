@@ -49,18 +49,29 @@ public class ScheduleListIteratorTest {
     service = mock(IWorkflowService.class);
   }
 
-  // --- eager prefetch ---
+  // --- lazy first fetch ---
 
   @Test
-  public void constructor_prefetchesFirstPageEagerly() {
+  public void constructor_doesNotFetchBeforeFirstHasNext() {
+    // No mock setup: if the constructor calls ListSchedules it would receive null (mock default)
+    // and the verify would fail.
+    new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
+
+    verify(service, times(0)).ListSchedules(any());
+  }
+
+  @Test
+  public void firstHasNext_kicksOffFirstFetch() {
     when(service.ListSchedules(any()))
         .thenReturn(
             CompletableFuture.completedFuture(
                 new ListSchedulesResponse().setSchedules(Collections.emptyList())));
 
-    new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
+    Iterator<ScheduleListEntry> it =
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE);
 
-    // First RPC must fire at construction time, before any hasNext()/next() call.
+    verify(service, times(0)).ListSchedules(any());
+    it.hasNext();
     verify(service, times(1)).ListSchedules(any());
   }
 

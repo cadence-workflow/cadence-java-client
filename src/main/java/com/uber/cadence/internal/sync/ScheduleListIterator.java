@@ -30,9 +30,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Eager-fetching iterator for schedule list pagination. The next page RPC is kicked off immediately
- * after the current page's token is received, so the wait at each page boundary is minimised to the
- * time remaining in the in-flight request rather than the full round-trip.
+ * Paginating iterator for schedule list. The first page RPC is deferred until the first {@link
+ * #hasNext()} call. Subsequent pages are prefetched immediately after the current page's token is
+ * received, so the wait at page boundaries is minimised to the remaining in-flight time rather than
+ * a full round-trip.
  */
 final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
 
@@ -44,6 +45,7 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
 
   private List<ScheduleListEntry> activeBuffer = Collections.emptyList();
   private int index = 0;
+  private boolean started = false;
   // null means no further pages exist; non-null means a page is in flight or ready.
   private CompletableFuture<ListSchedulesResponse> nextPageFuture;
 
@@ -54,11 +56,14 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
     this.service = service;
     this.domain = domain;
     this.pageSize = pageSize;
-    this.nextPageFuture = fetch(null);
   }
 
   @Override
   public boolean hasNext() {
+    if (!started) {
+      started = true;
+      nextPageFuture = fetch(null);
+    }
     if (index < activeBuffer.size()) {
       return true;
     }
@@ -75,25 +80,21 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
   }
 
   private void advance() {
-    if (nextPageFuture == null) {
-      return;
+    while (nextPageFuture != null) {
+      ListSchedulesResponse response = get(nextPageFuture);
+      byte[] token = response.getNextPageToken();
+      byte[] normalizedToken = (token != null && token.length > 0) ? token : null;
+      // Kick off the next page immediately before processing this one.
+      nextPageFuture = normalizedToken != null ? fetch(normalizedToken) : null;
+
+      List<ScheduleListEntry> page = toEntries(response);
+      if (!page.isEmpty() || nextPageFuture == null) {
+        activeBuffer = page;
+        index = 0;
+        return;
+      }
+      // Empty middle page with a continuation token is a server-side anomaly; loop to skip it.
     }
-
-    ListSchedulesResponse response = get(nextPageFuture);
-    byte[] token = response.getNextPageToken();
-    byte[] normalizedToken = (token != null && token.length > 0) ? token : null;
-    // Kick off the next page immediately before processing this one.
-    nextPageFuture = normalizedToken != null ? fetch(normalizedToken) : null;
-
-    List<ScheduleListEntry> page = toEntries(response);
-    if (page.isEmpty() && nextPageFuture != null) {
-      // Empty middle page with a continuation token is a server-side anomaly; skip it.
-      advance();
-      return;
-    }
-
-    activeBuffer = page;
-    index = 0;
   }
 
   private CompletableFuture<ListSchedulesResponse> fetch(byte[] token) {
