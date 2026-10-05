@@ -45,6 +45,7 @@ import com.uber.cadence.DescribeDomainResponse;
 import com.uber.cadence.DomainConfiguration;
 import com.uber.cadence.DomainInfo;
 import com.uber.cadence.DomainReplicationConfiguration;
+import com.uber.cadence.FailureOptions;
 import com.uber.cadence.Header;
 import com.uber.cadence.IndexedValueType;
 import com.uber.cadence.Memo;
@@ -102,6 +103,19 @@ class TypeMapper {
       return null;
     }
     return byteStringToArray(t.getDetails());
+  }
+
+  static FailureOptions failureOptions(com.uber.cadence.api.v1.Failure t) {
+    if (t == null || !t.hasOptions()) {
+      return null;
+    }
+    com.uber.cadence.api.v1.FailureOptions options = t.getOptions();
+    FailureOptions res = new FailureOptions();
+    res.setFailureCategory(EnumMapper.failureCategory(options.getFailureCategory()));
+    if (options.hasNextRetryInterval()) {
+      res.setNextRetryIntervalSeconds(durationToSeconds(options.getNextRetryInterval()));
+    }
+    return res;
   }
 
   static WorkflowExecution workflowExecution(com.uber.cadence.api.v1.WorkflowExecution t) {
@@ -439,6 +453,7 @@ class TypeMapper {
     res.setExpirationTimestamp(timeToUnixNano(t.getExpirationTime()));
     res.setLastFailureReason(failureReason(t.getLastFailure()));
     res.setLastFailureDetails(failureDetails(t.getLastFailure()));
+    res.setLastFailureOptions(failureOptions(t.getLastFailure()));
     res.setLastWorkerIdentity(t.getLastWorkerIdentity());
     return res;
   }

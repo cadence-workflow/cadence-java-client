@@ -201,8 +201,7 @@ public class HistoryMapperEventTest<
       testCase(
           EventType.ActivityTaskStarted,
           ProtoObjects.ACTIVITY_TASK_STARTED_EVENT_ATTRIBUTES,
-          ThriftObjects.ACTIVITY_TASK_STARTED_EVENT_ATTRIBUTES,
-          "lastFailureOptions"), // new IDL field, not wired yet
+          ThriftObjects.ACTIVITY_TASK_STARTED_EVENT_ATTRIBUTES),
       testCase(
           EventType.ActivityTaskCompleted,
           ProtoObjects.ACTIVITY_TASK_COMPLETED_EVENT_ATTRIBUTES,
@@ -210,13 +209,11 @@ public class HistoryMapperEventTest<
       testCase(
           EventType.ActivityTaskFailed,
           ProtoObjects.ACTIVITY_TASK_FAILED_EVENT_ATTRIBUTES,
-          ThriftObjects.ACTIVITY_TASK_FAILED_EVENT_ATTRIBUTES,
-          "failureOptions"), // new IDL field, not wired yet
+          ThriftObjects.ACTIVITY_TASK_FAILED_EVENT_ATTRIBUTES),
       testCase(
           EventType.ActivityTaskTimedOut,
           ProtoObjects.ACTIVITY_TASK_TIMED_OUT_EVENT_ATTRIBUTES,
-          ThriftObjects.ACTIVITY_TASK_TIMED_OUT_EVENT_ATTRIBUTES,
-          "lastFailureOptions"), // new IDL field, not wired yet
+          ThriftObjects.ACTIVITY_TASK_TIMED_OUT_EVENT_ATTRIBUTES),
       testCase(
           EventType.ActivityTaskCancelRequested,
           ProtoObjects.ACTIVITY_TASK_CANCEL_REQUESTED_EVENT_ATTRIBUTES,

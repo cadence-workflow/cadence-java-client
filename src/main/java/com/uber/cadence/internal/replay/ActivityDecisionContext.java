@@ -177,7 +177,12 @@ final class ActivityDecisionContext {
         byte[] details = attributes.getDetails();
         ActivityTaskFailedException failure =
             new ActivityTaskFailedException(
-                event.getEventId(), scheduled.getUserContext(), null, reason, details);
+                event.getEventId(),
+                scheduled.getUserContext(),
+                null,
+                reason,
+                details,
+                attributes.getFailureOptions());
         BiConsumer<byte[], Exception> completionHandle = scheduled.getCompletionCallback();
         completionHandle.accept(null, failure);
       }

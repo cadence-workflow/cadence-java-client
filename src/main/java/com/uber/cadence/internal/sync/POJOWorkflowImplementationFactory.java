@@ -24,6 +24,7 @@ import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.converter.DataConverterException;
 import com.uber.cadence.internal.common.CheckedExceptionWrapper;
+import com.uber.cadence.internal.common.FailureConverter;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.replay.DeciderCache;
 import com.uber.cadence.internal.replay.ReplayWorkflow;
@@ -265,8 +266,9 @@ final class POJOWorkflowImplementationFactory implements ReplayWorkflowFactory {
               dataConverter.toData(timeoutException.getDetails()));
     }
 
-    return new WorkflowExecutionException(
-        failure.getClass().getName(), dataConverter.toData(failure));
+    // Failure options are not supported for workflow failures.
+    FailureConverter.EncodedFailure encoded = FailureConverter.encode(failure, dataConverter);
+    return new WorkflowExecutionException(encoded.getReason(), encoded.getDetails());
   }
 
   static WorkflowExecutionException mapError(Error failure, DataConverter dataConverter) {

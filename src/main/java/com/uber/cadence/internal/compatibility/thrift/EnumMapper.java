@@ -26,6 +26,7 @@ import com.uber.cadence.DecisionTaskFailedCause;
 import com.uber.cadence.DecisionTaskTimedOutCause;
 import com.uber.cadence.DomainStatus;
 import com.uber.cadence.EncodingType;
+import com.uber.cadence.FailureCategory;
 import com.uber.cadence.IndexedValueType;
 import com.uber.cadence.ParentClosePolicy;
 import com.uber.cadence.PendingActivityState;
@@ -40,6 +41,20 @@ import com.uber.cadence.WorkflowIdReusePolicy;
 public final class EnumMapper {
 
   private EnumMapper() {}
+
+  public static FailureCategory failureCategory(com.uber.cadence.api.v1.FailureCategory t) {
+    switch (t) {
+      case FAILURE_CATEGORY_POLL:
+        return FailureCategory.Poll;
+      case FAILURE_CATEGORY_STANDARD:
+        return FailureCategory.Standard;
+      case FAILURE_CATEGORY_FATAL:
+        return FailureCategory.Fatal;
+      default:
+        // FAILURE_CATEGORY_INVALID or a category unknown to this client.
+        return null;
+    }
+  }
 
   public static TaskListKind taskListKind(com.uber.cadence.api.v1.TaskListKind t) {
     switch (t) {

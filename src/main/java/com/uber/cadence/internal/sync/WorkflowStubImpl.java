@@ -33,6 +33,7 @@ import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.converter.DataConverterException;
 import com.uber.cadence.converter.JsonDataConverter;
 import com.uber.cadence.internal.common.CheckedExceptionWrapper;
+import com.uber.cadence.internal.common.FailureConverter;
 import com.uber.cadence.internal.common.SignalWithStartWorkflowExecutionParameters;
 import com.uber.cadence.internal.common.StartWorkflowExecutionParameters;
 import com.uber.cadence.internal.common.WorkflowExecutionFailedException;
@@ -451,24 +452,12 @@ class WorkflowStubImpl implements WorkflowStub {
   private <R> R mapToWorkflowFailureException(
       Exception failure, @SuppressWarnings("unused") Class<R> returnType) {
     failure = CheckedExceptionWrapper.unwrap(failure);
-    Class<Throwable> detailsClass;
     if (failure instanceof WorkflowExecutionFailedException) {
       WorkflowExecutionFailedException executionFailed = (WorkflowExecutionFailedException) failure;
-      try {
-        @SuppressWarnings("unchecked")
-        Class<Throwable> dc = (Class<Throwable>) Class.forName(executionFailed.getReason());
-        detailsClass = dc;
-      } catch (Exception e) {
-        RuntimeException ee =
-            new RuntimeException(
-                "Couldn't deserialize failure cause "
-                    + "as the reason field is expected to contain an exception class name",
-                executionFailed);
-        throw new WorkflowFailureException(
-            execution.get(), workflowType, executionFailed.getDecisionTaskCompletedEventId(), ee);
-      }
+      // Workflow failures don't have failure options.
       Throwable cause =
-          dataConverter.fromData(executionFailed.getDetails(), detailsClass, detailsClass);
+          FailureConverter.decode(
+              executionFailed.getReason(), executionFailed.getDetails(), null, dataConverter);
       throw new WorkflowFailureException(
           execution.get(), workflowType, executionFailed.getDecisionTaskCompletedEventId(), cause);
     } else if (failure instanceof EntityNotExistsError) {
