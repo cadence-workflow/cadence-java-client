@@ -34,9 +34,11 @@ import com.uber.cadence.ActiveClusterSelectionPolicy;
 import com.uber.cadence.BadRequestError;
 import com.uber.cadence.CancellationAlreadyRequestedError;
 import com.uber.cadence.ClusterAttribute;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.DomainAlreadyExistsError;
 import com.uber.cadence.DomainNotActiveError;
 import com.uber.cadence.EntityNotExistsError;
+import com.uber.cadence.EventType;
 import com.uber.cadence.GetWorkflowExecutionHistoryResponse;
 import com.uber.cadence.HistoryEvent;
 import com.uber.cadence.Memo;
@@ -1652,6 +1654,58 @@ public class WorkflowTest {
     options.setTaskList(taskList);
     TestWorkflow1 client = workflowClient.newWorkflowStub(TestWorkflow1.class, options.build());
     assertEquals(null, client.execute(taskList));
+  }
+
+  private static final ActiveClusterSelectionPolicy CHILD_ACTIVE_CLUSTER_SELECTION_POLICY =
+      new ActiveClusterSelectionPolicy()
+          .setClusterAttribute(new ClusterAttribute().setScope("location").setName("lisbon"));
+
+  public static class TestChildWithStartPoliciesWorkflow implements TestWorkflow1 {
+
+    @Override
+    public String execute(String taskList) {
+      ChildWorkflowOptions workflowOptions =
+          new ChildWorkflowOptions.Builder()
+              .setTaskList(taskList)
+              .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
+              .setActiveClusterSelectionPolicy(CHILD_ACTIVE_CLUSTER_SELECTION_POLICY)
+              .build();
+      TestMultiargsWorkflowsFunc stubF =
+          Workflow.newChildWorkflowStub(TestMultiargsWorkflowsFunc.class, workflowOptions);
+      return stubF.func();
+    }
+  }
+
+  @Test
+  @RequiresTestService
+  public void testChildWorkflowWithStartPolicies() {
+    startWorkerFor(TestChildWithStartPoliciesWorkflow.class, TestMultiargsWorkflowsImpl.class);
+
+    TestWorkflow1 client =
+        workflowClient.newWorkflowStub(
+            TestWorkflow1.class, newWorkflowOptionsBuilder(taskList).build());
+    assertEquals("func", client.execute(taskList));
+
+    WorkflowExecution execution = WorkflowStub.fromTyped(client).getExecution();
+    GetWorkflowExecutionHistoryResponse historyResp =
+        WorkflowExecutionUtils.getHistoryPage(
+            new byte[] {}, workflowClient.getService(), DOMAIN, execution);
+    HistoryEvent initiated =
+        historyResp
+            .getHistory()
+            .getEvents()
+            .stream()
+            .filter(e -> e.getEventType() == EventType.StartChildWorkflowExecutionInitiated)
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("no StartChildWorkflowExecutionInitiated event"));
+    assertEquals(
+        CronOverlapPolicy.BUFFERONE,
+        initiated.getStartChildWorkflowExecutionInitiatedEventAttributes().getCronOverlapPolicy());
+    assertEquals(
+        CHILD_ACTIVE_CLUSTER_SELECTION_POLICY,
+        initiated
+            .getStartChildWorkflowExecutionInitiatedEventAttributes()
+            .getActiveClusterSelectionPolicy());
   }
 
   // This workflow is designed specifically for testing some internal logic in Async.procedure

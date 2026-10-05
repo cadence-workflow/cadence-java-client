@@ -16,8 +16,13 @@ package com.uber.cadence.internal.replay;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertNotEquals;
 
+import com.uber.cadence.ActiveClusterSelectionPolicy;
+import com.uber.cadence.ClusterAttribute;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.ParentClosePolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.WorkflowType;
@@ -171,5 +176,48 @@ public class StartChildWorkflowExecutionParametersTest {
     assertTrue(parameters.toString().contains("testDomain"));
     assertTrue(parameters.toString().contains("testControl"));
     assertTrue(parameters.toString().contains("1000"));
+  }
+
+  private static ActiveClusterSelectionPolicy testActiveClusterSelectionPolicy() {
+    return new ActiveClusterSelectionPolicy()
+        .setClusterAttribute(new ClusterAttribute().setScope("location").setName("lisbon"));
+  }
+
+  private static StartChildWorkflowExecutionParameters.Builder builderWithStartPolicies() {
+    return new StartChildWorkflowExecutionParameters.Builder()
+        .setWorkflowId("workflowId")
+        .setWorkflowType(new WorkflowType().setName("workflowType"))
+        .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
+        .setActiveClusterSelectionPolicy(testActiveClusterSelectionPolicy());
+  }
+
+  @Test
+  public void testStartPoliciesSetOnBuilder() {
+    StartChildWorkflowExecutionParameters parameters = builderWithStartPolicies().build();
+
+    assertEquals(CronOverlapPolicy.BUFFERONE, parameters.getCronOverlapPolicy());
+    assertEquals(testActiveClusterSelectionPolicy(), parameters.getActiveClusterSelectionPolicy());
+  }
+
+  @Test
+  public void testStartPoliciesDefaultToNull() {
+    StartChildWorkflowExecutionParameters parameters =
+        new StartChildWorkflowExecutionParameters.Builder().build();
+
+    assertNull(parameters.getCronOverlapPolicy());
+    assertNull(parameters.getActiveClusterSelectionPolicy());
+  }
+
+  @Test
+  public void testStartPoliciesConsideredByEqualsAndHashCode() {
+    StartChildWorkflowExecutionParameters parameters = builderWithStartPolicies().build();
+
+    assertEquals(parameters, builderWithStartPolicies().build());
+    assertEquals(parameters.hashCode(), builderWithStartPolicies().build().hashCode());
+    assertNotEquals(
+        parameters,
+        builderWithStartPolicies().setCronOverlapPolicy(CronOverlapPolicy.SKIPPED).build());
+    assertNotEquals(
+        parameters, builderWithStartPolicies().setActiveClusterSelectionPolicy(null).build());
   }
 }

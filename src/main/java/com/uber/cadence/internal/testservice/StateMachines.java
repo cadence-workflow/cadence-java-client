@@ -454,7 +454,9 @@ class StateMachines {
             .setRetryPolicy(d.getRetryPolicy())
             .setCronSchedule(d.getCronSchedule())
             .setHeader(d.getHeader())
-            .setParentClosePolicy(d.getParentClosePolicy());
+            .setParentClosePolicy(d.getParentClosePolicy())
+            .setCronOverlapPolicy(d.getCronOverlapPolicy())
+            .setActiveClusterSelectionPolicy(d.getActiveClusterSelectionPolicy());
     HistoryEvent event =
         new HistoryEvent()
             .setEventType(EventType.StartChildWorkflowExecutionInitiated)
@@ -476,7 +478,9 @@ class StateMachines {
                   .setWorkflowType(d.getWorkflowType())
                   .setRetryPolicy(d.getRetryPolicy())
                   .setCronSchedule(d.getCronSchedule())
-                  .setHeader(d.getHeader());
+                  .setHeader(d.getHeader())
+                  .setCronOverlapPolicy(d.getCronOverlapPolicy())
+                  .setActiveClusterSelectionPolicy(d.getActiveClusterSelectionPolicy());
           if (d.getInput() != null) {
             startChild.setInput(d.getInput());
           }
