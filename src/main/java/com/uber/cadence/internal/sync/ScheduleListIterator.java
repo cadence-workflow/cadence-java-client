@@ -23,7 +23,6 @@ import com.uber.cadence.client.schedule.ScheduleListEntry;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -127,11 +126,9 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
     for (com.uber.cadence.ScheduleListEntry e : raw) {
       String workflowType = e.getWorkflowType() != null ? e.getWorkflowType().getName() : null;
       boolean paused = e.getState() != null && e.getState().isPaused();
-      Map<String, Object> memo = e.getMemo() != null ? toObjectMap(e.getMemo().getFields()) : null;
-      Map<String, Object> searchAttributes =
-          e.getSearchAttributes() != null
-              ? toObjectMap(e.getSearchAttributes().getIndexedFields())
-              : null;
+      Map<String, byte[]> memo = e.getMemo() != null ? e.getMemo().getFields() : null;
+      Map<String, byte[]> searchAttributes =
+          e.getSearchAttributes() != null ? e.getSearchAttributes().getIndexedFields() : null;
       result.add(
           new ScheduleListEntry(
               e.getScheduleId(),
@@ -141,15 +138,6 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
               memo,
               searchAttributes));
     }
-    return result;
-  }
-
-  private static Map<String, Object> toObjectMap(Map<String, ?> src) {
-    if (src == null || src.isEmpty()) {
-      return null;
-    }
-    Map<String, Object> result = new HashMap<>();
-    src.forEach((k, v) -> result.put(k, v));
     return result;
   }
 }

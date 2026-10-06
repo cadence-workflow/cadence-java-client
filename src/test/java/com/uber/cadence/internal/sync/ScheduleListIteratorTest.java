@@ -279,8 +279,7 @@ public class ScheduleListIteratorTest {
         new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE).next();
 
     Assert.assertNotNull(entry.getMemo());
-    Assert.assertEquals(
-        "memoVal".getBytes().length, ((byte[]) entry.getMemo().get("memoKey")).length);
+    Assert.assertArrayEquals("memoVal".getBytes(), entry.getMemo().get("memoKey"));
     Assert.assertNotNull(entry.getSearchAttributes());
     Assert.assertTrue(entry.getSearchAttributes().containsKey("saKey"));
   }
