@@ -14,6 +14,7 @@
  */
 package com.uber.cadence.client.schedule;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -29,13 +30,22 @@ public final class ScheduleListEntry {
   private final String workflowType;
   private final boolean paused;
   private final String cronExpression;
+  private final Map<String, Object> memo;
+  private final Map<String, Object> searchAttributes;
 
   public ScheduleListEntry(
-      String scheduleId, String workflowType, boolean paused, String cronExpression) {
+      String scheduleId,
+      String workflowType,
+      boolean paused,
+      String cronExpression,
+      Map<String, Object> memo,
+      Map<String, Object> searchAttributes) {
     this.scheduleId = scheduleId;
     this.workflowType = workflowType;
     this.paused = paused;
     this.cronExpression = cronExpression;
+    this.memo = memo;
+    this.searchAttributes = searchAttributes;
   }
 
   /** The unique schedule identifier within the domain. */
@@ -62,6 +72,24 @@ public final class ScheduleListEntry {
     return cronExpression;
   }
 
+  /**
+   * Memo key/value pairs attached to the schedule itself. May be null if no memo was set. For
+   * full detail including memo from triggered workflows, call {@link
+   * com.uber.cadence.client.ScheduleClient#describeSchedule}.
+   */
+  public Map<String, Object> getMemo() {
+    return memo;
+  }
+
+  /**
+   * User-defined search attributes attached to the schedule. Scheduler-internal attributes
+   * (CadenceSchedule* keys) are stripped by the server before this is returned. May be null if
+   * no user search attributes were set.
+   */
+  public Map<String, Object> getSearchAttributes() {
+    return searchAttributes;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -70,12 +98,14 @@ public final class ScheduleListEntry {
     return paused == that.paused
         && Objects.equals(scheduleId, that.scheduleId)
         && Objects.equals(workflowType, that.workflowType)
-        && Objects.equals(cronExpression, that.cronExpression);
+        && Objects.equals(cronExpression, that.cronExpression)
+        && Objects.equals(memo, that.memo)
+        && Objects.equals(searchAttributes, that.searchAttributes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(scheduleId, workflowType, paused, cronExpression);
+    return Objects.hash(scheduleId, workflowType, paused, cronExpression, memo, searchAttributes);
   }
 
   @Override
@@ -89,6 +119,10 @@ public final class ScheduleListEntry {
         + cronExpression
         + "', paused="
         + paused
+        + ", memo="
+        + memo
+        + ", searchAttributes="
+        + searchAttributes
         + '}';
   }
 }
