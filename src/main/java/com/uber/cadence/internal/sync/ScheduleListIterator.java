@@ -127,8 +127,7 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
     for (com.uber.cadence.ScheduleListEntry e : raw) {
       String workflowType = e.getWorkflowType() != null ? e.getWorkflowType().getName() : null;
       boolean paused = e.getState() != null && e.getState().isPaused();
-      Map<String, Object> memo =
-          e.getMemo() != null ? toObjectMap(e.getMemo().getFields()) : null;
+      Map<String, Object> memo = e.getMemo() != null ? toObjectMap(e.getMemo().getFields()) : null;
       Map<String, Object> searchAttributes =
           e.getSearchAttributes() != null
               ? toObjectMap(e.getSearchAttributes().getIndexedFields())

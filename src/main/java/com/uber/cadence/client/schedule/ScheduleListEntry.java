@@ -73,8 +73,8 @@ public final class ScheduleListEntry {
   }
 
   /**
-   * Memo key/value pairs attached to the schedule itself. May be null if no memo was set. For
-   * full detail including memo from triggered workflows, call {@link
+   * Memo key/value pairs attached to the schedule itself. May be null if no memo was set. For full
+   * detail including memo from triggered workflows, call {@link
    * com.uber.cadence.client.ScheduleClient#describeSchedule}.
    */
   public Map<String, Object> getMemo() {
@@ -83,8 +83,8 @@ public final class ScheduleListEntry {
 
   /**
    * User-defined search attributes attached to the schedule. Scheduler-internal attributes
-   * (CadenceSchedule* keys) are stripped by the server before this is returned. May be null if
-   * no user search attributes were set.
+   * (CadenceSchedule* keys) are stripped by the server before this is returned. May be null if no
+   * user search attributes were set.
    */
   public Map<String, Object> getSearchAttributes() {
     return searchAttributes;

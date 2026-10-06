@@ -624,8 +624,7 @@ public class ScheduleTypesTest {
     Map<String, Object> newSA = Collections.singletonMap("env", new byte[] {2});
 
     ScheduleDescription updated =
-        original
-            .toBuilder()
+        original.toBuilder()
             .setState(newState)
             .setInfo(newInfo)
             .setMemo(newMemo)
@@ -824,7 +823,8 @@ public class ScheduleTypesTest {
 
   @Test
   public void scheduleListEntry_getters() {
-    ScheduleListEntry entry = new ScheduleListEntry("sched-1", "MyWf", true, "0 6 * * *", null, null);
+    ScheduleListEntry entry =
+        new ScheduleListEntry("sched-1", "MyWf", true, "0 6 * * *", null, null);
 
     assertEquals("sched-1", entry.getScheduleId());
     assertEquals("MyWf", entry.getWorkflowType());
