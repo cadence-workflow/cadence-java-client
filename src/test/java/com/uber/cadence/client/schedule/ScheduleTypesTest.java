@@ -759,72 +759,9 @@ public class ScheduleTypesTest {
   }
 
   @Test
-  public void listSchedulesResult_tokenDefensiveCopy() {
-    byte[] token = {7, 8, 9};
-    ListSchedulesResult result = new ListSchedulesResult(Collections.emptyList(), token);
-    token[0] = 99;
-    assertEquals(7, result.getNextPageToken()[0]);
-  }
-
-  @Test
-  public void listSchedulesResult_getTokenDoesNotExposeInternal() {
-    ListSchedulesResult result =
-        new ListSchedulesResult(Collections.emptyList(), new byte[] {1, 2, 3});
-    result.getNextPageToken()[0] = 99;
-    assertEquals(1, result.getNextPageToken()[0]);
-  }
-
-  @Test
-  public void listSchedulesResult_nullTokenRoundTrips() {
-    assertNull(new ListSchedulesResult(Collections.emptyList(), null).getNextPageToken());
-  }
-
-  @Test
-  public void listSchedulesResult_nullSchedulesNormalizesToEmpty() {
-    assertNotNull(new ListSchedulesResult(null, null).getSchedules());
-    assertTrue(new ListSchedulesResult(null, null).getSchedules().isEmpty());
-  }
-
-  @Test(expected = UnsupportedOperationException.class)
-  public void listSchedulesResult_schedulesIsUnmodifiable() {
-    ScheduleListEntry entry = new ScheduleListEntry("id", "wf", false, null);
-    new ListSchedulesResult(Arrays.asList(entry), null).getSchedules().add(entry);
-  }
-
-  @Test
-  public void listSchedulesResult_equals() {
-    ListSchedulesResult a = new ListSchedulesResult(Collections.emptyList(), new byte[] {1});
-    ListSchedulesResult b = new ListSchedulesResult(Collections.emptyList(), new byte[] {1});
-    assertEquals(a, b);
-    assertEquals(a.hashCode(), b.hashCode());
-  }
-
-  @Test
-  public void listSchedulesResult_notEqualOnDifferentToken() {
-    assertNotEquals(
-        new ListSchedulesResult(Collections.emptyList(), new byte[] {1}),
-        new ListSchedulesResult(Collections.emptyList(), new byte[] {2}));
-  }
-
-  @Test
-  public void listSchedulesResult_notEqualOnDifferentSchedules() {
-    ScheduleListEntry entry = new ScheduleListEntry("id", "wf", false, null);
-    assertNotEquals(
-        new ListSchedulesResult(Arrays.asList(entry), null),
-        new ListSchedulesResult(Collections.emptyList(), null));
-  }
-
-  @Test
-  public void listSchedulesResult_toString() {
-    assertTrue(
-        new ListSchedulesResult(Collections.emptyList(), new byte[] {5})
-            .toString()
-            .contains("nextPageToken.length=1"));
-  }
-
-  @Test
   public void scheduleListEntry_getters() {
-    ScheduleListEntry entry = new ScheduleListEntry("sched-1", "MyWf", true, "0 6 * * *");
+    ScheduleListEntry entry =
+        new ScheduleListEntry("sched-1", "MyWf", true, "0 6 * * *", null, null);
 
     assertEquals("sched-1", entry.getScheduleId());
     assertEquals("MyWf", entry.getWorkflowType());
@@ -834,8 +771,8 @@ public class ScheduleTypesTest {
 
   @Test
   public void scheduleListEntry_equals() {
-    ScheduleListEntry a = new ScheduleListEntry("id", "wf", false, "0 6 * * *");
-    ScheduleListEntry b = new ScheduleListEntry("id", "wf", false, "0 6 * * *");
+    ScheduleListEntry a = new ScheduleListEntry("id", "wf", false, "0 6 * * *", null, null);
+    ScheduleListEntry b = new ScheduleListEntry("id", "wf", false, "0 6 * * *", null, null);
     assertEquals(a, b);
     assertEquals(a.hashCode(), b.hashCode());
   }
@@ -843,34 +780,34 @@ public class ScheduleTypesTest {
   @Test
   public void scheduleListEntry_notEqualOnDifferentId() {
     assertNotEquals(
-        new ScheduleListEntry("id-1", "wf", false, null),
-        new ScheduleListEntry("id-2", "wf", false, null));
+        new ScheduleListEntry("id-1", "wf", false, null, null, null),
+        new ScheduleListEntry("id-2", "wf", false, null, null, null));
   }
 
   @Test
   public void scheduleListEntry_notEqualOnDifferentWorkflowType() {
     assertNotEquals(
-        new ScheduleListEntry("id", "WfA", false, null),
-        new ScheduleListEntry("id", "WfB", false, null));
+        new ScheduleListEntry("id", "WfA", false, null, null, null),
+        new ScheduleListEntry("id", "WfB", false, null, null, null));
   }
 
   @Test
   public void scheduleListEntry_notEqualOnDifferentPausedState() {
     assertNotEquals(
-        new ScheduleListEntry("id", "wf", true, null),
-        new ScheduleListEntry("id", "wf", false, null));
+        new ScheduleListEntry("id", "wf", true, null, null, null),
+        new ScheduleListEntry("id", "wf", false, null, null, null));
   }
 
   @Test
   public void scheduleListEntry_notEqualOnDifferentCronExpression() {
     assertNotEquals(
-        new ScheduleListEntry("id", "wf", false, "0 6 * * *"),
-        new ScheduleListEntry("id", "wf", false, "0 9 * * *"));
+        new ScheduleListEntry("id", "wf", false, "0 6 * * *", null, null),
+        new ScheduleListEntry("id", "wf", false, "0 9 * * *", null, null));
   }
 
   @Test
   public void scheduleListEntry_toString() {
-    String s = new ScheduleListEntry("my-sched", "MyWf", true, "0 6 * * *").toString();
+    String s = new ScheduleListEntry("my-sched", "MyWf", true, "0 6 * * *", null, null).toString();
     assertTrue(s.contains("my-sched"));
     assertTrue(s.contains("MyWf"));
     assertTrue(s.contains("paused=true"));

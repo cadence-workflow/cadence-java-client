@@ -21,7 +21,6 @@ import com.uber.cadence.BackfillScheduleResponse;
 import com.uber.cadence.CreateScheduleRequest;
 import com.uber.cadence.CreateScheduleResponse;
 import com.uber.cadence.DeleteScheduleResponse;
-import com.uber.cadence.ListSchedulesResponse;
 import com.uber.cadence.PauseScheduleResponse;
 import com.uber.cadence.UnpauseScheduleResponse;
 import com.uber.cadence.UpdateScheduleRequest;
@@ -44,8 +43,8 @@ import java.util.stream.Stream;
  *
  * <p>All methods except {@link #listSchedules()} and {@link #listSchedules(int)} return {@link
  * CompletableFuture}. Synchronous callers can block with {@link CompletableFuture#get()} or {@link
- * CompletableFuture#join()}. The streaming {@code listSchedules} overloads fetch pages
- * synchronously as the stream is consumed and throw failures directly as {@link RuntimeException}.
+ * CompletableFuture#join()}. The {@code listSchedules} overloads return a lazy {@link
+ * java.util.stream.Stream} and throw failures directly as {@link RuntimeException}.
  *
  * <pre>{@code
  * ScheduleClient sc = workflowClient.scheduleClient();
@@ -202,15 +201,6 @@ public interface ScheduleClient {
    */
   CompletableFuture<List<BackfillScheduleResponse>> backfillSchedule(
       String scheduleId, List<ScheduleBackfill> backfills);
-
-  /**
-   * Lists schedules in the domain, paginated.
-   *
-   * @param pageSize maximum number of schedules to return
-   * @param nextPageToken continuation token from a previous response, or {@code null} for the first
-   *     page
-   */
-  CompletableFuture<ListSchedulesResponse> listSchedules(int pageSize, byte[] nextPageToken);
 
   /**
    * Returns a lazy {@link Stream} over all schedules in the domain using the default page size.

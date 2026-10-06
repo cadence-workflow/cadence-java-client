@@ -11,4 +11,6 @@ public class ScheduleListEntry {
   private WorkflowType workflowType;
   private ScheduleState state;
   private String cronExpression;
+  private Memo memo;
+  private SearchAttributes searchAttributes;
 }

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -125,8 +126,17 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
     for (com.uber.cadence.ScheduleListEntry e : raw) {
       String workflowType = e.getWorkflowType() != null ? e.getWorkflowType().getName() : null;
       boolean paused = e.getState() != null && e.getState().isPaused();
+      Map<String, byte[]> memo = e.getMemo() != null ? e.getMemo().getFields() : null;
+      Map<String, byte[]> searchAttributes =
+          e.getSearchAttributes() != null ? e.getSearchAttributes().getIndexedFields() : null;
       result.add(
-          new ScheduleListEntry(e.getScheduleId(), workflowType, paused, e.getCronExpression()));
+          new ScheduleListEntry(
+              e.getScheduleId(),
+              workflowType,
+              paused,
+              e.getCronExpression(),
+              memo,
+              searchAttributes));
     }
     return result;
   }

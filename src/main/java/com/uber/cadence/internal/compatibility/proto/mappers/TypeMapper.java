@@ -1270,6 +1270,8 @@ class TypeMapper {
     res.setWorkflowType(workflowType(t.getWorkflowType()));
     res.setState(scheduleState(t.getState()));
     res.setCronExpression(t.getCronExpression());
+    res.setMemo(memo(t.getMemo()));
+    res.setSearchAttributes(searchAttributes(t.getSearchAttributes()));
     return res;
   }
 }

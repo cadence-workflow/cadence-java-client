@@ -28,12 +28,17 @@ import static org.mockito.Mockito.when;
 
 import com.uber.cadence.ListSchedulesRequest;
 import com.uber.cadence.ListSchedulesResponse;
+import com.uber.cadence.Memo;
+import com.uber.cadence.SearchAttributes;
 import com.uber.cadence.client.schedule.ScheduleListEntry;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -248,6 +253,52 @@ public class ScheduleListIteratorTest {
                 new ListSchedulesResponse().setSchedules(Collections.emptyList())));
 
     new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE).next();
+  }
+
+  // --- memo and searchAttributes ---
+
+  @Test
+  public void memoAndSearchAttributes_forwardedFromThriftEntry() {
+    Map<String, byte[]> memoFields = new HashMap<>();
+    memoFields.put("memoKey", "memoVal".getBytes());
+    Map<String, byte[]> saFields = new HashMap<>();
+    saFields.put("saKey", "saVal".getBytes());
+
+    com.uber.cadence.ScheduleListEntry thrift =
+        new com.uber.cadence.ScheduleListEntry()
+            .setScheduleId("s1")
+            .setMemo(new Memo().setFields(memoFields))
+            .setSearchAttributes(new SearchAttributes().setIndexedFields(saFields));
+
+    when(service.ListSchedules(any()))
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                new ListSchedulesResponse().setSchedules(Collections.singletonList(thrift))));
+
+    ScheduleListEntry entry =
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE).next();
+
+    Assert.assertNotNull(entry.getMemo());
+    Assert.assertArrayEquals("memoVal".getBytes(), entry.getMemo().get("memoKey"));
+    Assert.assertNotNull(entry.getSearchAttributes());
+    Assert.assertTrue(entry.getSearchAttributes().containsKey("saKey"));
+  }
+
+  @Test
+  public void nullMemoAndSearchAttributes_yieldNullFields() {
+    com.uber.cadence.ScheduleListEntry thrift =
+        new com.uber.cadence.ScheduleListEntry().setScheduleId("s2");
+
+    when(service.ListSchedules(any()))
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                new ListSchedulesResponse().setSchedules(Collections.singletonList(thrift))));
+
+    ScheduleListEntry entry =
+        new ScheduleListIterator(service, DOMAIN, ScheduleListIterator.DEFAULT_PAGE_SIZE).next();
+
+    Assert.assertNull(entry.getMemo());
+    Assert.assertNull(entry.getSearchAttributes());
   }
 
   // --- pageSize validation ---

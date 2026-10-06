@@ -25,8 +25,6 @@ import com.uber.cadence.DeleteScheduleRequest;
 import com.uber.cadence.DeleteScheduleResponse;
 import com.uber.cadence.DescribeScheduleRequest;
 import com.uber.cadence.DescribeScheduleResponse;
-import com.uber.cadence.ListSchedulesRequest;
-import com.uber.cadence.ListSchedulesResponse;
 import com.uber.cadence.Memo;
 import com.uber.cadence.PauseScheduleRequest;
 import com.uber.cadence.PauseScheduleResponse;
@@ -222,17 +220,6 @@ final class ScheduleClientImpl implements ScheduleClient {
               }
               return results;
             });
-  }
-
-  @Override
-  public CompletableFuture<ListSchedulesResponse> listSchedules(
-      int pageSize, byte[] nextPageToken) {
-    ListSchedulesRequest request =
-        new ListSchedulesRequest()
-            .setDomain(domain)
-            .setPageSize(pageSize)
-            .setNextPageToken(nextPageToken);
-    return service.ListSchedules(request);
   }
 
   @Override
