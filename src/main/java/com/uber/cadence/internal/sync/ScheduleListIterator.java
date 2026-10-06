@@ -135,14 +135,20 @@ final class ScheduleListIterator implements Iterator<ScheduleListEntry> {
               : null;
       result.add(
           new ScheduleListEntry(
-              e.getScheduleId(), workflowType, paused, e.getCronExpression(), memo,
+              e.getScheduleId(),
+              workflowType,
+              paused,
+              e.getCronExpression(),
+              memo,
               searchAttributes));
     }
     return result;
   }
 
   private static Map<String, Object> toObjectMap(Map<String, ?> src) {
-    if (src == null || src.isEmpty()) return null;
+    if (src == null || src.isEmpty()) {
+      return null;
+    }
     Map<String, Object> result = new HashMap<>();
     src.forEach((k, v) -> result.put(k, v));
     return result;

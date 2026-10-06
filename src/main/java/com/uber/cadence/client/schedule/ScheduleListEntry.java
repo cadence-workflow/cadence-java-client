@@ -92,8 +92,12 @@ public final class ScheduleListEntry {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof ScheduleListEntry)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ScheduleListEntry)) {
+      return false;
+    }
     ScheduleListEntry that = (ScheduleListEntry) o;
     return paused == that.paused
         && Objects.equals(scheduleId, that.scheduleId)
