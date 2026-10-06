@@ -624,7 +624,8 @@ public class ScheduleTypesTest {
     Map<String, Object> newSA = Collections.singletonMap("env", new byte[] {2});
 
     ScheduleDescription updated =
-        original.toBuilder()
+        original
+            .toBuilder()
             .setState(newState)
             .setInfo(newInfo)
             .setMemo(newMemo)
