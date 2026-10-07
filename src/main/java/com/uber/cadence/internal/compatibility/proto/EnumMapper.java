@@ -48,6 +48,7 @@ import com.uber.cadence.api.v1.ContinueAsNewInitiator;
 import com.uber.cadence.api.v1.CronOverlapPolicy;
 import com.uber.cadence.api.v1.DecisionTaskFailedCause;
 import com.uber.cadence.api.v1.EventFilterType;
+import com.uber.cadence.api.v1.FailureCategory;
 import com.uber.cadence.api.v1.ParentClosePolicy;
 import com.uber.cadence.api.v1.QueryConsistencyLevel;
 import com.uber.cadence.api.v1.QueryRejectCondition;
@@ -72,6 +73,21 @@ public final class EnumMapper {
         return TaskListKind.TASK_LIST_KIND_STICKY;
       case EPHEMERAL:
         return TaskListKind.TASK_LIST_KIND_EPHEMERAL;
+    }
+    throw new IllegalArgumentException("unexpected enum value");
+  }
+
+  public static FailureCategory failureCategory(com.uber.cadence.FailureCategory t) {
+    if (t == null) {
+      return FailureCategory.FAILURE_CATEGORY_INVALID;
+    }
+    switch (t) {
+      case Poll:
+        return FailureCategory.FAILURE_CATEGORY_POLL;
+      case Standard:
+        return FailureCategory.FAILURE_CATEGORY_STANDARD;
+      case Fatal:
+        return FailureCategory.FAILURE_CATEGORY_FATAL;
     }
     throw new IllegalArgumentException("unexpected enum value");
   }

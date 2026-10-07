@@ -65,6 +65,13 @@ public final class ProtoObjects {
 
   public static final Failure FAILURE =
       Failure.newBuilder().setDetails(utf8("details")).setReason("reason").build();
+  public static final FailureOptions FAILURE_OPTIONS =
+      FailureOptions.newBuilder()
+          .setFailureCategory(FailureCategory.FAILURE_CATEGORY_FATAL)
+          .setNextRetryInterval(seconds(7))
+          .build();
+  public static final Failure FAILURE_WITH_OPTIONS =
+      FAILURE.toBuilder().setOptions(FAILURE_OPTIONS).build();
   public static final StickyExecutionAttributes STICKY_EXECUTION_ATTRIBUTES =
       StickyExecutionAttributes.newBuilder()
           .setWorkerTaskList(TASK_LIST)
@@ -181,7 +188,8 @@ public final class ProtoObjects {
           .setLastFailure(
               Failure.newBuilder()
                   .setReason("lastFailureReason")
-                  .setDetails(utf8("lastFailureDetails")))
+                  .setDetails(utf8("lastFailureDetails"))
+                  .setOptions(FAILURE_OPTIONS))
           .build();
   public static final PendingChildExecutionInfo PENDING_CHILD_EXECUTION_INFO =
       PendingChildExecutionInfo.newBuilder()
@@ -542,6 +550,7 @@ public final class ProtoObjects {
               Failure.newBuilder()
                   .setReason("failureReason")
                   .setDetails(utf8("failureDetails"))
+                  .setOptions(FAILURE_OPTIONS)
                   .build())
           .build();
 
@@ -556,7 +565,7 @@ public final class ProtoObjects {
 
   public static final ActivityTaskFailedEventAttributes ACTIVITY_TASK_FAILED_EVENT_ATTRIBUTES =
       ActivityTaskFailedEventAttributes.newBuilder()
-          .setFailure(FAILURE)
+          .setFailure(FAILURE_WITH_OPTIONS)
           .setScheduledEventId(1)
           .setStartedEventId(2)
           .setIdentity("identity")
@@ -572,6 +581,7 @@ public final class ProtoObjects {
               Failure.newBuilder()
                   .setReason("failureReason")
                   .setDetails(utf8("failureDetails"))
+                  .setOptions(FAILURE_OPTIONS)
                   .build())
           .build();
 
@@ -968,14 +978,16 @@ public final class ProtoObjects {
               .setDomain("domain")
               .setWorkflowExecution(WORKFLOW_EXECUTION)
               .setActivityId("activityId")
-              .setFailure(FAILURE)
+              .setFailure(FAILURE_WITH_OPTIONS)
               .setIdentity("identity")
+              .setHeartbeatDetails(payload("heartbeatDetails"))
               .build();
   public static final RespondActivityTaskFailedRequest RESPOND_ACTIVITY_TASK_FAILED_REQUEST =
       RespondActivityTaskFailedRequest.newBuilder()
           .setTaskToken(utf8("taskToken"))
-          .setFailure(FAILURE)
+          .setFailure(FAILURE_WITH_OPTIONS)
           .setIdentity("identity")
+          .setHeartbeatDetails(payload("heartbeatDetails"))
           .build();
   public static final RespondDecisionTaskCompletedRequest RESPOND_DECISION_TASK_COMPLETED_REQUEST =
       RespondDecisionTaskCompletedRequest.newBuilder()

@@ -331,7 +331,7 @@ public class RequestMapper {
     RespondActivityTaskFailedByIDRequest.Builder builder =
         RespondActivityTaskFailedByIDRequest.newBuilder()
             .setWorkflowExecution(TypeMapper.workflowRunPair(t.getWorkflowID(), t.getRunID()))
-            .setFailure(failure(t.getReason(), t.getDetails()));
+            .setFailure(failure(t.getReason(), t.getDetails(), t.getFailureOptions()));
     if (t.getDomain() != null) {
       builder.setDomain(t.getDomain());
     }
@@ -340,6 +340,9 @@ public class RequestMapper {
     }
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
+    }
+    if (t.getHeartbeatDetails() != null) {
+      builder.setHeartbeatDetails(payload(t.getHeartbeatDetails()));
     }
     return builder.build();
   }
@@ -351,12 +354,15 @@ public class RequestMapper {
     }
     RespondActivityTaskFailedRequest.Builder builder =
         RespondActivityTaskFailedRequest.newBuilder()
-            .setFailure(failure(t.getReason(), t.getDetails()));
+            .setFailure(failure(t.getReason(), t.getDetails(), t.getFailureOptions()));
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
     }
     if (t.getTaskToken() != null) {
       builder.setTaskToken(arrayToByteString(t.getTaskToken()));
+    }
+    if (t.getHeartbeatDetails() != null) {
+      builder.setHeartbeatDetails(payload(t.getHeartbeatDetails()));
     }
     return builder.build();
   }

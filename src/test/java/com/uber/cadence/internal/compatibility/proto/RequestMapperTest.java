@@ -129,15 +129,11 @@ public class RequestMapperTest<
         testCase(
             ThriftObjects.RESPOND_ACTIVITY_TASK_FAILED_BY_ID_REQUEST,
             ProtoObjects.RESPOND_ACTIVITY_TASK_FAILED_BY_ID_REQUEST,
-            RequestMapper::respondActivityTaskFailedByIdRequest,
-            "heartbeatDetails", // new IDL field, not wired yet
-            "failureOptions"), // new IDL field, not wired yet
+            RequestMapper::respondActivityTaskFailedByIdRequest),
         testCase(
             ThriftObjects.RESPOND_ACTIVITY_TASK_FAILED_REQUEST,
             ProtoObjects.RESPOND_ACTIVITY_TASK_FAILED_REQUEST,
-            RequestMapper::respondActivityTaskFailedRequest,
-            "heartbeatDetails", // new IDL field, not wired yet
-            "failureOptions"), // new IDL field, not wired yet
+            RequestMapper::respondActivityTaskFailedRequest),
         testCase(
             ThriftObjects.RESPOND_DECISION_TASK_COMPLETED_REQUEST,
             ProtoObjects.RESPOND_DECISION_TASK_COMPLETED_REQUEST,

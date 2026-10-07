@@ -130,6 +130,8 @@ public final class ThriftObjects {
           .setAutoResetPoints(RESET_POINTS)
           .setTaskList(TASK_LIST.getName())
           .setIsCron(true);
+  public static final FailureOptions FAILURE_OPTIONS =
+      new FailureOptions().setFailureCategory(FailureCategory.Fatal).setNextRetryIntervalSeconds(7);
   public static final PendingActivityInfo PENDING_ACTIVITY_INFO =
       new PendingActivityInfo()
           .setActivityID("activityId")
@@ -144,7 +146,8 @@ public final class ThriftObjects {
           .setExpirationTimestamp(6)
           .setLastWorkerIdentity("lastWorkerIdentity")
           .setLastFailureReason("lastFailureReason")
-          .setLastFailureDetails(utf8("lastFailureDetails"));
+          .setLastFailureDetails(utf8("lastFailureDetails"))
+          .setLastFailureOptions(FAILURE_OPTIONS);
   public static final PendingChildExecutionInfo PENDING_CHILD_EXECUTION_INFO =
       new PendingChildExecutionInfo()
           .setWorkflowID(WORKFLOW_ID)
@@ -459,7 +462,8 @@ public final class ThriftObjects {
           .setRequestId("requestId")
           .setAttempt(2)
           .setLastFailureReason("failureReason")
-          .setLastFailureDetails(utf8("failureDetails"));
+          .setLastFailureDetails(utf8("failureDetails"))
+          .setLastFailureOptions(FAILURE_OPTIONS);
 
   public static final ActivityTaskCompletedEventAttributes
       ACTIVITY_TASK_COMPLETED_EVENT_ATTRIBUTES =
@@ -473,6 +477,7 @@ public final class ThriftObjects {
       new ActivityTaskFailedEventAttributes()
           .setReason("reason")
           .setDetails(utf8("details"))
+          .setFailureOptions(FAILURE_OPTIONS)
           .setScheduledEventId(1)
           .setStartedEventId(2)
           .setIdentity("identity");
@@ -484,7 +489,8 @@ public final class ThriftObjects {
           .setStartedEventId(2)
           .setTimeoutType(TimeoutType.SCHEDULE_TO_CLOSE)
           .setLastFailureReason("failureReason")
-          .setLastFailureDetails(utf8("failureDetails"));
+          .setLastFailureDetails(utf8("failureDetails"))
+          .setLastFailureOptions(FAILURE_OPTIONS);
 
   public static final ActivityTaskCancelRequestedEventAttributes
       ACTIVITY_TASK_CANCEL_REQUESTED_EVENT_ATTRIBUTES =
@@ -827,13 +833,17 @@ public final class ThriftObjects {
               .setActivityID("activityId")
               .setReason("reason")
               .setDetails(utf8("details"))
-              .setIdentity("identity");
+              .setFailureOptions(FAILURE_OPTIONS)
+              .setIdentity("identity")
+              .setHeartbeatDetails(utf8("heartbeatDetails"));
   public static final RespondActivityTaskFailedRequest RESPOND_ACTIVITY_TASK_FAILED_REQUEST =
       new RespondActivityTaskFailedRequest()
           .setTaskToken(utf8("taskToken"))
           .setDetails(utf8("details"))
           .setReason("reason")
-          .setIdentity("identity");
+          .setFailureOptions(FAILURE_OPTIONS)
+          .setIdentity("identity")
+          .setHeartbeatDetails(utf8("heartbeatDetails"));
   public static final RespondDecisionTaskCompletedRequest RESPOND_DECISION_TASK_COMPLETED_REQUEST =
       new RespondDecisionTaskCompletedRequest()
           .setDecisions(ImmutableList.of(DECISION_COMPLETE_WORKFLOW_EXECUTION))

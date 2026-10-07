@@ -27,6 +27,7 @@ import com.uber.cadence.StartTimerDecisionAttributes;
 import com.uber.cadence.TimerCanceledEventAttributes;
 import com.uber.cadence.TimerFiredEventAttributes;
 import com.uber.cadence.converter.DataConverter;
+import com.uber.cadence.internal.common.FailureConverter;
 import com.uber.cadence.internal.common.LocalActivityMarkerData;
 import com.uber.cadence.internal.sync.WorkflowInternal;
 import com.uber.cadence.internal.worker.LocalActivityWorker;
@@ -285,9 +286,13 @@ public final class ClockDecisionContext {
       Exception failure = null;
       if (marker.getIsCancelled()) {
         failure = new CancellationException(marker.getErrReason());
-      } else if (marker.getErrJson() != null) {
+      } else if (!Strings.isNullOrEmpty(marker.getErrReason())) {
+        // A failure always has a reason, but its details may be null. For example an
+        // ApplicationException without details.
+        // Failure options aren't recorded for local activities as they are not enforced.
         Throwable cause =
-            dataConverter.fromData(marker.getErrJson(), Throwable.class, Throwable.class);
+            FailureConverter.decode(
+                marker.getErrReason(), marker.getErrJson(), null, dataConverter);
         ActivityType activityType = new ActivityType();
         activityType.setName(marker.getActivityType());
         failure =
