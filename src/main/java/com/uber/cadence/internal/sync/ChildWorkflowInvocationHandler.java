@@ -32,6 +32,7 @@ import com.uber.cadence.workflow.WorkflowInterceptor;
 import com.uber.cadence.workflow.WorkflowMethod;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 /** Dynamic implementation of a strongly typed child workflow interface. */
 class ChildWorkflowInvocationHandler implements InvocationHandler {
@@ -59,22 +60,24 @@ class ChildWorkflowInvocationHandler implements InvocationHandler {
     if (method.getName().equals(WorkflowStubMarker.GET_EXECUTION_METHOD_NAME)) {
       return stub.getExecution();
     }
-    WorkflowMethod workflowMethod = method.getAnnotation(WorkflowMethod.class);
-    QueryMethod queryMethod = method.getAnnotation(QueryMethod.class);
-    SignalMethod signalMethod = method.getAnnotation(SignalMethod.class);
-    WorkflowInvocationHandler.checkAnnotations(method, workflowMethod, queryMethod, signalMethod);
-    if (workflowMethod != null) {
+    Optional<WorkflowMethod> workflowMethod =
+        InternalUtils.getWorkflowAnnotation(method, WorkflowMethod.class);
+    Optional<QueryMethod> queryMethod =
+        InternalUtils.getWorkflowAnnotation(method, QueryMethod.class);
+    Optional<SignalMethod> signalMethod =
+        InternalUtils.getWorkflowAnnotation(method, SignalMethod.class);
+    if (workflowMethod.isPresent()) {
       return getValueOrDefault(
           stub.execute(method.getReturnType(), method.getGenericReturnType(), args),
           method.getReturnType());
     }
-    if (queryMethod != null) {
+    if (queryMethod.isPresent()) {
       throw new UnsupportedOperationException(
           "Query is not supported from workflow to workflow. "
               + "Use activity that perform the query instead.");
     }
-    if (signalMethod != null) {
-      signalWorkflow(method, signalMethod, args);
+    if (signalMethod.isPresent()) {
+      signalWorkflow(method, signalMethod.get(), args);
       return null;
     }
     throw new IllegalArgumentException(

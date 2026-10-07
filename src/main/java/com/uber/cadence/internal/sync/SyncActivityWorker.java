@@ -45,6 +45,11 @@ public class SyncActivityWorker implements SuspendableWorker {
     taskHandler.setActivitiesImplementation(activitiesImplementation);
   }
 
+  /** Sets the activity implementations used by this worker. */
+  public void setRegistry(RegistryInternal registry) {
+    taskHandler.setRegistry(registry);
+  }
+
   @Override
   public void start() {
     worker.start();

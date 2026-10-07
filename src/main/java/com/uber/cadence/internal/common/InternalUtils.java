@@ -30,13 +30,17 @@ import com.uber.cadence.TaskListKind;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.converter.JsonDataConverter;
 import com.uber.cadence.internal.worker.Shutdownable;
+import com.uber.cadence.workflow.QueryMethod;
+import com.uber.cadence.workflow.SignalMethod;
 import com.uber.cadence.workflow.WorkflowMethod;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.apache.thrift.TDeserializer;
@@ -62,6 +66,34 @@ public final class InternalUtils {
     } else {
       return workflowName;
     }
+  }
+
+  /**
+   * Returns the annotation of the given type on a workflow interface method.
+   *
+   * @param annotationType one of {@link WorkflowMethod}, {@link QueryMethod} or {@link
+   *     SignalMethod}
+   * @throws IllegalArgumentException if the method has more than one of these annotations, or if
+   *     annotationType is not one of them
+   */
+  public static <T extends Annotation> Optional<T> getWorkflowAnnotation(
+      Method method, Class<T> annotationType) {
+    if (annotationType != WorkflowMethod.class
+        && annotationType != QueryMethod.class
+        && annotationType != SignalMethod.class) {
+      throw new IllegalArgumentException("Not a workflow method annotation: " + annotationType);
+    }
+    int count =
+        (method.isAnnotationPresent(WorkflowMethod.class) ? 1 : 0)
+            + (method.isAnnotationPresent(QueryMethod.class) ? 1 : 0)
+            + (method.isAnnotationPresent(SignalMethod.class) ? 1 : 0);
+    if (count > 1) {
+      throw new IllegalArgumentException(
+          method
+              + " must contain at most one annotation "
+              + "from @WorkflowMethod, @QueryMethod or @SignalMethod");
+    }
+    return Optional.ofNullable(method.getAnnotation(annotationType));
   }
 
   public static Method getWorkflowMethod(Class<?> workflowInterface) {

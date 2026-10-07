@@ -28,6 +28,7 @@ import com.uber.cadence.workflow.WorkflowInterceptor;
 import com.uber.cadence.workflow.WorkflowMethod;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 /** Dynamic implementation of a strongly typed child workflow interface. */
 class ExternalWorkflowInvocationHandler implements InvocationHandler {
@@ -45,20 +46,23 @@ class ExternalWorkflowInvocationHandler implements InvocationHandler {
     if (method.getName().equals(WorkflowStubMarker.GET_EXECUTION_METHOD_NAME)) {
       return stub.getExecution();
     }
-    WorkflowMethod workflowMethod = method.getAnnotation(WorkflowMethod.class);
-    QueryMethod queryMethod = method.getAnnotation(QueryMethod.class);
-    SignalMethod signalMethod = method.getAnnotation(SignalMethod.class);
-    WorkflowInvocationHandler.checkAnnotations(method, workflowMethod, queryMethod, signalMethod);
-    if (workflowMethod != null) {
+    Optional<WorkflowMethod> workflowMethod =
+        InternalUtils.getWorkflowAnnotation(method, WorkflowMethod.class);
+    Optional<QueryMethod> queryMethod =
+        InternalUtils.getWorkflowAnnotation(method, QueryMethod.class);
+    Optional<SignalMethod> signalMethod =
+        InternalUtils.getWorkflowAnnotation(method, SignalMethod.class);
+    if (workflowMethod.isPresent()) {
       throw new IllegalStateException(
           "Cannot start a workflow with an external workflow stub "
               + "created through Workflow.newExternalWorkflowStub");
     }
-    if (queryMethod != null) {
-      return getValueOrDefault(queryWorkflow(method, queryMethod, args), method.getReturnType());
+    if (queryMethod.isPresent()) {
+      return getValueOrDefault(
+          queryWorkflow(method, queryMethod.get(), args), method.getReturnType());
     }
-    if (signalMethod != null) {
-      signalWorkflow(method, signalMethod, args);
+    if (signalMethod.isPresent()) {
+      signalWorkflow(method, signalMethod.get(), args);
       return null;
     }
     throw new IllegalArgumentException(

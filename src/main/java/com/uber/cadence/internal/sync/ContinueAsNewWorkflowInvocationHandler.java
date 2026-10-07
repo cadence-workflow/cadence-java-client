@@ -21,8 +21,6 @@ import static com.uber.cadence.internal.common.InternalUtils.getValueOrDefault;
 
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.workflow.ContinueAsNewOptions;
-import com.uber.cadence.workflow.QueryMethod;
-import com.uber.cadence.workflow.SignalMethod;
 import com.uber.cadence.workflow.WorkflowInterceptor;
 import com.uber.cadence.workflow.WorkflowMethod;
 import java.lang.reflect.InvocationHandler;
@@ -42,24 +40,13 @@ class ContinueAsNewWorkflowInvocationHandler implements InvocationHandler {
 
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) {
-    WorkflowMethod workflowMethod = method.getAnnotation(WorkflowMethod.class);
-    QueryMethod queryMethod = method.getAnnotation(QueryMethod.class);
-    SignalMethod signalMethod = method.getAnnotation(SignalMethod.class);
-    int count =
-        (workflowMethod == null ? 0 : 1)
-            + (queryMethod == null ? 0 : 1)
-            + (signalMethod == null ? 0 : 1);
-    if (count > 1) {
-      throw new IllegalArgumentException(
-          method
-              + " must contain at most one annotation "
-              + "from @WorkflowMethod, @QueryMethod or @SignalMethod");
-    }
-    if (workflowMethod == null) {
+    Optional<WorkflowMethod> workflowMethod =
+        InternalUtils.getWorkflowAnnotation(method, WorkflowMethod.class);
+    if (!workflowMethod.isPresent()) {
       throw new IllegalStateException(
           "ContinueAsNew Stub supports only calls to methods annotated with @WorkflowMethod");
     }
-    String workflowType = InternalUtils.getWorkflowType(method, workflowMethod);
+    String workflowType = InternalUtils.getWorkflowType(method, workflowMethod.get());
     WorkflowInternal.continueAsNew(
         Optional.of(workflowType), Optional.of(options), args, decisionContext);
     return getValueOrDefault(null, method.getReturnType());
