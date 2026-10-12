@@ -57,6 +57,8 @@ public final class WorkerOptions {
     private Duration stickyTaskListScheduleToStartTimeout;
     // by default NoopTracer
     private Tracer tracer = NoopTracerFactory.create();
+    private String identity;
+    private String uniqueIdentity;
 
     private Builder() {}
 
@@ -72,6 +74,8 @@ public final class WorkerOptions {
       this.interceptorFactory = options.interceptorFactory;
       this.stickyTaskListScheduleToStartTimeout = options.stickyTaskListScheduleToStartTimeout;
       this.tracer = options.tracer;
+      this.identity = options.identity;
+      this.uniqueIdentity = options.uniqueIdentity;
     }
 
     /** Maximum number of activities started per second. Default is 0 which means unlimited. */
@@ -166,6 +170,25 @@ public final class WorkerOptions {
       return this;
     }
 
+    /**
+     * Optional: Overrides the identity this worker uses when polling and responding to the Cadence
+     * service. Defaults to the client's identity.
+     */
+    public Builder setIdentity(String identity) {
+      this.identity = identity;
+      return this;
+    }
+
+    /**
+     * Optional: Sets a unique identity for this worker, used verbatim as its sticky tasklist name.
+     * Must be unique per worker instance, or sticky decision tasks can be routed to the wrong
+     * worker. Default is the resolved identity plus a random UUID.
+     */
+    public Builder setUniqueIdentity(String uniqueIdentity) {
+      this.uniqueIdentity = uniqueIdentity;
+      return this;
+    }
+
     public WorkerOptions build() {
       return new WorkerOptions(
           workerActivitiesPerSecond,
@@ -177,7 +200,9 @@ public final class WorkerOptions {
           workflowPollerOptions,
           interceptorFactory,
           tracer,
-          stickyTaskListScheduleToStartTimeout);
+          stickyTaskListScheduleToStartTimeout,
+          identity,
+          uniqueIdentity);
     }
   }
 
@@ -191,6 +216,8 @@ public final class WorkerOptions {
   private final Function<WorkflowInterceptor, WorkflowInterceptor> interceptorFactory;
   private final Tracer tracer;
   private final Duration stickyTaskListScheduleToStartTimeout;
+  private final String identity;
+  private final String uniqueIdentity;
 
   private WorkerOptions(
       double workerActivitiesPerSecond,
@@ -202,7 +229,9 @@ public final class WorkerOptions {
       PollerOptions workflowPollerOptions,
       Function<WorkflowInterceptor, WorkflowInterceptor> interceptorFactory,
       Tracer tracer,
-      Duration stickyTaskListScheduleToStartTimeout) {
+      Duration stickyTaskListScheduleToStartTimeout,
+      String identity,
+      String uniqueIdentity) {
     this.workerActivitiesPerSecond = workerActivitiesPerSecond;
     this.maxConcurrentActivityExecutionSize = maxConcurrentActivityExecutionSize;
     this.maxConcurrentWorkflowExecutionSize = maxConcurrentWorkflowExecutionSize;
@@ -213,6 +242,8 @@ public final class WorkerOptions {
     this.interceptorFactory = interceptorFactory;
     this.tracer = tracer;
     this.stickyTaskListScheduleToStartTimeout = stickyTaskListScheduleToStartTimeout;
+    this.identity = identity;
+    this.uniqueIdentity = uniqueIdentity;
   }
 
   public double getWorkerActivitiesPerSecond() {
@@ -255,6 +286,14 @@ public final class WorkerOptions {
     return stickyTaskListScheduleToStartTimeout;
   }
 
+  public String getIdentity() {
+    return identity;
+  }
+
+  public String getUniqueIdentity() {
+    return uniqueIdentity;
+  }
+
   @Override
   public String toString() {
     return "WorkerOptions{"
@@ -274,6 +313,10 @@ public final class WorkerOptions {
         + workflowPollerOptions
         + ", stickyTaskListScheduleToStartTimeout="
         + stickyTaskListScheduleToStartTimeout
+        + ", identity="
+        + identity
+        + ", uniqueIdentity="
+        + uniqueIdentity
         + '}';
   }
 }
