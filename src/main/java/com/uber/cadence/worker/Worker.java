@@ -71,6 +71,7 @@ public final class Worker implements Suspendable {
    * @param threadPoolExecutor Thread pool executor to use for workflow and activity tasks.
    * @param contextPropagators Context propagators to use for workflow and activity tasks.
    */
+  @SuppressWarnings("deprecation")
   Worker(
       WorkflowClient client,
       String taskList,
