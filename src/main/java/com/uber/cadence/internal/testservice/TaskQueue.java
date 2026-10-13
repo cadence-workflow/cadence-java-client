@@ -48,7 +48,7 @@ class TaskQueue<E> {
         return;
       }
     }
-    backlog.push(element);
+    backlog.addLast(element);
   }
 
   /**
@@ -63,7 +63,7 @@ class TaskQueue<E> {
     E element;
     synchronized (this) {
       if (backlog.isEmpty()) {
-        waiters.push(future);
+        waiters.addLast(future);
         return future;
       }
       element = backlog.pop();

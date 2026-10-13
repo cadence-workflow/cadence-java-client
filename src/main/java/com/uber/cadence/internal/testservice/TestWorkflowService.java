@@ -424,12 +424,25 @@ public final class TestWorkflowService implements IWorkflowService {
       task = future.get(60, java.util.concurrent.TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      future.cancel(true); // Cancel the Future to remove it from waiters queue
-      return new PollForDecisionTaskResponse();
+      if (!future.cancel(true)) {
+        try {
+          task = future.get();
+        } catch (InterruptedException | java.util.concurrent.ExecutionException ex) {
+          return new PollForDecisionTaskResponse();
+        }
+      } else {
+        return new PollForDecisionTaskResponse();
+      }
     } catch (java.util.concurrent.TimeoutException e) {
-      // Poll timed out - cancel to remove from waiters queue
-      future.cancel(true);
-      return new PollForDecisionTaskResponse();
+      if (!future.cancel(true)) {
+        try {
+          task = future.get();
+        } catch (InterruptedException | java.util.concurrent.ExecutionException ex) {
+          return new PollForDecisionTaskResponse();
+        }
+      } else {
+        return new PollForDecisionTaskResponse();
+      }
     } catch (java.util.concurrent.CancellationException e) {
       // Poll was cancelled - return empty response
       return new PollForDecisionTaskResponse();
@@ -490,12 +503,25 @@ public final class TestWorkflowService implements IWorkflowService {
         task = future.get(60, java.util.concurrent.TimeUnit.SECONDS);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
-        future.cancel(true); // Cancel the Future to remove it from waiters queue
-        return new PollForActivityTaskResponse();
+        if (!future.cancel(true)) {
+          try {
+            task = future.get();
+          } catch (InterruptedException | java.util.concurrent.ExecutionException ex) {
+            return new PollForActivityTaskResponse();
+          }
+        } else {
+          return new PollForActivityTaskResponse();
+        }
       } catch (java.util.concurrent.TimeoutException e) {
-        // Poll timed out - cancel to remove from waiters queue
-        future.cancel(true);
-        return new PollForActivityTaskResponse();
+        if (!future.cancel(true)) {
+          try {
+            task = future.get();
+          } catch (InterruptedException | java.util.concurrent.ExecutionException ex) {
+            return new PollForActivityTaskResponse();
+          }
+        } else {
+          return new PollForActivityTaskResponse();
+        }
       } catch (java.util.concurrent.CancellationException e) {
         // Poll was cancelled - return empty response
         return new PollForActivityTaskResponse();

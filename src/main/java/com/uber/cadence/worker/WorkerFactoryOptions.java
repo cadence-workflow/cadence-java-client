@@ -18,6 +18,7 @@
 package com.uber.cadence.worker;
 
 import com.google.common.base.Preconditions;
+import java.time.Duration;
 
 public class WorkerFactoryOptions {
   public static Builder newBuilder() {
@@ -27,6 +28,9 @@ public class WorkerFactoryOptions {
   private static final WorkerFactoryOptions DEFAULT_INSTANCE;
   private static final int DEFAULT_STICKY_CACHE_SIZE = 600;
   private static final int DEFAULT_MAX_WORKFLOW_THREAD_COUNT = 600;
+  private static final int DEFAULT_STICKY_POLLER_COUNT = 5;
+  private static final Duration DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT =
+      Duration.ofSeconds(5);
 
   static {
     DEFAULT_INSTANCE = new Builder().build();
@@ -42,6 +46,9 @@ public class WorkerFactoryOptions {
     private int maxWorkflowThreadCount = DEFAULT_MAX_WORKFLOW_THREAD_COUNT;
     private boolean enableLoggingInReplay;
     private ExecutorWrapper executorWrapper = ExecutorWrapper.newDefaultInstance();
+    private Duration stickyTaskScheduleToStartTimeout =
+        DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT;
+    private int stickyPollerCount = DEFAULT_STICKY_POLLER_COUNT;
 
     private Builder() {}
 
@@ -87,13 +94,37 @@ public class WorkerFactoryOptions {
       return this;
     }
 
+    /**
+     * @deprecated sticky decision polling is now done per worker instead of per factory. Set
+     *     {@link WorkerOptions.Builder#setStickyTaskListScheduleToStartTimeout(Duration)} on the
+     *     individual worker instead. This factory-level value is still used as the fallback
+     *     default for any worker that does not set its own timeout.
+     */
+    @Deprecated
+    public Builder setStickyTaskScheduleToStartTimeout(Duration stickyTaskScheduleToStartTimeout) {
+      this.stickyTaskScheduleToStartTimeout = stickyTaskScheduleToStartTimeout;
+      return this;
+    }
+
+    /**
+     * @deprecated sticky decision polling is now done per worker instead of through a shared
+     *     factory-level poller. This method has no effect.
+     */
+    @Deprecated
+    public Builder setStickyPollerCount(int stickyPollerCount) {
+      this.stickyPollerCount = stickyPollerCount;
+      return this;
+    }
+
     public WorkerFactoryOptions build() {
       return new WorkerFactoryOptions(
           disableStickyExecution,
           stickyCacheSize,
           maxWorkflowThreadCount,
           enableLoggingInReplay,
-          executorWrapper);
+          executorWrapper,
+          stickyTaskScheduleToStartTimeout,
+          stickyPollerCount);
     }
   }
 
@@ -101,15 +132,18 @@ public class WorkerFactoryOptions {
   private final int cacheMaximumSize;
   private final int maxWorkflowThreadCount;
   private boolean enableLoggingInReplay;
-  private int stickyPollerCount;
   private ExecutorWrapper executorWrapper;
+  private final Duration stickyTaskScheduleToStartTimeout;
+  private final int stickyPollerCount;
 
   private WorkerFactoryOptions(
       boolean disableStickyExecution,
       int cacheMaximumSize,
       int maxWorkflowThreadCount,
       boolean enableLoggingInReplay,
-      ExecutorWrapper executorWrapper) {
+      ExecutorWrapper executorWrapper,
+      Duration stickyTaskScheduleToStartTimeout,
+      int stickyPollerCount) {
     Preconditions.checkArgument(cacheMaximumSize > 0, "cacheMaximumSize should be greater than 0");
     Preconditions.checkArgument(
         maxWorkflowThreadCount > 0, "maxWorkflowThreadCount should be greater than 0");
@@ -119,6 +153,8 @@ public class WorkerFactoryOptions {
     this.maxWorkflowThreadCount = maxWorkflowThreadCount;
     this.enableLoggingInReplay = enableLoggingInReplay;
     this.executorWrapper = executorWrapper;
+    this.stickyTaskScheduleToStartTimeout = stickyTaskScheduleToStartTimeout;
+    this.stickyPollerCount = stickyPollerCount;
   }
 
   public int getMaxWorkflowThreadCount() {
@@ -139,5 +175,25 @@ public class WorkerFactoryOptions {
 
   public ExecutorWrapper getExecutorWrapper() {
     return executorWrapper;
+  }
+
+  /**
+   * @deprecated sticky decision polling is now done per worker instead of per factory. Use {@link
+   *     WorkerOptions#getStickyTaskListScheduleToStartTimeout()} on the individual worker instead.
+   *     This factory-level value is still used as the fallback default for any worker that does
+   *     not set its own timeout.
+   */
+  @Deprecated
+  public Duration getStickyTaskScheduleToStartTimeout() {
+    return stickyTaskScheduleToStartTimeout;
+  }
+
+  /**
+   * @deprecated sticky decision polling is now done per worker instead of through a shared
+   *     factory-level poller. This value is no longer used.
+   */
+  @Deprecated
+  public int getStickyPollerCount() {
+    return stickyPollerCount;
   }
 }

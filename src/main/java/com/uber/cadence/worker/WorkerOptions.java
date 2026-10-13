@@ -56,8 +56,7 @@ public final class WorkerOptions {
     private PollerOptions activityPollerOptions;
     private PollerOptions workflowPollerOptions;
     private Function<WorkflowInterceptor, WorkflowInterceptor> interceptorFactory = (n) -> n;
-    private Duration stickyTaskListScheduleToStartTimeout =
-        DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT;
+    private Duration stickyTaskListScheduleToStartTimeout;
     // by default NoopTracer
     private Tracer tracer = NoopTracerFactory.create();
 
@@ -159,7 +158,9 @@ public final class WorkerOptions {
 
     /**
      * Timeout for sticky decision task to be picked up by the host assigned to it. Once it times
-     * out then it can be picked up by any worker. Default value is 5 seconds.
+     * out then it can be picked up by any worker. If not set, falls back to {@link
+     * WorkerFactoryOptions#getStickyTaskScheduleToStartTimeout()}, which itself defaults to 5
+     * seconds.
      */
     public Builder setStickyTaskListScheduleToStartTimeout(
         Duration stickyTaskListScheduleToStartTimeout) {

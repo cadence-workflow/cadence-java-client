@@ -126,7 +126,9 @@ public final class Worker implements Suspendable {
             .setTracer(options.getTracer())
             .setExecutorWrapper(factoryOptions.getExecutorWrapper())
             .setStickyTaskListScheduleToStartTimeout(
-                options.getStickyTaskListScheduleToStartTimeout())
+                options.getStickyTaskListScheduleToStartTimeout() != null
+                    ? options.getStickyTaskListScheduleToStartTimeout()
+                    : factoryOptions.getStickyTaskScheduleToStartTimeout())
             .build();
     SingleWorkerOptions localActivityOptions =
         SingleWorkerOptions.newBuilder()
