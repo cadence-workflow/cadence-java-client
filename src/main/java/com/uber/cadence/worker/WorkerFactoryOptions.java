@@ -95,10 +95,10 @@ public class WorkerFactoryOptions {
     }
 
     /**
-     * @deprecated sticky decision polling is now done per worker instead of per factory. Set
-     *     {@link WorkerOptions.Builder#setStickyTaskListScheduleToStartTimeout(Duration)} on the
-     *     individual worker instead. This factory-level value is still used as the fallback
-     *     default for any worker that does not set its own timeout.
+     * @deprecated sticky decision polling is now done per worker instead of per factory. Set {@link
+     *     WorkerOptions.Builder#setStickyTaskListScheduleToStartTimeout(Duration)} on the
+     *     individual worker instead. This factory-level value is still used as the fallback default
+     *     for any worker that does not set its own timeout.
      */
     @Deprecated
     public Builder setStickyTaskScheduleToStartTimeout(Duration stickyTaskScheduleToStartTimeout) {
@@ -180,8 +180,8 @@ public class WorkerFactoryOptions {
   /**
    * @deprecated sticky decision polling is now done per worker instead of per factory. Use {@link
    *     WorkerOptions#getStickyTaskListScheduleToStartTimeout()} on the individual worker instead.
-   *     This factory-level value is still used as the fallback default for any worker that does
-   *     not set its own timeout.
+   *     This factory-level value is still used as the fallback default for any worker that does not
+   *     set its own timeout.
    */
   @Deprecated
   public Duration getStickyTaskScheduleToStartTimeout() {
