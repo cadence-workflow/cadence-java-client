@@ -47,11 +47,11 @@ jobs:
 
       - name: Publish to Sonatype OSSRH (Maven Central)
         env:
-          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
-          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-          OSSATUBER_PASSWORD: ${{ secrets.OSSATUBER_PASSWORD }}
-          OSSATUBER_USERNAME: ${{ secrets.OSSATUBER_USERNAME }}
+          SIGNING_KEY_ID: ${{ secrets.PGP_PRIVATE_KEY_ID }}
+          SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY_PRIVATE_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.PGP_SIGNING_KEY_PASSWORD }}
+          OSSATUBER_PASSWORD: ${{ secrets.MAVEN_CENTRAL_USER_TOKEN_PASSWORD }}
+          OSSATUBER_USERNAME: ${{ secrets.MAVEN_CENTRAL_USER_TOKEN_USERNAME }}
         run: | # TODO old way of setting the properties from environment variables in gradle
           ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --info \
            -Psigning.keyId="${SIGNING_KEY_ID}" \
