@@ -94,7 +94,9 @@ public final class Worker implements Suspendable {
     this.options = options;
 
     String identity =
-        options.getIdentity() != null ? options.getIdentity() : client.getOptions().getIdentity();
+        !Strings.isNullOrEmpty(options.getIdentity())
+            ? options.getIdentity()
+            : client.getOptions().getIdentity();
 
     Scope metricsScope =
         client
