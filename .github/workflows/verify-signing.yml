@@ -4,6 +4,12 @@ name: Verify GPG signing
 # Confirms Gradle 6.0 in-memory failures vs gpg CLI success for Ed25519 keys.
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'fix/v3.13.x-gpg-cmd-signing'
+    paths:
+      - '.github/workflows/verify-signing.yml'
+      - 'build.gradle'
 
 jobs:
   in-memory-long-key-id:
