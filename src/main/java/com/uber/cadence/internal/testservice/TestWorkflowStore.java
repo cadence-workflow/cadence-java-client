@@ -31,6 +31,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Future;
 
 interface TestWorkflowStore {
 
@@ -144,11 +145,9 @@ interface TestWorkflowStore {
 
   void registerDelayedCallback(Duration delay, Runnable r);
 
-  PollForDecisionTaskResponse pollForDecisionTask(PollForDecisionTaskRequest pollRequest)
-      throws InterruptedException;
+  Future<PollForDecisionTaskResponse> pollForDecisionTask(PollForDecisionTaskRequest pollRequest);
 
-  PollForActivityTaskResponse pollForActivityTask(PollForActivityTaskRequest pollRequest)
-      throws InterruptedException;
+  Future<PollForActivityTaskResponse> pollForActivityTask(PollForActivityTaskRequest pollRequest);
 
   /** @return queryId */
   void sendQueryTask(ExecutionId executionId, TaskListId taskList, PollForDecisionTaskResponse task)

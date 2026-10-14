@@ -168,6 +168,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
   private final Map<String, WorkflowQuery> pendingQueries = new ConcurrentHashMap<>();
   private final Optional<String> continuedExecutionRunId;
   public StickyExecutionAttributes stickyExecutionAttributes;
+  private StickyExecutionAttributes previousStickyExecutionAttributes;
 
   /**
    * @param retryState present if workflow is a retry
@@ -218,11 +219,20 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
       throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
           BadRequestError {
     StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-    stickyExecutionAttributes = attributes;
-    update(true, updater, stackTraceElements[2].getMethodName());
+    update(true, updater, stackTraceElements[2].getMethodName(), attributes);
   }
 
   private void update(boolean completeDecisionUpdate, UpdateProcedure updater, String caller)
+      throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
+          BadRequestError {
+    update(completeDecisionUpdate, updater, caller, null);
+  }
+
+  private void update(
+      boolean completeDecisionUpdate,
+      UpdateProcedure updater,
+      String caller,
+      StickyExecutionAttributes attributes)
       throws InternalServiceError, EntityNotExistsError, WorkflowExecutionAlreadyCompletedError,
           BadRequestError {
     String callerInfo = "Decision Update from " + caller;
@@ -230,6 +240,10 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
     LockHandle lockHandle = selfAdvancingTimer.lockTimeSkipping(callerInfo);
 
     try {
+      if (completeDecisionUpdate) {
+        previousStickyExecutionAttributes = stickyExecutionAttributes;
+        stickyExecutionAttributes = attributes;
+      }
       checkCompleted();
       boolean concurrentDecision =
           !completeDecisionUpdate
@@ -686,6 +700,7 @@ class TestWorkflowMutableStateImpl implements TestWorkflowMutableState {
                 || decision.getData().scheduledEventId != scheduledEventId
                 || decision.getState() == State.COMPLETED) {
               // timeout for a previous decision
+              this.stickyExecutionAttributes = previousStickyExecutionAttributes;
               return;
             }
             decision.action(StateMachines.Action.TIME_OUT, ctx, TimeoutType.START_TO_CLOSE, 0);

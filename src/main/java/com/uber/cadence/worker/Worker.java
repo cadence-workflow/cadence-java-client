@@ -23,7 +23,6 @@ import com.google.common.base.Preconditions;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.common.WorkflowExecutionHistory;
 import com.uber.cadence.context.ContextPropagator;
-import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.replay.DeciderCache;
@@ -37,9 +36,9 @@ import com.uber.cadence.workflow.WorkflowMethod;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.util.ImmutableMap;
 import io.opentracing.noop.NoopTracer;
-import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -65,16 +64,21 @@ public final class Worker implements Suspendable {
    * @param client client to the Cadence Service endpoint.
    * @param taskList task list name worker uses to poll. It uses this name for both decision and
    *     activity task list polls.
-   * @param options Options (like {@link DataConverter} override) for configuring worker.
+   * @param factoryOptions Options for configuring worker factory.
+   * @param options Options for configuring worker.
+   * @param cache Decider cache to use for sticky execution.
+   * @param enableStickyExecution Whether to enable sticky execution.
+   * @param threadPoolExecutor Thread pool executor to use for workflow and activity tasks.
+   * @param contextPropagators Context propagators to use for workflow and activity tasks.
    */
+  @SuppressWarnings("deprecation")
   Worker(
       WorkflowClient client,
       String taskList,
       WorkerFactoryOptions factoryOptions,
       WorkerOptions options,
       DeciderCache cache,
-      String stickyTaskListName,
-      Duration stickyDecisionScheduleToStartTimeout,
+      boolean enableStickyExecution,
       ThreadPoolExecutor threadPoolExecutor,
       List<ContextPropagator> contextPropagators) {
     this.taskList = Objects.requireNonNull(taskList);
@@ -122,6 +126,10 @@ public final class Worker implements Suspendable {
             .setContextPropagators(contextPropagators)
             .setTracer(options.getTracer())
             .setExecutorWrapper(factoryOptions.getExecutorWrapper())
+            .setStickyTaskListScheduleToStartTimeout(
+                options.getStickyTaskListScheduleToStartTimeout() != null
+                    ? options.getStickyTaskListScheduleToStartTimeout()
+                    : factoryOptions.getStickyTaskScheduleToStartTimeout())
             .build();
     SingleWorkerOptions localActivityOptions =
         SingleWorkerOptions.newBuilder()
@@ -145,11 +153,17 @@ public final class Worker implements Suspendable {
             localActivityOptions,
             activityOptions,
             cache,
-            stickyTaskListName,
-            stickyDecisionScheduleToStartTimeout,
+            enableStickyExecution ? getStickyTaskListName(client.getOptions().getIdentity()) : null,
             threadPoolExecutor);
 
     applyRegistry(RegistryInternal.EMPTY);
+  }
+
+  private static String getStickyTaskListName(String workerIdentity) {
+    // Unique id is needed to avoid collisions with other workers that may be created for the same
+    // task list and with the same identity.
+    UUID uniqueId = UUID.randomUUID();
+    return String.format("%s:%s", workerIdentity, uniqueId);
   }
 
   SyncWorkflowWorker getWorkflowWorker() {

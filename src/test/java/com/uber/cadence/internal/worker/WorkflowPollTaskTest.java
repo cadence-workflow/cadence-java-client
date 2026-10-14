@@ -30,6 +30,7 @@ import com.uber.m3.tally.Histogram;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.tally.Stopwatch;
 import com.uber.m3.util.Duration;
+import java.util.concurrent.Semaphore;
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,11 +40,13 @@ public class WorkflowPollTaskTest {
   private IWorkflowService mockService;
   private Scope mockMetricScope;
   private WorkflowPollTask pollTask;
+  private Semaphore semaphore;
 
   @Before
   public void setup() {
     mockService = mock(IWorkflowService.class);
     mockMetricScope = mock(Scope.class);
+    semaphore = new Semaphore(100);
 
     // Mock the Histogram for poll latency (histogram-only by default)
     Histogram pollLatencyHistogram = mock(Histogram.class);
@@ -73,15 +76,20 @@ public class WorkflowPollTaskTest {
     when(mockMetricScope.counter(MetricsType.DECISION_POLL_SUCCEED_COUNTER))
         .thenReturn(succeedCounter);
 
+    // Create a sticky queue balancer (disabled for test)
+    StickyQueueBalancer stickyQueueBalancer = new StickyQueueBalancer(1, false);
+
     // Initialize pollTask with the mocked dependencies
     pollTask =
         new WorkflowPollTask(
             mockService,
             "test-domain",
             "test-taskList",
-            TaskListKind.NORMAL,
+            "test-taskList-sticky",
             mockMetricScope,
-            "test-identity");
+            "test-identity",
+            semaphore,
+            stickyQueueBalancer);
   }
 
   @Test
@@ -126,11 +134,11 @@ public class WorkflowPollTaskTest {
     when(mockMetricScope.counter(MetricsType.DECISION_POLL_COUNTER)).thenReturn(pollCounter);
     when(taggedScope.counter(MetricsType.DECISION_POLL_SUCCEED_COUNTER)).thenReturn(succeedCounter);
 
-    PollForDecisionTaskResponse result = pollTask.poll();
+    DecisionTask result = pollTask.poll();
 
     // Verify that the result is not null and task token is as expected
     assertNotNull(result);
-    assertArrayEquals("testToken".getBytes(), result.getTaskToken());
+    assertArrayEquals("testToken".getBytes(), result.getResponse().getTaskToken());
 
     // Verify counter and histogram behavior (histogram-only by default)
     verify(pollCounter, times(1)).inc(1);
@@ -143,6 +151,11 @@ public class WorkflowPollTaskTest {
     Duration expectedDuration =
         Duration.ofNanos(response.getStartedTimestamp() - response.getScheduledTimestamp());
     verify(scheduledToStartLatencyHistogram, times(1)).recordDuration(eq(expectedDuration));
+
+    // Verify the completion callback releases the semaphore
+    int permitsBeforeCallback = semaphore.availablePermits();
+    result.getCompletionCallback().apply();
+    assertEquals(permitsBeforeCallback + 1, semaphore.availablePermits());
   }
 
   @Test(expected = InternalServiceError.class)
@@ -208,7 +221,7 @@ public class WorkflowPollTaskTest {
     when(mockMetricScope.counter(MetricsType.DECISION_POLL_NO_TASK_COUNTER))
         .thenReturn(noTaskCounter);
 
-    PollForDecisionTaskResponse result = pollTask.poll();
+    DecisionTask result = pollTask.poll();
 
     assertNull(result);
     verify(noTaskCounter, times(1)).inc(1);
