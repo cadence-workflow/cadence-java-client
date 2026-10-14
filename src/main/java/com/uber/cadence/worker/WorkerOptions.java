@@ -40,8 +40,6 @@ public final class WorkerOptions {
 
   private static final WorkerOptions DEFAULT_INSTANCE;
 
-  static final Duration DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT = Duration.ofSeconds(5);
-
   static {
     DEFAULT_INSTANCE = WorkerOptions.newBuilder().build();
   }
@@ -164,9 +162,6 @@ public final class WorkerOptions {
      */
     public Builder setStickyTaskListScheduleToStartTimeout(
         Duration stickyTaskListScheduleToStartTimeout) {
-      if (stickyTaskListScheduleToStartTimeout == null) {
-        stickyTaskListScheduleToStartTimeout = DEFAULT_STICKY_TASK_SCHEDULE_TO_START_TIMEOUT;
-      }
       this.stickyTaskListScheduleToStartTimeout = stickyTaskListScheduleToStartTimeout;
       return this;
     }
