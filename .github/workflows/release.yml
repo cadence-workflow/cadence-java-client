@@ -45,17 +45,31 @@ jobs:
         run: |
           ./gradlew -q printVersion
 
+      # Sign via the runner's gpg (useGpgCmd). Gradle 6.0 in-memory signing cannot
+      # read Ed25519 keys and only accepts 8-character short key IDs.
+      - name: Import GPG signing key
+        env:
+          SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          printf 'allow-loopback-pinentry\n' >> ~/.gnupg/gpg-agent.conf
+          printf 'pinentry-mode loopback\n' >> ~/.gnupg/gpg.conf
+          gpgconf --kill gpg-agent || true
+          # Accept both real multi-line armor and single-line literal \n form.
+          printf '%b\n' "$SIGNING_KEY" | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+
       - name: Publish to Sonatype OSSRH (Maven Central)
         env:
           SIGNING_KEY_ID: ${{ secrets.PGP_PRIVATE_KEY_ID }}
-          SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY_PRIVATE_KEY }}
           SIGNING_PASSWORD: ${{ secrets.PGP_SIGNING_KEY_PASSWORD }}
           OSSATUBER_PASSWORD: ${{ secrets.MAVEN_CENTRAL_USER_TOKEN_PASSWORD }}
           OSSATUBER_USERNAME: ${{ secrets.MAVEN_CENTRAL_USER_TOKEN_USERNAME }}
-        run: | # TODO old way of setting the properties from environment variables in gradle
+        run: |
           ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --info \
-           -Psigning.keyId="${SIGNING_KEY_ID}" \
-            -Psigning.password="${SIGNING_PASSWORD}" \
-            -Psigning.key="${SIGNING_KEY}" \
+            -Psigning.gnupg.executable=gpg \
+            -Psigning.gnupg.keyName="${SIGNING_KEY_ID}" \
+            -Psigning.gnupg.passphrase="${SIGNING_PASSWORD}" \
             -PossrhPassword="${OSSATUBER_PASSWORD}" \
             -PossrhUsername="${OSSATUBER_USERNAME}"

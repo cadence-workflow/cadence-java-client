@@ -1,0 +1,113 @@
+name: Verify GPG signing
+
+# Dry-run signing against org test secrets (no Maven Central publish).
+# Confirms Gradle 6.0 in-memory failures vs gpg CLI success for Ed25519 keys.
+on:
+  workflow_dispatch:
+
+jobs:
+  in-memory-long-key-id:
+    name: in-memory + 16-char key ID (expect fail)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'gradle'
+      - name: Sign with in-memory PGP (long key ID)
+        id: sign
+        continue-on-error: true
+        env:
+          SIGNING_KEY_ID: ${{ secrets.PGP_PRIVATE_KEY_ID }}
+          SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY_PRIVATE_KEY_ESCAPED }}
+          SIGNING_PASSWORD: ${{ secrets.PGP_SIGNING_KEY_PASSWORD }}
+        run: |
+          set +e
+          ./gradlew signSigningSmokeTest --stacktrace \
+            -Psigning.keyId="${SIGNING_KEY_ID}" \
+            -Psigning.password="${SIGNING_PASSWORD}" \
+            -Psigning.key="${SIGNING_KEY}" > /tmp/sign.log 2>&1
+          status=$?
+          cat /tmp/sign.log
+          if grep -qi 'Could not read PGP secret key' /tmp/sign.log; then
+            echo "Saw expected generic PGP read failure for 16-char key ID."
+            exit 0
+          fi
+          echo "Did not see expected 'Could not read PGP secret key' message (exit=$status)."
+          exit 1
+      - name: Require expected failure
+        if: steps.sign.outcome != 'success'
+        run: exit 1
+
+  in-memory-short-key-id:
+    name: in-memory + 8-char key ID (expect algorithm fail)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'gradle'
+      - name: Sign with in-memory PGP (short key ID)
+        id: sign
+        continue-on-error: true
+        env:
+          SIGNING_KEY_ID: ${{ secrets.PGP_PRIVATE_KEY_ID_SHORT }}
+          SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY_PRIVATE_KEY_ESCAPED }}
+          SIGNING_PASSWORD: ${{ secrets.PGP_SIGNING_KEY_PASSWORD }}
+        run: |
+          set +e
+          ./gradlew signSigningSmokeTest --stacktrace \
+            -Psigning.keyId="${SIGNING_KEY_ID}" \
+            -Psigning.password="${SIGNING_PASSWORD}" \
+            -Psigning.key="${SIGNING_KEY}" > /tmp/sign.log 2>&1
+          status=$?
+          cat /tmp/sign.log
+          # Short ID should get past length checks; BC 1.63 then fails on Ed25519.
+          # Gradle 6.0 often still wraps this as the generic read error.
+          if grep -Eqi 'unknown public key algorithm|EdDSA|Ed25519|Could not read PGP secret key' /tmp/sign.log; then
+            echo "Saw expected in-memory failure after short key ID (exit=$status):"
+            grep -Ei 'unknown public key algorithm|EdDSA|Ed25519|Could not read PGP secret key|Caused by' /tmp/sign.log | head -40
+            exit 0
+          fi
+          echo "Unexpected log output (exit=$status)."
+          exit 1
+      - name: Require expected failure
+        if: steps.sign.outcome != 'success'
+        run: exit 1
+
+  gpg-cmd:
+    name: useGpgCmd (expect success)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'gradle'
+      - name: Import GPG signing key (escaped form)
+        env:
+          SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY_PRIVATE_KEY_ESCAPED }}
+        run: |
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          printf 'allow-loopback-pinentry\n' >> ~/.gnupg/gpg-agent.conf
+          printf 'pinentry-mode loopback\n' >> ~/.gnupg/gpg.conf
+          gpgconf --kill gpg-agent || true
+          printf '%b\n' "$SIGNING_KEY" | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+      - name: Sign with useGpgCmd
+        env:
+          SIGNING_KEY_ID: ${{ secrets.PGP_PRIVATE_KEY_ID_SHORT }}
+          SIGNING_PASSWORD: ${{ secrets.PGP_SIGNING_KEY_PASSWORD }}
+        run: |
+          ./gradlew signSigningSmokeTest --info --stacktrace \
+            -Psigning.gnupg.executable=gpg \
+            -Psigning.gnupg.keyName="${SIGNING_KEY_ID}" \
+            -Psigning.gnupg.passphrase="${SIGNING_PASSWORD}"
+          find build -name '*.asc' | tee /tmp/asc-files.txt
+          test -s /tmp/asc-files.txt

@@ -21,6 +21,7 @@ ext {
     signingKeyId = findProperty('signing.keyId')
     signingKey = findProperty('signing.key')
     signingPassword = findProperty('signing.password')
+    signingGnupgKeyName = findProperty('signing.gnupg.keyName')
 }
 
 repositories {
@@ -318,23 +319,38 @@ nexusPublishing {
     }
 }
 
-if (signingKeyId) {
+// Prefer signing.gnupg.* + useGpgCmd() for CI. Gradle 6.0's in-memory PGP
+// (BouncyCastle 1.63) only accepts 8-char key IDs and cannot read Ed25519 keys.
+if (signingGnupgKeyName || signingKeyId) {
     apply plugin: 'signing'
-    if (signingKey) { // for CI
-        signing {
+    signing {
+        if (signingGnupgKeyName) {
+            useGpgCmd()
+        } else if (signingKey) {
             useInMemoryPgpKeys(
                 signingKeyId,
                 signingKey.replace('\\n','\n'),
                 signingPassword
             )
-            sign configurations.archives
-            sign publishing.publications.mavenJava
         }
-    } else {
-        signing {
-            sign configurations.archives
-            sign publishing.publications.mavenJava
+        sign configurations.archives
+        sign publishing.publications.mavenJava
+    }
+
+    // Lightweight signing check that does not require thrift/proto compilation.
+    task prepareSigningSmokeTest {
+        def smokeFile = file("$buildDir/signing-smoke.txt")
+        outputs.file smokeFile
+        doLast {
+            smokeFile.parentFile.mkdirs()
+            smokeFile.text = "cadence-java-client signing smoke test\n"
         }
+    }
+
+    task signSigningSmokeTest(type: Sign) {
+        description = 'Signs a tiny file to verify signing config without a full build'
+        dependsOn prepareSigningSmokeTest
+        sign prepareSigningSmokeTest.outputs.files.singleFile
     }
 }
 
