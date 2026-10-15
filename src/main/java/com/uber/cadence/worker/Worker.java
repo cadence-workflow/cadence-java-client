@@ -20,6 +20,7 @@ package com.uber.cadence.worker;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.common.WorkflowExecutionHistory;
 import com.uber.cadence.context.ContextPropagator;
@@ -92,6 +93,11 @@ public final class Worker implements Suspendable {
     }
     this.options = options;
 
+    String identity =
+        !Strings.isNullOrEmpty(options.getIdentity())
+            ? options.getIdentity()
+            : client.getOptions().getIdentity();
+
     Scope metricsScope =
         client
             .getOptions()
@@ -100,7 +106,7 @@ public final class Worker implements Suspendable {
 
     SingleWorkerOptions activityOptions =
         SingleWorkerOptions.newBuilder()
-            .setIdentity(client.getOptions().getIdentity())
+            .setIdentity(identity)
             .setDataConverter(client.getOptions().getDataConverter())
             .setTaskExecutorThreadPoolSize(options.getMaxConcurrentActivityExecutionSize())
             .setTaskListActivitiesPerSecond(options.getTaskListActivitiesPerSecond())
@@ -118,7 +124,7 @@ public final class Worker implements Suspendable {
     SingleWorkerOptions workflowOptions =
         SingleWorkerOptions.newBuilder()
             .setDataConverter(client.getOptions().getDataConverter())
-            .setIdentity(client.getOptions().getIdentity())
+            .setIdentity(identity)
             .setPollerOptions(options.getWorkflowPollerOptions())
             .setTaskExecutorThreadPoolSize(options.getMaxConcurrentWorkflowExecutionSize())
             .setMetricsScope(metricsScope)
@@ -134,7 +140,7 @@ public final class Worker implements Suspendable {
     SingleWorkerOptions localActivityOptions =
         SingleWorkerOptions.newBuilder()
             .setDataConverter(client.getOptions().getDataConverter())
-            .setIdentity(client.getOptions().getIdentity())
+            .setIdentity(identity)
             .setPollerOptions(options.getWorkflowPollerOptions())
             .setTaskExecutorThreadPoolSize(options.getMaxConcurrentLocalActivityExecutionSize())
             .setMetricsScope(metricsScope)
@@ -153,13 +159,19 @@ public final class Worker implements Suspendable {
             localActivityOptions,
             activityOptions,
             cache,
-            enableStickyExecution ? getStickyTaskListName(client.getOptions().getIdentity()) : null,
+            enableStickyExecution
+                ? getStickyTaskListName(identity, options.getUniqueIdentity())
+                : null,
             threadPoolExecutor);
 
     applyRegistry(RegistryInternal.EMPTY);
   }
 
-  private static String getStickyTaskListName(String workerIdentity) {
+  @VisibleForTesting
+  static String getStickyTaskListName(String workerIdentity, String uniqueIdentity) {
+    if (!Strings.isNullOrEmpty(uniqueIdentity)) {
+      return uniqueIdentity;
+    }
     // Unique id is needed to avoid collisions with other workers that may be created for the same
     // task list and with the same identity.
     UUID uniqueId = UUID.randomUUID();
