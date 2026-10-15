@@ -75,6 +75,7 @@ import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.activity
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.externalInitiatedId;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.externalWorkflowExecution;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.failureDetails;
+import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.failureOptions;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.failureReason;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.header;
 import static com.uber.cadence.internal.compatibility.thrift.TypeMapper.memo;
@@ -481,6 +482,7 @@ class HistoryMapper {
     ActivityTaskFailedEventAttributes res = new ActivityTaskFailedEventAttributes();
     res.setReason(failureReason(t.getFailure()));
     res.setDetails(failureDetails(t.getFailure()));
+    res.setFailureOptions(failureOptions(t.getFailure()));
     res.setScheduledEventId(t.getScheduledEventId());
     res.setStartedEventId(t.getStartedEventId());
     res.setIdentity(t.getIdentity());
@@ -522,6 +524,7 @@ class HistoryMapper {
     res.setAttempt(t.getAttempt());
     res.setLastFailureReason(failureReason(t.getLastFailure()));
     res.setLastFailureDetails(failureDetails(t.getLastFailure()));
+    res.setLastFailureOptions(failureOptions(t.getLastFailure()));
     return res;
   }
 
@@ -538,6 +541,7 @@ class HistoryMapper {
     res.setTimeoutType(EnumMapper.timeoutType(t.getTimeoutType()));
     res.setLastFailureReason(failureReason(t.getLastFailure()));
     res.setLastFailureDetails(failureDetails(t.getLastFailure()));
+    res.setLastFailureOptions(failureOptions(t.getLastFailure()));
     return res;
   }
 

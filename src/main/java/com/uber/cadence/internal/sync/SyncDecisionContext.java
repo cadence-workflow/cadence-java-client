@@ -29,6 +29,7 @@ import com.uber.cadence.activity.LocalActivityOptions;
 import com.uber.cadence.common.RetryOptions;
 import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.converter.DataConverter;
+import com.uber.cadence.internal.common.FailureConverter;
 import com.uber.cadence.internal.common.InternalUtils;
 import com.uber.cadence.internal.common.RetryParameters;
 import com.uber.cadence.internal.replay.ActivityTaskFailedException;
@@ -234,17 +235,12 @@ final class SyncDecisionContext implements WorkflowInterceptor {
     }
     if (failure instanceof ActivityTaskFailedException) {
       ActivityTaskFailedException taskFailed = (ActivityTaskFailedException) failure;
-      String causeClassName = taskFailed.getReason();
-      Class<? extends Exception> causeClass;
-      Exception cause;
-      try {
-        @SuppressWarnings("unchecked") // cc is just to have a place to put this annotation
-        Class<? extends Exception> cc = (Class<? extends Exception>) Class.forName(causeClassName);
-        causeClass = cc;
-        cause = getDataConverter().fromData(taskFailed.getDetails(), causeClass, causeClass);
-      } catch (Exception e) {
-        cause = e;
-      }
+      Throwable cause =
+          FailureConverter.decode(
+              taskFailed.getReason(),
+              taskFailed.getDetails(),
+              taskFailed.getFailureOptions(),
+              getDataConverter());
       if (cause instanceof SimulatedTimeoutExceptionInternal) {
         // This exception is thrown only in unit tests to mock the activity timeouts
         SimulatedTimeoutExceptionInternal testTimeout = (SimulatedTimeoutExceptionInternal) cause;
@@ -520,16 +516,10 @@ final class SyncDecisionContext implements WorkflowInterceptor {
       return new IllegalArgumentException("Unexpected exception type: ", failure);
     }
     ChildWorkflowTaskFailedException taskFailed = (ChildWorkflowTaskFailedException) failure;
-    String causeClassName = taskFailed.getReason();
-    Exception cause;
-    try {
-      @SuppressWarnings("unchecked")
-      Class<? extends Exception> causeClass =
-          (Class<? extends Exception>) Class.forName(causeClassName);
-      cause = getDataConverter().fromData(taskFailed.getDetails(), causeClass, causeClass);
-    } catch (Exception e) {
-      cause = e;
-    }
+    // Child workflow failures don't have failure options.
+    Throwable cause =
+        FailureConverter.decode(
+            taskFailed.getReason(), taskFailed.getDetails(), null, getDataConverter());
     if (cause instanceof SimulatedTimeoutExceptionInternal) {
       // This exception is thrown only in unit tests to mock the child workflow timeouts
       return new ChildWorkflowTimedOutException(

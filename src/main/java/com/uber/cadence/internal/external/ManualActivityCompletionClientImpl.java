@@ -32,6 +32,7 @@ import com.uber.cadence.client.ActivityCancelledException;
 import com.uber.cadence.client.ActivityCompletionFailureException;
 import com.uber.cadence.client.ActivityNotExistsException;
 import com.uber.cadence.converter.DataConverter;
+import com.uber.cadence.internal.common.FailureConverter;
 import com.uber.cadence.internal.common.RpcRetryer;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.serviceclient.IWorkflowService;
@@ -135,11 +136,12 @@ class ManualActivityCompletionClientImpl extends ManualActivityCompletionClient 
     if (failure == null) {
       throw new IllegalArgumentException("null failure");
     }
-    // When converting failures reason is class name, details are serialized exception.
+    FailureConverter.EncodedFailure encoded = FailureConverter.encode(failure, dataConverter);
     if (taskToken != null) {
       RespondActivityTaskFailedRequest request = new RespondActivityTaskFailedRequest();
-      request.setReason(failure.getClass().getName());
-      request.setDetails(dataConverter.toData(failure));
+      request.setReason(encoded.getReason());
+      request.setDetails(encoded.getDetails());
+      request.setFailureOptions(encoded.getFailureOptions());
       request.setTaskToken(taskToken);
       try {
         RpcRetryer.retry(() -> service.RespondActivityTaskFailed(request));
@@ -154,8 +156,9 @@ class ManualActivityCompletionClientImpl extends ManualActivityCompletionClient 
     } else {
       RespondActivityTaskFailedByIDRequest request = new RespondActivityTaskFailedByIDRequest();
       request.setActivityID(activityId);
-      request.setReason(failure.getClass().getName());
-      request.setDetails(dataConverter.toData(failure));
+      request.setReason(encoded.getReason());
+      request.setDetails(encoded.getDetails());
+      request.setFailureOptions(encoded.getFailureOptions());
       request.setDomain(domain);
       request.setWorkflowID(execution.getWorkflowId());
       request.setRunID(execution.getRunId());

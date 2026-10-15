@@ -18,6 +18,8 @@
 package com.uber.cadence.internal.testservice;
 
 import com.uber.cadence.BadRequestError;
+import com.uber.cadence.FailureCategory;
+import com.uber.cadence.FailureOptions;
 import com.uber.cadence.RetryPolicy;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -56,6 +58,18 @@ final class RetryState {
   }
 
   int getBackoffIntervalInSeconds(String errReason, long currentTimeMillis) {
+    return getBackoffIntervalInSeconds(errReason, null, currentTimeMillis);
+  }
+
+  /**
+   * Mirrors the server: a fatal failure category is never retried and a positive next retry
+   * interval replaces the interval computed from the retry policy.
+   */
+  int getBackoffIntervalInSeconds(
+      String errReason, FailureOptions failureOptions, long currentTimeMillis) {
+    if (failureOptions != null && failureOptions.getFailureCategory() == FailureCategory.Fatal) {
+      return 0;
+    }
     RetryPolicy retryPolicy = getRetryPolicy();
     long expirationTime = getExpirationTime();
     if (retryPolicy.getMaximumAttempts() == 0 && expirationTime == 0) {
@@ -87,6 +101,9 @@ final class RetryState {
     }
 
     long backoffInterval = nextInterval;
+    if (failureOptions != null && failureOptions.getNextRetryIntervalSeconds() > 0) {
+      backoffInterval = TimeUnit.SECONDS.toMillis(failureOptions.getNextRetryIntervalSeconds());
+    }
     long nextScheduleTime = currentTimeMillis + backoffInterval;
     if (expirationTime != 0 && nextScheduleTime > expirationTime) {
       return 0;

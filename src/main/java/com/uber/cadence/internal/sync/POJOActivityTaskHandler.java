@@ -26,6 +26,7 @@ import com.uber.cadence.activity.ActivityTask;
 import com.uber.cadence.client.ActivityCancelledException;
 import com.uber.cadence.converter.DataConverter;
 import com.uber.cadence.internal.common.CheckedExceptionWrapper;
+import com.uber.cadence.internal.common.FailureConverter;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.worker.ActivityTaskHandler;
 import com.uber.cadence.serviceclient.IWorkflowService;
@@ -91,8 +92,10 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
 
     RespondActivityTaskFailedRequest result = new RespondActivityTaskFailedRequest();
     failure = CheckedExceptionWrapper.unwrap(failure);
-    result.setReason(failure.getClass().getName());
-    result.setDetails(dataConverter.toData(failure));
+    FailureConverter.EncodedFailure encoded = FailureConverter.encode(failure, dataConverter);
+    result.setReason(encoded.getReason());
+    result.setDetails(encoded.getDetails());
+    result.setFailureOptions(encoded.getFailureOptions());
     return new ActivityTaskHandler.Result(null, new Result.TaskFailedResult(result, failure), null);
   }
 

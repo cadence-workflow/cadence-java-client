@@ -18,6 +18,7 @@
 package com.uber.cadence.internal.replay;
 
 import com.uber.cadence.ActivityType;
+import com.uber.cadence.FailureOptions;
 
 /**
  * Internal. Do not catch or throw in application level code. Exception used to communicate failure
@@ -31,15 +32,22 @@ public class ActivityTaskFailedException extends RuntimeException {
   private final String activityId;
   private final byte[] details;
   private final String reason;
+  private final FailureOptions failureOptions;
 
   ActivityTaskFailedException(
-      long eventId, ActivityType activityType, String activityId, String reason, byte[] details) {
+      long eventId,
+      ActivityType activityType,
+      String activityId,
+      String reason,
+      byte[] details,
+      FailureOptions failureOptions) {
     super(reason);
     this.eventId = eventId;
     this.activityType = activityType;
     this.activityId = activityId;
     this.reason = reason;
     this.details = details;
+    this.failureOptions = failureOptions;
   }
 
   public long getEventId() {
@@ -60,5 +68,10 @@ public class ActivityTaskFailedException extends RuntimeException {
 
   public String getReason() {
     return reason;
+  }
+
+  /** @return failure options or null if not set. */
+  public FailureOptions getFailureOptions() {
+    return failureOptions;
   }
 }

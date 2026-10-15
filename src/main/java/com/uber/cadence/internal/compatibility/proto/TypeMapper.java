@@ -15,6 +15,7 @@
  */
 package com.uber.cadence.internal.compatibility.proto;
 
+import static com.uber.cadence.internal.compatibility.proto.EnumMapper.failureCategory;
 import static com.uber.cadence.internal.compatibility.proto.EnumMapper.queryResultType;
 import static com.uber.cadence.internal.compatibility.proto.EnumMapper.taskListKind;
 import static com.uber.cadence.internal.compatibility.proto.EnumMapper.workflowExecutionCloseStatus;
@@ -34,6 +35,7 @@ import com.uber.cadence.api.v1.ClusterAttribute;
 import com.uber.cadence.api.v1.ClusterAttributeScope;
 import com.uber.cadence.api.v1.ClusterReplicationConfiguration;
 import com.uber.cadence.api.v1.Failure;
+import com.uber.cadence.api.v1.FailureOptions;
 import com.uber.cadence.api.v1.Header;
 import com.uber.cadence.api.v1.Memo;
 import com.uber.cadence.api.v1.Payload;
@@ -83,12 +85,34 @@ class TypeMapper {
   }
 
   static Failure failure(String reason, byte[] details) {
+    return failure(reason, details, null);
+  }
+
+  static Failure failure(
+      String reason, byte[] details, com.uber.cadence.FailureOptions failureOptions) {
     Failure.Builder builder = Failure.newBuilder();
     if (reason != null) {
       builder.setReason(reason);
     }
     if (details != null) {
       builder.setDetails(arrayToByteString(details));
+    }
+    if (failureOptions != null) {
+      builder.setOptions(failureOptions(failureOptions));
+    }
+    return builder.build();
+  }
+
+  static FailureOptions failureOptions(com.uber.cadence.FailureOptions t) {
+    if (t == null) {
+      return null;
+    }
+    FailureOptions.Builder builder = FailureOptions.newBuilder();
+    if (t.isSetFailureCategory()) {
+      builder.setFailureCategory(failureCategory(t.getFailureCategory()));
+    }
+    if (t.isSetNextRetryIntervalSeconds()) {
+      builder.setNextRetryInterval(secondsToDuration(t.getNextRetryIntervalSeconds()));
     }
     return builder.build();
   }

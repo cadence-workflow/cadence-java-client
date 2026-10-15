@@ -63,6 +63,7 @@ import com.uber.cadence.EntityNotExistsError;
 import com.uber.cadence.EventType;
 import com.uber.cadence.ExternalWorkflowExecutionSignaledEventAttributes;
 import com.uber.cadence.FailWorkflowExecutionDecisionAttributes;
+import com.uber.cadence.FailureOptions;
 import com.uber.cadence.GetWorkflowExecutionHistoryRequest;
 import com.uber.cadence.History;
 import com.uber.cadence.HistoryEvent;
@@ -991,7 +992,7 @@ class StateMachines {
 
   private static State failActivityTaskByTaskToken(
       RequestContext ctx, ActivityTaskData data, RespondActivityTaskFailedRequest request) {
-    if (attemptActivityRetry(ctx, request.getReason(), data)) {
+    if (attemptActivityRetry(ctx, request.getReason(), request.getFailureOptions(), data)) {
       return INITIATED;
     }
     ActivityTaskFailedEventAttributes a =
@@ -1000,6 +1001,7 @@ class StateMachines {
             .setScheduledEventId(data.scheduledEventId)
             .setDetails(request.getDetails())
             .setReason(request.getReason())
+            .setFailureOptions(request.getFailureOptions())
             .setIdentity(request.getIdentity())
             .setStartedEventId(data.startedEventId);
     HistoryEvent event =
@@ -1012,7 +1014,7 @@ class StateMachines {
 
   private static State failActivityTaskById(
       RequestContext ctx, ActivityTaskData data, RespondActivityTaskFailedByIDRequest request) {
-    if (attemptActivityRetry(ctx, request.getReason(), data)) {
+    if (attemptActivityRetry(ctx, request.getReason(), request.getFailureOptions(), data)) {
       return INITIATED;
     }
     ActivityTaskFailedEventAttributes a =
@@ -1021,6 +1023,7 @@ class StateMachines {
             .setScheduledEventId(data.scheduledEventId)
             .setDetails(request.getDetails())
             .setReason(request.getReason())
+            .setFailureOptions(request.getFailureOptions())
             .setIdentity(request.getIdentity())
             .setStartedEventId(data.startedEventId);
     HistoryEvent event =
@@ -1036,7 +1039,7 @@ class StateMachines {
     // ScheduleToStart (queue timeout) is not retriable. Instead of the retry, a customer should set
     // a larger ScheduleToStart timeout.
     if (timeoutType != TimeoutType.SCHEDULE_TO_START
-        && attemptActivityRetry(ctx, TIMEOUT_ERROR_REASON, data)) {
+        && attemptActivityRetry(ctx, TIMEOUT_ERROR_REASON, null, data)) {
       return INITIATED;
     }
     ActivityTaskTimedOutEventAttributes a =
@@ -1054,11 +1057,15 @@ class StateMachines {
   }
 
   private static boolean attemptActivityRetry(
-      RequestContext ctx, String errorReason, ActivityTaskData data) {
+      RequestContext ctx,
+      String errorReason,
+      FailureOptions failureOptions,
+      ActivityTaskData data) {
     if (data.retryState != null) {
       RetryState nextAttempt = data.retryState.getNextAttempt();
       data.nextBackoffIntervalSeconds =
-          data.retryState.getBackoffIntervalInSeconds(errorReason, data.store.currentTimeMillis());
+          data.retryState.getBackoffIntervalInSeconds(
+              errorReason, failureOptions, data.store.currentTimeMillis());
       if (data.nextBackoffIntervalSeconds > 0) {
         PollForActivityTaskResponse task = data.activityTask.getTask();
         task.setHeartbeatDetails(data.heartbeatDetails);

@@ -23,6 +23,7 @@ import com.uber.cadence.GetTaskListsByDomainRequest;
 import com.uber.cadence.GetTaskListsByDomainResponse;
 import com.uber.cadence.activity.ActivityOptions;
 import com.uber.cadence.activity.LocalActivityOptions;
+import com.uber.cadence.internal.common.FailureConverter;
 import com.uber.cadence.internal.metrics.NoopScope;
 import com.uber.cadence.internal.worker.ActivityTaskHandler;
 import com.uber.cadence.internal.worker.ActivityTaskHandler.Result;
@@ -277,21 +278,12 @@ public final class TestActivityEnvironmentInternal implements TestActivityEnviro
         RespondActivityTaskFailedRequest taskFailed =
             response.getTaskFailedResult().getTaskFailedRequest();
         if (taskFailed != null) {
-          String causeClassName = taskFailed.getReason();
-          Class<? extends Exception> causeClass;
-          Exception cause;
-          try {
-            @SuppressWarnings("unchecked") // cc is just to have a place to put this annotation
-            Class<? extends Exception> cc =
-                (Class<? extends Exception>) Class.forName(causeClassName);
-            causeClass = cc;
-            cause =
-                testEnvironmentOptions
-                    .getDataConverter()
-                    .fromData(taskFailed.getDetails(), causeClass, causeClass);
-          } catch (Exception e) {
-            cause = e;
-          }
+          Throwable cause =
+              FailureConverter.decode(
+                  taskFailed.getReason(),
+                  taskFailed.getDetails(),
+                  taskFailed.getFailureOptions(),
+                  testEnvironmentOptions.getDataConverter());
           throw new ActivityFailureException(
               0, task.getActivityType(), task.getActivityId(), cause);
 
