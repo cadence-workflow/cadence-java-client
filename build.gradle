@@ -30,6 +30,12 @@ repositories {
     jcenter()
 }
 
+configurations.all {
+    attributes {
+        attribute(Attribute.of("org.gradle.jvm.environment", String), "standard-jvm")
+    }
+}
+
 apply plugin: 'com.google.protobuf'
 apply plugin: 'idea' // IntelliJ plugin to see files generated from protos
 apply plugin: 'maven'
@@ -80,7 +86,7 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.2'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.2'
     compile group: 'com.uber.m3', name: 'tally-core', version: '0.11.1'
-    compile group: 'com.google.guava', name: 'guava', version: '31.1-jre'
+    compile group: 'com.google.guava', name: 'guava', version: '33.7.2-jre'
     compile group: 'com.cronutils', name: 'cron-utils', version: '9.2.0'
     compile group: 'io.micrometer', name: 'micrometer-core', version: '1.10.2'
     compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
