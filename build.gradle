@@ -186,7 +186,7 @@ clean {
 compileJava {
     dependsOn 'googleJavaFormat'
     options.encoding = 'UTF-8'
-    options.compilerArgs << '-Xlint:none' << '-Xlint:deprecation' << '-Werror'
+    options.compilerArgs << '-Xlint:none' << '-Werror'
     options.errorprone.excludedPaths = '.*/generated-sources/.*'
     options.errorprone {
         disable('BadImport')
