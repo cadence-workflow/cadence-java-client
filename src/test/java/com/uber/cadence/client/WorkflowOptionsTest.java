@@ -19,6 +19,7 @@ package com.uber.cadence.client;
 
 import com.uber.cadence.ActiveClusterSelectionPolicy;
 import com.uber.cadence.ClusterAttribute;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.common.CronSchedule;
 import com.uber.cadence.common.MethodRetry;
@@ -27,6 +28,7 @@ import com.uber.cadence.workflow.ChildWorkflowOptions;
 import com.uber.cadence.workflow.WorkflowMethod;
 import java.lang.reflect.Method;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -259,6 +261,77 @@ public class WorkflowOptionsTest {
     Assert.assertEquals(withPolicy, samePolicy);
     Assert.assertEquals(withPolicy.hashCode(), samePolicy.hashCode());
     Assert.assertNotEquals(withPolicy, withoutPolicy);
+  }
+
+  private static final Instant FIRST_RUN_AT = Instant.parse("2030-01-02T03:04:05Z");
+
+  private static WorkflowOptions.Builder optionsWithStartTiming() {
+    return new WorkflowOptions.Builder()
+        .setTaskList("foo")
+        .setExecutionStartToCloseTimeout(Duration.ofSeconds(321))
+        .setCronSchedule("0 * * * *")
+        .setJitterStart(Duration.ofSeconds(30))
+        .setFirstRunAt(FIRST_RUN_AT)
+        .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE);
+  }
+
+  private static void assertStartTiming(WorkflowOptions o) {
+    Assert.assertEquals(Duration.ofSeconds(30), o.getJitterStart());
+    Assert.assertEquals(FIRST_RUN_AT, o.getFirstRunAt());
+    Assert.assertEquals(CronOverlapPolicy.BUFFERONE, o.getCronOverlapPolicy());
+  }
+
+  @Test
+  public void testStartTimingOptionsSetOnBuilder() {
+    assertStartTiming(optionsWithStartTiming().build());
+    assertStartTiming(optionsWithStartTiming().validateBuildWithDefaults());
+  }
+
+  @Test
+  public void testStartTimingOptionsDefaultToNull() {
+    WorkflowOptions o =
+        new WorkflowOptions.Builder()
+            .setTaskList("foo")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(321))
+            .validateBuildWithDefaults();
+    Assert.assertNull(o.getJitterStart());
+    Assert.assertNull(o.getFirstRunAt());
+    Assert.assertNull(o.getCronOverlapPolicy());
+  }
+
+  @Test
+  public void testStartTimingOptionsKeptByCopyConstructor() {
+    assertStartTiming(new WorkflowOptions.Builder(optionsWithStartTiming().build()).build());
+  }
+
+  @Test
+  public void testStartTimingOptionsKeptByMergeWithAnnotation() throws NoSuchMethodException {
+    WorkflowMethod a =
+        WorkflowOptionsTest.class
+            .getMethod("defaultWorkflowOptions")
+            .getAnnotation(WorkflowMethod.class);
+    assertStartTiming(WorkflowOptions.merge(a, null, null, optionsWithStartTiming().build()));
+  }
+
+  @Test
+  public void testStartTimingOptionsKeptByMergeWithoutAnnotation() {
+    assertStartTiming(WorkflowOptions.merge(null, null, null, optionsWithStartTiming().build()));
+  }
+
+  @Test
+  public void testStartTimingOptionsConsideredByEqualsAndHashCode() {
+    WorkflowOptions o = optionsWithStartTiming().build();
+    Assert.assertEquals(o, optionsWithStartTiming().build());
+    Assert.assertEquals(o.hashCode(), optionsWithStartTiming().build().hashCode());
+    Assert.assertNotEquals(o, optionsWithStartTiming().setJitterStart(null).build());
+    Assert.assertNotEquals(o, optionsWithStartTiming().setFirstRunAt(null).build());
+    Assert.assertNotEquals(
+        o, optionsWithStartTiming().setCronOverlapPolicy(CronOverlapPolicy.SKIPPED).build());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testNegativeJitterStartRejected() {
+    optionsWithStartTiming().setJitterStart(Duration.ofSeconds(-1)).validateBuildWithDefaults();
   }
 
   private Map<String, Object> getTestMemo() {

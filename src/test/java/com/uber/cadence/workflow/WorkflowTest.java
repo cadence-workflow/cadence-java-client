@@ -34,6 +34,7 @@ import com.uber.cadence.ActiveClusterSelectionPolicy;
 import com.uber.cadence.BadRequestError;
 import com.uber.cadence.CancellationAlreadyRequestedError;
 import com.uber.cadence.ClusterAttribute;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.DomainAlreadyExistsError;
 import com.uber.cadence.DomainNotActiveError;
 import com.uber.cadence.EntityNotExistsError;
@@ -1440,6 +1441,27 @@ public class WorkflowTest {
     assertEquals(
         policy,
         startEvent.getWorkflowExecutionStartedEventAttributes().getActiveClusterSelectionPolicy());
+  }
+
+  @Test
+  @RequiresTestService
+  public void testStartWithCronOverlapPolicy() {
+    startWorkerFor(TestMultiargsWorkflowsImpl.class);
+    WorkflowOptions workflowOptions =
+        newWorkflowOptionsBuilder(taskList)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
+            .build();
+    TestMultiargsWorkflowsFunc stubF =
+        workflowClient.newWorkflowStub(TestMultiargsWorkflowsFunc.class, workflowOptions);
+    WorkflowExecution executionF = WorkflowClient.start(stubF::func);
+
+    GetWorkflowExecutionHistoryResponse historyResp =
+        WorkflowExecutionUtils.getHistoryPage(
+            new byte[] {}, workflowClient.getService(), DOMAIN, executionF);
+    HistoryEvent startEvent = historyResp.getHistory().getEvents().get(0);
+    assertEquals(
+        CronOverlapPolicy.BUFFERONE,
+        startEvent.getWorkflowExecutionStartedEventAttributes().getCronOverlapPolicy());
   }
 
   @Test

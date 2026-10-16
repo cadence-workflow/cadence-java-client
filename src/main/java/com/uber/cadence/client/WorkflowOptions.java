@@ -26,6 +26,7 @@ import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
 import com.google.common.base.Strings;
 import com.uber.cadence.ActiveClusterSelectionPolicy;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.common.CronSchedule;
 import com.uber.cadence.common.MethodRetry;
@@ -34,6 +35,7 @@ import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.internal.common.OptionsUtils;
 import com.uber.cadence.workflow.WorkflowMethod;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -68,6 +70,9 @@ public final class WorkflowOptions {
         .setSearchAttributes(o.getSearchAttributes())
         .setContextPropagators(o.getContextPropagators())
         .setDelayStart(o.delayStart)
+        .setJitterStart(o.jitterStart)
+        .setFirstRunAt(o.firstRunAt)
+        .setCronOverlapPolicy(o.cronOverlapPolicy)
         .setActiveClusterSelectionPolicy(o.activeClusterSelectionPolicy)
         .validateBuildWithDefaults();
   }
@@ -96,6 +101,12 @@ public final class WorkflowOptions {
 
     private Duration delayStart;
 
+    private Duration jitterStart;
+
+    private Instant firstRunAt;
+
+    private CronOverlapPolicy cronOverlapPolicy;
+
     private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
 
     public Builder() {}
@@ -115,6 +126,9 @@ public final class WorkflowOptions {
       this.searchAttributes = o.searchAttributes;
       this.contextPropagators = o.contextPropagators;
       this.delayStart = o.delayStart;
+      this.jitterStart = o.jitterStart;
+      this.firstRunAt = o.firstRunAt;
+      this.cronOverlapPolicy = o.cronOverlapPolicy;
       this.activeClusterSelectionPolicy = o.activeClusterSelectionPolicy;
     }
 
@@ -229,6 +243,39 @@ public final class WorkflowOptions {
     }
 
     /**
+     * Sets the maximum random delay added to the workflow start. The service adds a random delay
+     * between zero and this value (in whole seconds), which spreads out workflows scheduled for the
+     * same time. For a cron workflow the jitter is applied to every run and must not be longer than
+     * the cron interval.
+     */
+    public Builder setJitterStart(Duration jitterStart) {
+      this.jitterStart = jitterStart;
+      return this;
+    }
+
+    /**
+     * Sets the time of the first run of the workflow. If this time is in the future, the first run
+     * starts at it and {@link #setDelayStart(Duration)}, {@link #setJitterStart(Duration)} and the
+     * cron schedule are ignored for that first run; later cron runs follow the cron schedule. A
+     * time in the past has no effect.
+     */
+    public Builder setFirstRunAt(Instant firstRunAt) {
+      this.firstRunAt = firstRunAt;
+      return this;
+    }
+
+    /**
+     * Sets what the service does when cron runs are missed because the previous run was still
+     * running. {@link CronOverlapPolicy#SKIPPED} skips the missed runs and waits for the next
+     * scheduled time; {@link CronOverlapPolicy#BUFFERONE} starts the next run as soon as the
+     * previous one finishes. Only meaningful together with {@link #setCronSchedule(String)}.
+     */
+    public Builder setCronOverlapPolicy(CronOverlapPolicy cronOverlapPolicy) {
+      this.cronOverlapPolicy = cronOverlapPolicy;
+      return this;
+    }
+
+    /**
      * Sets the active cluster selection policy for an active-active domain. The cluster attribute
      * is a scope/name pair, for example scope {@code "location"} and name {@code "lisbon"}. The
      * workflow follows that attribute's failover behavior as configured on the domain. This option
@@ -253,6 +300,9 @@ public final class WorkflowOptions {
           searchAttributes,
           contextPropagators,
           delayStart,
+          jitterStart,
+          firstRunAt,
+          cronOverlapPolicy,
           activeClusterSelectionPolicy);
     }
 
@@ -296,6 +346,10 @@ public final class WorkflowOptions {
         }
       }
 
+      if (jitterStart != null && jitterStart.isNegative()) {
+        throw new IllegalArgumentException("Jitter start value cannot be lower than zero");
+      }
+
       return new WorkflowOptions(
           workflowId,
           policy,
@@ -309,6 +363,9 @@ public final class WorkflowOptions {
           searchAttributes,
           contextPropagators,
           delayStart,
+          jitterStart,
+          firstRunAt,
+          cronOverlapPolicy,
           activeClusterSelectionPolicy);
     }
   }
@@ -335,6 +392,12 @@ public final class WorkflowOptions {
 
   private Duration delayStart;
 
+  private Duration jitterStart;
+
+  private Instant firstRunAt;
+
+  private CronOverlapPolicy cronOverlapPolicy;
+
   private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
 
   private WorkflowOptions(
@@ -349,6 +412,9 @@ public final class WorkflowOptions {
       Map<String, Object> searchAttributes,
       List<ContextPropagator> contextPropagators,
       Duration delayStart,
+      Duration jitterStart,
+      Instant firstRunAt,
+      CronOverlapPolicy cronOverlapPolicy,
       ActiveClusterSelectionPolicy activeClusterSelectionPolicy) {
     this.workflowId = workflowId;
     this.workflowIdReusePolicy = workflowIdReusePolicy;
@@ -361,6 +427,9 @@ public final class WorkflowOptions {
     this.searchAttributes = searchAttributes;
     this.contextPropagators = contextPropagators;
     this.delayStart = delayStart;
+    this.jitterStart = jitterStart;
+    this.firstRunAt = firstRunAt;
+    this.cronOverlapPolicy = cronOverlapPolicy;
     this.activeClusterSelectionPolicy = activeClusterSelectionPolicy;
   }
 
@@ -408,6 +477,18 @@ public final class WorkflowOptions {
     return delayStart;
   }
 
+  public Duration getJitterStart() {
+    return jitterStart;
+  }
+
+  public Instant getFirstRunAt() {
+    return firstRunAt;
+  }
+
+  public CronOverlapPolicy getCronOverlapPolicy() {
+    return cronOverlapPolicy;
+  }
+
   public ActiveClusterSelectionPolicy getActiveClusterSelectionPolicy() {
     return activeClusterSelectionPolicy;
   }
@@ -428,6 +509,9 @@ public final class WorkflowOptions {
         && Objects.equals(searchAttributes, that.searchAttributes)
         && Objects.equals(contextPropagators, that.contextPropagators)
         && Objects.equals(delayStart, that.delayStart)
+        && Objects.equals(jitterStart, that.jitterStart)
+        && Objects.equals(firstRunAt, that.firstRunAt)
+        && cronOverlapPolicy == that.cronOverlapPolicy
         && Objects.equals(activeClusterSelectionPolicy, that.activeClusterSelectionPolicy);
   }
 
@@ -445,6 +529,9 @@ public final class WorkflowOptions {
         searchAttributes,
         contextPropagators,
         delayStart,
+        jitterStart,
+        firstRunAt,
+        cronOverlapPolicy,
         activeClusterSelectionPolicy);
   }
 
@@ -479,6 +566,14 @@ public final class WorkflowOptions {
         + ", delayStart='"
         + delayStart
         + '\''
+        + ", jitterStart='"
+        + jitterStart
+        + '\''
+        + ", firstRunAt='"
+        + firstRunAt
+        + '\''
+        + ", cronOverlapPolicy="
+        + cronOverlapPolicy
         + ", activeClusterSelectionPolicy='"
         + activeClusterSelectionPolicy
         + '\''
