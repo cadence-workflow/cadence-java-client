@@ -30,6 +30,16 @@ repositories {
     jcenter()
 }
 
+// Guava 32+ publishes both jreRuntimeElements and androidRuntimeElements variants.
+// Gradle 6 cannot choose between them for configurations that do not declare the
+// org.gradle.jvm.environment attribute (e.g. the protobuf plugin's compileProtoPath).
+// Explicitly request the standard-jvm variant on all configurations.
+configurations.all {
+    attributes {
+        attribute(Attribute.of("org.gradle.jvm.environment", String), "standard-jvm")
+    }
+}
+
 apply plugin: 'com.google.protobuf'
 apply plugin: 'idea' // IntelliJ plugin to see files generated from protos
 apply plugin: 'maven'
