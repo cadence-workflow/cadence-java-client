@@ -19,6 +19,8 @@ package com.uber.cadence.workflow;
 
 import static com.uber.cadence.internal.common.OptionsUtils.roundUpToSeconds;
 
+import com.uber.cadence.ActiveClusterSelectionPolicy;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.ParentClosePolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.common.CronSchedule;
@@ -57,6 +59,8 @@ public final class ChildWorkflowOptions {
         .setRetryOptions(RetryOptions.merge(r, o.getRetryOptions()))
         .setCronSchedule(OptionsUtils.merge(cronAnnotation, o.getCronSchedule(), String.class))
         .setParentClosePolicy(o.getParentClosePolicy())
+        .setCronOverlapPolicy(o.getCronOverlapPolicy())
+        .setActiveClusterSelectionPolicy(o.getActiveClusterSelectionPolicy())
         .setMemo(o.getMemo())
         .setSearchAttributes(o.getSearchAttributes())
         .setContextPropagators(o.getContextPropagators())
@@ -83,6 +87,10 @@ public final class ChildWorkflowOptions {
 
     private ParentClosePolicy parentClosePolicy;
 
+    private CronOverlapPolicy cronOverlapPolicy;
+
+    private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
+
     private Map<String, Object> memo;
 
     private Map<String, Object> searchAttributes;
@@ -104,6 +112,8 @@ public final class ChildWorkflowOptions {
       this.retryOptions = source.getRetryOptions();
       this.cronSchedule = source.getCronSchedule();
       this.parentClosePolicy = source.getParentClosePolicy();
+      this.cronOverlapPolicy = source.getCronOverlapPolicy();
+      this.activeClusterSelectionPolicy = source.getActiveClusterSelectionPolicy();
       this.memo = source.getMemo();
       this.searchAttributes = source.getSearchAttributes();
       this.contextPropagators = source.getContextPropagators();
@@ -205,6 +215,30 @@ public final class ChildWorkflowOptions {
       return this;
     }
 
+    /**
+     * Sets what the service does when cron runs of the child workflow are missed because the
+     * previous run was still running. {@link CronOverlapPolicy#SKIPPED} skips the missed runs and
+     * waits for the next scheduled time; {@link CronOverlapPolicy#BUFFERONE} starts the next run as
+     * soon as the previous one finishes. Only meaningful together with {@link
+     * #setCronSchedule(String)}.
+     */
+    public Builder setCronOverlapPolicy(CronOverlapPolicy cronOverlapPolicy) {
+      this.cronOverlapPolicy = cronOverlapPolicy;
+      return this;
+    }
+
+    /**
+     * Sets the active cluster selection policy of the child workflow for an active-active domain.
+     * The cluster attribute is a scope/name pair, for example scope {@code "location"} and name
+     * {@code "lisbon"}. The child workflow follows that attribute's failover behavior as configured
+     * on the domain. This option is only meaningful for active-active domains.
+     */
+    public Builder setActiveClusterSelectionPolicy(
+        ActiveClusterSelectionPolicy activeClusterSelectionPolicy) {
+      this.activeClusterSelectionPolicy = activeClusterSelectionPolicy;
+      return this;
+    }
+
     /** Specifies additional non-indexed information in result of list workflow. */
     public Builder setMemo(Map<String, Object> memo) {
       this.memo = memo;
@@ -234,6 +268,8 @@ public final class ChildWorkflowOptions {
           retryOptions,
           cronSchedule,
           parentClosePolicy,
+          cronOverlapPolicy,
+          activeClusterSelectionPolicy,
           memo,
           searchAttributes,
           contextPropagators);
@@ -250,6 +286,8 @@ public final class ChildWorkflowOptions {
           retryOptions,
           cronSchedule,
           parentClosePolicy,
+          cronOverlapPolicy,
+          activeClusterSelectionPolicy,
           memo,
           searchAttributes,
           contextPropagators);
@@ -274,6 +312,10 @@ public final class ChildWorkflowOptions {
 
   private final ParentClosePolicy parentClosePolicy;
 
+  private final CronOverlapPolicy cronOverlapPolicy;
+
+  private final ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
+
   private final Map<String, Object> memo;
 
   private final Map<String, Object> searchAttributes;
@@ -290,6 +332,8 @@ public final class ChildWorkflowOptions {
       RetryOptions retryOptions,
       String cronSchedule,
       ParentClosePolicy parentClosePolicy,
+      CronOverlapPolicy cronOverlapPolicy,
+      ActiveClusterSelectionPolicy activeClusterSelectionPolicy,
       Map<String, Object> memo,
       Map<String, Object> searchAttributes,
       List<ContextPropagator> contextPropagators) {
@@ -302,6 +346,8 @@ public final class ChildWorkflowOptions {
     this.retryOptions = retryOptions;
     this.cronSchedule = cronSchedule;
     this.parentClosePolicy = parentClosePolicy;
+    this.cronOverlapPolicy = cronOverlapPolicy;
+    this.activeClusterSelectionPolicy = activeClusterSelectionPolicy;
     this.memo = memo;
     this.searchAttributes = searchAttributes;
     this.contextPropagators = contextPropagators;
@@ -343,6 +389,14 @@ public final class ChildWorkflowOptions {
     return parentClosePolicy;
   }
 
+  public CronOverlapPolicy getCronOverlapPolicy() {
+    return cronOverlapPolicy;
+  }
+
+  public ActiveClusterSelectionPolicy getActiveClusterSelectionPolicy() {
+    return activeClusterSelectionPolicy;
+  }
+
   public Map<String, Object> getMemo() {
     return memo;
   }
@@ -370,6 +424,8 @@ public final class ChildWorkflowOptions {
         && Objects.equals(retryOptions, that.retryOptions)
         && Objects.equals(cronSchedule, that.cronSchedule)
         && Objects.equals(parentClosePolicy, that.parentClosePolicy)
+        && cronOverlapPolicy == that.cronOverlapPolicy
+        && Objects.equals(activeClusterSelectionPolicy, that.activeClusterSelectionPolicy)
         && Objects.equals(memo, that.memo)
         && Objects.equals(searchAttributes, that.searchAttributes)
         && Objects.equals(contextPropagators, that.contextPropagators);
@@ -387,6 +443,8 @@ public final class ChildWorkflowOptions {
         retryOptions,
         cronSchedule,
         parentClosePolicy,
+        cronOverlapPolicy,
+        activeClusterSelectionPolicy,
         memo,
         searchAttributes,
         contextPropagators);
@@ -416,6 +474,10 @@ public final class ChildWorkflowOptions {
         + cronSchedule
         + ", parentClosePolicy="
         + parentClosePolicy
+        + ", cronOverlapPolicy="
+        + cronOverlapPolicy
+        + ", activeClusterSelectionPolicy="
+        + activeClusterSelectionPolicy
         + ", memo='"
         + memo
         + '\''
