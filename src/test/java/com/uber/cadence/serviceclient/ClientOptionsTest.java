@@ -14,15 +14,63 @@
  */
 package com.uber.cadence.serviceclient;
 
+import com.uber.cadence.common.RetryOptions;
 import com.uber.cadence.serviceclient.auth.OAuthAuthorizationProvider;
 import com.uber.m3.tally.NoopScope;
 import com.uber.m3.tally.Scope;
 import io.grpc.*;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 
 public class ClientOptionsTest extends TestCase {
+
+  public void testPartialRpcRetryOptionsAreRetained() {
+    RetryOptions partial =
+        new RetryOptions.Builder().setInitialInterval(Duration.ofMillis(500)).build();
+    ClientOptions options = ClientOptions.newBuilder().setRpcRetryOptions(partial).build();
+    assertSame(partial, options.getRpcRetryOptions());
+    assertNull(
+        ClientOptions.newBuilder()
+            .setRpcRetryOptions(partial)
+            .setRpcRetryOptions(null)
+            .build()
+            .getRpcRetryOptions());
+    assertNull(ClientOptions.defaultInstance().getRpcRetryOptions());
+  }
+
+  public void testNonFiniteRpcBackoffIsRejected() {
+    for (double coefficient : new double[] {Double.NaN, Double.POSITIVE_INFINITY}) {
+      try {
+        ClientOptions.newBuilder()
+            .setRpcRetryOptions(
+                new RetryOptions.Builder().setBackoffCoefficient(coefficient).build())
+            .build();
+        fail("Non-finite RPC backoff must be rejected");
+      } catch (IllegalArgumentException expected) {
+        assertTrue(expected.getMessage().contains("finite"));
+      }
+    }
+  }
+
+  public void testInvalidRpcIntervalsAreRejectedWhenOptionsAreBuilt() {
+    RetryOptions[] invalid = {
+      new RetryOptions.Builder()
+          .setInitialInterval(Duration.ofSeconds(5))
+          .setMaximumInterval(Duration.ofSeconds(4))
+          .build(),
+      new RetryOptions.Builder().setMaximumInterval(Duration.ofMillis(1)).build()
+    };
+    for (RetryOptions overrides : invalid) {
+      try {
+        ClientOptions.newBuilder().setRpcRetryOptions(overrides).build();
+        fail("Invalid effective intervals must fail before the first RPC");
+      } catch (IllegalStateException expected) {
+        assertTrue(expected.getMessage().contains("maximumInterval"));
+      }
+    }
+  }
 
   public void testBuilderWithGRPC() {
     ManagedChannel channel =
