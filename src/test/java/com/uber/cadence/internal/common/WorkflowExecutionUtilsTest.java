@@ -21,7 +21,9 @@ import com.google.common.collect.ImmutableMap;
 import com.uber.cadence.*;
 import com.uber.cadence.client.WorkflowTerminatedException;
 import com.uber.cadence.client.WorkflowTimedOutException;
+import com.uber.cadence.common.RetryOptions;
 import com.uber.cadence.internal.compatibility.ClientObjects;
+import com.uber.cadence.serviceclient.ClientOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.util.*;
 import java.util.concurrent.CancellationException;
@@ -73,6 +75,29 @@ public class WorkflowExecutionUtilsTest {
     GetWorkflowExecutionHistoryResponse response = new GetWorkflowExecutionHistoryResponse();
     response.setHistory(new History().setEvents(Collections.singletonList(event)));
     return response;
+  }
+
+  @Test
+  public void resultPollingIgnoresApplicationPolicy() throws Exception {
+    when(mockService.getOptions())
+        .thenReturn(
+            ClientOptions.newBuilder()
+                .setRpcRetryOptions(new RetryOptions.Builder().setMaximumAttempts(1).build())
+                .build());
+    HistoryEvent completed =
+        new HistoryEvent()
+            .setEventType(EventType.WorkflowExecutionCompleted)
+            .setWorkflowExecutionCompletedEventAttributes(
+                new WorkflowExecutionCompletedEventAttributes().setResult(new byte[] {42}));
+    when(mockService.GetWorkflowExecutionHistoryWithTimeout(any(), anyLong()))
+        .thenThrow(new ServiceBusyError())
+        .thenReturn(createResponseWithEvent(completed));
+    assertArrayEquals(
+        new byte[] {42},
+        WorkflowExecutionUtils.getWorkflowExecutionResult(
+            mockService, "domain", workflowExecution, Optional.empty(), 5, TimeUnit.SECONDS));
+    verify(mockService, times(2)).GetWorkflowExecutionHistoryWithTimeout(any(), anyLong());
+    verify(mockService, never()).getOptions();
   }
 
   // ===========================

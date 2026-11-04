@@ -20,6 +20,8 @@ package com.uber.cadence.serviceclient;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.uber.cadence.FeatureFlags;
+import com.uber.cadence.common.RetryOptions;
+import com.uber.cadence.internal.common.RpcRetryer;
 import com.uber.cadence.internal.metrics.NoopScope;
 import com.uber.cadence.serviceclient.auth.IAuthorizationProvider;
 import com.uber.m3.tally.Scope;
@@ -86,6 +88,8 @@ public class ClientOptions {
   /** Optional tracer for service client, default is GlobalTracer */
   private final Tracer tracer;
 
+  private final RetryOptions rpcRetryOptions;
+
   private ClientOptions(Builder builder) {
     if (Strings.isNullOrEmpty(builder.host)) {
       host =
@@ -131,6 +135,10 @@ public class ClientOptions {
     this.authProvider = builder.authProvider;
     this.isolationGroup = builder.isolationGroup;
     this.tracer = builder.tracer;
+    this.rpcRetryOptions = builder.rpcRetryOptions;
+    if (rpcRetryOptions != null) {
+      RpcRetryer.mergeRetryOptions(rpcRetryOptions, RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, null);
+    }
   }
 
   public static ClientOptions defaultInstance() {
@@ -211,6 +219,15 @@ public class ClientOptions {
   }
 
   /**
+   * Returns the supplied partial RPC retry overrides, or null when operation defaults are used.
+   *
+   * @see Builder#setRpcRetryOptions(RetryOptions)
+   */
+  public RetryOptions getRpcRetryOptions() {
+    return rpcRetryOptions;
+  }
+
+  /**
    * Builder is the builder for ClientOptions.
    *
    * @author venkat
@@ -235,6 +252,7 @@ public class ClientOptions {
     private String isolationGroup;
     // by default NoopTracer
     private Tracer tracer = NoopTracerFactory.create();
+    private RetryOptions rpcRetryOptions;
 
     private Builder() {}
 
@@ -388,6 +406,29 @@ public class ClientOptions {
      */
     public Builder setTracer(Tracer tracer) {
       this.tracer = tracer;
+      return this;
+    }
+
+    /**
+     * Overrides application workflow RPC retries: start/enqueue, signal, signal-with-start, query,
+     * cancellation and termination. Worker reports, manual completion, history/result polling and
+     * other retry policies are unaffected.
+     *
+     * <p>Null durations and zero numeric fields inherit RPC defaults. Use
+     * RetryOptions.Builder.build() for partial settings; passing null clears them. An omitted
+     * maximumInterval grows to accommodate a larger initialInterval; an explicit incompatible
+     * maximum is rejected when building ClientOptions.
+     *
+     * <p>A non-null doNotRetry list replaces the built-in exclusions (such as BadRequestError and
+     * EntityNotExistsError) and an empty list clears them. To add an exclusion, include
+     * RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS.getDoNotRetry() in the list. A maximumAttempts of 1
+     * disables retries; zero cannot clear an inherited limit.
+     *
+     * <p>Expiration is a retry budget, not a hard deadline, and cannot extend an explicit operation
+     * timeout. Workflow and activity execution retries are configured separately.
+     */
+    public Builder setRpcRetryOptions(RetryOptions rpcRetryOptions) {
+      this.rpcRetryOptions = rpcRetryOptions;
       return this;
     }
 
