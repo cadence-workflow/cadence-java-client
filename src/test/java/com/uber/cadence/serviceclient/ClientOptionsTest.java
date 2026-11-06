@@ -14,6 +14,7 @@
  */
 package com.uber.cadence.serviceclient;
 
+import com.uber.cadence.internal.compatibility.proto.serviceclient.IGrpcServiceStubs;
 import com.uber.cadence.serviceclient.auth.OAuthAuthorizationProvider;
 import com.uber.m3.tally.NoopScope;
 import com.uber.m3.tally.Scope;
@@ -56,5 +57,14 @@ public class ClientOptionsTest extends TestCase {
     assertEquals("value", options.getTransportHeaders().get("transportKey"));
     assertEquals("value", options.getHeaders().get("key"));
     assertEquals("isolation-group", options.getIsolationGroup());
+  }
+
+  public void testDefaultPortIsLocalServerGrpcPort() {
+    assertEquals(
+        IGrpcServiceStubs.DEFAULT_LOCAL_CADENCE_SERVER_GRPC_PORT,
+        ClientOptions.defaultInstance().getPort());
+    assertEquals(
+        IGrpcServiceStubs.DEFAULT_LOCAL_CADENCE_SERVER_GRPC_PORT,
+        ClientOptions.newBuilder().build().getPort());
   }
 }
