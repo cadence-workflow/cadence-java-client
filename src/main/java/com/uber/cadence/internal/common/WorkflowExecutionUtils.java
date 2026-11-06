@@ -281,7 +281,8 @@ public class WorkflowExecutionUtils {
     return response.thenComposeAsync(
         (r) -> {
           long elapsedTime = System.currentTimeMillis() - start;
-          if (timeout != 0 && elapsedTime > unit.toMillis(timeout)) {
+          long remainingMillis = unit.toMillis(timeout) - elapsedTime;
+          if (timeout != 0 && remainingMillis <= 0) {
             throw CheckedExceptionWrapper.wrap(
                 new TimeoutException(
                     "WorkflowId="
@@ -297,7 +298,12 @@ public class WorkflowExecutionUtils {
           if (history == null || history.getEvents().size() == 0) {
             // Empty poll returned
             return getInstanceCloseEventAsync(
-                service, domain, workflowExecution, pageToken, timeout - elapsedTime, unit);
+                service,
+                domain,
+                workflowExecution,
+                pageToken,
+                remainingMillis,
+                TimeUnit.MILLISECONDS);
           }
           HistoryEvent event = history.getEvents().get(0);
           if (!isWorkflowExecutionCompletedEvent(event)) {
@@ -317,8 +323,8 @@ public class WorkflowExecutionUtils {
                 domain,
                 nextWorkflowExecution,
                 r.getNextPageToken(),
-                timeout - elapsedTime,
-                unit);
+                remainingMillis,
+                TimeUnit.MILLISECONDS);
           }
           return CompletableFuture.completedFuture(event);
         });
@@ -326,7 +332,7 @@ public class WorkflowExecutionUtils {
 
   private static RetryOptions getRetryOptionWithTimeout(long timeout, TimeUnit unit) {
     return new RetryOptions.Builder(RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS)
-        .setExpiration(Duration.ofSeconds(unit.toSeconds(timeout)))
+        .setExpiration(Duration.ofNanos(unit.toNanos(timeout)))
         .build();
   }
 
