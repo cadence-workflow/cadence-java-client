@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Add GetVersionOptions to Workflow.getVersion() for controlled version selection (executeWithVersion, executeWithMinVersion)
+- Change the default `ClientOptions` port from 7933 (TChannel) to 7833 (gRPC), the transport the client uses
 
 ## 3.12.7
 - Release use versions from git tags instead of static value (#1002)
