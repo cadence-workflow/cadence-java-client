@@ -19,6 +19,7 @@ package com.uber.cadence.internal.sync;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,6 +30,7 @@ import com.uber.cadence.converter.JsonDataConverter;
 import com.uber.cadence.internal.worker.ActivityTask;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.m3.tally.NoopScope;
+import java.util.Arrays;
 import java.util.concurrent.ScheduledExecutorService;
 import org.junit.After;
 import org.junit.Test;
@@ -74,6 +76,16 @@ public class POJOActivityTaskHandlerTest {
       fail("expected the input failure to propagate");
     } catch (IllegalStateException e) {
       assertEquals("corrupted task input", e.getMessage());
+      // The input must be read inside the local activity's execute(), where the context is set
+      // and cleared. If it were ever read earlier (for example eagerly by ActivityTaskImpl), this
+      // test would pass without exercising that code, so fail loudly instead.
+      assertTrue(
+          "task input should be read while executing the local activity",
+          Arrays.stream(e.getStackTrace())
+              .anyMatch(
+                  frame ->
+                      frame.getClassName().endsWith("POJOLocalActivityImplementation")
+                          && frame.getMethodName().equals("execute")));
     }
 
     assertFalse(
