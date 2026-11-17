@@ -236,6 +236,9 @@ public final class Async {
    * Invokes function retrying in case of failures according to retry options. Asynchronous variant.
    * Use {@link Workflow#retry(RetryOptions, Functions.Func)} for synchronous functions.
    *
+   * <p>{@link RetryOptions#getJitterCoefficient()} is not applied, as the backoff is computed in
+   * workflow code and must be deterministic.
+   *
    * @param options retry options that specify retry policy
    * @param fn function to invoke and retry
    * @return result of the function or the last failure.

@@ -3,6 +3,7 @@
 ## Unreleased
 - Add GetVersionOptions to Workflow.getVersion() for controlled version selection (executeWithVersion, executeWithMinVersion)
 - Change the default `ClientOptions` port from 7933 (TChannel) to 7833 (gRPC), the transport the client uses
+- Add `jitterCoefficient` to `RetryOptions` and `@MethodRetry` to randomize activity and workflow retry intervals: each interval is multiplied by a random factor in (1 - jitterCoefficient, 1]. Values within [0, 0.2] are recommended. Requires a server version that supports it; older servers ignore the field. Local activity retries apply the jitter client-side; `Workflow.retry` and `Async.retry` do not apply it.
 
 ## 3.12.7
 - Release use versions from git tags instead of static value (#1002)

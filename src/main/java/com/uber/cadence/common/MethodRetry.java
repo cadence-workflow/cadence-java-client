@@ -57,6 +57,13 @@ public @interface MethodRetry {
   double backoffCoefficient() default 0;
 
   /**
+   * Coefficient for proportional jitter, used to spread retries out. Must be between 0 and 1. Each
+   * retry interval is multiplied by a random factor in (1 - jitterCoefficient, 1]. Default is 0 (no
+   * jitter). Values within [0, 0.2] are recommended.
+   */
+  double jitterCoefficient() default 0;
+
+  /**
    * Maximum number of attempts. When exceeded the retries stop even if not expired yet. Must be 1
    * or bigger. Default is unlimited.
    */

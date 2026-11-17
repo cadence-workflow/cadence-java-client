@@ -178,6 +178,7 @@ class TypeMapper {
         RetryPolicy.newBuilder()
             .setInitialInterval(secondsToDuration(t.getInitialIntervalInSeconds()))
             .setBackoffCoefficient(t.getBackoffCoefficient())
+            .setJitterCoefficient(t.getJitterCoefficient())
             .setMaximumInterval(secondsToDuration(t.getMaximumIntervalInSeconds()))
             .setMaximumAttempts(t.getMaximumAttempts())
             .setExpirationInterval(secondsToDuration(t.getExpirationIntervalInSeconds()));
@@ -437,6 +438,7 @@ class TypeMapper {
     com.uber.cadence.RetryPolicy res = new com.uber.cadence.RetryPolicy();
     res.setInitialIntervalInSeconds(durationToSeconds(t.getInitialInterval()));
     res.setBackoffCoefficient(t.getBackoffCoefficient());
+    res.setJitterCoefficient(t.getJitterCoefficient());
     res.setMaximumIntervalInSeconds(durationToSeconds(t.getMaximumInterval()));
     res.setMaximumAttempts(t.getMaximumAttempts());
     res.setNonRetriableErrorReasons(t.getNonRetryableErrorReasonsList());

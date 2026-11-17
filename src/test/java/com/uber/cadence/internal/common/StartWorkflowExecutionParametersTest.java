@@ -64,7 +64,7 @@ public class StartWorkflowExecutionParametersTest {
             + "input=[1, 2, 3], executionStartToCloseTimeoutSeconds=60, "
             + "taskStartToCloseTimeoutSeconds=30, workflowIdReusePolicy=null, "
             + "retryParameters=RetryParameters{initialIntervalInSeconds=0, "
-            + "backoffCoefficient=0.0, maximumIntervalInSeconds=0, "
+            + "backoffCoefficient=0.0, jitterCoefficient=0.0, maximumIntervalInSeconds=0, "
             + "maximumAttempts=0, "
             + "nonRetriableErrorReasons=null, expirationIntervalInSeconds=0}, "
             + "cronSchedule='* * * * *', "

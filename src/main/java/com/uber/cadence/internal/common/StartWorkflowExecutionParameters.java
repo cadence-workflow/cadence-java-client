@@ -345,6 +345,7 @@ public final class StartWorkflowExecutionParameters {
     if (retryOptions != null) {
       RetryParameters rp = new RetryParameters();
       rp.setBackoffCoefficient(retryOptions.getBackoffCoefficient());
+      rp.setJitterCoefficient(retryOptions.getJitterCoefficient());
       rp.setExpirationIntervalInSeconds(getSeconds(retryOptions.getExpiration()));
       rp.setInitialIntervalInSeconds(getSeconds(retryOptions.getInitialInterval()));
       rp.setMaximumIntervalInSeconds(getSeconds(retryOptions.getMaximumInterval()));

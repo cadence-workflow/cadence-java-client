@@ -64,6 +64,10 @@ public final class RetryOptions {
     } else {
       builder.setBackoffCoefficient(DEFAULT_BACKOFF_COEFFICIENT);
     }
+    double jitter = merge(r.jitterCoefficient(), o.getJitterCoefficient(), double.class);
+    if (jitter != 0d) {
+      builder.setJitterCoefficient(jitter);
+    }
     return builder
         .setMaximumAttempts(merge(r.maximumAttempts(), o.getMaximumAttempts(), int.class))
         .setDoNotRetry(merge(r.doNotRetry(), o.getDoNotRetry()))
@@ -81,6 +85,7 @@ public final class RetryOptions {
         .setMaximumInterval(merge(getMaximumInterval(), o.getMaximumInterval(), Duration.class))
         .setBackoffCoefficient(
             merge(getBackoffCoefficient(), o.getBackoffCoefficient(), double.class))
+        .setJitterCoefficient(merge(getJitterCoefficient(), o.getJitterCoefficient(), double.class))
         .setMaximumAttempts(merge(getMaximumAttempts(), o.getMaximumAttempts(), int.class))
         .setDoNotRetry(merge(getDoNotRetry(), o.getDoNotRetry()))
         .validateBuildWithDefaults();
@@ -106,6 +111,8 @@ public final class RetryOptions {
 
     private double backoffCoefficient;
 
+    private double jitterCoefficient;
+
     private int maximumAttempts;
 
     private Duration maximumInterval;
@@ -119,6 +126,7 @@ public final class RetryOptions {
         return;
       }
       this.backoffCoefficient = o.getBackoffCoefficient();
+      this.jitterCoefficient = o.getJitterCoefficient();
       this.maximumAttempts = o.getMaximumAttempts();
       this.expiration = o.getExpiration();
       this.initialInterval = o.getInitialInterval();
@@ -160,6 +168,20 @@ public final class RetryOptions {
         throw new IllegalArgumentException("coefficient less than 1.0: " + backoffCoefficient);
       }
       this.backoffCoefficient = backoffCoefficient;
+      return this;
+    }
+
+    /**
+     * Coefficient for proportional jitter. Must be between 0 and 1. Each retry interval is
+     * multiplied by a random factor in (1 - jitterCoefficient, 1], applied after the maximum
+     * interval is enforced. Default is 0 (no jitter). Values within [0, 0.2] are recommended.
+     */
+    public Builder setJitterCoefficient(double jitterCoefficient) {
+      if (!isValidJitterCoefficient(jitterCoefficient)) {
+        throw new IllegalArgumentException(
+            "jitterCoefficient must be between 0 and 1: " + jitterCoefficient);
+      }
+      this.jitterCoefficient = jitterCoefficient;
       return this;
     }
 
@@ -215,6 +237,7 @@ public final class RetryOptions {
       return new RetryOptions(
           initialInterval,
           backoffCoefficient,
+          jitterCoefficient,
           expiration,
           maximumAttempts,
           maximumInterval,
@@ -229,7 +252,13 @@ public final class RetryOptions {
       }
       RetryOptions result =
           new RetryOptions(
-              initialInterval, backoff, expiration, maximumAttempts, maximumInterval, doNotRetry);
+              initialInterval,
+              backoff,
+              jitterCoefficient,
+              expiration,
+              maximumAttempts,
+              maximumInterval,
+              doNotRetry);
       result.validate();
       return result;
     }
@@ -238,6 +267,8 @@ public final class RetryOptions {
   private final Duration initialInterval;
 
   private final double backoffCoefficient;
+
+  private final double jitterCoefficient;
 
   private final Duration expiration;
 
@@ -250,12 +281,14 @@ public final class RetryOptions {
   private RetryOptions(
       Duration initialInterval,
       double backoffCoefficient,
+      double jitterCoefficient,
       Duration expiration,
       int maximumAttempts,
       Duration maximumInterval,
       List<Class<? extends Throwable>> doNotRetry) {
     this.initialInterval = initialInterval;
     this.backoffCoefficient = backoffCoefficient;
+    this.jitterCoefficient = jitterCoefficient;
     this.expiration = expiration;
     this.maximumAttempts = maximumAttempts;
     this.maximumInterval = maximumInterval;
@@ -268,6 +301,10 @@ public final class RetryOptions {
 
   public double getBackoffCoefficient() {
     return backoffCoefficient;
+  }
+
+  public double getJitterCoefficient() {
+    return jitterCoefficient;
   }
 
   public Duration getExpiration() {
@@ -300,6 +337,9 @@ public final class RetryOptions {
     if (backoffCoefficient != 0d && backoffCoefficient < 1.0) {
       throw new IllegalArgumentException("coefficient less than 1");
     }
+    if (!isValidJitterCoefficient(jitterCoefficient)) {
+      throw new IllegalArgumentException("jitterCoefficient must be between 0 and 1");
+    }
     if (maximumAttempts != 0 && maximumAttempts < 0) {
       throw new IllegalArgumentException("negative maximum attempts");
     }
@@ -320,6 +360,8 @@ public final class RetryOptions {
         + initialInterval
         + ", backoffCoefficient="
         + backoffCoefficient
+        + ", jitterCoefficient="
+        + jitterCoefficient
         + ", expiration="
         + expiration
         + ", maximumAttempts="
@@ -337,6 +379,7 @@ public final class RetryOptions {
     if (o == null || getClass() != o.getClass()) return false;
     RetryOptions that = (RetryOptions) o;
     return Double.compare(that.backoffCoefficient, backoffCoefficient) == 0
+        && Double.compare(that.jitterCoefficient, jitterCoefficient) == 0
         && maximumAttempts == that.maximumAttempts
         && Objects.equals(initialInterval, that.initialInterval)
         && Objects.equals(expiration, that.expiration)
@@ -349,10 +392,15 @@ public final class RetryOptions {
     return Objects.hash(
         initialInterval,
         backoffCoefficient,
+        jitterCoefficient,
         expiration,
         maximumAttempts,
         maximumInterval,
         doNotRetry);
+  }
+
+  private static boolean isValidJitterCoefficient(double jitterCoefficient) {
+    return jitterCoefficient >= 0d && jitterCoefficient <= 1d;
   }
 
   private static <G> G merge(G annotation, G options, Class<G> type) {

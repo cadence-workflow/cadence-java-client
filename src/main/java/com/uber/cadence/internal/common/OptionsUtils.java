@@ -19,6 +19,7 @@ package com.uber.cadence.internal.common;
 
 import com.google.common.base.Defaults;
 import java.time.Duration;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class OptionsUtils {
 
@@ -73,6 +74,18 @@ public final class OptionsUtils {
     }
     Duration result = Duration.ofMillis((long) (Math.ceil(duration.toMillis() / SECOND) * SECOND));
     return result;
+  }
+
+  /**
+   * Scales a retry interval by a random factor in (1 - jitterCoefficient, 1] to avoid retries
+   * happening at the same time. Returns the interval unchanged when the coefficient <= 0 or > 1.
+   */
+  public static long applyJitter(long intervalMillis, double jitterCoefficient) {
+    if (jitterCoefficient > 0d && jitterCoefficient <= 1d) {
+      return (long)
+          (intervalMillis * (1 - jitterCoefficient * ThreadLocalRandom.current().nextDouble()));
+    }
+    return intervalMillis;
   }
 
   /** Prohibits instantiation. */
