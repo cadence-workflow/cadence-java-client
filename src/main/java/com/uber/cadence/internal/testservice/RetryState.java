@@ -91,7 +91,8 @@ final class RetryState {
     // (1-jitterCoefficient, 1]
     long backoffInterval =
         OptionsUtils.applyJitter(nextInterval, retryPolicy.getJitterCoefficient());
-    long nextScheduleTime = currentTimeMillis + backoffInterval;
+    long backoffSeconds = Math.max(1, (long) Math.ceil(backoffInterval / 1000.0));
+    long nextScheduleTime = currentTimeMillis + TimeUnit.SECONDS.toMillis(backoffSeconds);
     if (expirationTime != 0 && nextScheduleTime > expirationTime) {
       return 0;
     }
@@ -105,7 +106,7 @@ final class RetryState {
         }
       }
     }
-    return (int) Math.max(1, (long) Math.ceil(backoffInterval / 1000.0));
+    return (int) backoffSeconds;
   }
 
   static RetryPolicy validateRetryPolicy(RetryPolicy policy) throws BadRequestError {

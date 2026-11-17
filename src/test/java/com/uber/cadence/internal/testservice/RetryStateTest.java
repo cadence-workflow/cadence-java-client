@@ -86,6 +86,43 @@ public class RetryStateTest {
   }
 
   @Test
+  public void testExpirationIsCheckedAgainstRoundedBackoff() throws BadRequestError {
+    // attempt 1 backs off 1.5s, which rounds up to 2s
+    RetryPolicy policy =
+        new RetryPolicy()
+            .setInitialIntervalInSeconds(1)
+            .setBackoffCoefficient(1.5)
+            .setMaximumAttempts(20)
+            .setExpirationIntervalInSeconds(60);
+    long now = 1_000_000;
+
+    // 1.8s left: the unrounded 1.5s would fit, but the 2s that is actually used does not
+    RetryState expiresBeforeRoundedBackoff = new RetryState(policy, now + 1800).getNextAttempt();
+    assertEquals(0, expiresBeforeRoundedBackoff.getBackoffIntervalInSeconds("error", now));
+
+    // 2s left: the rounded 2s backoff fits exactly
+    RetryState expiresAtRoundedBackoff = new RetryState(policy, now + 2000).getNextAttempt();
+    assertEquals(2, expiresAtRoundedBackoff.getBackoffIntervalInSeconds("error", now));
+  }
+
+  @Test
+  public void testMinimumBackoffIsCheckedAgainstExpiration() throws BadRequestError {
+    // full jitter can shrink the backoff to a few ms, but the 1s floor is what gets scheduled
+    RetryPolicy policy =
+        new RetryPolicy()
+            .setInitialIntervalInSeconds(1)
+            .setBackoffCoefficient(1)
+            .setMaximumAttempts(20)
+            .setExpirationIntervalInSeconds(60)
+            .setJitterCoefficient(1);
+    long now = 1_000_000;
+    RetryState state = new RetryState(policy, now + 999);
+    for (int i = 0; i < 100; i++) {
+      assertEquals(0, state.getBackoffIntervalInSeconds("error", now));
+    }
+  }
+
+  @Test
   public void testInvalidJitterCoefficientIsRejected() {
     for (double jitter : new double[] {-0.1, 1.1, Double.NaN}) {
       try {
