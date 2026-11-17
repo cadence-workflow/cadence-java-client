@@ -30,7 +30,7 @@ import java.util.Map;
 
 public class ClientOptions {
 
-  private static final int DEFAULT_LOCAL_CADENCE_SERVER_PORT = 7933;
+  private static final int DEFAULT_LOCAL_CADENCE_SERVER_PORT = 7833;
 
   private static final String LOCALHOST = "127.0.0.1";
 
