@@ -18,11 +18,13 @@
 package com.uber.cadence.internal.common;
 
 import com.uber.cadence.ActiveClusterSelectionPolicy;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.common.RetryOptions;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +58,12 @@ public final class StartWorkflowExecutionParameters {
   private Map<String, byte[]> context;
 
   private Duration delayStart;
+
+  private Duration jitterStart;
+
+  private Instant firstRunAt;
+
+  private CronOverlapPolicy cronOverlapPolicy;
 
   private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
 
@@ -320,6 +328,30 @@ public final class StartWorkflowExecutionParameters {
     return delayStart;
   }
 
+  public Duration getJitterStart() {
+    return jitterStart;
+  }
+
+  public void setJitterStart(Duration jitterStart) {
+    this.jitterStart = jitterStart;
+  }
+
+  public Instant getFirstRunAt() {
+    return firstRunAt;
+  }
+
+  public void setFirstRunAt(Instant firstRunAt) {
+    this.firstRunAt = firstRunAt;
+  }
+
+  public CronOverlapPolicy getCronOverlapPolicy() {
+    return cronOverlapPolicy;
+  }
+
+  public void setCronOverlapPolicy(CronOverlapPolicy cronOverlapPolicy) {
+    this.cronOverlapPolicy = cronOverlapPolicy;
+  }
+
   public ActiveClusterSelectionPolicy getActiveClusterSelectionPolicy() {
     return activeClusterSelectionPolicy;
   }
@@ -364,6 +396,9 @@ public final class StartWorkflowExecutionParameters {
     if (options.getCronSchedule() != null) {
       parameters.setCronSchedule(options.getCronSchedule());
     }
+    parameters.setJitterStart(options.getJitterStart());
+    parameters.setFirstRunAt(options.getFirstRunAt());
+    parameters.setCronOverlapPolicy(options.getCronOverlapPolicy());
     parameters.setActiveClusterSelectionPolicy(options.getActiveClusterSelectionPolicy());
     return parameters;
   }
@@ -409,6 +444,14 @@ public final class StartWorkflowExecutionParameters {
         + ", delayStart='"
         + delayStart
         + '\''
+        + ", jitterStart='"
+        + jitterStart
+        + '\''
+        + ", firstRunAt='"
+        + firstRunAt
+        + '\''
+        + ", cronOverlapPolicy="
+        + cronOverlapPolicy
         + ", activeClusterSelectionPolicy='"
         + activeClusterSelectionPolicy
         + '\''
@@ -433,6 +476,9 @@ public final class StartWorkflowExecutionParameters {
         && Objects.equals(searchAttributes, that.searchAttributes)
         && Objects.equals(context, that.context)
         && Objects.equals(delayStart, that.delayStart)
+        && Objects.equals(jitterStart, that.jitterStart)
+        && Objects.equals(firstRunAt, that.firstRunAt)
+        && cronOverlapPolicy == that.cronOverlapPolicy
         && Objects.equals(activeClusterSelectionPolicy, that.activeClusterSelectionPolicy);
   }
 
@@ -452,6 +498,9 @@ public final class StartWorkflowExecutionParameters {
             searchAttributes,
             context,
             delayStart,
+            jitterStart,
+            firstRunAt,
+            cronOverlapPolicy,
             activeClusterSelectionPolicy);
     result = 31 * result + Arrays.hashCode(input);
     return result;
@@ -474,6 +523,9 @@ public final class StartWorkflowExecutionParameters {
     result.setSearchAttributes(searchAttributes);
     result.setContext(context);
     result.setDelayStart(delayStart);
+    result.setJitterStart(jitterStart);
+    result.setFirstRunAt(firstRunAt);
+    result.setCronOverlapPolicy(cronOverlapPolicy);
     result.setActiveClusterSelectionPolicy(activeClusterSelectionPolicy);
     return result;
   }

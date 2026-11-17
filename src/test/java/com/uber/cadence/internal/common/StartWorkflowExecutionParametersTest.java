@@ -19,9 +19,11 @@ import static org.junit.Assert.*;
 
 import com.uber.cadence.ActiveClusterSelectionPolicy;
 import com.uber.cadence.ClusterAttribute;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.client.WorkflowOptions;
 import java.time.Duration;
+import java.time.Instant;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -69,6 +71,7 @@ public class StartWorkflowExecutionParametersTest {
             + "nonRetriableErrorReasons=null, expirationIntervalInSeconds=0}, "
             + "cronSchedule='* * * * *', "
             + "memo='null', searchAttributes='null, context='null, delayStart='null', "
+            + "jitterStart='null', firstRunAt='null', cronOverlapPolicy=null, "
             + "activeClusterSelectionPolicy='null'}";
 
     assertEquals(expectedString, params1.toString());
@@ -147,5 +150,39 @@ public class StartWorkflowExecutionParametersTest {
         StartWorkflowExecutionParameters.fromWorkflowOptions(options);
 
     assertEquals(policy, parameters.getActiveClusterSelectionPolicy());
+  }
+
+  @Test
+  public void testFromWorkflowOptionsCopiesStartTimingOptions() {
+    Instant firstRunAt = Instant.parse("2030-01-02T03:04:05.123456789Z");
+    WorkflowOptions options =
+        new WorkflowOptions.Builder()
+            .setTaskList("taskList")
+            .setExecutionStartToCloseTimeout(Duration.ofSeconds(10))
+            .setJitterStart(Duration.ofSeconds(30))
+            .setFirstRunAt(firstRunAt)
+            .setCronOverlapPolicy(CronOverlapPolicy.BUFFERONE)
+            .build();
+
+    StartWorkflowExecutionParameters parameters =
+        StartWorkflowExecutionParameters.fromWorkflowOptions(options);
+
+    assertEquals(Duration.ofSeconds(30), parameters.getJitterStart());
+    assertEquals(firstRunAt, parameters.getFirstRunAt());
+    assertEquals(CronOverlapPolicy.BUFFERONE, parameters.getCronOverlapPolicy());
+  }
+
+  @Test
+  public void testCopyKeepsStartTimingOptions() {
+    Instant firstRunAt = Instant.parse("2030-01-02T03:04:05Z");
+    params1.setJitterStart(Duration.ofSeconds(30));
+    params1.setFirstRunAt(firstRunAt);
+    params1.setCronOverlapPolicy(CronOverlapPolicy.SKIPPED);
+
+    StartWorkflowExecutionParameters copy = params1.copy();
+
+    assertEquals(Duration.ofSeconds(30), copy.getJitterStart());
+    assertEquals(firstRunAt, copy.getFirstRunAt());
+    assertEquals(CronOverlapPolicy.SKIPPED, copy.getCronOverlapPolicy());
   }
 }

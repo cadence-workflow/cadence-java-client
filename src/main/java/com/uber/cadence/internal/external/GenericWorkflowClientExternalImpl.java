@@ -30,10 +30,12 @@ import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.util.ImmutableMap;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public final class GenericWorkflowClientExternalImpl implements GenericWorkflowClientExternal {
 
@@ -261,6 +263,15 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     if (startParameters.getDelayStart() != null) {
       request.setDelayStartSeconds((int) startParameters.getDelayStart().getSeconds());
     }
+    if (startParameters.getJitterStart() != null) {
+      request.setJitterStartSeconds((int) startParameters.getJitterStart().getSeconds());
+    }
+    if (startParameters.getFirstRunAt() != null) {
+      request.setFirstRunAtTimestamp(toUnixNano(startParameters.getFirstRunAt()));
+    }
+    if (startParameters.getCronOverlapPolicy() != null) {
+      request.setCronOverlapPolicy(startParameters.getCronOverlapPolicy());
+    }
     if (startParameters.getActiveClusterSelectionPolicy() != null) {
       request.setActiveClusterSelectionPolicy(startParameters.getActiveClusterSelectionPolicy());
     }
@@ -307,6 +318,10 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     Header headerEntity = new Header();
     headerEntity.setFields(fields);
     return headerEntity;
+  }
+
+  private static long toUnixNano(Instant instant) {
+    return TimeUnit.SECONDS.toNanos(instant.getEpochSecond()) + instant.getNano();
   }
 
   private RetryPolicy toRetryPolicy(RetryParameters retryParameters) {
@@ -489,6 +504,15 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     }
     if (startParameters.getDelayStart() != null) {
       request.setDelayStartSeconds((int) startParameters.getDelayStart().getSeconds());
+    }
+    if (startParameters.getJitterStart() != null) {
+      request.setJitterStartSeconds((int) startParameters.getJitterStart().getSeconds());
+    }
+    if (startParameters.getFirstRunAt() != null) {
+      request.setFirstRunAtTimestamp(toUnixNano(startParameters.getFirstRunAt()));
+    }
+    if (startParameters.getCronOverlapPolicy() != null) {
+      request.setCronOverlapPolicy(startParameters.getCronOverlapPolicy());
     }
     if (startParameters.getActiveClusterSelectionPolicy() != null) {
       request.setActiveClusterSelectionPolicy(startParameters.getActiveClusterSelectionPolicy());
