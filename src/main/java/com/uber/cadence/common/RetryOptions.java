@@ -64,8 +64,11 @@ public final class RetryOptions {
     } else {
       builder.setBackoffCoefficient(DEFAULT_BACKOFF_COEFFICIENT);
     }
+    int maximumAttempts = merge(r.maximumAttempts(), o.getMaximumAttempts(), int.class);
+    if (maximumAttempts != 0) {
+      builder.setMaximumAttempts(maximumAttempts);
+    }
     return builder
-        .setMaximumAttempts(merge(r.maximumAttempts(), o.getMaximumAttempts(), int.class))
         .setDoNotRetry(merge(r.doNotRetry(), o.getDoNotRetry()))
         .validateBuildWithDefaults();
   }
