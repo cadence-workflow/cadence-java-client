@@ -83,6 +83,10 @@ public class WorkflowExecutionUtils {
   // Wait period for passive cluster to retry getting workflow result in case of replication delay.
   private static final long ENTITY_NOT_EXIST_RETRY_WAIT_MILLIS = 500;
 
+  // The server rejects a long poll that arrives with less than 50ms left and ends it 50ms before
+  // the RPC deadline, so a re-poll with a smaller remaining budget cannot succeed.
+  private static final long MIN_REMAINING_POLL_MILLIS = 100;
+
   /**
    * Returns result of a workflow instance execution or throws an exception if workflow did not
    * complete successfully.
@@ -173,8 +177,15 @@ public class WorkflowExecutionUtils {
     // TODO: Interrupt service long poll call on timeout and on interrupt
     long start = System.currentTimeMillis();
     HistoryEvent event;
+    boolean firstPoll = true;
     do {
-      if (timeout != 0 && System.currentTimeMillis() - start > unit.toMillis(timeout)) {
+      long remainingMillis =
+          firstPoll
+              ? unit.toMillis(timeout)
+              : unit.toMillis(timeout) - (System.currentTimeMillis() - start);
+      // The first poll gets the full budget. A re-poll needs enough time left for the server to be
+      // able to answer it.
+      if (timeout != 0 && remainingMillis < (firstPoll ? 1 : MIN_REMAINING_POLL_MILLIS)) {
         throw new TimeoutException(
             "WorkflowId="
                 + workflowExecution.getWorkflowId()
@@ -193,12 +204,18 @@ public class WorkflowExecutionUtils {
       r.setNextPageToken(pageToken);
       r.setWaitForNewEvent(true);
       r.setSkipArchival(true);
-      RetryOptions retryOptions = getRetryOptionWithTimeout(timeout, unit);
+      firstPoll = false;
+      // timeout == 0 means no timeout, so it is passed on as is.
+      final long pollTimeout = timeout == 0 ? timeout : remainingMillis;
+      final TimeUnit pollUnit = timeout == 0 ? unit : TimeUnit.MILLISECONDS;
+      RetryOptions retryOptions = getRetryOptionWithTimeout(pollTimeout, pollUnit);
       try {
         response =
             RpcRetryer.retryWithResult(
                 retryOptions,
-                () -> service.GetWorkflowExecutionHistoryWithTimeout(r, unit.toMillis(timeout)));
+                () ->
+                    service.GetWorkflowExecutionHistoryWithTimeout(
+                        r, pollUnit.toMillis(pollTimeout)));
       } catch (EntityNotExistsError e) {
         if (e.getActiveCluster() != null
             && e.getCurrentCluster() != null
@@ -280,9 +297,36 @@ public class WorkflowExecutionUtils {
         getWorkflowExecutionHistoryAsync(service, request, timeout, unit);
     return response.thenComposeAsync(
         (r) -> {
-          long elapsedTime = System.currentTimeMillis() - start;
-          long remainingMillis = unit.toMillis(timeout) - elapsedTime;
-          if (timeout != 0 && remainingMillis <= 0) {
+          History history = r.getHistory();
+          WorkflowExecution nextWorkflowExecution = workflowExecution;
+          byte[] nextPageToken = pageToken;
+          if (history != null && history.getEvents().size() > 0) {
+            HistoryEvent event = history.getEvents().get(0);
+            if (!isWorkflowExecutionCompletedEvent(event)) {
+              throw new RuntimeException("Last history event is not completion event: " + event);
+            }
+            if (event.getEventType() != EventType.WorkflowExecutionContinuedAsNew) {
+              // A close event is returned even if the deadline has just passed.
+              return CompletableFuture.completedFuture(event);
+            }
+            // Workflow called continueAsNew. Start polling the new generation with new runId.
+            nextWorkflowExecution =
+                new WorkflowExecution()
+                    .setWorkflowId(workflowExecution.getWorkflowId())
+                    .setRunId(
+                        event
+                            .getWorkflowExecutionContinuedAsNewEventAttributes()
+                            .getNewExecutionRunId());
+            nextPageToken = r.getNextPageToken();
+          }
+          // Empty poll or continue as new: poll again with the remaining budget, if any.
+          // timeout == 0 means no timeout, so it is passed on as is.
+          if (timeout == 0) {
+            return getInstanceCloseEventAsync(
+                service, domain, nextWorkflowExecution, nextPageToken, timeout, unit);
+          }
+          long remainingMillis = unit.toMillis(timeout) - (System.currentTimeMillis() - start);
+          if (remainingMillis < MIN_REMAINING_POLL_MILLIS) {
             throw CheckedExceptionWrapper.wrap(
                 new TimeoutException(
                     "WorkflowId="
@@ -294,39 +338,13 @@ public class WorkflowExecutionUtils {
                         + ", unit="
                         + unit));
           }
-          History history = r.getHistory();
-          if (history == null || history.getEvents().size() == 0) {
-            // Empty poll returned
-            return getInstanceCloseEventAsync(
-                service,
-                domain,
-                workflowExecution,
-                pageToken,
-                remainingMillis,
-                TimeUnit.MILLISECONDS);
-          }
-          HistoryEvent event = history.getEvents().get(0);
-          if (!isWorkflowExecutionCompletedEvent(event)) {
-            throw new RuntimeException("Last history event is not completion event: " + event);
-          }
-          // Workflow called continueAsNew. Start polling the new generation with new runId.
-          if (event.getEventType() == EventType.WorkflowExecutionContinuedAsNew) {
-            WorkflowExecution nextWorkflowExecution =
-                new WorkflowExecution()
-                    .setWorkflowId(workflowExecution.getWorkflowId())
-                    .setRunId(
-                        event
-                            .getWorkflowExecutionContinuedAsNewEventAttributes()
-                            .getNewExecutionRunId());
-            return getInstanceCloseEventAsync(
-                service,
-                domain,
-                nextWorkflowExecution,
-                r.getNextPageToken(),
-                remainingMillis,
-                TimeUnit.MILLISECONDS);
-          }
-          return CompletableFuture.completedFuture(event);
+          return getInstanceCloseEventAsync(
+              service,
+              domain,
+              nextWorkflowExecution,
+              nextPageToken,
+              remainingMillis,
+              TimeUnit.MILLISECONDS);
         });
   }
 
