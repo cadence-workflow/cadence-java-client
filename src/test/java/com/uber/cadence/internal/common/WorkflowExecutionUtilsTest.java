@@ -22,15 +22,22 @@ import com.uber.cadence.*;
 import com.uber.cadence.client.WorkflowTerminatedException;
 import com.uber.cadence.client.WorkflowTimedOutException;
 import com.uber.cadence.internal.compatibility.ClientObjects;
+import com.uber.cadence.serviceclient.AsyncMethodCallback;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import java.util.*;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.junit.Before;
 import org.junit.Test;
 
 public class WorkflowExecutionUtilsTest {
+
+  private static final byte[] EXPECTED_RESULT = "result".getBytes();
+  private static final long FIRST_POLL_MILLIS = 100;
 
   private IWorkflowService mockService;
   private WorkflowExecution workflowExecution;
@@ -176,6 +183,365 @@ public class WorkflowExecutionUtilsTest {
     // Simulate a delay by mocking the service call to throw a TimeoutException
     WorkflowExecutionUtils.getWorkflowExecutionResult(
         mockService, "testDomain", workflowExecution, Optional.empty(), -1, TimeUnit.MILLISECONDS);
+  }
+
+  // ===========================
+  // Tests for timeouts shorter than a second
+  // ===========================
+  @Test
+  public void testGetWorkflowExecutionResult_SubSecondTimeout() throws Exception {
+    when(mockService.GetWorkflowExecutionHistoryWithTimeout(any(), anyLong()))
+        .thenReturn(createResponseWithEvent(createCompletedEvent()));
+
+    byte[] result =
+        WorkflowExecutionUtils.getWorkflowExecutionResult(
+            mockService,
+            "testDomain",
+            workflowExecution,
+            Optional.empty(),
+            800,
+            TimeUnit.MILLISECONDS);
+
+    assertArrayEquals(EXPECTED_RESULT, result);
+    verify(mockService).GetWorkflowExecutionHistoryWithTimeout(any(), eq(800L));
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResultAsync_SubSecondTimeout() throws Exception {
+    List<Long> pollTimeouts = mockAsyncPolls(0, createResponseWithEvent(createCompletedEvent()));
+
+    byte[] result =
+        WorkflowExecutionUtils.getWorkflowExecutionResultAsync(
+                mockService,
+                "testDomain",
+                workflowExecution,
+                Optional.empty(),
+                999,
+                TimeUnit.MILLISECONDS)
+            .get(10, TimeUnit.SECONDS);
+
+    assertArrayEquals(EXPECTED_RESULT, result);
+    assertEquals(Collections.singletonList(999L), pollTimeouts);
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResultAsync_SubMillisecondTimeoutExpires() throws Exception {
+    mockAsyncPolls(0, new GetWorkflowExecutionHistoryResponse());
+
+    assertFailsWithTimeoutException(
+        WorkflowExecutionUtils.getWorkflowExecutionResultAsync(
+            mockService,
+            "testDomain",
+            workflowExecution,
+            Optional.empty(),
+            500,
+            TimeUnit.MICROSECONDS));
+  }
+
+  // ===========================
+  // Tests for the remaining timeout carried over between async polls
+  // ===========================
+  @Test
+  public void testGetWorkflowExecutionResultAsync_EmptyPollKeepsRemainingTimeout()
+      throws Exception {
+    List<Long> pollTimeouts =
+        mockAsyncPolls(
+            FIRST_POLL_MILLIS,
+            new GetWorkflowExecutionHistoryResponse(),
+            createResponseWithEvent(createCompletedEvent()));
+
+    byte[] result =
+        WorkflowExecutionUtils.getWorkflowExecutionResultAsync(
+                mockService,
+                "testDomain",
+                workflowExecution,
+                Optional.empty(),
+                60,
+                TimeUnit.SECONDS)
+            .get(10, TimeUnit.SECONDS);
+
+    assertArrayEquals(EXPECTED_RESULT, result);
+    assertRemainingTimeoutCarriedOver(pollTimeouts, 60_000L);
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResultAsync_ContinueAsNewKeepsRemainingTimeout()
+      throws Exception {
+    List<Long> pollTimeouts =
+        mockAsyncPolls(
+            FIRST_POLL_MILLIS,
+            createResponseWithEvent(createContinuedAsNewEvent()),
+            createResponseWithEvent(createCompletedEvent()));
+
+    byte[] result =
+        WorkflowExecutionUtils.getWorkflowExecutionResultAsync(
+                mockService,
+                "testDomain",
+                workflowExecution,
+                Optional.empty(),
+                60,
+                TimeUnit.SECONDS)
+            .get(10, TimeUnit.SECONDS);
+
+    assertArrayEquals(EXPECTED_RESULT, result);
+    assertRemainingTimeoutCarriedOver(pollTimeouts, 60_000L);
+    verify(mockService)
+        .GetWorkflowExecutionHistoryWithTimeout(
+            argThat(request -> "newRunId".equals(request.getExecution().getRunId())),
+            any(AsyncMethodCallback.class),
+            anyLong());
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResultAsync_EmptyPollWithoutTimeoutKeepsPolling()
+      throws Exception {
+    mockAsyncPolls(
+        FIRST_POLL_MILLIS,
+        new GetWorkflowExecutionHistoryResponse(),
+        createResponseWithEvent(createCompletedEvent()));
+
+    byte[] result =
+        WorkflowExecutionUtils.getWorkflowExecutionResultAsync(
+                mockService,
+                "testDomain",
+                workflowExecution,
+                Optional.empty(),
+                Long.MAX_VALUE,
+                TimeUnit.MILLISECONDS)
+            .get(10, TimeUnit.SECONDS);
+
+    assertArrayEquals(EXPECTED_RESULT, result);
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResultAsync_EmptyPollExhaustsTimeout() throws Exception {
+    mockAsyncPolls(FIRST_POLL_MILLIS, new GetWorkflowExecutionHistoryResponse());
+
+    assertFailsWithTimeoutException(
+        WorkflowExecutionUtils.getWorkflowExecutionResultAsync(
+            mockService,
+            "testDomain",
+            workflowExecution,
+            Optional.empty(),
+            FIRST_POLL_MILLIS / 2,
+            TimeUnit.MILLISECONDS));
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResultAsync_LateCloseEventIsReturned() throws Exception {
+    mockAsyncPolls(FIRST_POLL_MILLIS, createResponseWithEvent(createCompletedEvent()));
+
+    byte[] result =
+        WorkflowExecutionUtils.getWorkflowExecutionResultAsync(
+                mockService,
+                "testDomain",
+                workflowExecution,
+                Optional.empty(),
+                FIRST_POLL_MILLIS / 2,
+                TimeUnit.MILLISECONDS)
+            .get(10, TimeUnit.SECONDS);
+
+    assertArrayEquals(EXPECTED_RESULT, result);
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResultAsync_EmptyPollBelowMinimumBudgetExpires()
+      throws Exception {
+    List<Long> pollTimeouts =
+        mockAsyncPolls(FIRST_POLL_MILLIS, new GetWorkflowExecutionHistoryResponse());
+
+    // Less than the minimum budget is left after the first poll, so no re-poll is sent.
+    assertFailsWithTimeoutException(
+        WorkflowExecutionUtils.getWorkflowExecutionResultAsync(
+            mockService,
+            "testDomain",
+            workflowExecution,
+            Optional.empty(),
+            FIRST_POLL_MILLIS + 50,
+            TimeUnit.MILLISECONDS));
+    assertEquals(1, pollTimeouts.size());
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResultAsync_ContinueAsNewBelowMinimumBudgetExpires()
+      throws Exception {
+    List<Long> pollTimeouts =
+        mockAsyncPolls(FIRST_POLL_MILLIS, createResponseWithEvent(createContinuedAsNewEvent()));
+
+    assertFailsWithTimeoutException(
+        WorkflowExecutionUtils.getWorkflowExecutionResultAsync(
+            mockService,
+            "testDomain",
+            workflowExecution,
+            Optional.empty(),
+            FIRST_POLL_MILLIS + 50,
+            TimeUnit.MILLISECONDS));
+    assertEquals(1, pollTimeouts.size());
+  }
+
+  // ===========================
+  // Tests for the remaining timeout carried over between sync polls
+  // ===========================
+  @Test
+  public void testGetWorkflowExecutionResult_EmptyPollKeepsRemainingTimeout() throws Exception {
+    List<Long> pollTimeouts =
+        mockSyncPolls(
+            FIRST_POLL_MILLIS,
+            new GetWorkflowExecutionHistoryResponse(),
+            createResponseWithEvent(createCompletedEvent()));
+
+    byte[] result =
+        WorkflowExecutionUtils.getWorkflowExecutionResult(
+            mockService, "testDomain", workflowExecution, Optional.empty(), 60, TimeUnit.SECONDS);
+
+    assertArrayEquals(EXPECTED_RESULT, result);
+    assertRemainingTimeoutCarriedOver(pollTimeouts, 60_000L);
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResult_ContinueAsNewKeepsRemainingTimeout() throws Exception {
+    List<Long> pollTimeouts =
+        mockSyncPolls(
+            FIRST_POLL_MILLIS,
+            createResponseWithEvent(createContinuedAsNewEvent()),
+            createResponseWithEvent(createCompletedEvent()));
+
+    byte[] result =
+        WorkflowExecutionUtils.getWorkflowExecutionResult(
+            mockService, "testDomain", workflowExecution, Optional.empty(), 60, TimeUnit.SECONDS);
+
+    assertArrayEquals(EXPECTED_RESULT, result);
+    assertRemainingTimeoutCarriedOver(pollTimeouts, 60_000L);
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResult_EmptyPollWithoutTimeoutKeepsPolling()
+      throws Exception {
+    mockSyncPolls(
+        FIRST_POLL_MILLIS,
+        new GetWorkflowExecutionHistoryResponse(),
+        createResponseWithEvent(createCompletedEvent()));
+
+    byte[] result =
+        WorkflowExecutionUtils.getWorkflowExecutionResult(
+            mockService,
+            "testDomain",
+            workflowExecution,
+            Optional.empty(),
+            Long.MAX_VALUE,
+            TimeUnit.MILLISECONDS);
+
+    assertArrayEquals(EXPECTED_RESULT, result);
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResult_EmptyPollBelowMinimumBudgetExpires() throws Exception {
+    List<Long> pollTimeouts =
+        mockSyncPolls(FIRST_POLL_MILLIS, new GetWorkflowExecutionHistoryResponse());
+
+    try {
+      WorkflowExecutionUtils.getWorkflowExecutionResult(
+          mockService,
+          "testDomain",
+          workflowExecution,
+          Optional.empty(),
+          FIRST_POLL_MILLIS + 50,
+          TimeUnit.MILLISECONDS);
+      fail("Expected TimeoutException");
+    } catch (TimeoutException expected) {
+      assertEquals(1, pollTimeouts.size());
+    }
+  }
+
+  @Test
+  public void testGetWorkflowExecutionResult_LateCloseEventIsReturned() throws Exception {
+    mockSyncPolls(FIRST_POLL_MILLIS, createResponseWithEvent(createCompletedEvent()));
+
+    byte[] result =
+        WorkflowExecutionUtils.getWorkflowExecutionResult(
+            mockService,
+            "testDomain",
+            workflowExecution,
+            Optional.empty(),
+            FIRST_POLL_MILLIS / 2,
+            TimeUnit.MILLISECONDS);
+
+    assertArrayEquals(EXPECTED_RESULT, result);
+  }
+
+  private HistoryEvent createContinuedAsNewEvent() {
+    return new HistoryEvent()
+        .setEventType(EventType.WorkflowExecutionContinuedAsNew)
+        .setWorkflowExecutionContinuedAsNewEventAttributes(
+            new WorkflowExecutionContinuedAsNewEventAttributes().setNewExecutionRunId("newRunId"));
+  }
+
+  /** Same as {@link #mockAsyncPolls} for the synchronous history call. */
+  private List<Long> mockSyncPolls(
+      long firstPollMillis, GetWorkflowExecutionHistoryResponse... responses) throws Exception {
+    List<Long> pollTimeouts = new CopyOnWriteArrayList<>();
+    Iterator<GetWorkflowExecutionHistoryResponse> remaining = Arrays.asList(responses).iterator();
+    when(mockService.GetWorkflowExecutionHistoryWithTimeout(any(), anyLong()))
+        .thenAnswer(
+            invocation -> {
+              if (pollTimeouts.isEmpty()) {
+                Thread.sleep(firstPollMillis);
+              }
+              pollTimeouts.add(invocation.getArgument(1));
+              return remaining.next();
+            });
+    return pollTimeouts;
+  }
+
+  private HistoryEvent createCompletedEvent() {
+    return new HistoryEvent()
+        .setEventType(EventType.WorkflowExecutionCompleted)
+        .setWorkflowExecutionCompletedEventAttributes(
+            new WorkflowExecutionCompletedEventAttributes().setResult(EXPECTED_RESULT));
+  }
+
+  /**
+   * Answers async history polls with the given responses in order, delaying the first one, and
+   * returns the live list of RPC timeouts passed to those polls.
+   */
+  private List<Long> mockAsyncPolls(
+      long firstPollMillis, GetWorkflowExecutionHistoryResponse... responses) throws Exception {
+    List<Long> pollTimeouts = new CopyOnWriteArrayList<>();
+    Iterator<GetWorkflowExecutionHistoryResponse> remaining = Arrays.asList(responses).iterator();
+    doAnswer(
+            invocation -> {
+              if (pollTimeouts.isEmpty()) {
+                Thread.sleep(firstPollMillis);
+              }
+              pollTimeouts.add(invocation.getArgument(2));
+              AsyncMethodCallback<GetWorkflowExecutionHistoryResponse> callback =
+                  invocation.getArgument(1);
+              callback.onComplete(remaining.next());
+              return null;
+            })
+        .when(mockService)
+        .GetWorkflowExecutionHistoryWithTimeout(any(), any(AsyncMethodCallback.class), anyLong());
+    return pollTimeouts;
+  }
+
+  private void assertRemainingTimeoutCarriedOver(List<Long> pollTimeouts, long timeoutMillis) {
+    assertEquals(2, pollTimeouts.size());
+    assertEquals(timeoutMillis, (long) pollTimeouts.get(0));
+    long secondPollTimeout = pollTimeouts.get(1);
+    assertTrue(
+        "Unexpected remaining timeout: " + secondPollTimeout,
+        secondPollTimeout > 0 && secondPollTimeout < timeoutMillis);
+  }
+
+  private void assertFailsWithTimeoutException(CompletableFuture<byte[]> result) throws Exception {
+    try {
+      result.get(10, TimeUnit.SECONDS);
+      fail("Expected the future to fail with TimeoutException");
+    } catch (ExecutionException e) {
+      assertTrue(
+          "Unexpected failure: " + e.getCause(),
+          CheckedExceptionWrapper.unwrap((Exception) e.getCause()) instanceof TimeoutException);
+    }
   }
 
   // ===========================
