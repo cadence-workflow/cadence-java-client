@@ -21,8 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.uber.cadence.BadRequestError;
 import com.uber.cadence.CancellationAlreadyRequestedError;
@@ -34,7 +32,6 @@ import com.uber.cadence.ServiceBusyError;
 import com.uber.cadence.WorkflowExecutionAlreadyCompletedError;
 import com.uber.cadence.WorkflowExecutionAlreadyStartedError;
 import com.uber.cadence.common.RetryOptions;
-import com.uber.cadence.serviceclient.IWorkflowService;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,7 +47,7 @@ public class RetryerTest {
     RetryOptions defaults = RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS;
     assertEquals(
         defaults, RpcRetryer.mergeRetryOptions(new RetryOptions.Builder().build(), defaults, null));
-    assertSame(defaults, RpcRetryer.mergeRetryOptions((RetryOptions) null, defaults, null));
+    assertSame(defaults, RpcRetryer.mergeRetryOptions(null, defaults, null));
   }
 
   @Test
@@ -138,24 +135,6 @@ public class RetryerTest {
           field == 4 ? overrides[field].getExpiration() : defaults.getExpiration(),
           actual.getExpiration());
       assertEquals(defaults.getDoNotRetry(), actual.getDoNotRetry());
-    }
-  }
-
-  @Test
-  public void testRpcMissingAndUnsupportedServiceOptions() {
-    IWorkflowService service = mock(IWorkflowService.class);
-    assertSame(RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, RpcRetryer.mergeRetryOptions(service));
-    when(service.getOptions()).thenThrow(new UnsupportedOperationException("legacy service"));
-    assertSame(RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, RpcRetryer.mergeRetryOptions(service));
-
-    IWorkflowService brokenService = mock(IWorkflowService.class);
-    IllegalStateException failure = new IllegalStateException("broken service");
-    when(brokenService.getOptions()).thenThrow(failure);
-    try {
-      RpcRetryer.mergeRetryOptions(brokenService);
-      fail("Unrelated failure must remain visible");
-    } catch (IllegalStateException actual) {
-      assertSame(failure, actual);
     }
   }
 

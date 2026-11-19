@@ -79,6 +79,30 @@ public class GenericWorkflowClientExternalImplTest {
   private void configureRetries(RetryOptions options) {
     when(service.getOptions())
         .thenReturn(ClientOptions.newBuilder().setRpcRetryOptions(options).build());
+    client = new GenericWorkflowClientExternalImpl(service, "test-domain", new NoopScope());
+  }
+
+  @Test
+  public void unsupportedServiceOptionsUseDefaults() throws Exception {
+    when(service.getOptions()).thenThrow(new UnsupportedOperationException("legacy service"));
+    client = new GenericWorkflowClientExternalImpl(service, "test-domain", new NoopScope());
+    when(service.StartWorkflowExecution(any()))
+        .thenThrow(new ServiceBusyError())
+        .thenReturn(new StartWorkflowExecutionResponse().setRunId("rid"));
+    assertEquals("rid", client.startWorkflow(startParameters()).getRunId());
+    verify(service, times(2)).StartWorkflowExecution(any());
+  }
+
+  @Test
+  public void otherServiceOptionFailuresAreVisible() {
+    IllegalStateException failure = new IllegalStateException("broken service");
+    when(service.getOptions()).thenThrow(failure);
+    try {
+      new GenericWorkflowClientExternalImpl(service, "test-domain", new NoopScope());
+      fail("Unrelated failure must remain visible");
+    } catch (IllegalStateException actual) {
+      assertSame(failure, actual);
+    }
   }
 
   @Test

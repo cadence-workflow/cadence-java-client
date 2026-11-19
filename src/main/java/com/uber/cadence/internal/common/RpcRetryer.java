@@ -28,8 +28,6 @@ import com.uber.cadence.QueryFailedError;
 import com.uber.cadence.WorkflowExecutionAlreadyCompletedError;
 import com.uber.cadence.WorkflowExecutionAlreadyStartedError;
 import com.uber.cadence.common.RetryOptions;
-import com.uber.cadence.serviceclient.ClientOptions;
-import com.uber.cadence.serviceclient.IWorkflowService;
 import java.time.Duration;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -106,24 +104,6 @@ public final class RpcRetryer {
   }
 
   private static final Logger log = LoggerFactory.getLogger(RpcRetryer.class);
-
-  public static RetryOptions mergeRetryOptions(IWorkflowService service) {
-    return mergeRetryOptions(service, DEFAULT_RPC_RETRY_OPTIONS, null);
-  }
-
-  /** Applies partial overrides to application RPCs, preserving their timeout-derived budgets. */
-  public static RetryOptions mergeRetryOptions(
-      IWorkflowService service, RetryOptions operationDefaults, Duration operationTimeout) {
-    ClientOptions clientOptions;
-    try {
-      clientOptions = service.getOptions();
-    } catch (UnsupportedOperationException e) {
-      // Service implementations based on IWorkflowServiceBase may not implement getOptions().
-      return operationDefaults;
-    }
-    RetryOptions overrides = clientOptions == null ? null : clientOptions.getRpcRetryOptions();
-    return mergeRetryOptions(overrides, operationDefaults, operationTimeout);
-  }
 
   /** Merges application RPC overrides; also used to validate ClientOptions before first use. */
   public static RetryOptions mergeRetryOptions(
