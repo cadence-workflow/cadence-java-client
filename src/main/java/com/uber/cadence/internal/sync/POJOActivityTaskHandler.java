@@ -266,8 +266,10 @@ class POJOActivityTaskHandler implements ActivityTaskHandler {
     public ActivityTaskHandler.Result execute(ActivityTaskImpl task, Scope metricsScope) {
       ActivityExecutionContext context =
           new LocalActivityExecutionContextImpl(service, domain, task);
-      CurrentActivityExecutionContext.set(context);
+      // Read the input before setting the context: if it throws, the finally block below
+      // would never run and the context would stay attached to this worker thread.
       byte[] input = task.getInput();
+      CurrentActivityExecutionContext.set(context);
       try {
         Object[] args = dataConverter.fromDataArray(input, method.getGenericParameterTypes());
         Object result = method.invoke(activity, args);
