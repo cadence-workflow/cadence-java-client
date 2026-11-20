@@ -476,6 +476,11 @@ class ReplayDecider implements Decider {
         metricsScope.counter(MetricsType.DECISION_TASK_FORCE_COMPLETED).inc(1);
       }
       return forceCreateNewDecisionTask;
+    } catch (VersionMismatchError e) {
+      // A version this code does not support is not non-determinism: during a rolling deployment
+      // an upgraded worker will process the decision task. Always fail the decision task so it is
+      // retried, whatever the NonDeterministicWorkflowPolicy. The decision task handler reports it.
+      throw e;
     } catch (Error e) {
       if (this.workflow.getWorkflowImplementationOptions().getNonDeterministicWorkflowPolicy()
           == FailWorkflow) {
