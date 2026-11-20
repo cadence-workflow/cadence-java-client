@@ -24,6 +24,7 @@ import com.uber.cadence.internal.logging.LoggerTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.replay.DeciderCache;
 import com.uber.cadence.internal.replay.DecisionContext;
+import com.uber.cadence.internal.replay.VersionMismatchError;
 import com.uber.cadence.workflow.Promise;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -101,7 +102,8 @@ class WorkflowThreadImpl implements WorkflowThread {
         }
       } catch (Error e) {
         // Error aborts decision, not fails the workflow.
-        if (log.isErrorEnabled() && !root) {
+        // A getVersion mismatch is reported by the decision task handler, so it is not logged here.
+        if (log.isErrorEnabled() && !root && !(e instanceof VersionMismatchError)) {
           StringWriter sw = new StringWriter();
           PrintWriter pw = new PrintWriter(sw, true);
           e.printStackTrace(pw);

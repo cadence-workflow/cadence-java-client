@@ -61,6 +61,10 @@ public class MetricsType {
       CADENCE_METRICS_PREFIX + "decision-scheduled-to-start-latency";
   public static final String DECISION_EXECUTION_FAILED_COUNTER =
       CADENCE_METRICS_PREFIX + "decision-execution-failed";
+  // Decision tasks that failed because getVersion found a version outside the range the workflow
+  // code supports. Tagged with VersionMismatchType.
+  public static final String DECISION_TASK_VERSION_MISMATCH_COUNTER =
+      CADENCE_METRICS_PREFIX + "decision-task-version-mismatch";
   public static final String DECISION_EXECUTION_LATENCY =
       CADENCE_METRICS_PREFIX + "decision-execution-latency";
   public static final String DECISION_RESPONSE_LATENCY =

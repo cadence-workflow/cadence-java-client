@@ -19,6 +19,7 @@ package com.uber.cadence.internal.replay;
 
 import static com.uber.cadence.internal.common.InternalUtils.createStickyTaskList;
 
+import com.google.common.collect.ImmutableMap;
 import com.uber.cadence.GetWorkflowExecutionHistoryRequest;
 import com.uber.cadence.GetWorkflowExecutionHistoryResponse;
 import com.uber.cadence.HistoryEvent;
@@ -31,6 +32,7 @@ import com.uber.cadence.StickyExecutionAttributes;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.WorkflowType;
 import com.uber.cadence.internal.common.WorkflowExecutionUtils;
+import com.uber.cadence.internal.metrics.MetricsTag;
 import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.worker.DecisionTaskHandler;
 import com.uber.cadence.internal.worker.LocalActivityWorker;
@@ -85,7 +87,14 @@ public final class ReplayDecisionTaskHandler implements DecisionTaskHandler {
     try {
       return handleDecisionTaskImpl(decisionTask);
     } catch (Throwable e) {
-      options.getMetricsScope().counter(MetricsType.DECISION_EXECUTION_FAILED_COUNTER).inc(1);
+      boolean isVersionMismatch = e instanceof VersionMismatchError;
+      if (isVersionMismatch) {
+        // Reported apart from other failures so that rolling deployments do not look like
+        // workflow crashes. The decision task still fails and is retried as before.
+        reportVersionMismatch(decisionTask, (VersionMismatchError) e);
+      } else {
+        options.getMetricsScope().counter(MetricsType.DECISION_EXECUTION_FAILED_COUNTER).inc(1);
+      }
       // Only fail decision on first attempt, subsequent failure on the same decision task will
       // timeout. This is to avoid spin on the failed decision task.
       if (decisionTask.getAttempt() > 0) {
@@ -94,7 +103,7 @@ public final class ReplayDecisionTaskHandler implements DecisionTaskHandler {
         }
         throw (Exception) e;
       }
-      if (log.isErrorEnabled()) {
+      if (!isVersionMismatch && log.isErrorEnabled()) {
         WorkflowExecution execution = decisionTask.getWorkflowExecution();
         log.error(
             "Workflow task failure. startedEventId="
@@ -114,6 +123,39 @@ public final class ReplayDecisionTaskHandler implements DecisionTaskHandler {
       String stackTrace = sw.toString();
       failedRequest.setDetails(stackTrace.getBytes(StandardCharsets.UTF_8));
       return new DecisionTaskHandler.Result(null, failedRequest, null);
+    }
+  }
+
+  /**
+   * Records a getVersion mismatch. A version that is too new is expected while a rolling deployment
+   * is in progress and clears up once an upgraded worker takes the task, so it is logged as a
+   * warning. A version that is too old means the workflow code dropped support for a version that
+   * is still in use, which needs a code fix, so it is logged as an error.
+   */
+  private void reportVersionMismatch(
+      PollForDecisionTaskResponse decisionTask, VersionMismatchError e) {
+    options
+        .getMetricsScope()
+        .tagged(ImmutableMap.of(MetricsTag.VERSION_MISMATCH_TYPE, e.getType().getTagValue()))
+        .counter(MetricsType.DECISION_TASK_VERSION_MISMATCH_COUNTER)
+        .inc(1);
+
+    WorkflowExecution execution = decisionTask.getWorkflowExecution();
+    String message =
+        "Workflow version mismatch. VersionMismatchType="
+            + e.getType().getTagValue()
+            + ", WorkflowID="
+            + execution.getWorkflowId()
+            + ", RunID="
+            + execution.getRunId()
+            + ", startedEventId="
+            + decisionTask.getStartedEventId()
+            + ": "
+            + e.getMessage();
+    if (e.getType() == VersionMismatchError.Type.TOO_NEW) {
+      log.warn(message);
+    } else {
+      log.error(message, e);
     }
   }
 
