@@ -17,6 +17,8 @@
 
 package com.uber.cadence.internal.replay;
 
+import com.uber.cadence.ActiveClusterSelectionPolicy;
+import com.uber.cadence.CronOverlapPolicy;
 import com.uber.cadence.ParentClosePolicy;
 import com.uber.cadence.WorkflowIdReusePolicy;
 import com.uber.cadence.WorkflowType;
@@ -58,6 +60,10 @@ public final class StartChildWorkflowExecutionParameters {
     private Map<String, byte[]> context;
 
     private ParentClosePolicy parentClosePolicy;
+
+    private CronOverlapPolicy cronOverlapPolicy;
+
+    private ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
 
     public Builder setDomain(String domain) {
       this.domain = domain;
@@ -135,6 +141,17 @@ public final class StartChildWorkflowExecutionParameters {
       return this;
     }
 
+    public Builder setCronOverlapPolicy(CronOverlapPolicy cronOverlapPolicy) {
+      this.cronOverlapPolicy = cronOverlapPolicy;
+      return this;
+    }
+
+    public Builder setActiveClusterSelectionPolicy(
+        ActiveClusterSelectionPolicy activeClusterSelectionPolicy) {
+      this.activeClusterSelectionPolicy = activeClusterSelectionPolicy;
+      return this;
+    }
+
     public StartChildWorkflowExecutionParameters build() {
       return new StartChildWorkflowExecutionParameters(
           domain,
@@ -151,7 +168,9 @@ public final class StartChildWorkflowExecutionParameters {
           memo,
           searchAttributes,
           context,
-          parentClosePolicy);
+          parentClosePolicy,
+          cronOverlapPolicy,
+          activeClusterSelectionPolicy);
     }
   }
 
@@ -185,6 +204,10 @@ public final class StartChildWorkflowExecutionParameters {
 
   private final ParentClosePolicy parentClosePolicy;
 
+  private final CronOverlapPolicy cronOverlapPolicy;
+
+  private final ActiveClusterSelectionPolicy activeClusterSelectionPolicy;
+
   private StartChildWorkflowExecutionParameters(
       String domain,
       byte[] input,
@@ -200,7 +223,9 @@ public final class StartChildWorkflowExecutionParameters {
       Map<String, Object> memo,
       Map<String, Object> searchAttributes,
       Map<String, byte[]> context,
-      ParentClosePolicy parentClosePolicy) {
+      ParentClosePolicy parentClosePolicy,
+      CronOverlapPolicy cronOverlapPolicy,
+      ActiveClusterSelectionPolicy activeClusterSelectionPolicy) {
     this.domain = domain;
     this.input = input;
     this.control = control;
@@ -216,6 +241,8 @@ public final class StartChildWorkflowExecutionParameters {
     this.searchAttributes = searchAttributes;
     this.context = context;
     this.parentClosePolicy = parentClosePolicy;
+    this.cronOverlapPolicy = cronOverlapPolicy;
+    this.activeClusterSelectionPolicy = activeClusterSelectionPolicy;
   }
 
   public String getDomain() {
@@ -278,6 +305,14 @@ public final class StartChildWorkflowExecutionParameters {
     return parentClosePolicy;
   }
 
+  public CronOverlapPolicy getCronOverlapPolicy() {
+    return cronOverlapPolicy;
+  }
+
+  public ActiveClusterSelectionPolicy getActiveClusterSelectionPolicy() {
+    return activeClusterSelectionPolicy;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -297,7 +332,9 @@ public final class StartChildWorkflowExecutionParameters {
         && Objects.equals(memo, that.memo)
         && Objects.equals(searchAttributes, that.searchAttributes)
         && Objects.equals(context, that.context)
-        && Objects.equals(parentClosePolicy, that.parentClosePolicy);
+        && Objects.equals(parentClosePolicy, that.parentClosePolicy)
+        && cronOverlapPolicy == that.cronOverlapPolicy
+        && Objects.equals(activeClusterSelectionPolicy, that.activeClusterSelectionPolicy);
   }
 
   @Override
@@ -317,7 +354,9 @@ public final class StartChildWorkflowExecutionParameters {
             memo,
             searchAttributes,
             context,
-            parentClosePolicy);
+            parentClosePolicy,
+            cronOverlapPolicy,
+            activeClusterSelectionPolicy);
     result = 31 * result + Arrays.hashCode(input);
     return result;
   }
@@ -359,6 +398,10 @@ public final class StartChildWorkflowExecutionParameters {
         + context
         + ", parentClosePolicy="
         + parentClosePolicy
+        + ", cronOverlapPolicy="
+        + cronOverlapPolicy
+        + ", activeClusterSelectionPolicy="
+        + activeClusterSelectionPolicy
         + '}';
   }
 }

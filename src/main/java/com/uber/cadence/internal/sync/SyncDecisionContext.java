@@ -425,6 +425,8 @@ final class SyncDecisionContext implements WorkflowInterceptor {
               .setMemo(options.getMemo())
               .setSearchAttributes(options.getSearchAttributes())
               .setParentClosePolicy(options.getParentClosePolicy())
+              .setCronOverlapPolicy(options.getCronOverlapPolicy())
+              .setActiveClusterSelectionPolicy(options.getActiveClusterSelectionPolicy())
               .build();
       return WorkflowRetryerInternal.retryAsync(
           retryOptions, () -> executeChildWorkflowOnce(name, o1, input, executionResult));
@@ -465,6 +467,8 @@ final class SyncDecisionContext implements WorkflowInterceptor {
             .setSearchAttributes(options.getSearchAttributes())
             .setContext(extractContextsAndConvertToBytes(propagators))
             .setParentClosePolicy(options.getParentClosePolicy())
+            .setCronOverlapPolicy(options.getCronOverlapPolicy())
+            .setActiveClusterSelectionPolicy(options.getActiveClusterSelectionPolicy())
             .build();
     CompletablePromise<byte[]> result = Workflow.newPromise();
     Consumer<Exception> cancellationCallback =

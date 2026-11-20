@@ -153,6 +153,14 @@ final class WorkflowDecisionContext {
       attributes.setParentClosePolicy(parentClosePolicy);
     }
 
+    if (parameters.getCronOverlapPolicy() != null) {
+      attributes.setCronOverlapPolicy(parameters.getCronOverlapPolicy());
+    }
+
+    if (parameters.getActiveClusterSelectionPolicy() != null) {
+      attributes.setActiveClusterSelectionPolicy(parameters.getActiveClusterSelectionPolicy());
+    }
+
     Map<String, Object> memoMap = parameters.getMemo();
     if (memoMap != null) {
       attributes.setMemo(InternalUtils.convertMapToMemo(memoMap));
