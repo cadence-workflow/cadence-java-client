@@ -29,6 +29,7 @@ public final class RetryParameters {
 
   public int initialIntervalInSeconds;
   public double backoffCoefficient;
+  public double jitterCoefficient;
   public int maximumIntervalInSeconds;
   public int maximumAttempts;
   public List<String> nonRetriableErrorReasons;
@@ -36,6 +37,7 @@ public final class RetryParameters {
 
   public RetryParameters(RetryOptions retryOptions) {
     setBackoffCoefficient(retryOptions.getBackoffCoefficient());
+    setJitterCoefficient(retryOptions.getJitterCoefficient());
     setExpirationIntervalInSeconds(
         (int) roundUpToSeconds(retryOptions.getExpiration()).getSeconds());
     setMaximumAttempts(retryOptions.getMaximumAttempts());
@@ -71,6 +73,14 @@ public final class RetryParameters {
 
   public void setBackoffCoefficient(double backoffCoefficient) {
     this.backoffCoefficient = backoffCoefficient;
+  }
+
+  public double getJitterCoefficient() {
+    return jitterCoefficient;
+  }
+
+  public void setJitterCoefficient(double jitterCoefficient) {
+    this.jitterCoefficient = jitterCoefficient;
   }
 
   public int getMaximumIntervalInSeconds() {
@@ -121,6 +131,7 @@ public final class RetryParameters {
     result.setMaximumAttempts(maximumAttempts);
     result.setExpirationIntervalInSeconds(expirationIntervalInSeconds);
     result.setBackoffCoefficient(backoffCoefficient);
+    result.setJitterCoefficient(jitterCoefficient);
     return result;
   }
 
@@ -131,6 +142,7 @@ public final class RetryParameters {
         .setInitialIntervalInSeconds(getInitialIntervalInSeconds())
         .setExpirationIntervalInSeconds(getExpirationIntervalInSeconds())
         .setBackoffCoefficient(getBackoffCoefficient())
+        .setJitterCoefficient(getJitterCoefficient())
         .setMaximumIntervalInSeconds(getMaximumIntervalInSeconds());
   }
 
@@ -141,6 +153,8 @@ public final class RetryParameters {
         + initialIntervalInSeconds
         + ", backoffCoefficient="
         + backoffCoefficient
+        + ", jitterCoefficient="
+        + jitterCoefficient
         + ", maximumIntervalInSeconds="
         + maximumIntervalInSeconds
         + ", maximumAttempts="

@@ -17,6 +17,9 @@ package com.uber.cadence.internal.common;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 
+import com.uber.cadence.RetryPolicy;
+import com.uber.cadence.common.RetryOptions;
+import java.time.Duration;
 import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +36,7 @@ public class RetryParametersTest {
     original.setMaximumAttempts(5);
     original.setExpirationIntervalInSeconds(600);
     original.setBackoffCoefficient(2.0);
+    original.setJitterCoefficient(0.2);
     original.setNonRetriableErrorReasons(Arrays.asList("Error1", "Error2"));
   }
 
@@ -46,6 +50,7 @@ public class RetryParametersTest {
     assertEquals(original.getMaximumAttempts(), copy.getMaximumAttempts());
     assertEquals(original.getExpirationIntervalInSeconds(), copy.getExpirationIntervalInSeconds());
     assertEquals(original.getBackoffCoefficient(), copy.getBackoffCoefficient(), 0.0);
+    assertEquals(original.getJitterCoefficient(), copy.getJitterCoefficient(), 0.0);
     assertEquals(original.getNonRetriableErrorReasons(), copy.getNonRetriableErrorReasons());
 
     // Verify that nonRetriableErrorReasons is deeply copied
@@ -65,5 +70,22 @@ public class RetryParametersTest {
     assertEquals(original.getMaximumAttempts(), copy.getMaximumAttempts());
     assertEquals(original.getExpirationIntervalInSeconds(), copy.getExpirationIntervalInSeconds());
     assertEquals(original.getBackoffCoefficient(), copy.getBackoffCoefficient(), 0.0);
+    assertEquals(original.getJitterCoefficient(), copy.getJitterCoefficient(), 0.0);
+  }
+
+  @Test
+  public void testJitterCoefficientFromRetryOptionsToRetryPolicy() {
+    RetryOptions options =
+        new RetryOptions.Builder()
+            .setInitialInterval(Duration.ofSeconds(1))
+            .setMaximumAttempts(3)
+            .setJitterCoefficient(0.2)
+            .validateBuildWithDefaults();
+
+    RetryParameters parameters = new RetryParameters(options);
+    assertEquals(0.2, parameters.getJitterCoefficient(), 0.0);
+
+    RetryPolicy policy = parameters.toRetryPolicy();
+    assertEquals(0.2, policy.getJitterCoefficient(), 0.0);
   }
 }

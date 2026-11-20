@@ -44,6 +44,7 @@ public final class ProtoObjects {
       RetryPolicy.newBuilder()
           .setInitialInterval(seconds(11))
           .setBackoffCoefficient(0.5)
+          .setJitterCoefficient(0.1)
           .setMaximumInterval(seconds(12))
           .setMaximumAttempts(13)
           .addNonRetryableErrorReasons("error")

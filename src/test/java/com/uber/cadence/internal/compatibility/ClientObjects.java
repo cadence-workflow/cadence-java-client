@@ -35,6 +35,7 @@ public class ClientObjects {
       new RetryPolicy()
           .setInitialIntervalInSeconds(11)
           .setBackoffCoefficient(0.5)
+          .setJitterCoefficient(0.1)
           .setMaximumIntervalInSeconds(12)
           .setMaximumAttempts(13)
           .setNonRetriableErrorReasons(ImmutableList.of("error"))

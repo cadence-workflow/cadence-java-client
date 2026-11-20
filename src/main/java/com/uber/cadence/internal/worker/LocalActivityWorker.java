@@ -24,6 +24,7 @@ import com.uber.cadence.PollForActivityTaskResponse;
 import com.uber.cadence.common.RetryOptions;
 import com.uber.cadence.context.ContextPropagator;
 import com.uber.cadence.internal.common.LocalActivityMarkerData;
+import com.uber.cadence.internal.common.OptionsUtils;
 import com.uber.cadence.internal.context.ContextThreadLocal;
 import com.uber.cadence.internal.metrics.HistogramBuckets;
 import com.uber.cadence.internal.metrics.MetricsEmit;
@@ -221,7 +222,10 @@ public final class LocalActivityWorker extends SuspendableWorkerBase {
       }
 
       RetryOptions retryOptions = task.params.getRetryOptions();
-      long sleepMillis = retryOptions.calculateSleepTime(task.params.getAttempt());
+      long sleepMillis =
+          OptionsUtils.applyJitter(
+              retryOptions.calculateSleepTime(task.params.getAttempt()),
+              retryOptions.getJitterCoefficient());
       long elapsedTask = System.currentTimeMillis() - task.taskStartTime;
       long elapsedTotal = elapsedTask + task.params.getElapsedTime();
       if (retryOptions.shouldRethrow(

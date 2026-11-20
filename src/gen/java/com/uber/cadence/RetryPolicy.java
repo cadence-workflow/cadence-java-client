@@ -13,4 +13,5 @@ public class RetryPolicy {
   private int maximumAttempts;
   private List<String> nonRetriableErrorReasons = new ArrayList<>();;
   private int expirationIntervalInSeconds;
+  private double jitterCoefficient;
 }

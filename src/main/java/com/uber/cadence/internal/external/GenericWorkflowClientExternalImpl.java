@@ -332,6 +332,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
   private RetryPolicy toRetryPolicy(RetryParameters retryParameters) {
     return new RetryPolicy()
         .setBackoffCoefficient(retryParameters.getBackoffCoefficient())
+        .setJitterCoefficient(retryParameters.getJitterCoefficient())
         .setExpirationIntervalInSeconds(retryParameters.getExpirationIntervalInSeconds())
         .setInitialIntervalInSeconds(retryParameters.getInitialIntervalInSeconds())
         .setMaximumAttempts(retryParameters.getMaximumAttempts())

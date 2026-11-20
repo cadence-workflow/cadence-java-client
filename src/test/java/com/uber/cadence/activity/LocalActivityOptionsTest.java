@@ -38,6 +38,7 @@ public class LocalActivityOptionsTest extends TestCase {
             + "retryOptions=RetryOptions{"
             + "initialInterval=PT2M3S, "
             + "backoffCoefficient=0.0, "
+            + "jitterCoefficient=0.0, "
             + "expiration=null, "
             + "maximumAttempts=43, "
             + "maximumInterval=null, "

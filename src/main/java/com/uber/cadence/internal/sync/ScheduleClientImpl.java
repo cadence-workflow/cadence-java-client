@@ -362,7 +362,10 @@ final class ScheduleClientImpl implements ScheduleClient {
   }
 
   private static RetryPolicy toThriftRetryPolicy(RetryOptions r) {
-    RetryPolicy t = new RetryPolicy().setBackoffCoefficient(r.getBackoffCoefficient());
+    RetryPolicy t =
+        new RetryPolicy()
+            .setBackoffCoefficient(r.getBackoffCoefficient())
+            .setJitterCoefficient(r.getJitterCoefficient());
     if (r.getInitialInterval() != null) {
       t.setInitialIntervalInSeconds((int) r.getInitialInterval().getSeconds());
     }
@@ -481,6 +484,7 @@ final class ScheduleClientImpl implements ScheduleClient {
         .setInitialInterval(Duration.ofSeconds(p.getInitialIntervalInSeconds()))
         .setMaximumInterval(Duration.ofSeconds(p.getMaximumIntervalInSeconds()))
         .setBackoffCoefficient(p.getBackoffCoefficient())
+        .setJitterCoefficient(p.getJitterCoefficient())
         .setMaximumAttempts(p.getMaximumAttempts())
         .setExpiration(Duration.ofSeconds(p.getExpirationIntervalInSeconds()))
         .build();

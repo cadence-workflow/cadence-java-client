@@ -19,6 +19,7 @@ package com.uber.cadence.internal.testservice;
 
 import com.uber.cadence.BadRequestError;
 import com.uber.cadence.RetryPolicy;
+import com.uber.cadence.internal.common.OptionsUtils;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -86,8 +87,12 @@ final class RetryState {
       nextInterval = maxInterval;
     }
 
-    long backoffInterval = nextInterval;
-    long nextScheduleTime = currentTimeMillis + backoffInterval;
+    // add jitter to avoid global synchronization, scaling the interval by a random factor in
+    // (1-jitterCoefficient, 1]
+    long backoffInterval =
+        OptionsUtils.applyJitter(nextInterval, retryPolicy.getJitterCoefficient());
+    long backoffSeconds = Math.max(1, (long) Math.ceil(backoffInterval / 1000.0));
+    long nextScheduleTime = currentTimeMillis + TimeUnit.SECONDS.toMillis(backoffSeconds);
     if (expirationTime != 0 && nextScheduleTime > expirationTime) {
       return 0;
     }
@@ -101,7 +106,7 @@ final class RetryState {
         }
       }
     }
-    return (int) TimeUnit.MILLISECONDS.toSeconds((long) Math.ceil((double) backoffInterval));
+    return (int) backoffSeconds;
   }
 
   static RetryPolicy validateRetryPolicy(RetryPolicy policy) throws BadRequestError {
@@ -121,6 +126,10 @@ final class RetryState {
     }
     if (policy.getMaximumAttempts() < 0) {
       throw new BadRequestError("MaximumAttempts cannot be less than 0 on retry policy.");
+    }
+    double jitter = policy.getJitterCoefficient();
+    if (Double.isNaN(jitter) || jitter < 0 || jitter > 1) {
+      throw new BadRequestError("JitterCoefficient must be between 0 and 1 on retry policy.");
     }
     if (policy.getMaximumAttempts() == 0 && policy.getExpirationIntervalInSeconds() == 0) {
       throw new BadRequestError(

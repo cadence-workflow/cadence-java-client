@@ -89,6 +89,7 @@ public class ActivityOptionsTest {
   @MethodRetry(
     initialIntervalSeconds = 12,
     backoffCoefficient = 1.97,
+    jitterCoefficient = 0.15,
     expirationSeconds = 1231423,
     maximumAttempts = 234567,
     maximumIntervalSeconds = 22,
@@ -122,6 +123,7 @@ public class ActivityOptionsTest {
     RetryOptions rMerged = merged.getRetryOptions();
     Assert.assertEquals(r.maximumAttempts(), rMerged.getMaximumAttempts());
     Assert.assertEquals(r.backoffCoefficient(), rMerged.getBackoffCoefficient(), 0.0);
+    Assert.assertEquals(r.jitterCoefficient(), rMerged.getJitterCoefficient(), 0.0);
     Assert.assertEquals(Duration.ofSeconds(r.expirationSeconds()), rMerged.getExpiration());
     Assert.assertEquals(
         Duration.ofSeconds(r.initialIntervalSeconds()), rMerged.getInitialInterval());
@@ -144,6 +146,7 @@ public class ActivityOptionsTest {
                     .setDoNotRetry(IllegalArgumentException.class)
                     .setMaximumAttempts(11111)
                     .setBackoffCoefficient(1.55)
+                    .setJitterCoefficient(0.05)
                     .setMaximumInterval(Duration.ofDays(3))
                     .setExpiration(Duration.ofDays(365))
                     .setInitialInterval(Duration.ofMinutes(12))
