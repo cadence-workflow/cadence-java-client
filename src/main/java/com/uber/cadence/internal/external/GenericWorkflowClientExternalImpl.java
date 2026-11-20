@@ -26,6 +26,7 @@ import com.uber.cadence.internal.metrics.MetricsType;
 import com.uber.cadence.internal.replay.QueryWorkflowParameters;
 import com.uber.cadence.internal.replay.SignalExternalWorkflowParameters;
 import com.uber.cadence.serviceclient.AsyncMethodCallback;
+import com.uber.cadence.serviceclient.ClientOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.m3.tally.Scope;
 import com.uber.m3.util.ImmutableMap;
@@ -40,12 +41,28 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
   private final String domain;
   private final IWorkflowService service;
   private final Scope metricsScope;
+  private final RetryOptions rpcRetryOverrides;
+  private final RetryOptions rpcRetryOptions;
 
   public GenericWorkflowClientExternalImpl(
       IWorkflowService service, String domain, Scope metricsScope) {
     this.service = service;
     this.domain = domain;
     this.metricsScope = metricsScope;
+    this.rpcRetryOverrides = getRpcRetryOverrides(service);
+    this.rpcRetryOptions =
+        RpcRetryer.mergeRetryOptions(rpcRetryOverrides, RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, null);
+  }
+
+  private static RetryOptions getRpcRetryOverrides(IWorkflowService service) {
+    ClientOptions options;
+    try {
+      options = service.getOptions();
+    } catch (UnsupportedOperationException e) {
+      // Service implementations based on IWorkflowServiceBase may not implement getOptions().
+      return null;
+    }
+    return options == null ? null : options.getRpcRetryOptions();
   }
 
   @Override
@@ -103,7 +120,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     try {
       result =
           RpcRetryer.retryWithResult(
-              RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, () -> service.StartWorkflowExecution(request));
+              rpcRetryOptions, () -> service.StartWorkflowExecution(request));
     } catch (WorkflowExecutionAlreadyStartedError e) {
       throw e;
     } catch (CadenceError e) {
@@ -116,13 +133,16 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     return execution;
   }
 
-  private RetryOptions getRetryOptionsWithExpiration(RetryOptions o, Long timeoutInMillis) {
+  private RetryOptions getRetryOptionsWithExpiration(Long timeoutInMillis) {
     if (timeoutInMillis == null || timeoutInMillis <= 0 || timeoutInMillis == Long.MAX_VALUE) {
-      return o;
+      return rpcRetryOptions;
     }
-    return new RetryOptions.Builder(RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS)
-        .setExpiration(Duration.ofMillis((timeoutInMillis)))
-        .build();
+    Duration timeout = Duration.ofMillis(timeoutInMillis);
+    RetryOptions defaults =
+        new RetryOptions.Builder(RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS)
+            .setExpiration(timeout)
+            .build();
+    return RpcRetryer.mergeRetryOptions(rpcRetryOverrides, defaults, timeout);
   }
 
   private CompletableFuture<WorkflowExecution> startWorkflowAsyncInternal(
@@ -130,7 +150,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     StartWorkflowExecutionRequest request = getStartRequest(startParameters);
 
     return RpcRetryer.retryWithResultAsync(
-        getRetryOptionsWithExpiration(RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, timeoutInMillis),
+        getRetryOptionsWithExpiration(timeoutInMillis),
         () -> {
           CompletableFuture<WorkflowExecution> result = new CompletableFuture<>();
           try {
@@ -182,7 +202,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
         new StartWorkflowExecutionAsyncRequest().setRequest(getStartRequest(startParameters));
     try {
       RpcRetryer.retryWithResult(
-          RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, () -> service.StartWorkflowExecutionAsync(request));
+          rpcRetryOptions, () -> service.StartWorkflowExecutionAsync(request));
     } catch (WorkflowExecutionAlreadyStartedError e) {
       throw e;
     } catch (CadenceError e) {
@@ -196,7 +216,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
         new StartWorkflowExecutionAsyncRequest().setRequest(getStartRequest(startParameters));
 
     return RpcRetryer.retryWithResultAsync(
-        getRetryOptionsWithExpiration(RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, timeoutInMillis),
+        getRetryOptionsWithExpiration(timeoutInMillis),
         () -> {
           CompletableFuture<Void> result = new CompletableFuture<>();
           try {
@@ -324,7 +344,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     SignalWorkflowExecutionRequest request = getSignalRequest(signalParameters);
 
     try {
-      RpcRetryer.retry(() -> service.SignalWorkflowExecution(request));
+      RpcRetryer.retry(rpcRetryOptions, () -> service.SignalWorkflowExecution(request));
     } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
     }
@@ -341,7 +361,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
       SignalExternalWorkflowParameters signalParameters, Long timeoutInMillis) {
     SignalWorkflowExecutionRequest request = getSignalRequest(signalParameters);
     return RpcRetryer.retryWithResultAsync(
-        getRetryOptionsWithExpiration(RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, timeoutInMillis),
+        getRetryOptionsWithExpiration(timeoutInMillis),
         () -> {
           CompletableFuture<Void> result = new CompletableFuture<>();
           try {
@@ -425,8 +445,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
             .setRequest(createSignalWithStartRequest(parameters));
     try {
       RpcRetryer.retryWithResult(
-          RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS,
-          () -> service.SignalWithStartWorkflowExecutionAsync(request));
+          rpcRetryOptions, () -> service.SignalWithStartWorkflowExecutionAsync(request));
       return new WorkflowExecution().setWorkflowId(request.getRequest().getWorkflowId());
     } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
@@ -439,8 +458,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     try {
       StartWorkflowExecutionResponse result =
           RpcRetryer.retryWithResult(
-              RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS,
-              () -> service.SignalWithStartWorkflowExecution(request));
+              rpcRetryOptions, () -> service.SignalWithStartWorkflowExecution(request));
       return new WorkflowExecution()
           .setRunId(result.getRunId())
           .setWorkflowId(request.getWorkflowId());
@@ -503,7 +521,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     request.setDomain(domain);
     request.setWorkflowExecution(execution);
     try {
-      RpcRetryer.retry(() -> service.RequestCancelWorkflowExecution(request));
+      RpcRetryer.retry(rpcRetryOptions, () -> service.RequestCancelWorkflowExecution(request));
     } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
     }
@@ -524,8 +542,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     request.setQueryConsistencyLevel(queryParameters.getQueryConsistencyLevel());
     try {
       QueryWorkflowResponse response =
-          RpcRetryer.retryWithResult(
-              RpcRetryer.DEFAULT_RPC_RETRY_OPTIONS, () -> service.QueryWorkflow(request));
+          RpcRetryer.retryWithResult(rpcRetryOptions, () -> service.QueryWorkflow(request));
       return response;
     } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
@@ -546,7 +563,7 @@ public final class GenericWorkflowClientExternalImpl implements GenericWorkflowC
     request.setReason(terminateParameters.getReason());
     //        request.setChildPolicy(terminateParameters.getChildPolicy());
     try {
-      RpcRetryer.retry(() -> service.TerminateWorkflowExecution(request));
+      RpcRetryer.retry(rpcRetryOptions, () -> service.TerminateWorkflowExecution(request));
     } catch (CadenceError e) {
       throw CheckedExceptionWrapper.wrap(e);
     }

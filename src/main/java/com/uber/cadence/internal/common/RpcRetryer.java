@@ -105,6 +105,54 @@ public final class RpcRetryer {
 
   private static final Logger log = LoggerFactory.getLogger(RpcRetryer.class);
 
+  /** Merges application RPC overrides; also used to validate ClientOptions before first use. */
+  public static RetryOptions mergeRetryOptions(
+      RetryOptions overrides, RetryOptions operationDefaults, Duration operationTimeout) {
+    if (overrides == null) {
+      return operationDefaults;
+    }
+
+    RetryOptions.Builder resolved = new RetryOptions.Builder(operationDefaults);
+    if (overrides.getInitialInterval() != null) {
+      resolved.setInitialInterval(overrides.getInitialInterval());
+    }
+    if (overrides.getMaximumInterval() != null) {
+      resolved.setMaximumInterval(overrides.getMaximumInterval());
+    } else if (overrides.getInitialInterval() != null
+        && operationDefaults.getMaximumInterval() != null
+        && overrides.getInitialInterval().compareTo(operationDefaults.getMaximumInterval()) > 0) {
+      // Only an inherited maximum may grow; an explicit incompatible maximum is an error.
+      resolved.setMaximumInterval(overrides.getInitialInterval());
+    }
+    double coefficient = overrides.getBackoffCoefficient();
+    if (coefficient != 0) {
+      if (!Double.isFinite(coefficient) || coefficient < 1) {
+        throw new IllegalArgumentException(
+            "RPC retry backoff coefficient must be finite and at least 1");
+      }
+      resolved.setBackoffCoefficient(coefficient);
+    }
+    if (overrides.getMaximumAttempts() != 0) {
+      resolved.setMaximumAttempts(overrides.getMaximumAttempts());
+    }
+    if (overrides.getExpiration() != null) {
+      Duration expiration = overrides.getExpiration();
+      if (operationTimeout != null && expiration.compareTo(operationTimeout) > 0) {
+        expiration = operationTimeout;
+      }
+      resolved.setExpiration(expiration);
+    }
+    if (overrides.getDoNotRetry() != null) {
+      @SuppressWarnings("unchecked")
+      Class<? extends Throwable>[] doNotRetry = overrides.getDoNotRetry().toArray(new Class[0]);
+      resolved.setDoNotRetry(doNotRetry);
+    }
+
+    RetryOptions result = resolved.build();
+    result.validate();
+    return result;
+  }
+
   public static <T extends Throwable> void retry(RetryOptions options, RetryableProc<T> r)
       throws T {
     retryWithResult(
