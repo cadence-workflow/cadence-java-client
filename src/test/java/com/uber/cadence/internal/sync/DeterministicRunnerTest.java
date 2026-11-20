@@ -19,11 +19,14 @@ package com.uber.cadence.internal.sync;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertSame;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.*;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.uber.cadence.PollForDecisionTaskResponse;
 import com.uber.cadence.WorkflowQuery;
 import com.uber.cadence.WorkflowType;
@@ -35,6 +38,7 @@ import com.uber.cadence.internal.metrics.NoopScope;
 import com.uber.cadence.internal.replay.Decider;
 import com.uber.cadence.internal.replay.DeciderCache;
 import com.uber.cadence.internal.replay.DecisionContext;
+import com.uber.cadence.internal.replay.VersionMismatchError;
 import com.uber.cadence.testUtils.HistoryUtils;
 import com.uber.cadence.workflow.Async;
 import com.uber.cadence.workflow.CancellationScope;
@@ -63,6 +67,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 public class DeterministicRunnerTest {
 
@@ -233,6 +238,53 @@ public class DeterministicRunnerTest {
     } catch (Exception ignored) {
     }
     assertTrue(d.isDone());
+  }
+
+  @Test
+  public void testErrorInChildThreadIsLogged() throws Throwable {
+    // Control for the test below: an ordinary Error in a child thread is logged by the thread.
+    List<ILoggingEvent> logs = runChildThreadThatThrows(new Error("simulated"));
+    assertTrue(
+        logs.stream().anyMatch(e -> e.getFormattedMessage().contains("run failed with Error")));
+  }
+
+  @Test
+  public void testVersionMismatchInChildThreadIsNotLoggedByThread() throws Throwable {
+    // The decision task handler reports version mismatches, so the thread does not log them.
+    List<ILoggingEvent> logs =
+        runChildThreadThatThrows(
+            new VersionMismatchError(VersionMismatchError.Type.TOO_NEW, "change1", 2, 0, 1));
+    assertFalse(
+        logs.stream().anyMatch(e -> e.getFormattedMessage().contains("run failed with Error")));
+  }
+
+  private List<ILoggingEvent> runChildThreadThatThrows(Error error) throws Throwable {
+    ListAppender<ILoggingEvent> appender = new ListAppender<>();
+    appender.start();
+    ch.qos.logback.classic.Logger threadLogger =
+        (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(WorkflowThreadImpl.class);
+    threadLogger.addAppender(appender);
+    DeterministicRunner d =
+        new DeterministicRunnerImpl(
+            () -> {
+              Promise<Void> child =
+                  Async.procedure(
+                      () -> {
+                        throw error;
+                      });
+              child.get();
+            });
+    Error thrown = null;
+    try {
+      d.runUntilAllBlocked();
+    } catch (Error e) {
+      thrown = e;
+    } finally {
+      threadLogger.detachAppender(appender);
+      d.close();
+    }
+    assertSame(error, thrown);
+    return new ArrayList<>(appender.list);
   }
 
   @Test

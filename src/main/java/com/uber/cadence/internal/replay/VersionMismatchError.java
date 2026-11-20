@@ -57,7 +57,7 @@ public final class VersionMismatchError extends Error {
   private final int minSupported;
   private final int maxSupported;
 
-  VersionMismatchError(
+  public VersionMismatchError(
       Type type, String changeId, int version, int minSupported, int maxSupported) {
     // Same message as before this type existed, so existing log searches keep working.
     super(

@@ -150,6 +150,48 @@ public class ReplayDeciderTaskHandlerTests {
     assertVersionMismatchReported(FailWorkflow, VersionMismatchError.Type.TOO_NEW);
   }
 
+  @Test
+  public void otherErrorsAreStillReportedAsDecisionExecutionFailures() throws Throwable {
+    // Arrange
+    StatsReporter reporter = mock(StatsReporter.class);
+    Scope scope =
+        new RootScopeBuilder()
+            .reporter(reporter)
+            .reportEvery(com.uber.m3.util.Duration.ofMillis(10));
+    ReplayWorkflow mockWorkflow = mock(ReplayWorkflow.class);
+    ReplayWorkflowFactory mockFactory = mock(ReplayWorkflowFactory.class);
+    when(mockFactory.getWorkflow(any())).thenReturn(mockWorkflow);
+    when(mockWorkflow.getWorkflowImplementationOptions())
+        .thenReturn(
+            new WorkflowImplementationOptions.Builder()
+                .setNonDeterministicWorkflowPolicy(BlockWorkflow)
+                .build());
+    when(mockWorkflow.eventLoop()).thenThrow(new Error("simulated"));
+
+    DecisionTaskHandler taskHandler =
+        new ReplayDecisionTaskHandler(
+            "domain",
+            mockFactory,
+            new DeciderCache(10, NoopScope.getInstance()),
+            SingleWorkerOptions.newBuilder().setMetricsScope(scope).build(),
+            null,
+            Duration.ofSeconds(5),
+            new TestWorkflowService(),
+            null);
+
+    // Act
+    DecisionTaskHandler.Result result =
+        taskHandler.handleDecisionTask(HistoryUtils.generateDecisionTaskWithInitialHistory());
+
+    // Assert
+    assertNotNull(result.getTaskFailed());
+    Thread.sleep(200);
+    verify(reporter, times(1))
+        .reportCounter(eq(MetricsType.DECISION_EXECUTION_FAILED_COUNTER), any(), eq(1L));
+    verify(reporter, never())
+        .reportCounter(eq(MetricsType.DECISION_TASK_VERSION_MISMATCH_COUNTER), any(), anyLong());
+  }
+
   private void assertVersionMismatchReported(
       NonDeterministicWorkflowPolicy policy, VersionMismatchError.Type type) throws Throwable {
     // Arrange
