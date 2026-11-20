@@ -154,6 +154,43 @@ public class ClockDecisionContextVersionOptionsTest {
   }
 
   @Test
+  public void testVersionTooNewThrowsVersionMismatchError() {
+    // A newer worker recorded version 3.
+    context.getVersion("change1", converter, 1, 3, null);
+
+    // Code that only supports up to 2, as an old worker during a rolling deployment.
+    VersionMismatchError e =
+        assertThrows(
+            VersionMismatchError.class, () -> context.getVersion("change1", converter, 1, 2, null));
+    assertEquals(VersionMismatchError.Type.TOO_NEW, e.getType());
+    assertEquals("toonew", e.getType().getTagValue());
+    assertEquals("change1", e.getChangeId());
+    assertEquals(3, e.getVersion());
+    assertEquals(1, e.getMinSupported());
+    assertEquals(2, e.getMaxSupported());
+    assertEquals(
+        "Version 3 of changeID change1 is not supported. Supported version is between 1 and 2.",
+        e.getMessage());
+  }
+
+  @Test
+  public void testVersionTooOldThrowsVersionMismatchError() {
+    // Version 3 was recorded.
+    context.getVersion("change1", converter, 1, 3, null);
+
+    // Code that dropped support for versions below 4.
+    VersionMismatchError e =
+        assertThrows(
+            VersionMismatchError.class, () -> context.getVersion("change1", converter, 4, 5, null));
+    assertEquals(VersionMismatchError.Type.TOO_OLD, e.getType());
+    assertEquals("tooold", e.getType().getTagValue());
+    assertEquals(3, e.getVersion());
+    assertEquals(
+        "Version 3 of changeID change1 is not supported. Supported version is between 4 and 5.",
+        e.getMessage());
+  }
+
+  @Test
   public void testOutOfRangeCustomVersionIgnoredWhenCached() {
     // First call records version 3 (default, maxSupported)
     context.getVersion("change1", converter, 1, 3, null);
