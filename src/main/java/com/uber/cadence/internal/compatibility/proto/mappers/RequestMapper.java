@@ -105,6 +105,7 @@ import com.uber.cadence.api.v1.UpdateDomainRequest.Builder;
 import com.uber.cadence.api.v1.WorkflowQueryResult;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class RequestMapper {
 
@@ -180,7 +181,7 @@ public class RequestMapper {
         RequestCancelWorkflowExecutionRequest.newBuilder()
             .setDomain(t.getDomain() != null ? t.getDomain() : "")
             .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
-            .setRequestId(t.getRequestId());
+            .setRequestId(t.getRequestId() != null ? t.getRequestId() : "");
     if (t.getIdentity() != null) {
       builder.setIdentity(t.getIdentity());
     }
@@ -214,7 +215,9 @@ public class RequestMapper {
         .setWorkflowExecution(workflowExecution(t.getWorkflowExecution()))
         .setReason(t.getReason() != null ? t.getReason() : "")
         .setDecisionFinishEventId(t.getDecisionFinishEventId())
-        .setRequestId(t.getRequestId())
+        // The server dedups resets against the current run's create request ID without exempting
+        // empty values, so always send a non-empty ID rather than risk a reset becoming a no-op.
+        .setRequestId(t.getRequestId() != null ? t.getRequestId() : UUID.randomUUID().toString())
         .setSkipSignalReapply(t.isSkipSignalReapply())
         .build();
   }
