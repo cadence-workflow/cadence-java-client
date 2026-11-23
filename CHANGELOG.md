@@ -3,6 +3,7 @@
 ## Unreleased
 - Add GetVersionOptions to Workflow.getVersion() for controlled version selection (executeWithVersion, executeWithMinVersion)
 - Change the default `ClientOptions` port from 7933 (TChannel) to 7833 (gRPC), the transport the client uses
+- `Workflow.getVersion` mismatches are reported separately from decision failures. They are counted on the new `cadence-decision-task-version-mismatch` metric, tagged with `VersionMismatchType` (`toonew` or `tooold`), instead of `cadence-decision-execution-failed` and `cadence-decision-task-error`. A version that is too new, which is expected during a rolling deployment, is logged at Warn; a version that is too old is logged at Error. A version mismatch now always fails the decision task so it is retried, and no longer fails the workflow under `NonDeterministicWorkflowPolicy.FailWorkflow`. If you alert on the old metrics to catch version mismatches, update those alerts to use the new metric.
 
 ## 3.12.7
 - Release use versions from git tags instead of static value (#1002)
