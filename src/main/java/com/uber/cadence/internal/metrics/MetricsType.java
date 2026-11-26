@@ -71,6 +71,8 @@ public class MetricsType {
       CADENCE_METRICS_PREFIX + "decision-task-completed";
   public static final String DECISION_TASK_FORCE_COMPLETED =
       CADENCE_METRICS_PREFIX + "decision-task-force-completed";
+  public static final String DECISION_TASK_SHORT_HISTORY_COUNTER =
+      CADENCE_METRICS_PREFIX + "decision-task-short-history";
 
   public static final String ACTIVITY_POLL_COUNTER = CADENCE_METRICS_PREFIX + "activity-poll-total";
   public static final String ACTIVITY_POLL_FAILED_COUNTER =
