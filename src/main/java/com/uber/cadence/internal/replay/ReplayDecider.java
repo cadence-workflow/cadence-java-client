@@ -511,6 +511,27 @@ class ReplayDecider implements Decider {
     }
   }
 
+  // Fails the decision task if a stale history ended before the started event. Called once, when
+  // the history has no events or its last event is fetched, before the last decision is processed.
+  // Throws a RuntimeException, as an Error would be handled as nondeterminism. Query tasks have no
+  // started event and are skipped. Like the premature-end check in the Go client's
+  // verifyAllEventsProcessed.
+  private void verifyHistoryReachedStartedEvent(
+      PollForDecisionTaskResponse decisionTask, long lastEventId) {
+    if (decisionTask.getQuery() != null) {
+      return;
+    }
+    long startedEventId = decisionTask.getStartedEventId();
+    if (lastEventId < startedEventId) {
+      metricsScope.counter(MetricsType.DECISION_TASK_SHORT_HISTORY_COUNTER).inc(1);
+      throw new IllegalStateException(
+          String.format(
+              "Premature end of history: decision task startedEventId=%d, "
+                  + "but no more events after eventId=%d",
+              startedEventId, lastEventId));
+    }
+  }
+
   private boolean processEventLoop(
       long startTime, int decisionTimeoutSecs, DecisionEvents decision, boolean isQuery)
       throws Throwable {
@@ -647,6 +668,9 @@ class ReplayDecider implements Decider {
       History history = task.getHistory();
       current = history.getEventsIterator();
       nextPageToken = task.getNextPageToken();
+      if (!current.hasNext() && nextPageToken == null) {
+        verifyHistoryReachedStartedEvent(task, 0);
+      }
     }
 
     @Override
@@ -669,6 +693,14 @@ class ReplayDecider implements Decider {
 
         @Override
         public HistoryEvent next() {
+          HistoryEvent event = fetchNext();
+          if (!hasNext()) {
+            verifyHistoryReachedStartedEvent(task, event.getEventId());
+          }
+          return event;
+        }
+
+        private HistoryEvent fetchNext() {
           if (current.hasNext()) {
             return current.next();
           }
